@@ -18,6 +18,8 @@ import java.util.concurrent.CompletableFuture;
 import lombok.Getter;
 import net.forthecrown.commands.manager.Commands;
 import net.forthecrown.commands.manager.FtcCommand;
+import net.forthecrown.commands.manager.FtcCommand.Usage;
+import net.forthecrown.commands.manager.FtcCommand.UsageFactory;
 import net.forthecrown.core.FTC;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
@@ -233,6 +235,13 @@ public class FtcHelpMap {
    */
   public void update() {
     existingCommands.forEach((s, command) -> {
+      UsageFactory factory = arguments -> {
+        Usage usage = new Usage(arguments);
+        command.getUsages().add(usage);
+        return usage;
+      };
+      command.populateUsages(factory);
+
       add(new CommandHelpEntry(command));
     });
   }

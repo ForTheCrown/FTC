@@ -11,16 +11,11 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.guilds.GuildPermission;
 import net.forthecrown.guilds.GuildPermissionsBook;
-import net.forthecrown.utils.text.writer.TextWriter;
 
 class GuildPermNode extends GuildCommandNode {
 
   public GuildPermNode() {
     super("guildperm", "toggleperm");
-  }
-
-  @Override
-  protected void writeHelpInfo(TextWriter writer, CommandSource source) {
   }
 
   @Override

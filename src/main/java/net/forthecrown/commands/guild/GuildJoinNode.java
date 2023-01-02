@@ -4,7 +4,6 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.guilds.Guild;
 import net.forthecrown.user.User;
-import net.forthecrown.utils.text.writer.TextWriter;
 
 class GuildJoinNode extends GuildCommandNode {
 
@@ -13,8 +12,8 @@ class GuildJoinNode extends GuildCommandNode {
   }
 
   @Override
-  protected void writeHelpInfo(TextWriter writer, CommandSource source) {
-    writer.field("join <guild>", "Joins a guild");
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("join <guild>", "Joins a guild");
   }
 
   @Override

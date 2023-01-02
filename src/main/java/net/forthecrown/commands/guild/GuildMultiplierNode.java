@@ -17,7 +17,6 @@ import net.forthecrown.guilds.GuildConfig;
 import net.forthecrown.guilds.GuildManager;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.text.Text;
-import net.forthecrown.utils.text.writer.TextWriter;
 import net.forthecrown.utils.text.writer.TextWriters;
 
 public class GuildMultiplierNode extends GuildCommandNode {
@@ -42,21 +41,17 @@ public class GuildMultiplierNode extends GuildCommandNode {
   }
 
   @Override
-  protected void writeHelpInfo(TextWriter writer, CommandSource source) {
-    writer.field("multiplier list", "Lists all active multipliers");
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("list", "Lists all active multipliers");
+    factory.usage("clear", "Clears all active multipliers");
 
-    writer.field(
-        "multiplier add player=<player> value=<amount> length=<length>",
+    factory.usage(
+        "add player=<player> value=<number> length=<time>",
         "Adds an active multiplier with the given player as the source"
     );
 
-    writer.field(
-        "multiplier clear",
-        "Clears all active multipliers"
-    );
-
-    writer.field(
-        "multiplier remove <index>",
+    factory.usage(
+        "remove <index: number>",
         "Removes the multiplier at the given index"
     );
   }

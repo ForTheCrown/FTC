@@ -38,11 +38,11 @@ public class CommandDeleteHome extends FtcCommand {
 
   @Override
   public void populateUsages(UsageFactory factory) {
-    factory.create("")
+    factory.usage("")
         .addInfo("Deletes your default home.")
         .addInfo("Your default home is named 'home'");
 
-    factory.create("<home>")
+    factory.usage("<home>")
         .addInfo("Deletes the home");
   }
 

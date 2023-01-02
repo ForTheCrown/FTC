@@ -20,8 +20,10 @@ public class UserMapCommand extends FtcCommand {
 
   private final UUID2IntMap map;
   private final Long2ObjectFunction<Component> displayProvider;
+  private final String units;
 
   public UserMapCommand(String name,
+                        String units,
                         UUID2IntMap map,
                         Long2ObjectFunction<Component> displayProvider,
                         String... aliases
@@ -30,6 +32,7 @@ public class UserMapCommand extends FtcCommand {
 
     this.map = map;
     this.displayProvider = displayProvider;
+    this.units = units;
 
     setAliases(aliases);
     register();
@@ -48,6 +51,31 @@ public class UserMapCommand extends FtcCommand {
    *
    * Main Author:
    */
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("")
+        .addInfo("Shows you your " + units);
+
+    factory.usage("<player>")
+        .addInfo("Shows you <player>'s " + units);
+
+    factory.usage("<player> add <amount: number>")
+        .setCondition(source -> source.hasPermission(Permissions.ADMIN))
+        .addInfo("Adds <amount> of %s to <player>", units);
+
+    factory.usage("<player> set <amount: number>")
+        .setCondition(source -> source.hasPermission(Permissions.ADMIN))
+        .addInfo("Sets the %s of <player> to <amount>", units);
+
+    factory.usage("<player> remove <amount: number>")
+        .setCondition(source -> source.hasPermission(Permissions.ADMIN))
+        .addInfo("Removes <amount> from the %s of <player>", units);
+
+    factory.usage("<player> delete")
+        .setCondition(source -> source.hasPermission(Permissions.ADMIN))
+        .addInfo("Deletes the <player>'s %s data", units);
+  }
 
   @Override
   protected void createCommand(BrigadierCommand command) {
@@ -182,6 +210,7 @@ public class UserMapCommand extends FtcCommand {
 
     new UserMapCommand(
         "balance",
+        "Rhines",
         users.getBalances(),
         UnitFormat::rhines,
         "bal", "bank", "cash", "money", "ebal"
@@ -189,18 +218,21 @@ public class UserMapCommand extends FtcCommand {
 
     new UserMapCommand(
         "gems",
+        "Gems",
         users.getGems(),
         UnitFormat::gems
     );
 
     new UserMapCommand(
         "votes",
+        "Votes",
         users.getVotes(),
         UnitFormat::votes
     );
 
     new UserMapCommand(
         "playtime",
+        "Playtime-Hours",
         users.getPlayTime(),
         UnitFormat::playTime
     );

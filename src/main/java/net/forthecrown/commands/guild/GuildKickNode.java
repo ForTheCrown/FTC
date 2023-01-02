@@ -12,7 +12,6 @@ import net.forthecrown.guilds.Guild;
 import net.forthecrown.guilds.GuildMember;
 import net.forthecrown.guilds.GuildPermission;
 import net.forthecrown.user.User;
-import net.forthecrown.utils.text.writer.TextWriter;
 
 class GuildKickNode extends GuildCommandNode {
 
@@ -21,12 +20,12 @@ class GuildKickNode extends GuildCommandNode {
   }
 
   @Override
-  protected void writeHelpInfo(TextWriter writer, CommandSource source) {
-    writer.field("kick <user>", "Kicks a user out of your guild");
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("<user>", "Kicks a user out of your guild");
 
-    if (source.hasPermission(Permissions.GUILD_ADMIN)) {
-      writer.field("kick <user> <guild>", "Kicks a user out of a guild");
-    }
+    factory.usage("<user> <guild>")
+        .setPermission(Permissions.GUILD_ADMIN)
+        .addInfo("Kicks a user out of a guild");
   }
 
   @Override

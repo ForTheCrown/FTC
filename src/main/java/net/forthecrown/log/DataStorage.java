@@ -1,7 +1,6 @@
 package net.forthecrown.log;
 
 import com.google.gson.JsonElement;
-import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -30,8 +29,6 @@ public class DataStorage {
 
   /* ----------------------- FILE NAME FORMATTERS ------------------------- */
 
-  public static final boolean USE_BINARY_FORMAT = true;
-
   public static final DateTimeFormatter FILENAME_FORMATTER = new DateTimeFormatterBuilder()
       .appendValue(ChronoField.DAY_OF_MONTH, 2)
       .appendLiteral("_")
@@ -59,7 +56,6 @@ public class DataStorage {
       }
 
       YearMonth minYear = YearMonth.now();
-
       var stream = Files.newDirectoryStream(directory);
 
       for (var p : stream) {
@@ -69,9 +65,7 @@ public class DataStorage {
               YEAR_MONTH_FORMATTER
           );
 
-          if (month.getYear() < minYear.getYear()
-              && month.getMonthValue() < minYear.getMonthValue()
-          ) {
+          if (minYear.isAfter(month)) {
             minYear = month;
           }
         } catch (DateTimeParseException ignored) {
@@ -79,6 +73,7 @@ public class DataStorage {
       }
 
       stream.close();
+      LOGGER.debug("Min log date={}", minYear);
       return LocalDate.of(minYear.getYear(), minYear.getMonth(), 1);
     } catch (IOException exc) {
       LOGGER.error(exc);
@@ -94,14 +89,6 @@ public class DataStorage {
   public Path getLogFile(ChronoLocalDate date) {
     var directory = getDirectory(date);
 
-    Path textPath = directory.resolve(
-        FILENAME_FORMATTER.format(date) + ".json"
-    );
-
-    if (Files.exists(textPath) || !USE_BINARY_FORMAT) {
-      return textPath;
-    }
-
     return directory.resolve(
         FILENAME_FORMATTER.format(date) + ".ftc_log"
     );
@@ -114,26 +101,18 @@ public class DataStorage {
       return;
     }
 
-    if (path.toString().endsWith(".json")) {
-      SerializationHelper.readJsonFile(path, wrapper -> {
-        container.deserialize(
-            new Dynamic<>(JsonOps.INSTANCE, wrapper.getSource())
-        );
-      });
-    } else {
-      try {
-        InputStream stream = Files.newInputStream(path);
-        DataInputStream input = new DataInputStream(stream);
+    try {
+      InputStream stream = Files.newInputStream(path);
+      DataInputStream input = new DataInputStream(stream);
 
-        LogFile.readLog(input, container);
+      LogFile.readLog(input, container);
 
-        input.close();
-        stream.close();
-      } catch (IOException exc) {
-        LOGGER.error("Couldn't read binary JSON file {}",
-            path, exc
-        );
-      }
+      input.close();
+      stream.close();
+    } catch (IOException exc) {
+      LOGGER.error("Couldn't read binary JSON file {}",
+          path, exc
+      );
     }
   }
 
@@ -147,17 +126,13 @@ public class DataStorage {
 
     var path = getLogFile(date);
 
-    if (path.toString().endsWith(".json")) {
-      SerializationHelper.writeJson(getLogFile(date), result.get());
-    } else {
-      try {
-        SerializationHelper.ensureParentExists(path);
-        saveBinaryLogs(path, container);
-      } catch (IOException exc) {
-        LOGGER.error("Couldn't write binary log file {}",
-            path, exc
-        );
-      }
+    try {
+      SerializationHelper.ensureParentExists(path);
+      saveBinaryLogs(path, container);
+    } catch (IOException exc) {
+      LOGGER.error("Couldn't write binary log file {}",
+          path, exc
+      );
     }
   }
 
@@ -174,18 +149,6 @@ public class DataStorage {
     var path = getLogFile(date);
 
     var holder = builder.getQuery().getSchema();
-
-    if (path.toString().endsWith(".json")) {
-      var container = new LogContainer();
-      loadLogs(date, container);
-
-      var log = container.getLog(holder);
-
-      if (log != null) {
-        log.performQuery(builder);
-      }
-      return;
-    }
 
     try {
       InputStream stream = Files.newInputStream(path);

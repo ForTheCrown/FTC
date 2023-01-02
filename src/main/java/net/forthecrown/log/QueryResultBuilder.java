@@ -1,6 +1,5 @@
 package net.forthecrown.log;
 
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -9,8 +8,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-class QueryResultBuilder
-    implements Consumer<LogEntry>, Predicate<LogEntry> {
+class QueryResultBuilder implements Consumer<LogEntry>, Predicate<LogEntry> {
 
   private final LinkedList<LogEntry> result = new LinkedList<>();
 
@@ -36,6 +34,6 @@ class QueryResultBuilder
   }
 
   public List<LogEntry> build() {
-    return new ObjectArrayList<>(result);
+    return result;
   }
 }

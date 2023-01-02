@@ -16,8 +16,13 @@ public class CommandTell extends FtcCommand {
   public CommandTell() {
     super("ftell");
 
-    setAliases("emsg", "tell", "whisper", "w", "msg", "etell", "ewhisper", "pm", "dm", "t",
-        "message");
+    setAliases(
+        "emsg", "tell", "whisper",
+        "w", "msg", "etell",
+        "ewhisper", "pm", "dm",
+        "t", "message"
+    );
+
     setPermission(Permissions.MESSAGE);
     setDescription("Sends a message to a player");
 
@@ -27,6 +32,13 @@ public class CommandTell extends FtcCommand {
   @Override
   public String getHelpListName() {
     return "tell";
+  }
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("<player> <message>")
+        .addInfo("Sends a <message> to <player>")
+        .addInfo("Donators can use color codes and emotes");
   }
 
   @Override

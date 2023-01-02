@@ -58,7 +58,8 @@ public interface Arguments {
   }
 
   static User getUser(CommandContext<CommandSource> c, String argument)
-      throws CommandSyntaxException {
+      throws CommandSyntaxException
+  {
     UserParseResult result = c.getArgument(argument, UserParseResult.class);
     return result.get(c.getSource(), true);
   }

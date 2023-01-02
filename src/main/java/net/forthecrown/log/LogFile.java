@@ -230,7 +230,6 @@ public class LogFile {
   }
 
   static class HeaderElement {
-
     String section;
     long offset;
     short version;

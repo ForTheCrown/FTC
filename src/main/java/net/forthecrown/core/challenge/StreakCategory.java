@@ -2,14 +2,10 @@ package net.forthecrown.core.challenge;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.chrono.ChronoLocalDate;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalAdjusters;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.Range;
+import net.forthecrown.log.DateRange;
 
 /**
  * A category for streaks, each challenge selects its own category.
@@ -18,7 +14,7 @@ import org.apache.commons.lang3.Range;
  * in an allowed time frame.
  */
 @RequiredArgsConstructor
-public enum StreakCategory implements TemporalAdjuster {
+public enum StreakCategory {
   /**
    * Challenges which reset daily
    */
@@ -29,16 +25,16 @@ public enum StreakCategory implements TemporalAdjuster {
    */
   WEEKLY("Weekly") {
     @Override
-    public Range<ChronoLocalDate> searchRange(LocalDate date) {
+    public DateRange searchRange(LocalDate date) {
       var start = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
       var end = date.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
 
-      return Range.between(start, end);
+      return DateRange.between(start, end);
     }
 
     @Override
-    public Temporal adjustInto(Temporal temporal) {
-      return temporal.minus(7, ChronoUnit.DAYS);
+    public DateRange moveRange(DateRange dateRange) {
+      return dateRange.minus(7L);
     }
   },
 
@@ -50,19 +46,11 @@ public enum StreakCategory implements TemporalAdjuster {
   @Getter
   private final String displayName;
 
-  public Range<ChronoLocalDate> searchRange(LocalDate date) {
-    return Range.is(date);
+  public DateRange searchRange(LocalDate date) {
+    return DateRange.exact(date);
   }
 
-  public Range<ChronoLocalDate> moveRange(Range<ChronoLocalDate> dateRange) {
-    return Range.between(
-        dateRange.getMinimum().with(this),
-        dateRange.getMaximum().with(this)
-    );
-  }
-
-  @Override
-  public Temporal adjustInto(Temporal temporal) {
-    return temporal.minus(1L, ChronoUnit.DAYS);
+  public DateRange moveRange(DateRange dateRange) {
+    return dateRange.minus(1L);
   }
 }

@@ -11,7 +11,6 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.guilds.Guild;
 import net.forthecrown.guilds.GuildPermission;
 import net.forthecrown.user.User;
-import net.forthecrown.utils.text.writer.TextWriter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Sound;
 
@@ -22,11 +21,11 @@ public class GuildInviteNode extends GuildCommandNode {
   }
 
   @Override
-  protected void writeHelpInfo(TextWriter writer, CommandSource source) {
-    writer.field("invite <user>", "Invites a player to your guild");
-    writer.field("invite <user> cancel", "Cancels a sent invite");
-    writer.field("invite accept <guild>", "Accepts a guild join invite");
-    writer.field("invite deny <guild>", "Denies a guild join invite");
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("<user>", "Invites a player to your guild");
+    factory.usage("<user> cancel", "Cancels a sent invite");
+    factory.usage("accept <guild>", "Accepts a guild join invite");
+    factory.usage("deny <guild>", "Denies a guild join invite");
   }
 
   @Override

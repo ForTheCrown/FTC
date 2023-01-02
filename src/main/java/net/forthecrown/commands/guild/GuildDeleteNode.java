@@ -11,7 +11,6 @@ import net.forthecrown.guilds.Guild;
 import net.forthecrown.guilds.GuildMember;
 import net.forthecrown.guilds.Guilds;
 import net.forthecrown.user.User;
-import net.forthecrown.utils.text.writer.TextWriter;
 
 class GuildDeleteNode extends GuildCommandNode {
 
@@ -21,12 +20,12 @@ class GuildDeleteNode extends GuildCommandNode {
   }
 
   @Override
-  protected void writeHelpInfo(TextWriter writer, CommandSource source) {
-    writer.field("delete", "Deletes your guild");
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("", "Deletes your guild");
 
-    if (source.hasPermission(Permissions.GUILD_ADMIN)) {
-      writer.field("delete <guild>", "Deletes a guild");
-    }
+    factory.usage("<guild>")
+        .setPermission(Permissions.GUILD_ADMIN)
+        .addInfo("Deletes a guild");
   }
 
   @Override

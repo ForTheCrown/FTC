@@ -13,7 +13,6 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.guilds.GuildPermission;
 import net.forthecrown.guilds.GuildRank;
-import net.forthecrown.utils.text.writer.TextWriter;
 
 class GuildChangeRankNode extends GuildCommandNode {
 
@@ -25,15 +24,13 @@ class GuildChangeRankNode extends GuildCommandNode {
   }
 
   @Override
-  protected void writeHelpInfo(TextWriter writer, CommandSource source) {
-    writer.field((getArgumentName()[0]) + " <user>", "Demotes a user");
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("<user>")
+        .addInfo((promotes ? "Promotes" : "Demotes") + " a user");
 
-    if (source.hasPermission(Permissions.GUILD_ADMIN)) {
-      writer.field(
-          (getArgumentName()[0]) + " <user> <guild>",
-          "Demotes a user in the given guild"
-      );
-    }
+    factory.usage("<user> <guild>")
+        .setPermission(Permissions.GUILD_ADMIN)
+        .addInfo((promotes ? "Promotes" : "Demotes") + " a user in a guild");
   }
 
   @Override

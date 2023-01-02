@@ -40,8 +40,8 @@ public class ChunkedMap<T extends BoundsHolder> {
   /**
    * Constant returned by {@link #findNearest(Vector3d)} when no near object was found
    */
-  public static final ObjectDoublePair
-      NO_NEAREST = ObjectDoublePair.of(null, -1.0D);
+  public static final ObjectDoublePair NO_NEAREST
+      = ObjectDoublePair.of(null, -1.0D);
 
   /* -------------------------- INSTANCE FIELDS --------------------------- */
 

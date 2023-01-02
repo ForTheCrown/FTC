@@ -35,10 +35,10 @@ public class CommandSetHome extends FtcCommand {
 
   @Override
   public void populateUsages(UsageFactory factory) {
-    factory.create("")
+    factory.usage("")
         .addInfo("Sets your default home, named 'home'");
 
-    factory.create("<home name>")
+    factory.usage("<home name>")
         .addInfo("Sets a home to where you're standing");
   }
 

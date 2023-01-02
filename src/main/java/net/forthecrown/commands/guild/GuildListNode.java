@@ -67,8 +67,8 @@ class GuildListNode extends GuildCommandNode {
   }
 
   @Override
-  protected void writeHelpInfo(TextWriter writer, CommandSource source) {
-    writer.field("list", "Lists all guilds");
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("", "Lists all guilds");
   }
 
   @Override

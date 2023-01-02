@@ -5,7 +5,6 @@ import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.Messages;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.guilds.Guilds;
-import net.forthecrown.utils.text.writer.TextWriter;
 
 class GuildLeaveNode extends GuildCommandNode {
 
@@ -14,8 +13,8 @@ class GuildLeaveNode extends GuildCommandNode {
   }
 
   @Override
-  protected void writeHelpInfo(TextWriter writer, CommandSource source) {
-    writer.field("leave", "Leaves the current guild you're in");
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("", "Leaves the current guild you're in");
   }
 
   @Override

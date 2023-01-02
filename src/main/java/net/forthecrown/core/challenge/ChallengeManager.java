@@ -6,7 +6,6 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Collection;
 import java.util.Collections;
@@ -26,13 +25,13 @@ import net.forthecrown.core.registry.Holder;
 import net.forthecrown.core.registry.Registries;
 import net.forthecrown.core.registry.Registry;
 import net.forthecrown.economy.Economy;
+import net.forthecrown.log.DateRange;
 import net.forthecrown.log.LogManager;
 import net.forthecrown.log.LogQuery;
 import net.forthecrown.utils.Time;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.inventory.menu.Menu;
 import net.forthecrown.utils.io.PathUtil;
-import org.apache.commons.lang3.Range;
 import org.apache.logging.log4j.Logger;
 
 public class ChallengeManager {
@@ -275,9 +274,9 @@ public class ChallengeManager {
     loadActive();
   }
 
-  private static Range<ChronoLocalDate> getQueryRange() {
+  private static DateRange getQueryRange() {
     var now = LocalDate.now();
-    return Range.between(
+    return DateRange.between(
         now.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)),
         now
     );

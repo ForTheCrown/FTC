@@ -53,6 +53,19 @@ public class GuildCommands {
     }
 
     @Override
+    public void populateUsages(UsageFactory factory) {
+      for (var n: NODES) {
+        for (var name: n.getArgumentName()) {
+          var prefixed = factory.withPrefix(name)
+              .withPermission(n.getPermission());
+
+          n.populateUsages(prefixed);
+          break;
+        }
+      }
+    }
+
+    @Override
     protected void createCommand(BrigadierCommand command) {
       for (var n : NODES) {
         // The help command shouldn't be created

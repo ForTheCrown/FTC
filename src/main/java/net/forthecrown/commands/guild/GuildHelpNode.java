@@ -19,8 +19,8 @@ class GuildHelpNode extends GuildCommandNode {
   }
 
   @Override
-  protected void writeHelpInfo(TextWriter writer, CommandSource source) {
-    writer.field("?", "Shows help information");
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("").addInfo("Shows help information");
   }
 
   @Override
@@ -37,7 +37,7 @@ class GuildHelpNode extends GuildCommandNode {
           writer.newLine();
         }
 
-        n.writeHelpInfo(writer, c.getSource());
+        n.writeUsages(writer, c.getSource(), false);
       }
 
       c.getSource().sendMessage(writer);

@@ -13,8 +13,6 @@ import net.forthecrown.core.Messages;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import org.apache.commons.lang3.ArrayUtils;
 
 @Getter
 @RequiredArgsConstructor
@@ -25,11 +23,11 @@ public class CommandHelpEntry implements HelpEntry {
   public void writeShort(TextWriter writer, CommandSource source) {
     Component c = text()
         .append(
-            text(command.getName(), writer.getFieldStyle()),
+            text("/" + command.getName(), writer.getFieldStyle()),
             writer.getFieldSeparator(),
             text(command.getDescription(), writer.getFieldValueStyle())
         )
-        .hoverEvent(command)
+        .hoverEvent(command.asHoverEvent(source))
         .build();
 
     writer.write(c);
@@ -43,27 +41,8 @@ public class CommandHelpEntry implements HelpEntry {
     writer.space();
     writer.write(Messages.PAGE_BORDER);
 
-    command.writeMetadata(writer);
-
-    var usages = command.getUsages();
-    usages.removeIf(usage -> !usage.getCondition().test(source));
-
-    if (!usages.isEmpty()) {
-      writer.newLine();
-      writer.newLine();
-      writer.field("Usages", "");
-
-      for (var n : usages) {
-        writer.line(n.argumentsWithPrefix("/" + command.getHelpListName()));
-
-        if (!ArrayUtils.isEmpty(n.getInfo())) {
-          writer.write(":");
-        }
-
-        Arrays.stream(n.getInfo())
-            .forEach(s -> writer.line("  " + s, NamedTextColor.GRAY));
-      }
-    }
+    command.writeMetadata(writer, source);
+    command.writeUsages(writer, source, true);
 
     writer.line(Messages.PAGE_BORDER);
     writer.write(Messages.PAGE_BORDER);

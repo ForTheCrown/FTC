@@ -7,7 +7,6 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.guilds.GuildManager;
 import net.forthecrown.guilds.Guilds;
 import net.forthecrown.utils.text.Text;
-import net.forthecrown.utils.text.writer.TextWriter;
 
 class GuildCreateNode extends GuildCommandNode {
 
@@ -17,8 +16,8 @@ class GuildCreateNode extends GuildCommandNode {
   }
 
   @Override
-  protected void writeHelpInfo(TextWriter writer, CommandSource source) {
-    writer.field("create", "Creates a new guild");
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("<name>", "Creates a new guild with the name");
   }
 
   @Override

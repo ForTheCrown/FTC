@@ -41,10 +41,10 @@ public class CommandHome extends FtcCommand {
 
   @Override
   public void populateUsages(UsageFactory factory) {
-    factory.create("")
+    factory.usage("")
         .addInfo("Teleports you to your home named 'home'");
 
-    factory.create("<home>")
+    factory.usage("<home>")
         .addInfo("Teleports you to the <home>");
   }
 

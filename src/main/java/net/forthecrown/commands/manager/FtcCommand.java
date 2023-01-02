@@ -2,14 +2,13 @@ package net.forthecrown.commands.manager;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
-import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -26,16 +25,13 @@ import net.forthecrown.utils.text.writer.TextWriter;
 import net.forthecrown.utils.text.writer.TextWriters;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.event.HoverEventSource;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import org.apache.commons.lang3.ArrayUtils;
+import org.bukkit.permissions.Permission;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class FtcCommand
-    extends AbstractCommand
-    implements HoverEventSource<Component>
-{
+public abstract class FtcCommand extends AbstractCommand {
   public static final String DEFAULT_DESCRIPTION = "An FTC command";
 
   @Getter
@@ -50,12 +46,6 @@ public abstract class FtcCommand
 
     setPermission(Permissions.registerCmd(name));
     setDescription(DEFAULT_DESCRIPTION);
-
-    populateUsages(arguments -> {
-      var us = new Usage(arguments);
-      usages.add(us);
-      return us;
-    });
 
     FtcHelpMap.getInstance()
         .addCommand(this);
@@ -82,21 +72,23 @@ public abstract class FtcCommand
   public void populateUsages(UsageFactory factory) {
   }
 
-  @Override
-  public @NotNull HoverEvent<Component> asHoverEvent(
-      @NotNull UnaryOperator<Component> op
-  ) {
+  public @NotNull HoverEvent<Component> asHoverEvent(CommandSource source) {
     TextWriter writer = TextWriters.newWriter();
     writer.setFieldStyle(Style.style(NamedTextColor.GRAY));
 
     writer.write("/" + getHelpListName());
-    writeMetadata(writer);
+    writeMetadata(writer, source);
 
-    return writer.asComponent().asHoverEvent(op);
+    return writer.asComponent()
+        .asHoverEvent();
   }
 
   /** Writes this command's aliases and description to the given writer */
-  public void writeMetadata(TextWriter writer) {
+  public void writeMetadata(TextWriter writer, CommandSource source) {
+    if (!test(source)) {
+      return;
+    }
+
     if (aliases != null) {
       writer.field("Aliases", Joiner.on(", ").join(aliases));
     }
@@ -110,17 +102,71 @@ public abstract class FtcCommand
     if (!usages.isEmpty()) {
       writer.field("Usages", usages.size());
     }
+
+    if (source.hasPermission(Permissions.ADMIN)) {
+      var perm = getPermission();
+      writer.field("Permission", perm == null ? "unset" : perm.getName());
+    }
+  }
+
+  public void writeUsages(TextWriter writer,
+                          CommandSource source,
+                          boolean includeTitle
+  ) {
+    if (!test(source)) {
+      return;
+    }
+
+    LinkedList<Usage> usages = (LinkedList<Usage>) getUsages().clone();
+    usages.removeIf(usage -> !usage.getCondition().test(source));
+
+    if (!usages.isEmpty()) {
+      if (includeTitle) {
+        writer.newLine();
+        writer.newLine();
+        writer.field("Usages", "");
+      }
+
+      for (var n : usages) {
+        writer.line(n.argumentsWithPrefix("/" + getHelpListName()));
+
+        if (!ArrayUtils.isEmpty(n.getInfo())) {
+          writer.write(":");
+        }
+
+        Arrays.stream(n.getInfo())
+            .forEach(s -> writer.line("  " + s, NamedTextColor.GRAY));
+      }
+    }
   }
 
   /** A function which generates Usage instances */
   @FunctionalInterface
   public interface UsageFactory {
-    Usage create(String arguments);
+    Usage usage(String arguments);
+
+    default Usage usage(String argument, String... usages) {
+      var usage = usage(argument);
+
+      for (var s: usages) {
+        usage.addInfo(s);
+      }
+
+      return usage;
+    }
 
     default UsageFactory withPrefix(String prefix) {
-      return arguments -> create(
+      return arguments -> usage(
           prefix + (Strings.isNullOrEmpty(arguments) ? "" : " " + arguments)
       );
+    }
+
+    default UsageFactory withCondition(Predicate<CommandSource> predicate) {
+      return arguments -> usage(arguments).setCondition(predicate);
+    }
+
+    default UsageFactory withPermission(Permission permission) {
+      return arguments -> usage(arguments).setPermission(permission);
     }
   }
 
@@ -147,11 +193,14 @@ public abstract class FtcCommand
      */
     @Setter
     @Accessors(chain = true)
-    private Predicate<CommandSource> condition
-        = ArgumentBuilder.defaultRequirement();
+    private Predicate<CommandSource> condition = source -> true;
 
-    public Usage addInfo(String info) {
-      this.info = ArrayUtils.add(this.info, info);
+    public Usage setPermission(Permission permission) {
+      return setCondition(source -> source.hasPermission(permission));
+    }
+
+    public Usage addInfo(String info, Object... args) {
+      this.info = ArrayUtils.add(this.info, info.formatted(args));
       return this;
     }
 
