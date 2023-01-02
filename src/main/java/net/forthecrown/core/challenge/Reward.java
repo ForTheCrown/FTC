@@ -1,13 +1,10 @@
 package net.forthecrown.core.challenge;
 
 
-import com.google.common.base.Strings;
 import com.google.gson.JsonElement;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
-import net.forthecrown.core.FTC;
-import net.forthecrown.core.script2.Script;
 import net.forthecrown.guilds.GuildManager;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.Util;
@@ -40,7 +37,7 @@ public class Reward {
       StreakBasedValue.EMPTY,
       StreakBasedValue.EMPTY,
       StreakBasedValue.EMPTY,
-      null, null
+      null
   );
 
   /* -------------------------- INSTANCE FIELDS --------------------------- */
@@ -65,11 +62,6 @@ public class Reward {
    */
   private final ItemStack item;
 
-  /**
-   * Script ran when claiming item
-   */
-  private final String claimScript;
-
   /* ------------------------------ METHODS ------------------------------- */
 
   /**
@@ -90,8 +82,7 @@ public class Reward {
     return rhines == StreakBasedValue.EMPTY
         && gems == StreakBasedValue.EMPTY
         && guildExp == StreakBasedValue.EMPTY
-        && ItemStacks.isEmpty(item)
-        && Strings.isNullOrEmpty(claimScript);
+        && ItemStacks.isEmpty(item);
   }
 
   /**
@@ -109,8 +100,7 @@ public class Reward {
     return rhines < 1
         && gems < 1
         && guildExp < 1
-        && ItemStacks.isEmpty(item)
-        && Strings.isNullOrEmpty(claimScript);
+        && ItemStacks.isEmpty(item);
   }
 
   /**
@@ -175,10 +165,6 @@ public class Reward {
     }
 
     user.sendMessage(joiner);
-
-    if (!Strings.isNullOrEmpty(claimScript)) {
-      Script.run(claimScript, "onRewardClaim", user, streak);
-    }
   }
 
   /**
@@ -224,12 +210,6 @@ public class Reward {
     if (ItemStacks.notEmpty(item)) {
       writer.field("Item", Text.itemAndAmount(item));
     }
-
-    if (FTC.inDebugMode()
-        && !Strings.isNullOrEmpty(claimScript)
-    ) {
-      writer.field("Script", claimScript);
-    }
   }
 
   /* --------------------------- SERIALIZATION ---------------------------- */
@@ -243,7 +223,6 @@ public class Reward {
         .guildExp(StreakBasedValue.read(json.get(KEY_GUILDEXP)))
 
         .item(json.getItem(KEY_ITEM))
-        .claimScript(json.getString(KEY_SCRIPT))
 
         .build();
   }

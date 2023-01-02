@@ -83,7 +83,7 @@ class ExtendedItemFix {
       CompoundTag newGoals = new CompoundTag();
 
       for (var e : oldTag.getCompound(OLD_TAG_GOALS).tags.entrySet()) {
-        String key = e.getKey();
+        String key = e.getKey().replaceAll("ftccore:", "forthecrown:");
         int value = ((IntTag) e.getValue()).getAsInt();
 
         if (key.contains("r9")) {

@@ -8,7 +8,6 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.core.challenge.ChallengeManager;
 import net.forthecrown.core.config.ConfigManager;
-import net.forthecrown.core.holidays.ServerHolidays;
 import net.forthecrown.core.module.ModuleServices;
 import net.forthecrown.core.resource.ResourceWorldTracker;
 import net.forthecrown.core.script2.ScriptManager;
@@ -179,11 +178,6 @@ public class SaveReloadCommands extends FtcCommand {
     ANNOUNCER(
         Announcer.get()::save,
         Announcer.get()::reload
-    ),
-
-    HOLIDAYS(
-        ServerHolidays.get()::save,
-        ServerHolidays.get()::reload
     ),
 
     STRUCTURES(

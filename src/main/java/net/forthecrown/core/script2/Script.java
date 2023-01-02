@@ -2,7 +2,6 @@ package net.forthecrown.core.script2;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Objects;
@@ -15,8 +14,7 @@ import javax.script.ScriptContext;
 import javax.script.ScriptException;
 import lombok.Getter;
 import net.forthecrown.core.FTC;
-import net.forthecrown.utils.Util;
-import net.forthecrown.utils.io.PathUtil;
+import net.forthecrown.core.script2.ScriptSource.FileSource;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import org.openjdk.nashorn.api.scripting.JSObject;
@@ -32,14 +30,10 @@ public class Script implements Closeable, JSObject {
   private static final Logger LOGGER = FTC.getLogger();
 
   /**
-   * The file the script is loaded from
+   * The source where the script originates, could be raw JS code,
+   * or a file's path
    */
-  private final Path file;
-
-  /**
-   * name of the script
-   */
-  private final String name;
+  private final ScriptSource source;
 
   /**
    * Script's event handler
@@ -64,34 +58,8 @@ public class Script implements Closeable, JSObject {
 
   /* ---------------------------- CONSTRUCTORS ---------------------------- */
 
-  private Script(Path file) {
-    this.file = file;
-    this.name = deriveName(file);
-
-    if (!Files.isRegularFile(file)) {
-      throw Util.newException(
-          "Script file '%s' is not a file!",
-          file
-      );
-    }
-  }
-
-  /**
-   * Derives the script's name from the given path.
-   * <p>
-   * If the script is in the script directory, then it's relative path inside the script directory
-   * is returned, otherwise, the script's entire path is returned in string form
-   */
-  private static String deriveName(Path path) {
-    var str = path.toString();
-    var scriptDirectory = ScriptManager.getInstance()
-        .getDirectory();
-
-    if (str.contains(scriptDirectory.toString())) {
-      return scriptDirectory.relativize(path).toString();
-    }
-
-    return path.toString();
+  private Script(ScriptSource source) {
+    this.source = Objects.requireNonNull(source);
   }
 
   /* ------------------------ STATIC CONSTRUCTORS ------------------------- */
@@ -118,7 +86,11 @@ public class Script implements Closeable, JSObject {
    * @return The created script
    */
   public static Script of(Path path) {
-    return new Script(path);
+    return new Script(ScriptSource.of(path));
+  }
+
+  public static Script ofCode(String code) {
+    return new Script(ScriptSource.of(code));
   }
 
   /**
@@ -353,11 +325,11 @@ public class Script implements Closeable, JSObject {
     }
 
     try {
-      var reader = Files.newBufferedReader(file);
+      var reader = source.produceReader();
       var engine = ScriptManager.getInstance().createEngine();
 
       // Add default values
-      ScriptsBuiltIn.populate(name, engine);
+      ScriptsBuiltIn.populate(source.getName(), engine);
       engine.put("scheduler", tasks);
       engine.put("events", events);
       engine.put("_script", this);
@@ -487,26 +459,16 @@ public class Script implements Closeable, JSObject {
    * Gets the directory the script is inside
    */
   public Path getWorkingDirectory() {
-    return file.getParent();
+    if (source instanceof FileSource source) {
+      return source.getPath().getParent();
+    }
+
+    return ScriptManager.getInstance()
+        .getDirectory();
   }
 
-  /**
-   * Gets the script's data folder. The folder at the returned path may or may not exist.
-   * <p>
-   * A script's data folder is a folder with the same name as the script, with the file suffix
-   * removed.
-   *
-   * @return This script's data folder
-   */
-  public Path getDataDirectory() {
-    var path = getWorkingDirectory().resolve(
-        file.getFileName()
-            .toString()
-            .replaceAll(".js", "")
-    );
-
-    PathUtil.ensureDirectoryExists(path).orThrow();
-    return path;
+  public String getName() {
+    return getSource().getName();
   }
 
   /* -------------------------- OBJECT OVERRIDES -------------------------- */
@@ -519,17 +481,17 @@ public class Script implements Closeable, JSObject {
     if (!(o instanceof Script script)) {
       return false;
     }
-    return getFile().equals(script.getFile());
+    return Objects.equals(source, script.getSource());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(getFile(), getCompiledScript());
+    return Objects.hash(getSource());
   }
 
   @Override
   public String toString() {
-    return name;
+    return source.getName();
   }
 
   /* ------------------------- JSObject DELEGATES ------------------------- */

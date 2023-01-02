@@ -13,6 +13,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Objects;
+import java.util.function.Predicate;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.Permissions;
@@ -21,7 +22,7 @@ import net.forthecrown.guilds.Guild;
 import net.forthecrown.guilds.GuildManager;
 import net.forthecrown.guilds.GuildPermission;
 import net.forthecrown.guilds.Guilds;
-import net.forthecrown.guilds.unlockables.UnlockableDiscordRole;
+import net.forthecrown.guilds.unlockables.UnlockableTextChannel;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.utils.text.Text;
@@ -37,6 +38,27 @@ class GuildSetNode extends GuildCommandNode {
     setAliases("gset");
   }
 
+  private static final Predicate<CommandSource> CHANNEL_UNLOCKED = source -> {
+    if (!source.isPlayer()) {
+      return true;
+    }
+
+    var player = source.asPlayerOrNull();
+    var user = Users.getLoadedUser(player.getUniqueId());
+
+    if (user == null) {
+      return false;
+    }
+
+    var guild = user.getGuild();
+
+    if (guild == null) {
+      return false;
+    }
+
+    return UnlockableTextChannel.CHANNEL.isUnlocked(guild);
+  };
+
   @Override
   public void populateUsages(UsageFactory factory) {
     factory.usage("name <name>", "Sets your guild's name");
@@ -47,20 +69,7 @@ class GuildSetNode extends GuildCommandNode {
         .addInfo("at, or the closest one to you");
 
     factory.usage("discordAnnouncements")
-        .setCondition(source -> {
-          if (!source.isPlayer()) {
-            return true;
-          }
-
-          var player = source.asPlayerOrNull();
-          var guild = Users.get(player).getGuild();
-
-          if (guild == null) {
-            return false;
-          }
-
-          return UnlockableDiscordRole.ROLE.isUnlocked(guild);
-        })
+        .setCondition(CHANNEL_UNLOCKED)
         .addInfo("Sets whether guild announcements are")
         .addInfo("forwarded to the guild's discord channel");
 
@@ -101,10 +110,9 @@ class GuildSetNode extends GuildCommandNode {
         .then(donatorArg("roleColor", ROLE_COLOR))
         .then(donatorArg("guildChannel", GUILD_CHANNEL))
 
-        .then(createGuildCommand(
-            "discordAnnouncements",
-            this::discordAnnouncements
-        ))
+        .then(createGuildCommand("discordAnnouncements", this::discordAnnouncements)
+            .requires(CHANNEL_UNLOCKED)
+        )
 
         .then(literal("name")
             .then(nameArg)

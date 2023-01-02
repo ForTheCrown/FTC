@@ -11,7 +11,7 @@ import lombok.Data;
 import lombok.Getter;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.config.GeneralConfig;
-import net.forthecrown.core.holidays.RewardRange;
+import net.forthecrown.utils.RewardRange;
 import net.forthecrown.dungeons.boss.BossContext;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.Util;

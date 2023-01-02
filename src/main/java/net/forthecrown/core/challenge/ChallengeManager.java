@@ -70,8 +70,6 @@ public class ChallengeManager {
   // Called reflectively in BootStrap
   @OnEnable
   private static void init() {
-    instance.loadChallenges();
-
     ConfigManager.get()
         .registerConfig(ChallengeConfig.class);
   }
@@ -248,10 +246,13 @@ public class ChallengeManager {
     storage.loadChallenges(challengeRegistry);
     storage.loadItemChallenges(challengeRegistry);
 
-    itemChallengeMenu = Challenges.createItemMenu(
-        challengeRegistry,
-        Economy.get().getSellShop()
-    );
+    LOGGER.debug("creating challenge item menu");
+    var shop = Economy.get().getSellShop();
+    itemChallengeMenu = Challenges.createItemMenu(challengeRegistry, shop);
+
+    if (shop.getMainMenu() != null) {
+      shop.load();
+    }
   }
 
   @OnSave
@@ -261,7 +262,10 @@ public class ChallengeManager {
 
   @OnLoad
   public void load() {
+    LOGGER.debug("load() in {} called", getClass().getSimpleName());
+
     clear();
+    loadChallenges();
 
     storage.loadEntries(challengeRegistry)
         .resultOrPartial(LOGGER::error)

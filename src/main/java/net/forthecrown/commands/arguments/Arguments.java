@@ -17,13 +17,9 @@ public interface Arguments {
 
   ChatArgument CHAT = new ChatArgument();
 
-  HolidayArgument HOLIDAY = new HolidayArgument();
-
   HomeArgument HOME = new HomeArgument();
 
   MarketArgument MARKET = new MarketArgument();
-
-  RewardRangeArgument REWARD_RANGE = new RewardRangeArgument();
 
   TriggerArgument TRIGGER = new TriggerArgument();
 

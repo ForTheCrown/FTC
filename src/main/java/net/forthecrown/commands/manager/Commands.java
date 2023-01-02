@@ -40,7 +40,6 @@ import net.forthecrown.commands.admin.CommandGameMode;
 import net.forthecrown.commands.admin.CommandGetOffset;
 import net.forthecrown.commands.admin.CommandGetPos;
 import net.forthecrown.commands.admin.CommandGift;
-import net.forthecrown.commands.admin.CommandHolidays;
 import net.forthecrown.commands.admin.CommandHologram;
 import net.forthecrown.commands.admin.CommandIllegalWorlds;
 import net.forthecrown.commands.admin.CommandJoinInfo;
@@ -171,7 +170,6 @@ public final class Commands {
     new CommandSetSpawn();
     new CommandDungeons();
     new CommandPlayerTime();
-    new CommandHolidays();
     new CommandEndOpener();
     new CommandSpeed();
     new CommandSign();

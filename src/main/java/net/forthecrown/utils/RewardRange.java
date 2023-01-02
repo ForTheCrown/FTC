@@ -1,4 +1,4 @@
-package net.forthecrown.core.holidays;
+package net.forthecrown.utils;
 
 import java.util.Random;
 import lombok.Data;

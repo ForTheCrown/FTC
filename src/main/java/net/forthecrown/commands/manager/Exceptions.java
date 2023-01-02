@@ -14,7 +14,6 @@ import net.forthecrown.core.admin.PunishEntry;
 import net.forthecrown.core.admin.PunishType;
 import net.forthecrown.core.challenge.Challenge;
 import net.forthecrown.core.config.GeneralConfig;
-import net.forthecrown.core.holidays.Holiday;
 import net.forthecrown.economy.market.MarketDisplay;
 import net.forthecrown.economy.market.MarketShop;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
@@ -266,27 +265,6 @@ public interface Exceptions {
   // -------------------------------------
   // --- SECTION: ADMIN ARGUMENT TYPES ---
   // -------------------------------------
-
-  /**
-   * Exception which states the parsed reward range is invalid
-   * <p>
-   * Used by {@link net.forthecrown.commands.arguments.RewardRangeArgument} when parsing the reward
-   * range object.
-   */
-  CommandSyntaxException INVALID_REWARD_RANGE = create("Max or Min bounds cannot be below 100");
-
-  /**
-   * Creates an exception stating that no {@link Holiday} exists by the given name
-   * <p>
-   * Used by {@link net.forthecrown.commands.arguments.HolidayArgument}
-   *
-   * @param reader The reader to get the context from
-   * @param name   The holiday's name
-   * @return The created exception
-   */
-  static CommandSyntaxException unknownHoliday(ImmutableStringReader reader, String name) {
-    return unknown("holiday", reader, name);
-  }
 
   /**
    * Creates an exception stating that no {@link net.forthecrown.useables.UsableTrigger} by the
@@ -844,12 +822,6 @@ public interface Exceptions {
   static CommandSyntaxException invalidBounds(int min, int max) {
     return format("Invalid bounds! Min ({0}) was larger than Max ({1})",
         min, max
-    );
-  }
-
-  static CommandSyntaxException holidayNoItem(Holiday holiday) {
-    return format("{0} has no reward item to give",
-        holiday.name()
     );
   }
 

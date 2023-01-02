@@ -1,40 +1,22 @@
 package net.forthecrown.commands.docs;
 
 import com.google.common.base.Strings;
-import com.mojang.brigadier.arguments.ArgumentType;
-import com.mojang.brigadier.arguments.DoubleArgumentType;
-import com.mojang.brigadier.arguments.FloatArgumentType;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.arguments.LongArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringJoiner;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.commands.arguments.RegistryArguments;
-import net.forthecrown.commands.arguments.UserArgument;
-import net.forthecrown.commands.arguments.chat.ChatArgument;
 import net.forthecrown.commands.help.FtcHelpMap;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcCommand.Usage;
-import net.forthecrown.grenadier.types.ArrayArgument;
-import net.forthecrown.grenadier.types.EnumArgument;
-import net.forthecrown.grenadier.types.args.ArgsArgument;
-import net.forthecrown.grenadier.types.args.Argument;
-import net.forthecrown.grenadier.types.selectors.EntityArgument;
 import net.forthecrown.utils.ArrayIterator;
 import net.forthecrown.utils.io.SerializationHelper;
-import net.forthecrown.utils.text.Text;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.compare.ComparableUtils;
 
 @RequiredArgsConstructor
 public class CommandDocs {
@@ -86,130 +68,6 @@ public class CommandDocs {
         aPackage -> new ObjectArrayList<>()
     );
     list.add(document);
-  }
-
-  private String getTypeString(ArgumentType<?> type) {
-    if (type instanceof StringArgumentType arg) {
-      return switch (arg.getType()) {
-        case SINGLE_WORD -> "word";
-        case GREEDY_PHRASE -> "greedy string";
-        case QUOTABLE_PHRASE -> "string";
-      };
-    }
-
-    if (type instanceof IntegerArgumentType intArg) {
-      return numberArgument(
-          intArg.getMinimum(), intArg.getMaximum(),
-          Integer.MIN_VALUE, Integer.MAX_VALUE
-      );
-    }
-
-    if (type instanceof LongArgumentType longArg) {
-      return numberArgument(
-          longArg.getMinimum(), longArg.getMaximum(),
-          Long.MIN_VALUE, Long.MAX_VALUE
-      );
-    }
-
-    if (type instanceof FloatArgumentType floatArg) {
-      return numberArgument(
-          floatArg.getMinimum(), floatArg.getMaximum(),
-          Float.MIN_VALUE, Float.MAX_VALUE
-      );
-    }
-
-    if (type instanceof DoubleArgumentType doubleArg) {
-      return numberArgument(
-          doubleArg.getMinimum(), doubleArg.getMaximum(),
-          Double.MIN_VALUE, Double.MAX_VALUE
-      );
-    }
-
-    if (type instanceof UserArgument userArg) {
-      if (userArg.allowMultiple) {
-        return userArg.allowOffline ? "users" : "online users";
-      } else {
-        return userArg.allowOffline ? "user" : "online user";
-      }
-    }
-
-    if (type instanceof EntityArgument e) {
-      if (e.allowsEntities()) {
-        return e.allowsMultiple() ? "entities" : "entity";
-      } else {
-        return e.allowsMultiple() ? "online users" : "online user";
-      }
-    }
-
-    if (type instanceof RegistryArguments<?> reg) {
-      return reg.getUnknown().toLowerCase();
-    }
-
-    if (type instanceof ChatArgument) {
-      return "message";
-    }
-
-    if (type instanceof ArrayArgument<?> arr) {
-      return "array(" + getTypeString(arr.getType()) + ")";
-    }
-
-    if (type instanceof EnumArgument<?> enumArg) {
-      return enumArg.getEnumType()
-          .getSimpleName();
-    }
-
-    if (type instanceof ArgsArgument args) {
-      StringJoiner joiner = new StringJoiner(", ", "(", ")")
-          .setEmptyValue("");
-
-      Set<Argument<?>> alreadyPicked = new ObjectOpenHashSet<>();
-
-      for (var k: args.getKeys()) {
-        Argument argument = args.getArg(k);
-
-        if (!alreadyPicked.add(argument)) {
-          continue;
-        }
-
-        joiner.add(
-            argument.getName() + ": " + getTypeString(argument.getParser())
-        );
-      }
-
-      return "args" + joiner;
-    }
-
-    return type.getClass()
-        .getSimpleName()
-        .toLowerCase()
-        .replaceAll("type", "")
-        .replaceAll("ftc", "")
-        .replaceAll("impl", "")
-        .replaceAll("argument", "");
-  }
-
-  private <T extends Comparable<T>> String numberArgument(T min, T max,
-                                                          T possibleMin, T possibleMax
-  ) {
-    StringJoiner joiner = new StringJoiner("...", "(", ")")
-        .setEmptyValue("");
-
-    boolean minSet = ComparableUtils.gt(possibleMin).test(min);
-    boolean maxSet = ComparableUtils.lt(possibleMax).test(max);
-
-    if (minSet) {
-      joiner.add(Text.NUMBER_FORMAT.format(min));
-    } else if (maxSet) {
-      joiner.add("");
-    }
-
-    if (maxSet) {
-      joiner.add(Text.NUMBER_FORMAT.format(max));
-    } else if (minSet) {
-      joiner.add("");
-    }
-
-    return "number" + joiner;
   }
 
   @RequiredArgsConstructor

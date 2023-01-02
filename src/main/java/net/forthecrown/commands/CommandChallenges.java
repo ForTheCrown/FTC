@@ -23,6 +23,7 @@ import net.forthecrown.core.registry.Holder;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.EnumArgument;
+import net.forthecrown.useables.util.UsageUtil;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserLookupEntry;
 import net.forthecrown.user.UserManager;
@@ -35,6 +36,7 @@ import net.forthecrown.utils.text.writer.TextWriters;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
 
 public class CommandChallenges extends FtcCommand {
 
@@ -174,7 +176,50 @@ public class CommandChallenges extends FtcCommand {
                     )
                 )
 
-                .then(literal("fill")
+                .then(literal("add")
+                    .executes(c -> {
+                      var player = c.getSource().asPlayer();
+                      var item = Commands.getHeldItem(player);
+
+                      Holder<Challenge> holder
+                          = c.getArgument("challenge", Holder.class);
+
+                      return itemsAdd(c, item, holder);
+                    })
+
+                    .then(argument("item", UsageUtil.ITEM_ARGUMENT)
+                        .executes(c -> {
+                          var item = c.getArgument("item", ItemStack.class);
+                          Holder<Challenge> holder
+                              = c.getArgument("challenge", Holder.class);
+
+                          return itemsAdd(c, item, holder);
+                        })
+                    )
+                )
+
+                .then(literal("set_active")
+                    .executes(c -> {
+                      Holder<Challenge> holder
+                          = c.getArgument("challenge", Holder.class);
+
+                      var item = Commands.getHeldItem(c.getSource().asPlayer());
+                      return itemsSetActive(c, item, holder);
+                    })
+
+                    .then(argument("item", UsageUtil.ITEM_ARGUMENT)
+                        .executes(c -> {
+                          Holder<Challenge> holder
+                              = c.getArgument("challenge", Holder.class);
+
+                          var item = c.getArgument("item", ItemStack.class);
+
+                          return itemsSetActive(c, item, holder);
+                        })
+                    )
+                )
+
+                .then(literal("recursively_add_items_in_faced_chest")
                     .executes(this::itemsFill)
                 )
 
@@ -435,6 +480,62 @@ public class CommandChallenges extends FtcCommand {
 
     c.getSource().sendAdmin(
         Text.format("Cleared item container of {0}",
+            holder.getKey()
+        )
+    );
+    return 0;
+  }
+
+  private int itemsSetActive(CommandContext<CommandSource> c,
+                             ItemStack item,
+                             Holder<Challenge> holder
+  ) throws CommandSyntaxException {
+    ensureItemChallenge(holder);
+    ItemChallenge challenge = (ItemChallenge) holder.getValue();
+
+    challenge.setTargetItem(item);
+
+    var container = ChallengeManager.getInstance()
+        .getStorage()
+        .loadContainer(holder);
+
+    container.setActive(item);
+
+    ChallengeManager.getInstance()
+        .getStorage()
+        .saveContainer(container);
+
+    c.getSource().sendAdmin(
+        Text.format("Set active item of {0} to {1, item}",
+            holder.getKey(),
+            item
+        )
+    );
+    return 0;
+  }
+
+  private int itemsAdd(CommandContext<CommandSource> c,
+                       ItemStack item,
+                       Holder<Challenge> holder
+  ) throws CommandSyntaxException {
+    ensureItemChallenge(holder);
+
+    var challenge = (ItemChallenge) holder.getValue();
+    var storage = ChallengeManager.getInstance().getStorage();
+    var container = storage.loadContainer(holder);
+
+    container.getPotentials().add(item);
+
+    if (challenge.getTargetItem().isEmpty()) {
+      challenge.setTargetItem(item);
+      container.setActive(item);
+    }
+
+    storage.saveContainer(container);
+
+    c.getSource().sendAdmin(
+        Text.format("Added {0, item} to {1}",
+            item,
             holder.getKey()
         )
     );

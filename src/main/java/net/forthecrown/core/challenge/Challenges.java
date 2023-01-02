@@ -189,6 +189,10 @@ public final class Challenges {
         continue;
       }
 
+      FTC.getLogger().debug("Adding item challenge to shop menu: {}",
+          h.getKey()
+      );
+
       builder.add(
           item.getMenuSlot(),
           item.toInvOption()

@@ -4,7 +4,6 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.nio.file.Path;
-import javax.script.ScriptException;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -14,7 +13,6 @@ import net.forthecrown.core.script2.Script;
 import net.forthecrown.core.script2.ScriptLoadException;
 import net.forthecrown.core.script2.ScriptManager;
 import net.forthecrown.core.script2.ScriptResult;
-import net.forthecrown.core.script2.ScriptsBuiltIn;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.utils.io.PathUtil;
@@ -140,29 +138,9 @@ public class CommandScripts extends FtcCommand {
       throws CommandSyntaxException
   {
     String input = c.getArgument("input", String.class);
-    Object obj;
+    Script script = Script.ofCode(input);
 
-    try {
-      var engine = ScriptManager.getInstance()
-          .createEngine("command-script", "");
-
-      ScriptsBuiltIn.populate("command-script", engine);
-
-      obj = engine.eval(input);
-    } catch (ScriptException exc) {
-      throw Exceptions.format(
-          "Error running script: {0}",
-          exc.getMessage()
-      );
-    }
-
-    c.getSource().sendAdmin(
-        Text.format("Succesfully ran script! Result: {0}",
-            obj
-        )
-    );
-
-    return 0;
+    return runScript(c.getSource(), script, true, null);
   }
 
   private int run(CommandContext<CommandSource> c,
@@ -170,19 +148,27 @@ public class CommandScripts extends FtcCommand {
                   boolean closeAfter
   ) throws CommandSyntaxException {
     String scriptName = c.getArgument("script", String.class);
-    Script script;
+    Script script = Script.of(scriptName);
+
+    return runScript(c.getSource(), script, closeAfter, method);
+  }
+
+  private int runScript(CommandSource source,
+                        Script script,
+                        boolean closeAfter,
+                        String method
+  ) throws CommandSyntaxException {
+    var scriptName = script.getSource().getName();
     ScriptResult result;
 
     try {
-      script = Script.of(scriptName).compile();
-      result = script.eval();
+      result = script.compile().eval();
     } catch (ScriptLoadException exc) {
       exc.printStackTrace();
 
       throw Exceptions.format(
           "Couldn't evaluate script '{0}', reason: {1}",
-          exc.getScript().getName(),
-          exc.getCause()
+          script, exc.getCause()
       );
     }
 
@@ -191,7 +177,7 @@ public class CommandScripts extends FtcCommand {
 
       throw Exceptions.format(
           "Couldn't evaluate script '{0}', reason: {1}",
-          script.getName(),
+          scriptName,
           exc.getCause()
       );
     }
@@ -222,7 +208,7 @@ public class CommandScripts extends FtcCommand {
     }
 
     if (method != null) {
-      c.getSource().sendAdmin(
+      source.sendAdmin(
           Text.format("Successfully ran {0} in script {1}, result={2}",
               method,
               scriptName,
@@ -230,7 +216,7 @@ public class CommandScripts extends FtcCommand {
           )
       );
     } else {
-      c.getSource().sendAdmin(
+      source.sendAdmin(
           Text.format("Successfully ran script {0}, result={1}",
               scriptName,
               result.result().orElse(null)

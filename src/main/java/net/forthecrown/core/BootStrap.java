@@ -8,7 +8,6 @@ import net.forthecrown.core.challenge.ChallengeLogs;
 import net.forthecrown.core.challenge.ChallengeManager;
 import net.forthecrown.core.config.ConfigManager;
 import net.forthecrown.core.config.Configs;
-import net.forthecrown.core.holidays.ServerHolidays;
 import net.forthecrown.core.module.ModuleServices;
 import net.forthecrown.core.resource.ResourceWorld;
 import net.forthecrown.core.resource.ResourceWorldTracker;
@@ -94,7 +93,6 @@ final class BootStrap {
     init(Cosmetics.class);
     init(Usables::getInstance);
     init(ResourceWorldTracker::get);
-    init(ServerHolidays::get);
     init(Announcer::get);
     init(Economy::get);
     init(Configs.class);

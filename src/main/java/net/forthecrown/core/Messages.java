@@ -1366,7 +1366,7 @@ public interface Messages {
    * @return The formatted message
    */
   static Component edMarriageChat(MarriageMessage message, Mute mute) {
-    return format("{0} {1}{2, user} > {2}",
+    return format("{0} {1}{2, user} > {3}",
         MARRIAGE_PREFIX,
         mute.getPrefix(),
         message.getSender(),

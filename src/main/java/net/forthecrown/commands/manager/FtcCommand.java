@@ -207,5 +207,9 @@ public abstract class FtcCommand extends AbstractCommand {
     public String argumentsWithPrefix(String prefix) {
       return prefix + (Strings.isNullOrEmpty(arguments) ? "" : " " + arguments);
     }
+
+    public void write(String prefix, TextWriter writer) {
+
+    }
   }
 }
