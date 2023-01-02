@@ -21,6 +21,7 @@ import net.forthecrown.guilds.Guild;
 import net.forthecrown.guilds.GuildManager;
 import net.forthecrown.guilds.GuildPermission;
 import net.forthecrown.guilds.Guilds;
+import net.forthecrown.guilds.unlockables.UnlockableDiscordRole;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.utils.text.Text;
@@ -52,7 +53,13 @@ class GuildSetNode extends GuildCommandNode {
           }
 
           var player = source.asPlayerOrNull();
-          return Users.get(player).getGuild() != null;
+          var guild = Users.get(player).getGuild();
+
+          if (guild == null) {
+            return false;
+          }
+
+          return UnlockableDiscordRole.ROLE.isUnlocked(guild);
         })
         .addInfo("Sets whether guild announcements are")
         .addInfo("forwarded to the guild's discord channel");
