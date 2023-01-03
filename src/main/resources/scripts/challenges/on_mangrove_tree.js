@@ -5,8 +5,14 @@ function canComplete(user) {
 }
 
 function onEvent(event, handle) {
+    let player = event.getPlayer();
+    
+    if (player == null) {
+        return;
+    }
+    
     // StructureGrowEvent
     if (event.getSpecies() == TreeType.MANGROVE || event.getSpecies() == TreeType.TALL_MANGROVE) {
-        handle.givePoint(event.getPlayer());
+        handle.givePoint(player);
     }
 }
