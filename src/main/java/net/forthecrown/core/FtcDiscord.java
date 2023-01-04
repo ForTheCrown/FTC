@@ -24,7 +24,6 @@ public final class FtcDiscord {
       C_PUNISH = "Punishments",
       C_END = "End",
       C_RW = "RW",
-      C_SERVER = "Server",
       C_MARKETS = "Markets";
 
   public static boolean isActive() {

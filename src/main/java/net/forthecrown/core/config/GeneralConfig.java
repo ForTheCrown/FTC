@@ -49,6 +49,8 @@ public @UtilityClass class GeneralConfig {
       announcePunishments         = false,
       allowMaxPlayerRandomization = true,
 
+      discordAnnouncementsToServer= true,
+
       /**
        * Determines whether chunk loader runs in parallel or in series.
        * <p>
@@ -81,7 +83,8 @@ public @UtilityClass class GeneralConfig {
       autoAfkDelay                = TimeUnit.HOURS.toMillis(1),
       dataRetentionTime           = TimeUnit.DAYS.toMillis(7 * 2),
       shopUnloadDelay             = TimeUnit.MINUTES.toMillis(5),
-      validInviteTime             = TimeUnit.MINUTES.toMillis(10);
+      validInviteTime             = TimeUnit.MINUTES.toMillis(10),
+      updateChannelId             = 650112388879745024L;
 
   @Setter
   private Location
@@ -94,7 +97,9 @@ public @UtilityClass class GeneralConfig {
   /* ----------------------------- METHODS ------------------------------ */
 
   public Location getServerSpawn() {
-  // If current spawn null -> set spawn to default constant, else return current spawn
-  return (serverSpawn == null ? serverSpawn = DEFAULT_SPAWN.clone() : serverSpawn).clone();
+    // If current spawn null -> set spawn to default constant, else return current spawn
+    return (serverSpawn == null
+        ? serverSpawn = DEFAULT_SPAWN.clone()
+        : serverSpawn).clone();
   }
 }

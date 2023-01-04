@@ -170,8 +170,7 @@ public class SaveReloadCommands extends FtcCommand {
     ),
 
     SELL_SHOP(
-        () -> {
-        },
+        () -> {},
         Economy.get().getSellShop()::load
     ),
 

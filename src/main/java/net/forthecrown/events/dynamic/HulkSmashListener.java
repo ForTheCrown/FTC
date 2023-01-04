@@ -38,7 +38,7 @@ public class HulkSmashListener implements Listener {
   private BukkitTask tickTask;
 
   private void tick() {
-    if (--ticks < 1) {
+    if (--ticks < 1 || user.getPlayer().isOnGround()) {
       unregister();
       return;
     }

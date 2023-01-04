@@ -293,7 +293,7 @@ public class UserLookup extends SerializableObject.AbstractSerializer<JsonArray>
    * it that has played on the server before.
    */
   void clearInvalid() {
-    LOGGER.info("clearInvalid called");
+    LOGGER.debug("clearInvalid called");
     var iterator = identified.entrySet().iterator();
 
     while (iterator.hasNext()) {
@@ -304,6 +304,7 @@ public class UserLookup extends SerializableObject.AbstractSerializer<JsonArray>
         LOGGER.info("{} has not played before, removing entry", e.getKey());
 
         iterator.remove();
+        unsaved = true;
 
         if (cache.getName() != null) {
           named.remove(cache.getName());

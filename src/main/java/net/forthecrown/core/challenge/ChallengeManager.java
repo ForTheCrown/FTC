@@ -249,10 +249,6 @@ public class ChallengeManager {
     LOGGER.debug("creating challenge item menu");
     var shop = Economy.get().getSellShop();
     itemChallengeMenu = Challenges.createItemMenu(challengeRegistry, shop);
-
-    if (shop.getMainMenu() != null) {
-      shop.load();
-    }
   }
 
   @OnSave

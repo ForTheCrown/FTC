@@ -8,11 +8,13 @@ import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import it.unimi.dsi.fastutil.longs.LongSets;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
 import java.util.UUID;
+import javax.imageio.ImageIO;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.core.FTC;
@@ -50,6 +52,8 @@ public class GuildDataStorage {
 
   private final Path modifiers;
 
+  private final Path icons;
+
   /* ---------------------------- CONSTRUCTOR ----------------------------- */
 
   GuildDataStorage(Path directory) {
@@ -57,6 +61,27 @@ public class GuildDataStorage {
     this.archiveDirectory = directory.resolve("archive");
     this.chunkFile = directory.resolve("chunks.json");
     this.modifiers = directory.resolve("modifiers.json");
+    this.icons = directory.resolve("icons");
+
+    PathUtil.ensureDirectoryExists(icons)
+        .orThrow();
+  }
+
+  public Path getIcon(Guild guild) {
+    return icons.resolve(guild.getId() + ".png");
+  }
+
+  public void saveIcon(Guild guild, BufferedImage image) {
+    var path = getIcon(guild);
+    try {
+      Files.deleteIfExists(path);
+
+      try (var output = Files.newOutputStream(path)) {
+        ImageIO.write(image, "png", output);
+      }
+    } catch (IOException exc) {
+      LOGGER.error("Couldn't save {} icon file.", guild.getId(), exc);
+    }
   }
 
   /* ------------------------ GUILD SERIALIZATION ------------------------- */
@@ -84,6 +109,7 @@ public class GuildDataStorage {
         if (p.equals(getChunkFile())
             || p.equals(getArchiveDirectory())
             || p.equals(getModifiers())
+            || p.equals(getIcons())
             || p.toString().contains("config.json")
         ) {
           continue;

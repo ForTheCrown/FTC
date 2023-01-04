@@ -12,6 +12,7 @@ class GuildHelpNode extends GuildCommandNode {
 
   public GuildHelpNode() {
     super("guildhelp", "help", "?");
+    setAliases("ghelp");
   }
 
   @Override
@@ -27,7 +28,9 @@ class GuildHelpNode extends GuildCommandNode {
       writer.setFieldStyle(Style.style(NamedTextColor.GOLD));
       writer.setFieldValueStyle(Style.empty());
 
-      writeUsages(writer, c.getSource(), false);
+      for (var n: GuildCommands.NODES) {
+        n.writeUsages(writer, c.getSource(), false);
+      }
 
       c.getSource().sendMessage(writer);
       return 0;

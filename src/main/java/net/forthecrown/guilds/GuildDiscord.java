@@ -10,14 +10,20 @@ import github.scarsz.discordsrv.dependencies.jda.api.EmbedBuilder;
 import github.scarsz.discordsrv.dependencies.jda.api.JDA;
 import github.scarsz.discordsrv.dependencies.jda.api.Permission;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Category;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.Guild.BoostTier;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.Icon;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.Icon.IconType;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Member;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Role;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import github.scarsz.discordsrv.dependencies.jda.api.managers.ChannelManager;
 import github.scarsz.discordsrv.util.WebhookUtil;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.function.Consumer;
+import javax.imageio.ImageIO;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -197,7 +203,21 @@ public class GuildDiscord {
       return;
     }
 
-    getDiscordGuild()
+    Icon icon = null;
+    try {
+      icon = getIcon();
+    } catch (IOException exc) {
+      LOGGER.error("Couldn't get icon for {}", guild.getId(), exc);
+    }
+
+    var discordGuild = getDiscordGuild();
+    var boost = discordGuild.getBoostTier();
+
+    if (boost == BoostTier.NONE || boost == BoostTier.TIER_1) {
+      icon = null;
+    }
+
+    discordGuild
         .createRole()
         .setName("Guild: " +  guild.getName())
         .setColor(
@@ -207,9 +227,14 @@ public class GuildDiscord {
         )
         .setMentionable(true)
         .setHoisted(true)
+        .setIcon(icon)
         .submit()
         .whenComplete((role, throwable) -> {
           if (throwable != null) {
+            LOGGER.error("Error creating role for {}",
+                guild.getId(), throwable
+            );
+
             return;
           }
 
@@ -228,6 +253,21 @@ public class GuildDiscord {
                 .submit();
           });
         });
+  }
+
+  public Icon getIcon() throws IOException {
+    var manager = GuildManager.get();
+    var storage = manager.getStorage();
+
+    var image = manager.getRenderer()
+        .render(guild.getSettings().getBanner());
+
+    storage.saveIcon(guild, image);
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    ImageIO.write(image, "png", outputStream);
+
+    byte[] bytes = outputStream.toByteArray();
+    return Icon.from(bytes, IconType.PNG);
   }
 
   /* ----------------------------- CHANNELS ------------------------------- */

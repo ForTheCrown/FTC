@@ -302,12 +302,6 @@ public class RoyalSword extends ExtendedItem {
       setLastFlavorChange(SwordRanks.RANKS[lastFlavor]);
     }
 
-    if (!tag.contains(TAG_RANK)) {
-      return;
-    }
-
-    this.rank = SwordRanks.RANKS[tag.getInt(TAG_RANK)];
-
     if (tag.contains(TAG_ABILITY_TYPE)) {
       WeaponAbilities.REGISTRY.readTag(tag.get(TAG_ABILITY_TYPE))
           .ifPresentOrElse(type -> {
@@ -319,6 +313,12 @@ public class RoyalSword extends ExtendedItem {
             );
           });
     }
+
+    if (!tag.contains(TAG_RANK)) {
+      return;
+    }
+
+    this.rank = SwordRanks.RANKS[tag.getInt(TAG_RANK)];
 
     if (tag.contains(TAG_GOALS)) {
       for (var e : tag.getCompound(TAG_GOALS).tags.entrySet()) {

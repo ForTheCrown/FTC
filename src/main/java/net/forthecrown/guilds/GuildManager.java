@@ -16,6 +16,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import it.unimi.dsi.fastutil.objects.ObjectSets;
+import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -72,6 +73,9 @@ public class GuildManager {
   @Getter
   private final ExpModifiers expModifier = new ExpModifiers();
 
+  @Getter
+  private final BannerRenderer renderer;
+
   private GuildManager() {
     storage = new GuildDataStorage(PathUtil.getPluginDirectory("guilds"));
 
@@ -82,6 +86,12 @@ public class GuildManager {
           ? uuid + " doesn't belong to a guild!"
           : null;
     });
+
+    try {
+      this.renderer = new BannerRenderer();
+    } catch (IOException exc) {
+      throw new IllegalStateException(exc);
+    }
   }
 
   public static GuildManager get() {

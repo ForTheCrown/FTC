@@ -98,10 +98,9 @@ public final class Events {
     PacketListeners.register(new PlayerPacketListener());
     PacketListeners.register(new ChatPacketListener());
 
-    var listener = new GuildDiscordListener();
     var api = DiscordSRV.api;
-
-    api.subscribe(listener);
+    api.subscribe(new GuildDiscordListener());
+    api.subscribe(new AnnouncementForwardingListener());
   }
 
   /**

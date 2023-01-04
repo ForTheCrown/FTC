@@ -5,13 +5,16 @@ import static net.kyori.adventure.text.Component.text;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.regex.Pattern;
+import javax.imageio.ImageIO;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.docs.CommandDocs;
+import net.forthecrown.commands.manager.Commands;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.FTC;
@@ -20,6 +23,7 @@ import net.forthecrown.core.challenge.StreakCategory;
 import net.forthecrown.core.challenge.StreakIncreaseEvent;
 import net.forthecrown.core.module.ModuleServices;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.guilds.GuildManager;
 import net.forthecrown.useables.Usables;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.Particles;
@@ -32,6 +36,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Color;
 import org.bukkit.World;
+import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.scheduler.BukkitTask;
 import org.openjdk.nashorn.api.scripting.NashornScriptEngine;
 import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
@@ -64,6 +69,32 @@ public class CommandFtcTest extends FtcCommand {
   @Override
   protected void createCommand(BrigadierCommand command) {
     command
+        .then(literal("render_held_banner")
+            .executes(c -> {
+              var player = c.getSource().asPlayer();
+              var held = Commands.getHeldItem(player);
+
+              if (!(held.getItemMeta() instanceof BannerMeta)) {
+                throw Exceptions.format("Held item not banner");
+              }
+
+              try {
+                var img = GuildManager.get().getRenderer()
+                    .render(held);
+
+                ImageIO.write(
+                    img,
+                    "png",
+                    PathUtil.pluginPath("banner_test.png").toFile()
+                );
+              } catch (IOException e) {
+                throw new RuntimeException(e);
+              }
+
+              return 0;
+            })
+        )
+
         .then(literal("generate_command_docs")
             .then(argument("stubs", BoolArgumentType.bool())
                 .executes(c -> {

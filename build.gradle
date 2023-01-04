@@ -83,6 +83,7 @@ dependencies {
 
     // SpongePowered math library
     implementation "org.spongepowered:math:2.1.0-SNAPSHOT"
+    implementation files("/libs/McAssetExtractor-1.0.jar")
 
     // JavaScript engine
     compileOnly nashornDependency

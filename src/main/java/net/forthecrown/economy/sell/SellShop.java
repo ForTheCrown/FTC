@@ -75,14 +75,12 @@ public class SellShop {
     var challengeMenu = ChallengeManager.getInstance()
         .getItemChallengeMenu();
 
-    if (challengeMenu != null) {
-      builder.add(Slot.of(4, 2),
-          Menus.createOpenNode(
-              challengeMenu,
-              Challenges.createMenuHeader()
-          )
-      );
-    }
+    builder.add(Slot.of(4, 2),
+        Menus.createOpenNode(
+            challengeMenu,
+            Challenges.createMenuHeader()
+        )
+    );
 
     this.mainMenu = builder.build();
   }

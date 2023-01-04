@@ -24,9 +24,7 @@ import org.bukkit.command.CommandSender;
  * Checks and manages banned words in user messages and inputs.
  */
 public final class BannedWords {
-
-  private BannedWords() {
-  }
+  private BannedWords() {}
 
   private static final ObjectList<String> BANNED_WORDS = new ObjectArrayList<>();
   private static final String COOLDOWN_CATEGORY = "banned_words";
@@ -35,7 +33,9 @@ public final class BannedWords {
   public static void load() {
     InputStream stream = getFileOrResource("banned_words.json");
     JsonElement element = JsonParser.parseReader(
-        new InputStreamReader(stream, StandardCharsets.UTF_8));
+        new InputStreamReader(stream, StandardCharsets.UTF_8)
+    );
+
     JsonArray array = element.getAsJsonArray();
 
     BANNED_WORDS.clear();
@@ -82,10 +82,10 @@ public final class BannedWords {
 
     boolean result = containsBannedWords(input);
 
-    if (result) {
-      if (!Cooldown.containsOrAdd(sender, COOLDOWN_CATEGORY, COOLDOWN_TIME)) {
-        sender.sendMessage(Messages.BAD_LANGUAGE);
-      }
+    if (result
+        && !Cooldown.containsOrAdd(sender, COOLDOWN_CATEGORY, COOLDOWN_TIME)
+    ) {
+      sender.sendMessage(Messages.BAD_LANGUAGE);
     }
 
     return result;

@@ -23,7 +23,7 @@ import org.bukkit.Location;
 import org.bukkit.util.BoundingBox;
 
 public class CommandHome extends FtcCommand {
-  public static final Set<String> HOME_KEYWORDS = Set.of("home", "homes");
+  public static final Set<String> HOME_KEYWORDS = Set.of("homes");
 
   public CommandHome() {
     super(UserHomes.DEFAULT);

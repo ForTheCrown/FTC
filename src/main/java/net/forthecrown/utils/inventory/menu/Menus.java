@@ -157,7 +157,11 @@ public final class Menus {
   public static MenuNode createOpenNode(Menu menu, MenuNodeItem item) {
     return MenuNode.builder()
         .setItem(item)
-        .setRunnable((user, context, click) -> menu.open(user, context))
+        .setRunnable((user, context, click) -> {
+          if (menu != null) {
+            menu.open(user, context);
+          }
+        })
         .build();
   }
 

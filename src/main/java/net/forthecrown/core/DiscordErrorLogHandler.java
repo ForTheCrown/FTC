@@ -17,7 +17,11 @@ public class DiscordErrorLogHandler extends Handler {
 
   private DiscordErrorLogHandler() {}
 
-  void onLog(String formattedMessage, Throwable thrown, String levelName) {
+  void onLog(String formattedMessage,
+             Throwable thrown,
+             String levelName,
+             String loggerName
+  ) {
     // I will never get over that function's name
     TextChannel channel = DiscordSRV.getPlugin()
         .getDestinationTextChannelForGameChannelName("error-log");
@@ -39,7 +43,10 @@ public class DiscordErrorLogHandler extends Handler {
     if (channel == null) {
       FtcDiscord.staffLog(levelName, builder.toString());
     } else {
-      DiscordUtil.queueMessage(channel, "**" + levelName + "** " + builder);
+      DiscordUtil.queueMessage(
+          channel,
+          "**" + levelName + "** [" + loggerName + "]" + builder
+      );
     }
   }
 
@@ -49,7 +56,12 @@ public class DiscordErrorLogHandler extends Handler {
       return;
     }
 
-    onLog(record.getMessage(), record.getThrown(), record.getLevel().getName());
+    onLog(
+        record.getMessage(),
+        record.getThrown(),
+        record.getLevel().getName(),
+        record.getLoggerName()
+    );
   }
 
   private boolean shouldLog(LogRecord record) {
