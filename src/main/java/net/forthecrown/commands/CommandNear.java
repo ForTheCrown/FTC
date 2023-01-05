@@ -35,6 +35,18 @@ public class CommandNear extends FtcCommand {
   }
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    factory = factory.withPermission(Permissions.NEARBY_ADMIN);
+
+    factory.usage("<radius: number(1..100,000)>")
+        .addInfo("Shows all players with a <radius>");
+
+    factory.usage("<user> [<radius: number(1..100,000)>]")
+        .addInfo("Shows all players near to a <user>")
+        .addInfo("and within an optional [range]");
+  }
+
+  @Override
   protected void createCommand(BrigadierCommand command) {
     command
         .executes(c -> {

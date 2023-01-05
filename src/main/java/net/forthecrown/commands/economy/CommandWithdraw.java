@@ -25,6 +25,15 @@ public class CommandWithdraw extends FtcCommand {
   }
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("<amount>")
+        .addInfo("Withdraws a coin worth <amount>");
+
+    factory.usage("<amount> <coins>")
+        .addInfo("Withdraws <coins>, each worth <amount>");
+  }
+
+  @Override
   protected void createCommand(BrigadierCommand command) {
     command.then(argument("amount", IntegerArgumentType.integer(1))
         .suggests(CommandPay.BAL_SUGGESTIONS)

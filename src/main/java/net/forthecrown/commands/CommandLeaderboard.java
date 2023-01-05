@@ -26,6 +26,10 @@ public class CommandLeaderboard extends FtcCommand {
     this.objectiveName = objectiveName;
 
     setPermission(Permissions.DEFAULT);
+    setDescription(
+        "Shows you an objective's leaderboard on the side of your screen"
+    );
+
     register();
   }
 

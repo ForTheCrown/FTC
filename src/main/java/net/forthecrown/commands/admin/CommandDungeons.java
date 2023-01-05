@@ -22,6 +22,8 @@ public class CommandDungeons extends FtcCommand {
     super("dungeons");
 
     setPermission(Permissions.CMD_DUNGEONS);
+    setDescription("Admin command to manage the dungeons");
+
     register();
   }
 
@@ -36,6 +38,32 @@ public class CommandDungeons extends FtcCommand {
    *
    * Main Author: Julie
    */
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("spawndummy [<location: x,y,z>]")
+        .addInfo("Spawns a punching bag")
+        .addInfo("if [location] is not set, spawns it")
+        .addInfo("where you're standing");
+
+    var prefixed = factory.withPrefix("debug");
+    prefixed.usage("apples <boss>")
+        .addInfo("Gives you a <boss>'s golden apple");
+
+    prefixed = prefixed.withPrefix("<boss>");
+    prefixed.usage("kill", "Kills a boss, if it's alive");
+
+    prefixed.usage("attemptSpawn",
+        "Attempts to spawn the boss, as if",
+        "a normal player were using the spawn boss",
+        "slime in a boss room"
+    );
+
+    prefixed.usage("spawn",
+        "Spawns the boss, if it",
+        "hasn't already been spawned"
+    );
+  }
 
   @Override
   protected void createCommand(BrigadierCommand command) {

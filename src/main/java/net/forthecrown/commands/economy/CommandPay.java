@@ -90,6 +90,13 @@ public class CommandPay extends FtcCommand {
   };
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("<players> <amount: number(1..)> [<message>]")
+        .addInfo("Pays all <players> an <amount> of rhines [message] specifies")
+        .addInfo("an optional message to send to players being paid.");
+  }
+
+  @Override
   protected void createCommand(BrigadierCommand command) {
     command
         .then(argument("players", Arguments.USERS)

@@ -16,6 +16,8 @@ public class CommandMemory extends FtcCommand {
 
     setAliases("mem");
     setPermission(Permissions.CMD_MEMORY);
+    setDescription("Displays current memory usage information");
+    simpleUsages();
 
     register();
   }

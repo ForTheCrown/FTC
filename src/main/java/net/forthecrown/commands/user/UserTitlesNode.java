@@ -32,6 +32,25 @@ class UserTitlesNode extends UserCommandNode {
   }
 
   @Override
+  void createUsages(UsageFactory factory) {
+    factory.usage("")
+        .addInfo("Displays a user's active title,")
+        .addInfo("available titles and tier");
+
+    factory.usage("tier", "Shows a user's tier");
+    factory.usage("tier <tier>", "Sets the user's tiers");
+
+    factory.usage("title", "Show's a user's active title");
+    factory.usage("title <title>", "Sets a user's active title");
+
+    var prefix = factory.withPrefix("available_titles");
+
+    prefix.usage("", "Lists a user's available titles");
+    prefix.usage("add <title list>", "Adds all titles to a user");
+    prefix.usage("remove <title list>", "Removes all titles from a user");
+  }
+
+  @Override
   protected <T extends ArgumentBuilder<CommandSource, T>> void create(T command,
                                                                       UserProvider provider
   ) {

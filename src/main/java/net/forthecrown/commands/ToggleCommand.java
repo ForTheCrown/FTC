@@ -74,8 +74,8 @@ public class ToggleCommand extends FtcCommand {
     this.displayName = displayName;
     this.property = property;
     this.messageFormat = messageFormat;
-    this.description = description;
 
+    setDescription(description);
     setPermission(permission);
     setAliases(aliases);
 

@@ -19,6 +19,13 @@ public class CommandIllegalWorlds extends FtcCommand {
     super("IllegalWorlds");
 
     setPermission(Permissions.ADMIN);
+
+    setDescription(
+        "Command to manage illegal worlds\n"
+        + "An illegal world is any world to which a player cannot "
+        + "TP or /home into"
+    );
+
     register();
   }
 
@@ -34,6 +41,16 @@ public class CommandIllegalWorlds extends FtcCommand {
    *
    * Main Author: Jules
    */
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("", "Lists all 'illegal worlds'");
+    factory.usage("add <world>", "Adds a world to the illegal worlds list");
+
+    factory.usage("remove <world>",
+        "Removes a world from the illegal worlds list"
+    );
+  }
 
   @Override
   protected void createCommand(BrigadierCommand command) {

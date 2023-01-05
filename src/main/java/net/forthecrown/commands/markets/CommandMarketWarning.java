@@ -34,6 +34,7 @@ public class CommandMarketWarning extends FtcCommand {
 
     setPermission(Permissions.MARKET_WARNING);
     setAliases("shopevict", "evictshop", "evictmarket");
+    setDescription("Issues/revokes a shop eviction");
 
     register();
   }
@@ -56,6 +57,18 @@ public class CommandMarketWarning extends FtcCommand {
    *
    * Main Author: Julie
    */
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    var prefixed = factory.withPrefix("<user | shop> <value>");
+
+    prefixed.usage("<time> <reason>")
+        .addInfo("Starts a market eviction with <reason>.")
+        .addInfo("The owner will be evicted after <time> has passed");
+
+    prefixed.usage("undo")
+        .addInfo("Cancels a shop eviction");
+  }
 
   @Override
   protected void createCommand(BrigadierCommand command) {

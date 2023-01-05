@@ -23,6 +23,38 @@ class UserEarningsNode extends UserCommandNode {
   }
 
   @Override
+  void createUsages(UsageFactory factory) {
+    var autoSell = factory.withPrefix("auto_sell");
+    autoSell.usage("", "Lists a user's auto sell materials");
+    autoSell.usage("clear", "Clears a user's auto sell materials list");
+
+    autoSell.usage("add <material>")
+        .addInfo("Adds a material to a user's auto sell list");
+
+    autoSell.usage("remove <material>")
+        .addInfo("Removes a material from a user's auto sell list");
+
+    var earned = factory.withPrefix("earned");
+    earned.usage("")
+        .addInfo("Lists how many Rhines a user has earned")
+        .addInfo("from every material they've sold");
+
+    earned.usage("clear")
+        .addInfo("Clears all the user's earnings data");
+
+    earned.usage("set <material> <amount: number>")
+        .addInfo("Sets the <amount> the user has earned")
+        .addInfo("from the <material>");
+
+    earned.usage("add <material> <amount: number(1..)>")
+        .addInfo("Adds <amount> to the earned amount");
+
+    earned.usage("remove <material> <amount: number(1..)>")
+        .addInfo("Removes <amount> from the earnings of")
+        .addInfo("<material>");
+  }
+
+  @Override
   protected <T extends ArgumentBuilder<CommandSource, T>> void create(T command,
                                                                       UserProvider provider
   ) {

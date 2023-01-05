@@ -11,7 +11,10 @@ public class CommandCosmetics extends FtcCommand {
   public CommandCosmetics() {
     super("cosmetics");
 
+    setDescription("Opens the cosmetics menu");
     setPermission(Permissions.DEFAULT);
+    simpleUsages();
+
     register();
   }
 

@@ -33,6 +33,11 @@ public class CommandVisit extends FtcCommand {
    */
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("<waypoint name>", "Visits a teleport <waypoint>");
+  }
+
+  @Override
   protected void createCommand(BrigadierCommand command) {
     command
         .then(argument("waypoint", Arguments.WAYPOINT)

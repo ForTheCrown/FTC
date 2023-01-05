@@ -33,6 +33,7 @@ public abstract class HelpCommand extends FtcCommand {
     super(name);
 
     setPermission(Permissions.HELP);
+    simpleUsages();
   }
 
   @Override

@@ -56,6 +56,20 @@ public class CommandWild extends FtcCommand {
    */
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("")
+        .addInfo("Teleports you into the wilderness.")
+        .addInfo("This command only works at spawn or")
+        .addInfo("in the Resource World");
+
+    factory.usage("<entities> [<world>]")
+        .setPermission(Permissions.ADMIN)
+        .addInfo("Teleports a <player> into the wilderness")
+        .addInfo("in a [world]. If [world] is not set, then")
+        .addInfo("the user is teleported in their own world");
+  }
+
+  @Override
   protected void createCommand(BrigadierCommand command) {
     command
         // /wild

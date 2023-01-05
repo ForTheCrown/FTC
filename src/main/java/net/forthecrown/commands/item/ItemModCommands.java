@@ -32,6 +32,14 @@ public class ItemModCommands extends CmdUtil {
     }
 
     @Override
+    public void populateUsages(UsageFactory factory) {
+      for (var n: NODES) {
+        var prefixed = factory.withPrefix(n.getArgumentName());
+        n.populateUsages(prefixed);
+      }
+    }
+
+    @Override
     protected void createCommand(BrigadierCommand command) {
       for (var node : NODES) {
         var literal = literal(node.getArgumentName());

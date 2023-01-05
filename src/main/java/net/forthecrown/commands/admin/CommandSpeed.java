@@ -67,8 +67,10 @@ public class CommandSpeed extends FtcCommand {
   }
 
   private int changeSpeed(User user, float amount, CommandSource source, boolean fly) {
-    var attribute = fly ? user.getPlayer().getAttribute(Attribute.GENERIC_FLYING_SPEED)
+    var attribute = fly
+        ? user.getPlayer().getAttribute(Attribute.GENERIC_FLYING_SPEED)
         : user.getPlayer().getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+
     var modifier = fly ? DEF_FLY : DEF_WALK;
 
     attribute.setBaseValue(modifier * amount);
@@ -83,7 +85,10 @@ public class CommandSpeed extends FtcCommand {
   }
 
   private int querySpeed(User user, CommandSource source, boolean fly) {
-    float realValue = fly ? user.getPlayer().getFlySpeed() : user.getPlayer().getWalkSpeed();
+    float realValue = fly
+        ? user.getPlayer().getFlySpeed()
+        : user.getPlayer().getWalkSpeed();
+
     double value = Math.floor(realValue / (fly ? DEF_FLY : DEF_WALK));
 
     source.sendMessage(

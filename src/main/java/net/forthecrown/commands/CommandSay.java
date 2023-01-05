@@ -22,6 +22,8 @@ public class CommandSay extends FtcCommand {
     super("Say");
 
     setPermission(Permissions.DEFAULT);
+    setDescription("Says a message in chat");
+
     register();
   }
 

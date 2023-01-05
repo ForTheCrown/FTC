@@ -21,6 +21,15 @@ public class ItemNameNode extends ItemModifierNode {
   }
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("<name>")
+        .addInfo("Sets the name of the item you're holding");
+
+    factory.usage("-clear")
+        .addInfo("Clears the name of the item you're holding");
+  }
+
+  @Override
   public void create(LiteralArgumentBuilder<CommandSource> command) {
     command
         .then(argument("name", Arguments.CHAT)

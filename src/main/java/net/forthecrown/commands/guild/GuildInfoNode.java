@@ -14,8 +14,8 @@ class GuildInfoNode extends GuildCommandNode {
 
   @Override
   public void populateUsages(UsageFactory factory) {
-    factory.usage("info", "Displays info about your guild");
-    factory.usage("info <guild>", "Displays info about a specific guild");
+    factory.usage("", "Displays info about your guild");
+    factory.usage("<guild>", "Displays info about a specific guild");
   }
 
   @Override

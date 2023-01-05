@@ -38,6 +38,15 @@ public class CommandProfile extends FtcCommand {
    */
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("")
+        .addInfo("Shows your profile");
+
+    factory.usage("<player>")
+        .addInfo("Shows you a <player>'s profile");
+  }
+
+  @Override
   protected void createCommand(BrigadierCommand command) {
     command
         .executes(command(false))
@@ -49,7 +58,10 @@ public class CommandProfile extends FtcCommand {
   public Command<CommandSource> command(boolean userGiven) {
     return c -> {
       CommandSource s = c.getSource();
-      User user = userGiven ? Arguments.getUser(c, "player") : getUserSender(c);
+      User user = userGiven
+          ? Arguments.getUser(c, "player")
+          : getUserSender(c);
+
       UserFormat format = UserFormat.create(user)
           .withViewer(s);
 

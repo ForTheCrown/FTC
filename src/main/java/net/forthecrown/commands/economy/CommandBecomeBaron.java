@@ -20,6 +20,7 @@ public class CommandBecomeBaron extends FtcCommand {
 
     setPermission(Permissions.BECOME_BARON);
     setDescription("Allows you to become a baron");
+    simpleUsages();
 
     register();
   }

@@ -19,6 +19,7 @@ public class CommandMe extends FtcCommand {
 
     setAliases("me");
     setPermission(Permissions.DEFAULT);
+    setDescription("I have no idea what the point of this command is -Julie");
 
     register();
   }
@@ -36,6 +37,14 @@ public class CommandMe extends FtcCommand {
    *
    * Main Author: Julie
    */
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("<action: string>")
+        .addInfo("Broadcasts the <action> in chat")
+        .addInfo("Lets you trick people into thinking you died")
+        .addInfo("by doing '/me was blown up by Creeper'");
+  }
 
   @Override
   protected void createCommand(BrigadierCommand command) {

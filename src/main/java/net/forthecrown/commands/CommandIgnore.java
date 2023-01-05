@@ -22,6 +22,11 @@ public class CommandIgnore extends FtcCommand {
   }
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("<user>", "Ignores/unignores a <user>");
+  }
+
+  @Override
   protected void createCommand(BrigadierCommand command) {
     command
         .then(argument("user", Arguments.USER)

@@ -22,6 +22,25 @@ class UserTimeNode extends UserCommandNode {
   }
 
   @Override
+  void createUsages(UsageFactory factory) {
+    factory.usage("")
+        .addInfo("Shows a user's time fields as")
+        .addInfo("human-readable dates");
+
+    factory.usage("set <time field> <time stamp: number>")
+        .addInfo("Sets the <time field> to the given <time stamp>")
+        .addInfo("value, the <time stamp> is a UNIX millisecond")
+        .addInfo("time stamp");
+
+    factory.usage("set <time field> -now")
+        .addInfo("Sets the <time field> to the current")
+        .addInfo("moment in time.");
+
+    factory.usage("unset <time field>")
+        .addInfo("Resets the <time field> for a user");
+  }
+
+  @Override
   protected <T extends ArgumentBuilder<CommandSource, T>> void create(T command,
                                                                       UserProvider provider
   ) {

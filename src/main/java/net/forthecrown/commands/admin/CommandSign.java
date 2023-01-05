@@ -7,14 +7,17 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Map;
 import java.util.UUID;
 import net.forthecrown.commands.arguments.Arguments;
+import net.forthecrown.commands.arguments.chat.MessageSuggestions;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
+import net.forthecrown.core.Messages;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.pos.Position;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.user.User;
+import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Location;
@@ -26,10 +29,23 @@ public class CommandSign extends FtcCommand {
     super("sign");
 
     setAliases("editsign");
+    setDescription("Allows you to edit a sign");
+
     register();
   }
 
   private final Map<UUID, SignLines> copies = new Object2ObjectOpenHashMap<>();
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    var prefixed = factory.withPrefix("<pos: x,y,z>");
+
+    prefixed.usage("clear", "Clears the sign of all text");
+    prefixed.usage("copy", "Copies the sign's content");
+    prefixed.usage("paste", "Pastes your copied sign contents onto a sign");
+    prefixed.usage("<line: number(1..4)> <text>", "Sets a sign's <line> to <text>");
+    prefixed.usage("<line: number(1..4)> -clear", "Clears <line>");
+  }
 
   @Override
   protected void createCommand(BrigadierCommand command) {
@@ -105,7 +121,14 @@ public class CommandSign extends FtcCommand {
                             return b.buildFuture();
                           }
 
-                          return Arguments.CHAT.listSuggestions(c, b);
+                          return MessageSuggestions.get(
+                              c, b, true,
+                              (builder, source) -> {
+                                CompletionProvider.suggestMatching(
+                                    builder, "-clear"
+                                );
+                              }
+                          );
                         })
 
                         .executes(c -> set(c, c.getArgument("line", Component.class)))
@@ -113,7 +136,7 @@ public class CommandSign extends FtcCommand {
                 )
 
                 .then(literal("clear")
-                    .executes(c -> set(c, Component.empty()))
+                    .executes(c -> set(c, Messages.DASH_CLEAR))
                 )
             )
         );
@@ -123,13 +146,21 @@ public class CommandSign extends FtcCommand {
     int index = c.getArgument("index", Integer.class);
     Sign sign = get(c);
 
-    sign.line(index - 1, text);
-    sign.update();
+    if (Text.isDashClear(text)) {
+      sign.line(index - 1, Component.empty());
 
-    c.getSource().sendAdmin(
-        Component.text("Set line " + index + " to: ")
-            .append(text)
-    );
+      c.getSource().sendAdmin(
+          Text.format("Cleared line {0, number}", index)
+      );
+    } else {
+      sign.line(index - 1, text);
+
+      c.getSource().sendAdmin(
+          Text.format("Set line {0, number} to {1}", index, text)
+      );
+    }
+
+    sign.update();
     return 0;
   }
 

@@ -15,6 +15,7 @@ public class CommandSuicide extends FtcCommand {
     setPermission(Permissions.CMD_SUICIDE);
     setDescription("Commits suicide D:");
 
+    simpleUsages();
     register();
   }
 

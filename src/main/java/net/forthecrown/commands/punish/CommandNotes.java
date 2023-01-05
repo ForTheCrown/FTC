@@ -25,6 +25,8 @@ public class CommandNotes extends FtcCommand {
     super("Notes");
 
     setPermission(Permissions.PUNISH_NOTES);
+    setDescription("Shows all admin notes of a player");
+
     register();
   }
 
@@ -40,6 +42,20 @@ public class CommandNotes extends FtcCommand {
    *
    * Main Author:
    */
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory = factory.withPrefix("<user>");
+
+    factory.usage("")
+        .addInfo("Views a <user>'s staff notes");
+
+    factory.usage("add <text>")
+        .addInfo("Adds a staff note to a <user>");
+
+    factory.usage("remove <index>")
+        .addInfo("Removes a staff note from a <user>");
+  }
 
   @Override
   protected void createCommand(BrigadierCommand command) {

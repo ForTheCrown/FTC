@@ -34,7 +34,8 @@ public class CommandShopHistory extends FtcCommand {
     super("ShopHistory");
 
     setPermission(Permissions.SHOP_HISTORY);
-    setDescription("Shows a shop's history");
+    setDescription("Shows the history of the shop you're looking at");
+    simpleUsages();
 
     register();
   }

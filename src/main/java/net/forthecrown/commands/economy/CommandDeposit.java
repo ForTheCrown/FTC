@@ -43,6 +43,15 @@ public class CommandDeposit extends FtcCommand {
   private static final Pattern WORTH_PATTERN = Pattern.compile("Worth [\\d,.]+ Rhine(s|)");
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("")
+        .addInfo("Deposits all held coins");
+
+    factory.usage("all")
+        .addInfo("Deposits all coins in your inventory");
+  }
+
+  @Override
   protected void createCommand(BrigadierCommand command) {
     command
         .executes(c -> {

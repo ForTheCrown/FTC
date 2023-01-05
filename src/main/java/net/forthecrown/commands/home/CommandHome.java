@@ -45,7 +45,11 @@ public class CommandHome extends FtcCommand {
         .addInfo("Teleports you to your home named 'home'");
 
     factory.usage("<home>")
-        .addInfo("Teleports you to the <home>");
+        .addInfo("Teleports you to <home>");
+
+    factory.usage("<player>:<home>")
+        .setPermission(Permissions.HOME_OTHERS)
+        .addInfo("Teleports to the <player>'s <home>");
   }
 
   @Override

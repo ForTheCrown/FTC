@@ -66,7 +66,7 @@ public class CommandMail extends FtcCommand {
     super("mail");
 
     setPermission(Permissions.MAIL);
-    setDescription("Does mail stuff, idk");
+    setDescription("Lets you send, read and claim items from mail");
 
     register();
   }
@@ -217,6 +217,56 @@ public class CommandMail extends FtcCommand {
     );
     return format;
   });
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("[<page>] [<page size: number(5..20)>]")
+        .addInfo("Shows you your mail, page and page")
+        .addInfo("size are optional arguments");
+
+    factory.usage("send <user> <message>")
+        .addInfo("Sends a <user> a <message>");
+
+    factory.usage("send_item <user> <message>")
+        .setPermission(Permissions.MAIL_ITEMS)
+        .addInfo("Sends a <user> a <message> and then")
+        .addInfo("opens a menu to send an item with the mail");
+
+    factory.usage("clear")
+        .addInfo("Clears all your mail")
+        .addInfo("messages that have unclaimed items")
+        .addInfo("will not cleared");
+
+    factory.usage("claim <index: number>")
+        .addInfo("Claims the mail at the given index")
+        .addInfo("This will mostly not be needed, as")
+        .addInfo("the [claim] button will do this for you");
+
+    var others = factory.withPermission(Permissions.MAIL_OTHERS);
+
+    others.usage("read_other <user> [<page>] [<page size: number(5..20)>]")
+        .addInfo("Reads a user's mail");
+
+    others.usage("clear <user>")
+        .addInfo("Clears ALL of the user's mail, even unclaimed mail");
+
+    var all = factory.withPermission(Permissions.MAIL_ALL);
+
+    all.usage("send -all <message>")
+        .addInfo("Sends a <message> to ALL users, even offline");
+
+    all.usage("send_item -all <message>")
+        .addInfo("Sends a <message> with an item to")
+        .addInfo("ALL users, even offline");
+
+    all.usage(
+        "send_admin [users | -all] message=<message> [item=<item>] "
+            + "[rhines=<amount>] [gems=<gems>] [tag=<tag>] "
+            + "[script=<claim script>]"
+        )
+        .addInfo("Sends a message to either all users or a specific user")
+        .addInfo("with the given parameters");
+  }
 
   @Override
   protected void createCommand(BrigadierCommand command) {

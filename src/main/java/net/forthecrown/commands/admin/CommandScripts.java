@@ -27,6 +27,7 @@ public class CommandScripts extends FtcCommand {
 
     setAliases("script");
     setPermission(Permissions.ADMIN);
+    setDescription("Command to use scripts");
 
     register();
   }
@@ -43,6 +44,26 @@ public class CommandScripts extends FtcCommand {
    *
    * Main Author:
    */
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("eval <java script code>")
+        .addInfo("Runs the given JavaScript code");
+
+    factory.usage("run <script file> [-doNotClose]")
+        .addInfo("Runs the given script file's global function")
+        .addInfo("If -doNotClose flag is set, the script won't")
+        .addInfo("be shutdown after execution");
+
+    factory.usage("run <script file> <method name> [-doNotClose]")
+        .addInfo("Runs the given script file's global function, then")
+        .addInfo("runs the given method.")
+        .addInfo("If -doNotClose flag is set, the script won't")
+        .addInfo("be shutdown after execution");
+
+    factory.usage("delete <script file>")
+        .addInfo("Deletes a <script file>");
+  }
 
   @Override
   protected void createCommand(BrigadierCommand command) {

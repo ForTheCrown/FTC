@@ -72,12 +72,26 @@ public abstract class FtcCommand extends AbstractCommand {
   public void populateUsages(UsageFactory factory) {
   }
 
+  public void simpleUsages() {
+    usages.add(new Usage("").addInfo(getDescription()));
+  }
+
   public @NotNull HoverEvent<Component> asHoverEvent(CommandSource source) {
     TextWriter writer = TextWriters.newWriter();
     writer.setFieldStyle(Style.style(NamedTextColor.GRAY));
 
     writer.write("/" + getHelpListName());
     writeMetadata(writer, source);
+
+    LinkedList<Usage> usages = (LinkedList<Usage>) getUsages().clone();
+    usages.removeIf(usage -> !usage.getCondition().test(source));
+
+    if (!usages.isEmpty()) {
+      writer.field("Usages", "");
+      usages.forEach(usage -> {
+        writer.line(usage.argumentsWithPrefix("/" + getHelpListName()));
+      });
+    }
 
     return writer.asComponent()
         .asHoverEvent();
@@ -97,10 +111,6 @@ public abstract class FtcCommand extends AbstractCommand {
         && !getDescription().contains(DEFAULT_DESCRIPTION)
     ) {
       writer.field("Description", getDescription());
-    }
-
-    if (!usages.isEmpty()) {
-      writer.field("Usages", usages.size());
     }
 
     if (source.hasPermission(Permissions.ADMIN)) {

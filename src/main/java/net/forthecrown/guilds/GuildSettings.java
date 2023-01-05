@@ -3,6 +3,9 @@ package net.forthecrown.guilds;
 import static net.forthecrown.guilds.GuildRank.RANK_COUNT;
 
 import com.google.gson.JsonObject;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.Guild.BoostTier;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.Icon;
+import java.io.IOException;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.AccessLevel;
@@ -11,6 +14,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.forthecrown.core.DynmapUtil;
 import net.forthecrown.core.FTC;
+import net.forthecrown.guilds.unlockables.UnlockableRoleColor;
 import net.forthecrown.utils.ArrayIterator;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
@@ -189,6 +193,36 @@ public class GuildSettings {
     banner.setType(item.getType());
     banner.editMeta(BannerMeta.class, banner -> {
       banner.setPatterns(meta.getPatterns());
+    });
+
+    var disc = guild.getDiscord();
+    var boost = GuildDiscord.getDiscordGuild().getBoostTier();
+
+    if (boost == BoostTier.NONE
+        || boost == BoostTier.TIER_1
+        || !UnlockableRoleColor.COLOR.isUnlocked(guild) // Check if donator
+    ) {
+      return;
+    }
+
+    disc.getRole().ifPresent(role -> {
+      try {
+        Icon icon = disc.getIcon();
+        role.getManager()
+            .setIcon(icon)
+            .submit()
+            .whenComplete((unused, throwable) -> {
+              if (throwable == null) {
+                return;
+              }
+
+              LOGGER.error("Couldn't set guild icon for {}",
+                  guild, throwable
+              );
+            });
+      } catch (IOException exc) {
+        LOGGER.error("Couldn't create role icon for {}", guild, exc);
+      }
     });
   }
 

@@ -701,12 +701,11 @@ public class Guild
 
   @Override
   public String toString() {
-    return "Guild{" +
-        "id=" + id +
-        ", totalExp=" + totalExp +
-        ", members=" + members.keySet() +
-        ", outgoingInvites=" + outgoingInvites +
-        '}';
+    return "%s{id=%s, name=%s}".formatted(
+        getClass().getSimpleName(),
+        getId(),
+        settings.getName()
+    );
   }
 
   public boolean equals(Guild other) {

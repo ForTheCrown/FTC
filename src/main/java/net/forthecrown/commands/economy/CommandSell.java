@@ -20,6 +20,9 @@ public class CommandSell extends FtcCommand {
   public CommandSell() {
     super("Sell");
 
+    setDescription("Sells an item your holding");
+    simpleUsages();
+
     register();
   }
 

@@ -6,6 +6,7 @@ import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.arguments.RegistryArguments;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
+import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.JailCell;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.core.registry.Registries;
@@ -24,6 +25,11 @@ public class CommandJails extends FtcCommand {
 
   public CommandJails() {
     super("Jails");
+
+    setPermission(Permissions.PUNISH_JAIL);
+    setDescription("Lists all jails");
+    setAliases("jaillist", "listjails");
+    simpleUsages();
 
     register();
   }

@@ -139,6 +139,8 @@ public class CommandFtcStruct extends FtcCommand {
 
     setAliases("ftcstructure", "structure", "struct");
     setPermission(Permissions.ADMIN);
+    setDescription("Command to place, create and manage FTC structures");
+
     register();
   }
 
@@ -154,6 +156,74 @@ public class CommandFtcStruct extends FtcCommand {
    *
    * Main Author:
    */
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    addCreationArg(factory.withPrefix("create"), "Structure");
+
+    var prefixed = factory.withPrefix("<structure name>");
+    var palette = prefixed.withPrefix("palette");
+    addCreationArg(palette.withPrefix("add"), "Palette");
+
+    palette.usage("remove <name>")
+        .addInfo("Removes a palette with <name> from a <structure>");
+
+    prefixed.usage("place")
+        .addInfo("Places the structure where you're standing");
+
+    prefixed.usage("remove", "Deletes a <structure>");
+
+    prefixed.usage("place "
+        + "[rotation=<rot>] "
+        + "[offset=<x,y,z>] "
+        + "[pivot=<x,y,z>] "
+        + "[pos=<x,y,z>] "
+        + "[place_entities=<true | false>] "
+        + "[ignore_air=<true | false>] "
+        + "[palette=<name>]"
+    )
+        .addInfo("Places a <structure> with the parameters")
+        .addInfo("")
+        .addInfo("-rotation: The rotation applied to the structure")
+        .addInfo("-offset: Offset applied to the structure")
+        .addInfo("-pivot: The pivot used when placing the structure")
+        .addInfo("-pos: The position the structure is placed at")
+        .addInfo("-place_entities: Whether to place entities")
+        .addInfo("-ignore_air: If true, then existing blocks in the world")
+        .addInfo("  won't be overridden if they would be overriden by air")
+        .addInfo("-palette: the name of structure palette to place");
+
+    var header = prefixed.withPrefix("header");
+    header.usage("view")
+        .addInfo("Shows the structure's header data");
+
+    header.usage("put <compound tag>")
+        .addInfo("Places the <compound tag> into a <structure>'s")
+        .addInfo("header data");
+
+    header.usage("remove <nbt path>")
+        .addInfo("Removes the element at the specified <nbt path>")
+        .addInfo("in a <structure>'s header data");
+  }
+
+  private void addCreationArg(UsageFactory factory, String name) {
+    factory.usage("<name>")
+        .addInfo("Creates a %s from your selected", name)
+        .addInfo("region and gives it the <name>");
+
+    factory.usage("<name> "
+            + "[ignore_blocks=<block tags>] "
+            + "[ignore_entities=<entity type list>] "
+            + "[include_functions=<true | false>]"
+        )
+        .addInfo("Creates a %s with the given parameters", name)
+        .addInfo("-ignore_blocks: A list of blocks that'll be ignored")
+        .addInfo("  when the %s is being scanned", name)
+        .addInfo("-ignore_entities: A list of entity types that won't be")
+        .addInfo("  included in the %s", name)
+        .addInfo("-include_functions: Whether to include structure functions")
+        .addInfo("  in the %s or not", name);
+  }
 
   @Override
   protected void createCommand(BrigadierCommand command) {

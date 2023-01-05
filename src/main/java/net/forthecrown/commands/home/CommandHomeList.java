@@ -35,6 +35,14 @@ public class CommandHomeList extends FtcCommand {
   }
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("", "Lists your homes");
+
+    factory.usage("<user>", "Lists the <user>'s homes")
+        .setPermission(Permissions.HOME_OTHERS);
+  }
+
+  @Override
   protected void createCommand(BrigadierCommand command) {
     command
         // /homes

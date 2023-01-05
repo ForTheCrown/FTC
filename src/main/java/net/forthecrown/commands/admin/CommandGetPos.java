@@ -14,6 +14,7 @@ public class CommandGetPos extends FtcCommand {
     super("getpos");
 
     setPermission(Permissions.CMD_GET_POS);
+    setDescription("Gets the accurate position of a player");
     register();
   }
 

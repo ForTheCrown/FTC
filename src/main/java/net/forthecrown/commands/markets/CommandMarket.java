@@ -42,6 +42,8 @@ public class CommandMarket extends FtcCommand {
     super("market");
 
     setPermission(Permissions.ADMIN);
+    setDescription("General purpose commands to manage markets");
+    setAliases("markets", "shops");
 
     register();
   }
@@ -59,6 +61,73 @@ public class CommandMarket extends FtcCommand {
    *
    * Main Author: Julie <3
    */
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("refresh_all")
+        .addInfo("Refreshes all existing shops")
+        .addInfo("This will just ensure every shop's entrance")
+        .addInfo("exists and is displaying the correct info");
+
+    factory.usage("create <region name>")
+        .addInfo("Creates a new shop, linked to <region name>.")
+        .addInfo("Every shop has to be linked to a world guard")
+        .addInfo("region for membership and protection");
+
+    factory.usage("list", "Lists all existing markets");
+
+    var prefixed = factory.withPrefix("<shop name>");
+
+    prefixed.usage("")
+        .addInfo("Lists info about the <shop>");
+
+    prefixed.usage("claim <user>")
+        .addInfo("Claims the <shop> for the <user>.")
+        .addInfo("Only works if the shop is not already claimed");
+
+    prefixed.usage("connections <other shop> <add | remove>")
+        .addInfo("Adds/removes a 'connection' with another")
+        .addInfo("shop. Connections allow shops to be merged");
+
+    prefixed.usage("delete")
+        .addInfo("Deletes the shop");
+
+    var ent = prefixed.withPrefix("entrances");
+    ent.usage("add")
+        .addInfo("Adds a shop entrance, with the notice set")
+        .addInfo("as your position, the sign position as the")
+        .addInfo("block above you and the direction being the")
+        .addInfo("direction you're facing");
+
+    ent.usage("add <notice: x,y,z> <sign: x,y,z> [<direction>]")
+        .addInfo("Adds a shop entrance with the given parameters")
+        .addInfo("If [direction] is not set, uses your direction");
+
+    ent.usage("remove <index>")
+        .addInfo("Removes the entrance with the given index");
+
+    ent.usage("merge <other shop>")
+        .addInfo("Merges <shop name> with <other shop>");
+
+    prefixed.usage("unmerge", "Unmerges the shop");
+
+    prefixed.usage("price <price: number(-1..)>")
+        .addInfo("Sets the shop's price, 0 means free")
+        .addInfo("If the price is -1, then the shop will use")
+        .addInfo("a default price set in the markets config");
+
+    prefixed.usage("wg_region")
+        .addInfo("Displays info about the <shop>'s world guard region");
+
+    prefixed.usage("unclaim", "Unclaims the shop, just removes the owner");
+
+    prefixed.usage("unclaim_complete")
+        .addInfo("Unclaims the shop, removes the owner and then")
+        .addInfo("resets the shop");
+
+    prefixed.usage("reset")
+        .addInfo("Resets the shop");
+  }
 
   @Override
   protected void createCommand(BrigadierCommand command) {

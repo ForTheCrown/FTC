@@ -96,7 +96,7 @@ public class UserMapTopCommand extends FtcCommand {
     factory.usage("")
         .addInfo("Shows you the " + sTitle);
 
-    factory.usage("<page: number> [page size: number]")
+    factory.usage("<page> [<page size: number(5..20)>]")
         .addInfo("Shows you the " + sTitle + " on <page>")
         .addInfo("If [page size] is not set, then it defaults to " + DEF_PAGE_SIZE);
   }

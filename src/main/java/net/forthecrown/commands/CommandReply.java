@@ -24,6 +24,13 @@ public class CommandReply extends FtcCommand {
   }
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("<message>")
+        .addInfo("Sends <message> to the last person that")
+        .addInfo("messaged you / you messaged.");
+  }
+
+  @Override
   protected void createCommand(BrigadierCommand command) {
     command.then(argument("message", Arguments.MESSAGE)
         .executes(c -> {

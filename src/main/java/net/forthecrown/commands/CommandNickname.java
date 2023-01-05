@@ -28,6 +28,13 @@ public class CommandNickname extends FtcCommand {
     register();
   }
 
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("", "Clears your nickname");
+    factory.usage("-clear", "Clears your nickname");
+    factory.usage("<nick>", "Sets your nickname");
+  }
+
   /**
    * Checks if the given nickname is allowed
    *

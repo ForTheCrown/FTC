@@ -31,6 +31,7 @@ public class CommandTeleport extends FtcCommand {
 
     setPermission(Permissions.CMD_TELEPORT);
     setAliases("tp", "teleport", "eteleport", "etp");
+    setDescription("FTC's version of the vanilla /tp command");
 
     register();
   }

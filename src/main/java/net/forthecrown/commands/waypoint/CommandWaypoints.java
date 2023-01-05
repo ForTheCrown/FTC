@@ -52,6 +52,32 @@ public class CommandWaypoints extends FtcCommand {
   }
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    var prefixed = factory.withPrefix("<waypoint>");
+
+    prefixed.usage("move [<pos: x, y, z>]")
+        .addInfo("Moves a waypoint. If [pos] is not set, then")
+        .addInfo("the waypoint is moved to where you're standing");
+
+    prefixed.usage("data")
+        .addInfo("Shows a waypoint's region raw NBT data");
+
+    prefixed.usage("remove")
+        .addInfo("Deletes <waypoint>");
+
+    prefixed = prefixed.withPrefix("property <property name>");
+
+    prefixed.usage("")
+        .addInfo("Shows the <property name>'s value");
+
+    prefixed.usage("<value>")
+        .addInfo("Sets the <property name>'s value to <value>");
+
+    prefixed.usage("-clear")
+        .addInfo("Clears the <property name>'s value");
+  }
+
+  @Override
   protected void createCommand(BrigadierCommand command) {
     command
         .then(argument("waypoint", Arguments.WAYPOINT)

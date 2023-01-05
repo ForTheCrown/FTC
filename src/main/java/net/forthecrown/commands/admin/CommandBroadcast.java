@@ -36,6 +36,11 @@ public class CommandBroadcast extends FtcCommand {
    */
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("<message>", "Broadcasts a <message> to the entire server");
+  }
+
+  @Override
   protected void createCommand(BrigadierCommand command) {
     command
         .then(argument("message", Arguments.CHAT)

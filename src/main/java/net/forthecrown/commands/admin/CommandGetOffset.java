@@ -16,6 +16,9 @@ public class CommandGetOffset extends FtcCommand {
     super("GetOffset");
 
     setPermission(Permissions.ADMIN);
+    setDescription("Gets the offset between 2 selected points");
+    simpleUsages();
+
     register();
   }
 

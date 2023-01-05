@@ -18,6 +18,8 @@ public class CommandList extends FtcCommand {
 
     setAliases("list", "elist", "playerlist");
     setPermission(Permissions.CMD_LIST);
+    setDescription("Lists all players on the server");
+
     register();
   }
 

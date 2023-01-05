@@ -10,7 +10,6 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.inventory.ExtendedItems;
 import net.forthecrown.inventory.weapon.RoyalSword;
 import net.forthecrown.user.User;
-import net.forthecrown.user.Users;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
@@ -40,9 +39,24 @@ public class CommandRoyalSword extends FtcCommand {
    */
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("create <owner: player>", "Creates a sword with an <owner>");
+
+    factory.usage("update",
+        "Forces your held sword to update",
+        "the lore and sword data, this is",
+        "normally done after killing any mob",
+        "with the sword"
+    );
+
+    factory.usage("data", "Views the data of the sword you're holding");
+    factory.usage("upgrade", "Upgrades your held sword by 1 level");
+  }
+
+  @Override
   protected void createCommand(BrigadierCommand command) {
     command
-        .then(literal("give")
+        .then(literal("create")
             .then(argument("owner", Arguments.USER)
                 .executes(c -> {
                   User sender = getUserSender(c);
@@ -103,22 +117,6 @@ public class CommandRoyalSword extends FtcCommand {
               sword.update(item);
 
               c.getSource().sendAdmin("Upgraded held sword");
-              return 0;
-            })
-        )
-
-        .then(literal("get_owner")
-            .executes(c -> {
-              User user = getUserSender(c);
-              var swordPair = getSword(user);
-              var sword = swordPair.second();
-
-              User owner = Users.get(sword.getOwner());
-
-              c.getSource().sendMessage(
-                  Component.text("Sword owner: ")
-                      .append(owner.displayName())
-              );
               return 0;
             })
         );

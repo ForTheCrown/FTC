@@ -26,6 +26,15 @@ abstract class UserCommandNode extends FtcCommand {
     command.then(argument);
   }
 
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    createUsages(factory.withPrefix("<user>"));
+  }
+
+  void createUsages(UsageFactory factory) {
+
+  }
+
   protected abstract <T extends ArgumentBuilder<CommandSource, T>> void create(T command,
                                                                                UserProvider provider
   );

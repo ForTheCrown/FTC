@@ -22,6 +22,8 @@ public class CommandLaunch extends FtcCommand {
 
     setPermission(Permissions.ADMIN);
     setAliases("rocket");
+    setDescription("Rockets a player in a given direction");
+
     register();
   }
 
@@ -39,6 +41,21 @@ public class CommandLaunch extends FtcCommand {
    *
    * Main Author: Julie
    */
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    var prefix = factory.withPrefix("<entities>");
+
+    prefix.usage("")
+        .addInfo("Launches every selected entity in")
+        .addInfo("the direction you're looking");
+
+    prefix.usage("<velocity: x,y,z>")
+        .addInfo("Sets the velocity of every entity");
+
+    prefix.usage("add <velocity: x,y,z>")
+        .addInfo("Adds to the velocity of every entity");
+  }
 
   @Override
   protected void createCommand(BrigadierCommand command) {

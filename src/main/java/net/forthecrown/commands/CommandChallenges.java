@@ -48,6 +48,8 @@ public class CommandChallenges extends FtcCommand {
     super("Challenges");
 
     setPermission(Permissions.CHALLENGES);
+    setDescription("Opens the challenge book");
+
     register();
   }
 
@@ -92,6 +94,65 @@ public class CommandChallenges extends FtcCommand {
     var user = Users.get(entry);
 
     return user.getGuild() != null;
+  }
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("", getDescription());
+
+    factory = factory.withCondition(IS_ADMIN);
+
+    factory.usage("list", "Lists all loaded challenges");
+    factory.usage("list_active", "Lists all active challenges");
+
+    factory.usage("give_points <challenge> <player> [<points: number(1..)>]")
+        .addInfo("Gives [points] for a <challenge> to a <player>")
+        .addInfo("If [points] is not set, defaults to 1");
+
+    factory.usage("trigger <challenge> <player>")
+        .addInfo("Triggers a <challenge> for a <player>")
+        .addInfo("What 'triggering' means, varies based on implementation");
+
+    factory.usage("complete_all <category> <user>")
+        .addInfo("Completes all active challenges in a <category> for a")
+        .addInfo("<user>");
+
+    factory.usage("reset [<category>]")
+        .addInfo("Resets all challenges in a [category]. If a [category] is")
+        .addInfo("not set, it resets all categories");
+
+    var items = factory.withPrefix("items <challenge>");
+    items.usage("list [-withNbt]")
+        .addInfo("Lists a <challenge>'s potential items.")
+        .addInfo("If the -withNbt flag is set, each item's NBT data will")
+        .addInfo("also be printed.");
+
+    items.usage("clear")
+        .addInfo("Clears every item in a <challenge>'s potential item list.")
+        .addInfo("This only clears the challenge's potential item list, it")
+        .addInfo("does not modify the current item");
+
+    items.usage("remove <index: number(1..)>")
+        .addInfo("Removes an item from a <challenge>'s item list")
+        .addInfo("To find the index, use '/challenges items <challenge> list'")
+        .addInfo("This changes the challenge's potential item list, it")
+        .addInfo("does not modify the current item");
+
+    items.usage("recursively_add_items_in_faced_chest")
+        .addInfo("Recursively adds all the items in a chest/container you're")
+        .addInfo("looking at. This doesn't remove any existing items in a")
+        .addInfo("<challenge>'s item list.")
+        .addInfo("All 'nested' items, are added separately, meaning any")
+        .addInfo("shulkers inside chests have their contents added, not the")
+        .addInfo("shulker itself");
+
+    items.usage("set_active [<item>]")
+        .addInfo("Sets an [item] to be a <challenge>'s active item")
+        .addInfo("If [item] is not set, then your held item is used");
+
+    items.usage("add [<item>]")
+        .addInfo("Adds an [item] to a <challenge>'s item list")
+        .addInfo("If [item] is not set, then your held item is used");
   }
 
   @Override

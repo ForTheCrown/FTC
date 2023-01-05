@@ -30,15 +30,36 @@ public class HulkSmashListener implements Listener {
     user.hulkSmashing = true;
 
     Events.register(this);
-    tickTask = Tasks.runTimer(this::tick, GAME_TICKS_PER_COSMETIC_TICK,
-        GAME_TICKS_PER_COSMETIC_TICK);
+
+    tickTask = Tasks.runTimer(
+        this::tick,
+        GAME_TICKS_PER_COSMETIC_TICK,
+        GAME_TICKS_PER_COSMETIC_TICK
+    );
   }
 
   private short ticks = 30 * (Ticks.TICKS_PER_SECOND / GAME_TICKS_PER_COSMETIC_TICK);
+  private short groundTicks = 0;
+
   private BukkitTask tickTask;
 
   private void tick() {
-    if (--ticks < 1 || user.getPlayer().isOnGround()) {
+    var vel = user.getPlayer().getVelocity();
+    double velY = vel.getY();
+
+    // Test if on ground, god-damn floating point errors
+    if (!user.getPlayer().isGliding() && velY >= -0.07841 && velY <= 0) {
+      ++groundTicks;
+    }
+
+    // If been on ground for 5 or more ticks, stop
+    if (groundTicks >= 5) {
+      end();
+      return;
+    }
+
+    // If below max fall tick, stop
+    if (--ticks < 1) {
       unregister();
       return;
     }
@@ -61,17 +82,7 @@ public class HulkSmashListener implements Listener {
     tickTask = Tasks.cancel(tickTask);
   }
 
-  @EventHandler(ignoreCancelled = true)
-  public void onEntityDamage(EntityDamageEvent event) {
-    if (!user.getUniqueId().equals(event.getEntity().getUniqueId())) {
-      return;
-    }
-
-    if (event.getCause() != EntityDamageEvent.DamageCause.FALL) {
-      return;
-    }
-
-    event.setCancelled(true);
+  private void end() {
     unregister();
     user.playSound(Sound.ENTITY_GENERIC_EXPLODE, 0.7F, 1);
 
@@ -86,5 +97,19 @@ public class HulkSmashListener implements Listener {
     if (effect != null) {
       effect.onHulkLand(user, user.getLocation());
     }
+  }
+
+  @EventHandler(ignoreCancelled = true)
+  public void onEntityDamage(EntityDamageEvent event) {
+    if (!user.getUniqueId().equals(event.getEntity().getUniqueId())) {
+      return;
+    }
+
+    if (event.getCause() != EntityDamageEvent.DamageCause.FALL) {
+      return;
+    }
+
+    event.setCancelled(true);
+    end();
   }
 }

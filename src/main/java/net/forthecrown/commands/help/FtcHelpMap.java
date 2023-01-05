@@ -23,6 +23,7 @@ import net.forthecrown.commands.manager.FtcCommand.UsageFactory;
 import net.forthecrown.core.FTC;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
+import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.context.ContextOption;
 import net.forthecrown.utils.context.ContextSet;
 import net.forthecrown.utils.text.format.page.Footer;
@@ -30,6 +31,7 @@ import net.forthecrown.utils.text.format.page.Header;
 import net.forthecrown.utils.text.format.page.PageEntry;
 import net.forthecrown.utils.text.format.page.PageEntryIterator;
 import net.forthecrown.utils.text.format.page.PageFormat;
+import net.forthecrown.utils.text.writer.LoreWriter;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.forthecrown.utils.text.writer.TextWriters;
 import net.kyori.adventure.text.Component;
@@ -58,30 +60,32 @@ public class FtcHelpMap {
   private final ContextSet contextSet = ContextSet.create();
   private final ContextOption<CommandSource> sourceOption = contextSet.newOption();
   private final ContextOption<String> inputOption = contextSet.newOption();
+  private final ContextOption<Integer> actualPageSize = contextSet.newOption(5);
 
   // Page format used to format entries for list-based display
   private final PageFormat<HelpEntry> pageFormat = PageFormat.create();
+
+  private final PageFormat<Component> singleEntryPaginator
+      = PageFormat.create();
 
   private FtcHelpMap() {
     // Initialize the page format used to display help entries
 
     // Footer format
-    pageFormat.setFooter(
-        Footer.create()
-            .setPageButton((viewerPage, pageSize, context) -> {
-              var s = context.get(inputOption);
+    var footer = Footer.create()
+        .setPageButton((viewerPage, pageSize, context) -> {
+          var s = context.get(inputOption);
 
-              return ClickEvent.runCommand(
-                  String.format("/help '%s' %s %s",
-                      s == null ? "" : s,
-                      viewerPage, pageSize
-                  )
-              );
-            })
-    );
+          return ClickEvent.runCommand(
+              String.format("/help '%s' %s %s",
+                  s == null ? "" : s,
+                  viewerPage, context.get(actualPageSize)
+              )
+          );
+        });
 
     // Header format
-    Header<HelpEntry> header = Header.create();
+    Header header = Header.create();
     header.title((it, writer, context) -> {
       var s = context.get(inputOption);
 
@@ -91,13 +95,24 @@ public class FtcHelpMap {
         writer.formatted("Results for: {0}", s);
       }
     });
-    pageFormat.setHeader(header);
 
     // Entry format
     PageEntry<HelpEntry> entry = PageEntry.create();
     entry.setEntryDisplay((writer, entry1, viewerIndex, context, it) -> {
       entry1.writeShort(writer, context.getOrThrow(sourceOption));
     });
+
+    PageEntry<Component> singletonEntry = PageEntry.create();
+    singletonEntry.setIndex((viewerIndex, entry1, it) -> null);
+    singletonEntry.setEntryDisplay((writer, entry1, viewerIndex, context, it) -> {
+      writer.line(entry1);
+    });
+
+    singleEntryPaginator.setFooter(footer);
+    singleEntryPaginator.setHeader(header);
+    singleEntryPaginator.setEntry(singletonEntry);
+    pageFormat.setHeader(header);
+    pageFormat.setFooter(footer);
     pageFormat.setEntry(entry);
   }
 
@@ -146,36 +161,49 @@ public class FtcHelpMap {
     // Remove the ones the source doesn't have permission to see
     entries.removeIf(entry -> !entry.test(source));
 
-    // Ensure list isn't empty and page number is valid
-    Commands.ensurePageValid(page, pageSize, entries.size());
-
     TextWriter writer = TextWriters.newWriter();
     writer.setFieldStyle(Style.style(NamedTextColor.YELLOW));
 
+    Context context = contextSet.createContext()
+        .set(sourceOption, source)
+        .set(inputOption, tag)
+        .set(actualPageSize, pageSize);
+
     // Single entry, write that 1 entry
     if (entries.size() == 1) {
+      pageSize += 5;
       var entry = entries.iterator().next();
-      entry.writeFull(writer, source);
+      LoreWriter loreWriter = TextWriters.loreWriter();
+
+      loreWriter.setFieldStyle(Style.style(NamedTextColor.YELLOW));
+      entry.writeFull(loreWriter, source);
+
+      var text = loreWriter.getLore();
+
+      // Ensure list isn't empty and page number is valid
+      Commands.ensurePageValid(page, pageSize, text.size());
+
+      var it = PageEntryIterator.of(text, page, pageSize);
+      singleEntryPaginator.write(it, writer, context);
+
       return writer.asComponent();
     }
 
+    // Ensure list isn't empty and page number is valid
+    Commands.ensurePageValid(page, pageSize, entries.size());
+
     // Format all results onto a page
-    PageEntryIterator<HelpEntry> iterator
-        = PageEntryIterator.of(entries, page, pageSize);
+    var iterator = PageEntryIterator.of(entries, page, pageSize);
 
-    pageFormat.write(iterator, writer,
-        contextSet.createContext()
-            .set(sourceOption, source)
-            .set(inputOption, tag)
-    );
-
+    pageFormat.write(iterator, writer, context);
     return writer.asComponent();
   }
 
   private Collection<HelpEntry> lookup(String tag) {
     // Try just calling the keyword lookup
-    Collection<HelpEntry> result
-        = keywordLookup.getOrDefault(tag, Collections.emptyList());
+    Collection<HelpEntry> result = keywordLookup.getOrDefault(
+        tag, Collections.emptyList()
+    );
 
     if (!result.isEmpty()) {
       return result;

@@ -24,8 +24,9 @@ import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.writer.TextWriters;
 
 @RequiredArgsConstructor
-public class UsableArgumentNode<T extends UsageInstance, H extends UsageTypeHolder> extends
-    CmdUtil {
+public class UsableArgumentNode<T extends UsageInstance, H extends UsageTypeHolder>
+    extends CmdUtil
+{
 
   private final UsageTypeAccessor<T, H> accessor;
 

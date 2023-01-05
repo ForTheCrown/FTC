@@ -10,7 +10,7 @@ public class CommandStructFunction extends FtcCommand {
 
   public CommandStructFunction() {
     super(COMMAND_NAME);
-
+    setDescription("Ignore this command");
     register();
   }
 

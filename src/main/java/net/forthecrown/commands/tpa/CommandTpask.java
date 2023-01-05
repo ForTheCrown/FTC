@@ -57,6 +57,12 @@ public class CommandTpask extends FtcCommand {
    */
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("<player>")
+        .addInfo("Asks to teleport to a <player>");
+  }
+
+  @Override
   protected void createCommand(BrigadierCommand command) {
     command.then(argument("player", Arguments.ONLINE_USER)
         .executes(c -> {

@@ -28,6 +28,25 @@ class UserCosmeticsNode extends UserCommandNode {
   }
 
   @Override
+  void createUsages(UsageFactory factory) {
+    var prefixed = factory.withPrefix("<effect type>");
+
+    prefixed.usage("", "Shows a user's active and available <effect types>");
+    prefixed.usage("set <cosmetic>", "Sets the user's active <effect type>");
+    prefixed.usage("unset", "Clears the user's active <effect type> cosmetic");
+
+    prefixed.usage("clear", "Clears the user's available")
+            .addInfo("<effect type> cosmetics");
+
+    prefixed.usage("add <cosmetic>", "Adds the <cosmetic> to the user's")
+        .addInfo("cosmetic effect list");
+
+    prefixed.usage("remove <cosmetic>")
+        .addInfo("Removes the <cosmetic> from the user's")
+        .addInfo("available cosmetics list");
+  }
+
+  @Override
   protected <T extends ArgumentBuilder<CommandSource, T>> void create(T command,
                                                                       UserProvider provider
   ) {

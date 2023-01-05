@@ -98,12 +98,18 @@ public class CommandFtcTest extends FtcCommand {
         .then(literal("generate_command_docs")
             .then(argument("stubs", BoolArgumentType.bool())
                 .executes(c -> {
-                  Path dir = PathUtil.pluginPath("generated_docs");
+                  Path dir = PathUtil.pluginPath("command_docs.md");
                   boolean stubs = c.getArgument("stubs", Boolean.class);
 
                   var docs = new CommandDocs(stubs);
                   docs.fill();
-                  docs.write(dir);
+
+                  try {
+                    docs.write(dir);
+                  } catch (IOException exc) {
+                    LOGGER.error("Couldn't write command documentation", exc);
+                    return 0;
+                  }
 
                   c.getSource().sendMessage("Generated documentation");
                   return 0;

@@ -2,6 +2,7 @@ package net.forthecrown.guilds.unlockables;
 
 import static net.forthecrown.guilds.menu.GuildMenus.GUILD;
 import static net.kyori.adventure.text.Component.empty;
+import static net.kyori.adventure.text.Component.text;
 
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.FTC;
@@ -109,16 +110,22 @@ public class UnlockableDiscordRole implements Unlockable {
             click.shouldReloadMenu(true);
 
             if (roleOpt.isEmpty()) {
-              guild.getDiscord().createRole();
+              guild.getDiscord().createRole().whenComplete((role, throwable) -> {
+                if (throwable != null) {
+                  guild.sendMessage(text(
+                      "Failed to create role, internal error!",
+                      NamedTextColor.RED
+                  ));
 
-              guild.sendMessage(
-                  Text.format(
-                      "&e{0, user}&r created Discord role for the Guild!",
-                      NamedTextColor.GOLD,
-                      user
-                  )
-              );
+                  return;
+                }
 
+                guild.sendMessage(Text.format(
+                    "&e{0, user}&r created Discord role for the Guild!",
+                    NamedTextColor.GOLD,
+                    user
+                ));
+              });
               return;
             }
 

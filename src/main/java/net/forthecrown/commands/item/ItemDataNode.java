@@ -26,6 +26,22 @@ public class ItemDataNode extends ItemModifierNode {
   }
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("view")
+        .addInfo("Displays the item's data");
+
+    factory.usage("merge <compound tag>")
+        .addInfo("Merges the <compound tag> into the item's tag")
+        .addInfo("Note: the <compound tag> is put into the item's raw")
+        .addInfo("NBT, not into the 'tag' element in the NBT");
+
+    factory.usage("remove <nbt path>")
+        .addInfo("Removes a tag at the given NBT path.")
+        .addInfo("Note: the path's root is considered the item's raw")
+        .addInfo("NBT, not the 'tag' element in the data");
+  }
+
+  @Override
   public void create(LiteralArgumentBuilder<CommandSource> command) {
     command
         .then(literal("view")

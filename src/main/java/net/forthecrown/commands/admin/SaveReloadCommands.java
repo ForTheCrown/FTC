@@ -37,7 +37,22 @@ public class SaveReloadCommands extends FtcCommand {
     this.save = save;
 
     setPermission(Permissions.ADMIN);
+    setDescription(
+        (save ? "Saves" : "Reloads") + " the FTC plugin, or a single module"
+    );
+
     register();
+  }
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    String action = (save ? "Saves" : "Reloads");
+
+    factory.usage("")
+        .addInfo("%s the entire FTC plugin", action);
+
+    factory.usage("<module>")
+        .addInfo("%s the <module>", action);
   }
 
   @Override

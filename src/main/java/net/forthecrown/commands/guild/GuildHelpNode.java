@@ -1,12 +1,8 @@
 package net.forthecrown.commands.guild;
 
-import static net.kyori.adventure.text.Component.text;
-
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.utils.text.writer.TextWriters;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.Style;
+import org.bukkit.Bukkit;
 
 class GuildHelpNode extends GuildCommandNode {
 
@@ -23,16 +19,10 @@ class GuildHelpNode extends GuildCommandNode {
   @Override
   protected <T extends ArgumentBuilder<CommandSource, T>> void create(T command) {
     command.executes(c -> {
-      var writer = TextWriters.newWriter();
-      writer.setFieldSeparator(text(" - "));
-      writer.setFieldStyle(Style.style(NamedTextColor.GOLD));
-      writer.setFieldValueStyle(Style.empty());
-
-      for (var n: GuildCommands.NODES) {
-        n.writeUsages(writer, c.getSource(), false);
-      }
-
-      c.getSource().sendMessage(writer);
+      Bukkit.dispatchCommand(
+          c.getSource().asBukkit(),
+          "help guild 1 15"
+      );
       return 0;
     });
   }

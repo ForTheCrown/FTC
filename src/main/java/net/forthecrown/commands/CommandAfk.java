@@ -20,6 +20,12 @@ public class CommandAfk extends FtcCommand {
   }
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("", "Sets you afk/unafk");
+    factory.usage("<message>", "AFKs you with an AFK message");
+  }
+
+  @Override
   protected void createCommand(BrigadierCommand command) {
     command
         .executes(c -> afk(getUserSender(c), null))

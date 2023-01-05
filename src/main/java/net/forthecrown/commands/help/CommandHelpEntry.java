@@ -9,7 +9,6 @@ import java.util.Set;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.core.Messages;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.kyori.adventure.text.Component;
@@ -35,18 +34,8 @@ public class CommandHelpEntry implements HelpEntry {
 
   @Override
   public void writeFull(TextWriter writer, CommandSource source) {
-    writer.line(Messages.PAGE_BORDER);
-    writer.space();
-    writer.write("/" + command.getHelpListName());
-    writer.space();
-    writer.write(Messages.PAGE_BORDER);
-
     command.writeMetadata(writer, source);
     command.writeUsages(writer, source, true);
-
-    writer.line(Messages.PAGE_BORDER);
-    writer.write(Messages.PAGE_BORDER);
-    writer.write(Messages.PAGE_BORDER);
   }
 
   @Override

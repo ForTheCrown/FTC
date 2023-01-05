@@ -29,11 +29,11 @@ public class CommandHelp extends FtcCommand {
     factory.usage("")
         .addInfo("Displays all help info");
 
-    factory.usage("<topic> [page: number(1..)] [page size: number(5..20)]")
+    factory.usage("<topic> [<page: number(1..)>] [<page size: number(5..20)>]")
         .addInfo("Queries information for a specific topic.")
         .addInfo("[page] optionally displays the specific page of information");
 
-    factory.usage("'' [page: number(1..)] [page size: number(5..20)]")
+    factory.usage("'' [<page: number(1..)>] [<page size: number(5..20)>]")
         .addInfo("Displays a specific page of all help info.");
   }
 

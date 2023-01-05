@@ -28,6 +28,7 @@ public abstract class GuildCommandNode extends FtcCommand {
     this.argumentName = Validate.notEmpty(argumentName);
 
     setPermission(Permissions.GUILD);
+    setDescription("Guild command, see '/help guild' for more info");
   }
 
   @Override

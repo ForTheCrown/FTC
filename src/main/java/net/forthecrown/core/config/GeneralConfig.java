@@ -41,7 +41,6 @@ public @UtilityClass class GeneralConfig {
       logAdminShop                = true,
       logNormalShop               = false,
       crownEventActive            = false,
-      crownEventIsTimed           = false,
       hulkSmashPoles              = true,
       allowNonOwnerSwords         = false,
       useAsyncTpForPlayers        = false,
@@ -67,18 +66,15 @@ public @UtilityClass class GeneralConfig {
       effectCost_death            = 2000,
       effectCost_travel           = 2500,
       swordGoalGainPerKill        = 1,
-      tpTickDelay                 = 60,
       tpCooldown                  = 60,
       tpaExpiryTime               = 2400,
       startRhines                 = 100,
       baronPrice                  = 500_000,
-      maxUserMapValue             = 50_000_000,
       maxSignShopPrice            = 1_000_000,
       dailySellShopPriceLoss      = 5000;
 
   public static long
       autoSaveInterval            = TimeUnit.MINUTES.toMillis(30),
-      marriageCooldown            = TimeUnit.DAYS.toMillis(3),
       afkKickDelay                = TimeUnit.HOURS.toMillis(3),
       autoAfkDelay                = TimeUnit.HOURS.toMillis(1),
       dataRetentionTime           = TimeUnit.DAYS.toMillis(7 * 2),

@@ -34,6 +34,14 @@ public class UserCommands extends CmdUtil {
     }
 
     @Override
+    public void populateUsages(UsageFactory factory) {
+      var prefixed = factory.withPrefix("<user>");
+      for (var n: NODES) {
+        n.createUsages(prefixed.withPrefix(n.argumentName));
+      }
+    }
+
+    @Override
     protected void createCommand(BrigadierCommand command) {
       var argument = argument(USER_ARG_NAME, Arguments.USER);
       UserProvider provider = c -> Arguments.getUser(c, USER_ARG_NAME);

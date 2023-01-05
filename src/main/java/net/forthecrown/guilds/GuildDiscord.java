@@ -22,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import javax.imageio.ImageIO;
 import lombok.Getter;
@@ -29,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.forthecrown.core.FTC;
+import net.forthecrown.guilds.unlockables.UnlockableRoleColor;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.forthecrown.utils.text.Text;
@@ -198,9 +200,9 @@ public class GuildDiscord {
     });
   }
 
-  public void createRole() {
+  public CompletableFuture<Role> createRole() {
     if (getRole().isPresent()) {
-      return;
+      return CompletableFuture.failedFuture(new NullPointerException());
     }
 
     Icon icon = null;
@@ -213,11 +215,14 @@ public class GuildDiscord {
     var discordGuild = getDiscordGuild();
     var boost = discordGuild.getBoostTier();
 
-    if (boost == BoostTier.NONE || boost == BoostTier.TIER_1) {
+    if (boost == BoostTier.NONE
+        || boost == BoostTier.TIER_1
+        || UnlockableRoleColor.COLOR.isUnlocked(guild) // Check if donator
+    ) {
       icon = null;
     }
 
-    discordGuild
+    return discordGuild
         .createRole()
         .setName("Guild: " +  guild.getName())
         .setColor(

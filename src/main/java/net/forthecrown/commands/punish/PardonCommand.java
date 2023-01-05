@@ -19,8 +19,14 @@ public class PardonCommand extends FtcCommand {
 
     setAliases(aliases);
     setPermission(type.getPermission());
+    setDescription("Pardons a user, if they've been " + type.nameEndingED());
 
     register();
+  }
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("<user>", "Pardons a <user>");
   }
 
   @Override
