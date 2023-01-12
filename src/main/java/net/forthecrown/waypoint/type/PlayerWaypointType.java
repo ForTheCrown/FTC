@@ -55,7 +55,7 @@ public class PlayerWaypointType extends WaypointType {
     int destroyedCount = 0;
 
     for (int i = 0; i < column.length; i++) {
-      var bPos = pos.add(0, i, 0);
+      var bPos = i == 0 ? pos : pos.add(0, i, 0);
       var block = Vectors.getBlock(bPos, world);
 
       if (block.getType() != column[i]) {

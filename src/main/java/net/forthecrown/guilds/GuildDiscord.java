@@ -8,19 +8,24 @@ import com.google.gson.JsonElement;
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.EmbedBuilder;
 import github.scarsz.discordsrv.dependencies.jda.api.JDA;
+import github.scarsz.discordsrv.dependencies.jda.api.MessageBuilder;
 import github.scarsz.discordsrv.dependencies.jda.api.Permission;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Category;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Guild.BoostTier;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Icon;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Icon.IconType;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Member;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.Message;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Role;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.Webhook;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.WebhookClient;
 import github.scarsz.discordsrv.dependencies.jda.api.managers.ChannelManager;
-import github.scarsz.discordsrv.util.WebhookUtil;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.EnumSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -32,9 +37,11 @@ import lombok.experimental.Accessors;
 import net.forthecrown.core.FTC;
 import net.forthecrown.guilds.unlockables.UnlockableRoleColor;
 import net.forthecrown.user.User;
+import net.forthecrown.utils.io.FtcJar;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.Logger;
 
 @Getter
@@ -44,6 +51,7 @@ public class GuildDiscord {
   public static final String
       KEY_CHANNEL = "channelId",
       KEY_ROLE = "roleId",
+      KEY_WEBHOOK = "webhookId",
       KEY_CHANNEL_UPDATE = "lastChannelUpdate",
       KEY_ROLE_UPDATE = "lastRoleUpdate",
       KEY_ANNOUNCEMENTS = "forwardAnnouncements";
@@ -64,10 +72,13 @@ public class GuildDiscord {
         - Love, Steven
       """;
 
+  public static final String WEBHOOK_NAME = "Steven, the Guild Commissioner";
+
   private final Guild guild;
 
   private long channelId = NULL_ID;
   private long roleId = NULL_ID;
+  private long webhookId = NULL_ID;
 
   private long lastChannelUpdate = UNSET;
   private long lastRoleUpdate = UNSET;
@@ -152,33 +163,84 @@ public class GuildDiscord {
   public void forwardGuildChat(User sender, Component message) {
     getChannel().ifPresent(channel -> {
       String text = Text.toDiscord(message);
-      String name = sender.getNickOrName();
+      String name = Text.toDiscord(sender.getTabName());
 
       webHookMessage(channel, name + " **>** " + text, false);
     });
   }
 
-  private void webHookMessage(TextChannel channel, String message, boolean asEmbeded) {
-    WebhookUtil.deliverMessage(
-        channel,
-        "Steven, the Guild Commissioner",
+  private void webHookMessage(TextChannel channel,
+                              String message,
+                              boolean asEmbeded
+  ) {
+    MessageBuilder builder = new MessageBuilder();
 
-        // Avatar URL
-        getJDA().getSelfUser()
-            .getEffectiveAvatarUrl(),
+    if (asEmbeded) {
+      EmbedBuilder embedBuilder = new EmbedBuilder();
+      embedBuilder.setDescription(message);
+      builder.setEmbeds(embedBuilder.build());
+    } else {
+      builder.setContent(message);
+    }
 
-        // Dumb quick thing to quickly toggle between
-        // embedded messages and normal text messages
-        asEmbeded ? null : message,
-        !asEmbeded ? null : new EmbedBuilder()
-            .setTitle(message)
-            .setColor(
-                guild.getSettings()
-                    .getPrimaryColor()
-                    .getTextColor()
-                    .value()
-            )
-            .build()
+    webHookMessage(channel, builder.build());
+  }
+
+  private void webHookMessage(TextChannel channel, Message message) {
+    Objects.requireNonNull(message, "Message null");
+
+    if (channel == null) {
+      channel = getChannel().orElseThrow();
+    }
+
+    LOGGER.debug("message={}", message);
+
+    getOrCreateWebhook(channel)
+        .thenAccept(webhook -> {
+          WebhookClient<Void> client = (WebhookClient<Void>) webhook;
+          client.sendMessage(message).submit();
+        });
+  }
+
+  private CompletableFuture<Webhook> getOrCreateWebhook(TextChannel channel) {
+    return getWebhook().orElseGet(() -> createWebhook(channel));
+  }
+
+  private CompletableFuture<Webhook> createWebhook(TextChannel channel) {
+    var path = FtcJar.resourcePath(GuildConfig.webhookAvatarPath);
+
+    Icon icon = null;
+    try {
+      var input = Files.newInputStream(path);
+
+      var extension =  FilenameUtils.getExtension(path.getFileName().toString());
+      icon = Icon.from(input, IconType.fromExtension(extension));
+    } catch (IOException exc) {
+      LOGGER.error("Couldn't read icon from path {}",
+          path.toString(), exc
+      );
+    }
+
+    return channel.createWebhook(WEBHOOK_NAME)
+        .setAvatar(icon)
+        .submit()
+        .whenComplete((webhook, throwable) -> {
+          if (throwable == null) {
+            return;
+          }
+
+          LOGGER.error("Error creating webhook for {}", guild, throwable);
+        });
+  }
+
+  public Optional<CompletableFuture<Webhook>> getWebhook() {
+    if (webhookId == NULL_ID || getChannel().isEmpty()) {
+      return Optional.empty();
+    }
+
+    return Optional.of(
+        getJDA().retrieveWebhookById(webhookId)
+            .submit()
     );
   }
 
@@ -265,7 +327,7 @@ public class GuildDiscord {
     var storage = manager.getStorage();
 
     var image = manager.getRenderer()
-        .render(guild.getSettings().getBanner());
+        .renderSquare(guild.getSettings().getBanner());
 
     storage.saveIcon(guild, image);
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -286,8 +348,7 @@ public class GuildDiscord {
   }
 
   public Optional<TextChannel> channelIfNotArchived() {
-    return getChannel()
-        .map(channel -> isArchived(channel) ? null : channel);
+    return getChannel().filter(channel -> !isArchived(channel));
   }
 
   public static ChannelVisibility getVisibility(TextChannel channel) {
@@ -459,6 +520,10 @@ public class GuildDiscord {
       json.add(KEY_CHANNEL, channelId);
     }
 
+    if (webhookId != NULL_ID) {
+      json.add(KEY_WEBHOOK, webhookId);
+    }
+
     if (lastChannelUpdate != UNSET) {
       json.addTimeStamp(KEY_CHANNEL_UPDATE, lastChannelUpdate);
     }
@@ -481,6 +546,7 @@ public class GuildDiscord {
 
     roleId = json.getLong(KEY_ROLE, NULL_ID);
     channelId = json.getLong(KEY_CHANNEL, NULL_ID);
+    webhookId = json.getLong(KEY_WEBHOOK, NULL_ID);
     lastRoleUpdate = json.getTimeStamp(KEY_ROLE_UPDATE, UNSET);
     lastChannelUpdate = json.getTimeStamp(KEY_CHANNEL_UPDATE, UNSET);
     forwardAnnouncements = json.getBool(KEY_ANNOUNCEMENTS, true);

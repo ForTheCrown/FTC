@@ -46,8 +46,10 @@ public class RoyalSword extends ExtendedItem {
       TAG_ABILITY = "ability",
       TAG_ABILITY_TYPE = "abilityType";
 
-  public static final Component BORDER = Component.text("------------------------------",
-      nonItalic(NamedTextColor.DARK_GRAY));
+  public static final Component BORDER = Component.text(
+      "------------------------------",
+      nonItalic(NamedTextColor.DARK_GRAY)
+  );
 
   @Setter
   private SwordRank rank;
@@ -214,6 +216,7 @@ public class RoyalSword extends ExtendedItem {
     }
 
     if (ability != null) {
+      writer.newLine();
       ability.write(writer);
       writer.newLine();
       writer.newLine();

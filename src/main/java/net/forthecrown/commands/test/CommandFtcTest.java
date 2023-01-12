@@ -80,7 +80,7 @@ public class CommandFtcTest extends FtcCommand {
 
               try {
                 var img = GuildManager.get().getRenderer()
-                    .render(held);
+                    .renderSquare(held);
 
                 ImageIO.write(
                     img,

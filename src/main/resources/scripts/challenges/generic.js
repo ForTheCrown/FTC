@@ -3,5 +3,12 @@ function canComplete(user) {
 }
 
 function onEvent(event, handle) {
-    handle.givePoint(event.getPlayer());
+    let player = event.getPlayer();
+
+    if (player == null) {
+        logger.warn("Player in event {} is null", event.getClass());
+        return;
+    }
+
+    handle.givePoint(player);
 }

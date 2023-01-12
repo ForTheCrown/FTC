@@ -41,6 +41,12 @@ public class CommandTransferShop extends FtcCommand {
    */
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("<user>")
+        .addInfo("Transfers the shop you own to a <user>");
+  }
+
+  @Override
   protected void createCommand(BrigadierCommand command) {
     command
         .then(argument("user", Arguments.USER)

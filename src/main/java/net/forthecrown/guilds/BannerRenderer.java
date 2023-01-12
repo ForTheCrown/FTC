@@ -41,7 +41,7 @@ public class BannerRenderer {
   public static final int BANNER_HEIGHT = 40;
 
   /**
-   * The scalar applied images resulting from {@link #render(ItemStack)}.
+   * The scalar applied images resulting from {@link #renderSquare(ItemStack)}.
    * <p>
    * Done to raise the normally 20x40 banner textures above Discord's required
    * 64x64 image size.
@@ -64,12 +64,15 @@ public class BannerRenderer {
     fillFileNames();
     assetsPath = Path.of("mc_assets");
 
+    // Get the banner directory
     this.bannerTextureDirectory = assetsPath.resolve("assets")
         .resolve("minecraft")
         .resolve("textures")
         .resolve("entity")
         .resolve("banner");
 
+    // Optionally download assets if the assets directory doesn't exist or
+    // is from a previous version
     if (shouldDownloadAssets()) {
       PathUtil.safeDelete(assetsPath);
 
@@ -88,6 +91,10 @@ public class BannerRenderer {
     }
   }
 
+  /**
+   * Fills the pattern filename lookup map with filenames from the vanilla
+   * pattern registry
+   */
   private void fillFileNames() {
     Registry<BannerPattern> registry = BuiltInRegistries.BANNER_PATTERN;
 
@@ -133,7 +140,17 @@ public class BannerRenderer {
     return DyeColor.valueOf(metaName);
   }
 
-  public BufferedImage render(ItemStack item) throws IOException {
+  /**
+   * Renders the given banner itemStack as a square PNG, adding blank pixels
+   * to the sides to preserve image quality.
+   *
+   * @param item The banner item to render
+   * @return The rendered image
+   *
+   * @throws IOException If the texture of one of the banner's patterns could
+   *                     not be read
+   */
+  public BufferedImage renderSquare(ItemStack item) throws IOException {
     var meta = item.getItemMeta();
     Validate.isInstanceOf(BannerMeta.class, meta);
     BannerMeta bannerMeta = (BannerMeta) meta;
@@ -147,17 +164,19 @@ public class BannerRenderer {
     patterns.add(0, base);
 
     // Scale the image's bounds
-    int w = BANNER_WIDTH  * IMAGE_SCALE;
-    int h = BANNER_HEIGHT * IMAGE_SCALE;
+    int size = BANNER_HEIGHT * IMAGE_SCALE;
 
     // Create image and create graphics renderer for image
-    BufferedImage result = new BufferedImage(w, h, TYPE_INT_ARGB);
+    BufferedImage result = new BufferedImage(size, size, TYPE_INT_ARGB);
     Graphics2D g2d = result.createGraphics();
+
+    int xOffset = ((BANNER_HEIGHT - BANNER_WIDTH) / 2);
 
     // Create transform to scale all given inputs
     AffineTransform transform = AffineTransform.getScaleInstance(
         IMAGE_SCALE, IMAGE_SCALE
     );
+    transform.translate(xOffset, 0);
     g2d.setTransform(transform);
 
     // Draw all patterns
@@ -201,6 +220,10 @@ public class BannerRenderer {
 
           // Fill rectangle
           g2d.setColor(c);
+
+          // Size of 1 and off set from 1, 1, we don't care about any
+          // offsets or sizes because the g2d's affine transform takes
+          // care of that
           g2d.fillRect(x - startX, y - startY, 1, 1);
         }
       }

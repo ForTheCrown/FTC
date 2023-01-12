@@ -52,8 +52,8 @@ public class ChallengeDataStorage {
     this.itemDataDirectory = directory.resolve("item_data");
 
     // Files
-    this.challengesFile = directory.resolve("challenges.json");
-    this.itemChallengesFile = directory.resolve("item_challenges.json");
+    this.challengesFile = directory.resolve("challenges.toml");
+    this.itemChallengesFile = directory.resolve("item_challenges.toml");
     this.userDataFile = directory.resolve("user_data.json");
     this.streakScriptFile = directory.resolve("streak_scripts.json");
   }
@@ -120,7 +120,7 @@ public class ChallengeDataStorage {
                                Path path,
                                Function<JsonObject, DataResult<? extends Challenge>> parser
   ) {
-    SerializationHelper.readJsonFile(path, json -> {
+    SerializationHelper.readTomlAsJson(path, json -> {
       int loaded = 0;
 
       for (var e : json.entrySet()) {

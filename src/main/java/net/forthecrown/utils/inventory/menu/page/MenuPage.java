@@ -26,6 +26,10 @@ public abstract class MenuPage implements MenuNode {
   @Getter
   private Menu menu;
 
+  public MenuPage() {
+    this(null);
+  }
+
   protected final void initMenu(MenuBuilder builder, boolean parentButton) {
     addBorder(builder);
 

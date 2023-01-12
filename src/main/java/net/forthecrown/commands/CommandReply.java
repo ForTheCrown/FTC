@@ -26,7 +26,7 @@ public class CommandReply extends FtcCommand {
   @Override
   public void populateUsages(UsageFactory factory) {
     factory.usage("<message>")
-        .addInfo("Sends <message> to the last person that")
+        .addInfo("Sends a <message> to the last person that")
         .addInfo("messaged you / you messaged.");
   }
 

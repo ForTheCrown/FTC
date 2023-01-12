@@ -178,9 +178,18 @@ public class Properties {
    * Determines whether only public guilds are shown in the guild
    * discovery menu
    */
-  G_DISC_PUBLIC_ONLY   = new BoolProperty("guildDiscovery_onlyPublic", true),
+  G_DISC_PUBLIC_ONLY = new BoolProperty("guildDiscovery_onlyPublic", true),
 
-  G_CHAT_TOGGLE        = new BoolProperty("guildChatToggled", false);
+  /** Determines whether all messages will go guild chat or not */
+  G_CHAT_TOGGLE = new BoolProperty("guildChatToggled", false),
+
+  /**
+   * Determines whether the animation when upgrading/setting a weapon ability
+   * should be skipped or not
+   */
+  SKIP_ABILITY_ANIM = new BoolProperty("skipAbilityAnimation", false),
+
+  BYPASS_TRUST = new BoolProperty("bypassClaimTrust", false);
 
   /**
    * Determines a player's TAB prefix.

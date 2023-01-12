@@ -1,7 +1,10 @@
 package net.forthecrown.core.script2;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.Reader;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Objects;
@@ -30,8 +33,8 @@ public class Script implements Closeable, JSObject {
   private static final Logger LOGGER = FTC.getLogger();
 
   /**
-   * The source where the script originates, could be raw JS code,
-   * or a file's path
+   * The source where the script originates, could be raw JS code, or a file's
+   * path
    */
   private final ScriptSource source;
 
@@ -65,8 +68,8 @@ public class Script implements Closeable, JSObject {
   /* ------------------------ STATIC CONSTRUCTORS ------------------------- */
 
   /**
-   * Creates a script instance with the given name as the script's path within the plugin script
-   * directory.
+   * Creates a script instance with the given name as the script's path within
+   * the plugin script directory.
    *
    * @param name The script's name
    * @return The created script
@@ -96,104 +99,118 @@ public class Script implements Closeable, JSObject {
   /**
    * Reads the script file with the given name.
    * <p>
-   * Script names are relative to the <code>plugins/ForTheCrown/scripts</code> directory, as an
-   * example, a script used by a challenge might be called,
+   * Script names are relative to the <code>plugins/ForTheCrown/scripts</code>
+   * directory, as an example, a script used by a challenge might be called,
    * <code>challenges/on_challenge.js</code>. They must always include the
    * '.js' file extension as well.
    * <p>
-   * Be aware! Since scripts can start scheduled tasks and register event listeners, it's optimal to
-   * use a try-with-resources or other method to ensure that the {@link #close()} method is called
-   * after the script is no longer needed to be in memory.
+   * Be aware! Since scripts can start scheduled tasks and register event
+   * listeners, it's optimal to use a try-with-resources or other method to
+   * ensure that the {@link #close()} method is called after the script is no
+   * longer needed to be in memory.
    *
    * @param file The script's name
    * @return The loaded script.
-   * @throws ScriptLoadException      If an error occurred during script loading, script
-   *                                  evaluation.
-   * @throws IllegalArgumentException If the given file doesn't exist or isn't a file
+   * @throws ScriptLoadException      If an error occurred during script
+   *                                  loading, script evaluation.
+   * @throws IllegalArgumentException If the given file doesn't exist or isn't a
+   *                                  file
    */
   public static Script read(String file)
-      throws ScriptLoadException, IllegalArgumentException
-  {
+      throws ScriptLoadException, IllegalArgumentException {
     return of(file).load();
   }
 
   /**
    * Reads the script file at the given path.
    * <p>
-   * Be aware! Since scripts can start scheduled tasks and register event listeners, it's optimal to
-   * use a try-with-resources or other method to ensure that the {@link #close()} method is called
-   * after the script is no longer needed to be in memory.
+   * Be aware! Since scripts can start scheduled tasks and register event
+   * listeners, it's optimal to use a try-with-resources or other method to
+   * ensure that the {@link #close()} method is called after the script is no
+   * longer needed to be in memory.
    *
    * @param file The script's file
    * @return The loaded script
-   * @throws ScriptLoadException      If an error occurred during script loading, script
-   *                                  evaluation.
-   * @throws IllegalArgumentException If the given file doesn't exist or isn't a file
+   * @throws ScriptLoadException      If an error occurred during script
+   *                                  loading, script evaluation.
+   * @throws IllegalArgumentException If the given file doesn't exist or isn't a
+   *                                  file
    */
   public static Script read(Path file)
-      throws ScriptLoadException, IllegalArgumentException
-  {
+      throws ScriptLoadException, IllegalArgumentException {
     return of(file).load();
   }
 
   /**
-   * Reads a script file using {@link #read(Path)} and then invokes the method with the given name
-   * and arguments. After the function is executed, the script is closed
+   * Reads a script file using {@link #read(Path)} and then invokes the method
+   * with the given name and arguments. After the function is executed, the
+   * script is closed
    *
    * @param file   The script file to invoke
    * @param method The name of the method to invoke
    * @param args   Arguments to pass to the function being invoked
-   * @throws ScriptLoadException      If the script couldn't be loaded, see {@link #load()}
-   * @throws IllegalArgumentException If the given script file didn't exist or wasn't a file
+   * @throws ScriptLoadException      If the script couldn't be loaded, see
+   *                                  {@link #load(String...)}
+   * @throws IllegalArgumentException If the given script file didn't exist or
+   *                                  wasn't a file
    */
   public static void run(Path file, String method, Object... args)
-      throws ScriptLoadException, IllegalArgumentException
-  {
+      throws ScriptLoadException, IllegalArgumentException {
     read(file).invoke(method, args).close();
   }
 
   /**
-   * Reads a script file using {@link #read(String)} and then invokes the method with the given name
-   * and arguments. After the function is executed, the script is closed
+   * Reads a script file using {@link #read(String)} and then invokes the method
+   * with the given name and arguments. After the function is executed, the
+   * script is closed
    *
-   * @param f      The name of the script to invoke.
+   * @param f      The name (path) of the script to invoke.
    * @param method The name of the method to invoke
    * @param args   Arguments to pass to the function being invoked
-   * @throws ScriptLoadException      If the script couldn't be loaded, see {@link #load()}
-   * @throws IllegalArgumentException If the given script file didn't exist or wasn't a file
+   * @throws ScriptLoadException      If the script couldn't be loaded, see
+   *                                  {@link #load(String...)}
+   * @throws IllegalArgumentException If the given script file didn't exist or
+   *                                  wasn't a file
    */
   public static void run(String f, String method, Object... args)
-      throws ScriptLoadException, IllegalArgumentException
-  {
+      throws ScriptLoadException, IllegalArgumentException {
     read(f).invoke(method, args).close();
   }
 
-  /* ------------------------------ METHODS ------------------------------- */
+  /* ------------------------------ READING ------------------------------ */
 
-  /**
-   * Invokes the method with the given name and passes it the given arguments.
-   * <p>
-   * If the script is not loaded when this invocation is called, then {@link #load()} will be called
-   * to load the script.
-   * <p>
-   * Any exception thrown by this method directly, will be wrapped with a script exception that
-   * holds the name of the method, script and actual error to provide more detail.
-   *
-   * @param method The name of the method to invoke
-   * @param args   The arguments to pass to the method.
-   * @return The invocation result
-   * @throws ScriptLoadException If the script was not already loaded and could not be loaded
-   *                             either.
-   */
-  public ScriptResult invoke(String method, Object... args)
-      throws ScriptLoadException
-  {
-    if (engine == null) {
-      load();
+  public static Script read(JsonElement element, boolean assumeRawJs) {
+    ScriptSource source;
+
+    if (element instanceof JsonObject obj) {
+      if (obj.has("js")) {
+        source = ScriptSource.of(obj.get("js").getAsString());
+      } else if (obj.has("path")) {
+        source = ScriptSource.of(
+            ScriptManager.getInstance()
+                .getScriptFile(obj.get("path").getAsString())
+        );
+      } else {
+        throw new IllegalStateException(
+            "Object did not have either 'path' or 'js' values"
+        );
+      }
+    } else {
+      var str = element.getAsString();
+
+      if (assumeRawJs) {
+        source = ScriptSource.of(str);
+      } else {
+        source = ScriptSource.of(
+            ScriptManager.getInstance().getScriptFile(str)
+        );
+      }
     }
 
-    return invokeSafe(this, mirror, method, args);
+    return new Script(source);
   }
+
+  /* ------------------------------ METHODS ------------------------------- */
 
   static ScriptResult invokeSafe(Script script,
                                  ScriptObjectMirror thiz,
@@ -221,19 +238,44 @@ public class Script implements Closeable, JSObject {
   }
 
   /**
-   * Tests if the method with the given name exists, if it does, calls
-   * {@link #invoke(String, Object...)}, if it doesn't, returns an empty optional
+   * Invokes the method with the given name and passes it the given arguments.
+   * <p>
+   * If the script is not loaded when this invocation is called, then
+   * {@link #load(String...)} will be called to load the script.
+   * <p>
+   * Any exception thrown by this method directly, will be wrapped with a script
+   * exception that holds the name of the method, script and actual error to
+   * provide more detail.
    *
    * @param method The name of the method to invoke
    * @param args   The arguments to pass to the method.
-   * @return An empty optional, if the method didn't exist, an optional containing the invocation
-   * result otherwise
-   * @throws ScriptLoadException If the script was not already loaded and could not be loaded
-   *                             either.
+   * @return The invocation result
+   * @throws ScriptLoadException If the script was not already loaded and could
+   *                             not be loaded either.
+   */
+  public ScriptResult invoke(String method, Object... args)
+      throws ScriptLoadException {
+    if (engine == null) {
+      load();
+    }
+
+    return invokeSafe(this, mirror, method, args);
+  }
+
+  /**
+   * Tests if the method with the given name exists, if it does, calls
+   * {@link #invoke(String, Object...)}, if it doesn't, returns an empty
+   * optional
+   *
+   * @param method The name of the method to invoke
+   * @param args   The arguments to pass to the method.
+   * @return An empty optional, if the method didn't exist, an optional
+   * containing the invocation result otherwise
+   * @throws ScriptLoadException If the script was not already loaded and could
+   *                             not be loaded either.
    */
   public Optional<ScriptResult> invokeIfExists(String method, Object... args)
-      throws ScriptLoadException
-  {
+      throws ScriptLoadException {
     if (!hasMethod(method)) {
       return Optional.empty();
     }
@@ -242,14 +284,15 @@ public class Script implements Closeable, JSObject {
   }
 
   /**
-   * Delegate for {@link #load(Consumer)} with a null consumer
+   * Delegate for {@link #load(Consumer, String...)} with a null consumer
+   *
    * @return This
    * @throws ScriptLoadException If the script couldn't be loaded
-   * @see #load(Consumer)
+   * @see #load(Consumer, String...)
    */
   @Deprecated
-  public Script load() throws ScriptLoadException {
-    return load(null);
+  public Script load(String... args) throws ScriptLoadException {
+    return load(null, args);
   }
 
   /**
@@ -270,24 +313,22 @@ public class Script implements Closeable, JSObject {
    * fields are set and the script itself is loaded.
    * <p>
    * On-top of just loading the script, this method also populates the script's
-   * bindings with the default java classes, specified in {@link ScriptsBuiltIn},
-   * and adds the {@link #getTasks()} and {@link #getEvents()} to the script.
+   * bindings with the default java classes, specified in
+   * {@link ScriptsBuiltIn}, and adds the {@link #getTasks()} and
+   * {@link #getEvents()} to the script.
    *
-   * @param loadCallback Callback for placing values into the script's
-   *                     bindings before evaluation
-   *
+   * @param loadCallback Callback for placing values into the script's bindings
+   *                     before evaluation
    * @return This
    * @throws ScriptLoadException If the script couldn't be loaded
-   *
    * @deprecated This method performs 2 operations at once, compilation and
-   *             evaluation of a script, use {@link #compile()} to load and
-   *             compile a script, and then use {@link #eval()} to evaluate
+   * evaluation of a script, use {@link #compile(String...)} to load and compile
+   * a script, and then use {@link #eval()} to evaluate
    */
   @Deprecated
-  public Script load(@Nullable Consumer<Bindings> loadCallback)
-      throws ScriptLoadException
-  {
-    compile();
+  public Script load(@Nullable Consumer<Bindings> loadCallback, String... args)
+      throws ScriptLoadException {
+    compile(args);
 
     if (loadCallback != null) {
       loadCallback.accept(mirror);
@@ -312,27 +353,31 @@ public class Script implements Closeable, JSObject {
    *    tokens not supported by the Nashorn engine </pre>
    * If an exception is thrown, then {@link #close()} will be called again
    * <p>
-   * After compilation, users of this class are free to edit the script
-   * bindings however they deem fit. Script bindings can be accessed with
+   * After compilation, users of this class are free to edit the script bindings
+   * however they deem fit. Script bindings can be accessed with
    * {@link #getMirror()}
    *
+   * @param args Optional arguments to supply to the engine
    * @return This
    * @throws ScriptLoadException If the script couldn't be loaded
    */
-  public Script compile() throws ScriptLoadException {
-    if (engine != null) {
+  public Script compile(String... args) throws ScriptLoadException {
+    if (isCompiled()) {
       close();
     }
 
     try {
-      var reader = source.produceReader();
-      var engine = ScriptManager.getInstance().createEngine();
+      Reader reader = source.produceReader();
+      reader = JsPreProcessor.preprocess(reader);
+
+      NashornScriptEngine engine
+          = ScriptManager.getInstance().createEngine(args);
 
       // Add default values
       ScriptsBuiltIn.populate(source.getName(), engine);
       engine.put("scheduler", tasks);
       engine.put("events", events);
-      engine.put("_script", this);
+      engine.put("args", args);
 
       this.engine = engine;
       this.mirror = (ScriptObjectMirror)
@@ -348,13 +393,12 @@ public class Script implements Closeable, JSObject {
   }
 
   /**
-   * Evaluates this script. This requires the script to be compiled,
-   * with {@link #compile()}
+   * Evaluates this script. This requires the script to be compiled, with
+   * {@link #compile(String...)}
    * <p>
    * Aka, runs the main scope of this script.
    *
    * @return A successful or failed result
-   *
    * @throws NullPointerException If the script is not compiled
    */
   public ScriptResult eval() throws NullPointerException {
@@ -387,11 +431,12 @@ public class Script implements Closeable, JSObject {
   }
 
   /**
-   * Tests if this script has a method with the given name. If {@link #isCompiled()} is false, then
-   * this returns false
+   * Tests if this script has a method with the given name. If
+   * {@link #isCompiled()} is false, then this returns false
    *
    * @param name The name of the method to look for
-   * @return True, if a binding value with the given name existed, and it was a method
+   * @return True, if a binding value with the given name existed, and it was a
+   * method
    */
   public boolean hasMethod(String name) {
     if (mirror == null) {
@@ -408,8 +453,8 @@ public class Script implements Closeable, JSObject {
   }
 
   /**
-   * Ensures this script has been compiled, if it hasn't throws a
-   * null pointer exception
+   * Ensures this script has been compiled, if it hasn't throws a null pointer
+   * exception
    */
   private void ensureCompiled() throws NullPointerException {
     Objects.requireNonNull(compiledScript, "Script not compiled");
@@ -418,15 +463,16 @@ public class Script implements Closeable, JSObject {
   /**
    * Places an object into the script's bindings.
    * <p>
-   * This allows you to use the given object within the script easily,
-   * for example, placing a {@link net.forthecrown.user.User} instance into a
-   * script with the key 'user' would allow you to use it like so:
+   * This allows you to use the given object within the script easily, for
+   * example, placing a {@link net.forthecrown.user.User} instance into a script
+   * with the key 'user' would allow you to use it like so:
    * <pre>
    * const afk = user.isAfk();
    * print(afk);
    * </pre>
+   *
    * @param key The name of the binding
-   * @param o The binding's value
+   * @param o   The binding's value
    * @throws NullPointerException If this script wasn't compiled
    */
   public void put(String key, Object o) throws NullPointerException {

@@ -21,6 +21,7 @@ public class CommandMarketEditing extends FtcCommand {
     setDescription(
         "Allows/disallows shop members to edit sign shops in your shop"
     );
+    simpleUsages();
 
     register();
   }

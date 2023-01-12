@@ -188,7 +188,9 @@ public class UserTeleport {
       if (GeneralConfig.useAsyncTpForPlayers && async) {
         player.teleportAsync(dest);
       } else {
-        player.teleport(dest);
+        // Ignore passengers and dismount the player if they're riding
+        // another entity
+        player.teleport(dest, true, true);
       }
       user.playSound(Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
 

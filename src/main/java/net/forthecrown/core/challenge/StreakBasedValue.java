@@ -53,21 +53,6 @@ public interface StreakBasedValue {
   }
 
   /**
-   * Creates a streak based value that uses the given array to fetch values, treating the streak
-   * value that it's given as an index for said array and clamping the streak value to the array's
-   * maximum index.
-   *
-   * @param values The values array to use
-   * @return The created container
-   */
-  static StreakBasedValue arrayBased(float[] values) {
-    return streak -> {
-      int index = GenericMath.clamp(streak, 0, values.length - 1);
-      return values[index];
-    };
-  }
-
-  /**
    * Creates a streak based value that scales using the given scalar and base, the formula this uses
    * is very simple: <code>result = base * (streak * scalar)</code>. The streak that's inputted into
    * the formula is also {@link Math#max(float, float)}-ed, so it doesn't drop below 1.
@@ -81,6 +66,10 @@ public interface StreakBasedValue {
       float streakF = Math.max(1.0F, streak);
       return base * (streakF * scalar);
     };
+  }
+
+  static StreakBasedValue daphScalar(float base) {
+    return streak -> base * (1.0F + Math.max(1.0F, streak) * 0.01F);
   }
 
   /**
@@ -118,26 +107,15 @@ public interface StreakBasedValue {
       return fixed(element.getAsFloat());
     }
 
-    // Array-based
-    if (element.isJsonArray()) {
-      var arr = element.getAsJsonArray();
-      float[] values = new float[arr.size()];
-
-      for (int i = 0; i < arr.size(); i++) {
-        values[i] = arr.get(i).getAsFloat();
-      }
-
-      if (values.length < 1) {
-        return def;
-      }
-
-      return arrayBased(values);
-    }
-
     // Scalar-based
     JsonWrapper json = JsonWrapper.wrap(element.getAsJsonObject());
+
+    if (json.has("daphScalar")) {
+      return daphScalar(json.getFloat("daphScalar"));
+    }
+
     float base = json.getFloat("base", 1.0F);
-    float scalar = json.getFloat("scalar", 1.0F);
+    float scalar = json.getFloat("scalar", 0.0F);
 
     if (base <= 0 || scalar <= 0) {
       return def;

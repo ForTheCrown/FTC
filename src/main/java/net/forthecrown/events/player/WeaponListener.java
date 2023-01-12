@@ -1,8 +1,8 @@
 package net.forthecrown.events.player;
 
-import net.forthecrown.core.config.GeneralConfig;
 import net.forthecrown.inventory.ExtendedItems;
 import net.forthecrown.inventory.weapon.RoyalSword;
+import net.forthecrown.inventory.weapon.SwordConfig;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -33,21 +33,20 @@ public class WeaponListener implements Listener {
       return;
     }
 
-    if (GeneralConfig.allowNonOwnerSwords
+    if (SwordConfig.allowNonOwnerSwords
         || sword.getOwner().equals(damager.getUniqueId())
     ) {
       sword.damage(damager, event, item);
     }
   }
 
-  // Don't ignore cancelled, by default,
-  // interactions with air blocks will be cancelled
-
   @EventHandler(ignoreCancelled = true)
   public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
     onInteract(event, event.getRightClicked(), false);
   }
 
+  // Don't ignore cancelled, by default,
+  // interactions with air blocks will be cancelled
   @EventHandler
   public void onPlayerInteract(PlayerInteractEvent event) {
     onInteract(event, null, event.getAction().isLeftClick());
@@ -68,14 +67,12 @@ public class WeaponListener implements Listener {
       return;
     }
 
-    if (leftClick) {
-      ability.onLeftClick(player, entity);
-    } else {
-      ability.onRightClick(player, entity);
-    }
+    boolean giveCooldown = leftClick
+        ? ability.onLeftClick(player, entity)
+        : ability.onRightClick(player, entity);
 
     int cooldownTicks = ability.getCooldownTicks();
-    if (cooldownTicks > 0) {
+    if (cooldownTicks > 0 && giveCooldown) {
       player.setCooldown(item.getType(), cooldownTicks);
     }
   }

@@ -123,13 +123,13 @@ public final class UserManager implements SerializableObject {
   }
 
   private void readExtraRanks() {
-    Path rankJson = directory.resolve("ranks.json");
+    Path rankJson = directory.resolve("ranks.toml");
 
     if (!Files.exists(rankJson)) {
       return;
     }
 
-    SerializationHelper.readJsonFile(rankJson, wrapper -> {
+    SerializationHelper.readTomlAsJson(rankJson, wrapper -> {
       for (var e: wrapper.entrySet()) {
         if (!Keys.isValidKey(e.getKey())) {
           LOGGER.warn("{} is an invalid registry key", e.getKey());

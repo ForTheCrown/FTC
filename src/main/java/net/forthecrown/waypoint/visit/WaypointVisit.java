@@ -264,7 +264,7 @@ public class WaypointVisit implements Runnable {
       }
 
       // Just TP them to pole... boring
-      user.getPlayer().teleport(getTeleportLocation());
+      user.getPlayer().teleport(getTeleportLocation(), true, true);
       user.playSound(Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
 
       runTpHandlers();
@@ -301,7 +301,7 @@ public class WaypointVisit implements Runnable {
         if (--tick < 0) {
           task.cancel();
 
-          user.getPlayer().teleport(getTeleportLocation());
+          user.getPlayer().teleport(getTeleportLocation(), true, true);
           user.playSound(Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
 
           runTpHandlers();

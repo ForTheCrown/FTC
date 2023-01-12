@@ -3,13 +3,13 @@ package net.forthecrown.useables.test;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.arguments.Arguments;
-import net.forthecrown.core.script2.Script;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.useables.CheckHolder;
 import net.forthecrown.useables.ConstructType;
 import net.forthecrown.useables.UsableConstructor;
 import net.forthecrown.useables.UsageTest;
 import net.forthecrown.useables.UsageType;
+import net.forthecrown.useables.actions.ActionScript;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
@@ -44,9 +44,10 @@ public class TestScript extends UsageTest {
 
   @Override
   public boolean test(Player player, CheckHolder holder) {
-    var script = Script.read(this.script);
+    var script = ActionScript.getScript(this.script, holder);
 
     if (!script.hasMethod("test")) {
+      script.close();
       return true;
     }
 
@@ -60,9 +61,10 @@ public class TestScript extends UsageTest {
 
   @Override
   public @Nullable Component getFailMessage(Player player, CheckHolder holder) {
-    var script = Script.read(this.script);
+    var script = ActionScript.getScript(this.script, holder);
 
     if (!script.hasMethod("getFailMessage")) {
+      script.close();
       return null;
     }
 
@@ -81,7 +83,7 @@ public class TestScript extends UsageTest {
 
   @Override
   public void postTests(Player player, CheckHolder holder) {
-    try (var script = Script.read(this.script)) {
+    try (var script = ActionScript.getScript(this.script, holder)) {
       script.invokeIfExists("onTestsPassed", Users.get(player));
     }
   }

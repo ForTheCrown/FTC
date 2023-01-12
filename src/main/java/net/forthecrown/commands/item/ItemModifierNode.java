@@ -1,12 +1,16 @@
 package net.forthecrown.commands.item;
 
+import com.google.common.base.Strings;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.Commands;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.utils.text.Text;
+import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.ItemStack;
 
 public abstract class ItemModifierNode extends FtcCommand {
@@ -38,5 +42,25 @@ public abstract class ItemModifierNode extends FtcCommand {
     }
 
     return held;
+  }
+
+  protected Component optionallyWrap(Component text,
+                                     CommandContext<CommandSource> c,
+                                     String argName
+  ) {
+    var input = Commands.findInput(argName, c);
+
+    if (Strings.isNullOrEmpty(input)) {
+      return Text.wrapForItems(text);
+    }
+
+    if (input.startsWith("{")
+        || input.startsWith("\"")
+        || input.startsWith("[")
+    ) {
+      return text;
+    }
+
+    return Text.wrapForItems(text);
   }
 }

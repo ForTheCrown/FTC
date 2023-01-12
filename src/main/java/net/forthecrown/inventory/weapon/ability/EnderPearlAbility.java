@@ -20,19 +20,24 @@ public class EnderPearlAbility extends WeaponAbility {
   }
 
   @Override
-  public void onRightClick(Player player, @Nullable Entity clicked) {
+  public boolean onRightClick(Player player, @Nullable Entity clicked) {
     if (clicked != null) {
-      return;
+      return false;
     }
 
-    player.getWorld().spawn(player.getEyeLocation(), EnderPearl.class, pearl -> {
-      pearl.setShooter(player);
-      pearl.setHasLeftShooter(false);
+    var projectile = player.launchProjectile(
+        EnderPearl.class,
+        player.getLocation()
+            .getDirection()
+            .multiply(getLevel())
+    );
 
-      pearl.setVelocity(
-          player.getEyeLocation().getDirection()
-      );
-    });
+    player.setInvisible(true);
+
+    // If something like WorldGuard cancels the projectile launch event that's
+    // triggered by the above code, the projectile will be removed, if it is
+    // removed, then don't put the player on cooldown
+    return !projectile.isDead();
   }
 
   @Override
@@ -41,8 +46,9 @@ public class EnderPearlAbility extends WeaponAbility {
   }
 
   @Override
-  public void onLeftClick(Player player, @Nullable Entity clicked) {
+  public boolean onLeftClick(Player player, @Nullable Entity clicked) {
     // Do nothing
+    return false;
   }
 
   @Override

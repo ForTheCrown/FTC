@@ -1,15 +1,23 @@
 package net.forthecrown.commands.item;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.List;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.Messages;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.text.Text;
+import net.forthecrown.utils.text.TextJoiner;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.commands.arguments.CompoundTagArgument;
 import net.minecraft.commands.arguments.NbtPathArgument;
+import net.minecraft.commands.arguments.NbtPathArgument.NbtPath;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 
 public class ItemDataNode extends ItemModifierNode {
 
@@ -27,8 +35,10 @@ public class ItemDataNode extends ItemModifierNode {
 
   @Override
   public void populateUsages(UsageFactory factory) {
-    factory.usage("view")
-        .addInfo("Displays the item's data");
+    factory.usage("view [<nbt pat>]")
+        .addInfo("Displays the item's data")
+        .addInfo("If <nbt path> is set, then it'll only display the data")
+        .addInfo("at that path");
 
     factory.usage("merge <compound tag>")
         .addInfo("Merges the <compound tag> into the item's tag")
@@ -44,19 +54,28 @@ public class ItemDataNode extends ItemModifierNode {
   @Override
   public void create(LiteralArgumentBuilder<CommandSource> command) {
     command
-        .then(literal("view")
+        .then(literal("give_command")
             .executes(c -> {
               var held = getHeld(c.getSource());
 
-              var tag = ItemStacks.save(held);
-              var text = Text.displayTag(tag, true);
+              String nbt = ItemStacks.save(held).getCompound("tag").toString();
+              String cmd = "/give @s " + held.getType().getKey() + nbt;
 
               c.getSource().sendMessage(
-                  Component.text("Item data: ")
-                      .append(text)
+                  Component.text(
+                      "[Click to copy /give command]", NamedTextColor.AQUA
+                  ).clickEvent(ClickEvent.copyToClipboard(cmd))
               );
               return 0;
             })
+        )
+
+        .then(literal("view")
+            .executes(c -> view(c, false))
+
+            .then(argument("path", NbtPathArgument.nbtPath())
+                .executes(c -> view(c, true))
+            )
         )
 
         .then(literal("remove")
@@ -100,5 +119,36 @@ public class ItemDataNode extends ItemModifierNode {
                 })
             )
         );
+  }
+
+  private int view(CommandContext<CommandSource> c, boolean pathSet)
+      throws CommandSyntaxException
+  {
+    var held = getHeld(c.getSource());
+
+    var tag = ItemStacks.save(held);
+    List<Tag> elements;
+
+    if (pathSet) {
+      NbtPath path = c.getArgument("path", NbtPath.class);
+      elements = path.get(tag);
+
+      if (elements.isEmpty()) {
+        throw Exceptions.format("No data at {0}",
+            path.toString()
+        );
+      }
+    } else {
+      elements = List.of(tag);
+    }
+
+    c.getSource().sendMessage(
+        Component.text("Item data: ").append(
+            TextJoiner.onNewLine()
+                .add(elements.stream().map(tag1 -> Text.displayTag(tag1, true)))
+                .asComponent()
+        )
+    );
+    return 0;
   }
 }

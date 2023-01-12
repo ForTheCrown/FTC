@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -80,6 +81,15 @@ public class UsablesListeners implements Listener {
 
   @EventHandler
   public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+    boolean b = check(event.getRightClicked(), event.getPlayer(), event.getHand());
+
+    if (b && !event.isCancelled()) {
+      event.setCancelled(true);
+    }
+  }
+
+  @EventHandler
+  public void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event) {
     boolean b = check(event.getRightClicked(), event.getPlayer(), event.getHand());
 
     if (b && !event.isCancelled()) {

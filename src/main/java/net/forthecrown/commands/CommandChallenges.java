@@ -13,7 +13,6 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.challenge.Challenge;
 import net.forthecrown.core.challenge.ChallengeBook;
-import net.forthecrown.core.challenge.ChallengeItemContainer;
 import net.forthecrown.core.challenge.ChallengeManager;
 import net.forthecrown.core.challenge.Challenges;
 import net.forthecrown.core.challenge.ItemChallenge;
@@ -21,20 +20,21 @@ import net.forthecrown.core.challenge.ResetInterval;
 import net.forthecrown.core.challenge.StreakCategory;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.EnumArgument;
+import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.useables.util.UsageUtil;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserLookupEntry;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.Users;
-import net.forthecrown.utils.Util;
-import net.forthecrown.utils.inventory.ItemStacks;
+import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.forthecrown.utils.text.writer.TextWriters;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Location;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
@@ -122,37 +122,19 @@ public class CommandChallenges extends FtcCommand {
         .addInfo("not set, it resets all categories");
 
     var items = factory.withPrefix("items <challenge>");
-    items.usage("list [-withNbt]")
-        .addInfo("Lists a <challenge>'s potential items.")
-        .addInfo("If the -withNbt flag is set, each item's NBT data will")
-        .addInfo("also be printed.");
-
-    items.usage("clear")
-        .addInfo("Clears every item in a <challenge>'s potential item list.")
-        .addInfo("This only clears the challenge's potential item list, it")
-        .addInfo("does not modify the current item");
-
-    items.usage("remove <index: number(1..)>")
-        .addInfo("Removes an item from a <challenge>'s item list")
-        .addInfo("To find the index, use '/challenges items <challenge> list'")
-        .addInfo("This changes the challenge's potential item list, it")
-        .addInfo("does not modify the current item");
-
-    items.usage("recursively_add_items_in_faced_chest")
-        .addInfo("Recursively adds all the items in a chest/container you're")
-        .addInfo("looking at. This doesn't remove any existing items in a")
-        .addInfo("<challenge>'s item list.")
-        .addInfo("All 'nested' items, are added separately, meaning any")
-        .addInfo("shulkers inside chests have their contents added, not the")
-        .addInfo("shulker itself");
-
     items.usage("set_active [<item>]")
         .addInfo("Sets an [item] to be a <challenge>'s active item")
         .addInfo("If [item] is not set, then your held item is used");
 
-    items.usage("add [<item>]")
-        .addInfo("Adds an [item] to a <challenge>'s item list")
-        .addInfo("If [item] is not set, then your held item is used");
+    var chests = items.withPrefix("chests");
+
+    chests.usage("")
+        .addInfo("Lists all chests a <challenge> is getting items from");
+
+    chests.usage("add [<block: x,y,z>]")
+        .addInfo("Adds a chest item source to a <challenge>")
+        .addInfo("If <block> is not set, the block you are looking at")
+        .addInfo("is used instead");
   }
 
   @Override
@@ -223,39 +205,45 @@ public class CommandChallenges extends FtcCommand {
             .requires(IS_ADMIN)
 
             .then(argument("challenge", RegistryArguments.CHALLENGE)
-                .then(literal("list")
-                    .executes(c -> itemsList(c, false))
+                .suggests((context, builder) -> {
+                  var registry = ChallengeManager.getInstance()
+                      .getChallengeRegistry();
 
-                    .then(literal("-with_nbt")
-                        .executes(c -> itemsList(c, true))
+                  return CompletionProvider.suggestMatching(builder,
+                      registry.entries()
+                          .stream()
+                          .filter(holder -> {
+                            return holder.getValue() instanceof ItemChallenge;
+                          })
+                          .map(Holder::getKey)
+                  );
+                })
+
+                .then(literal("chests")
+
+                    // List all chests
+                    .executes(this::itemsChestsList)
+
+                    .then(literal("add")
+                        // Add chest you're facing
+                        .executes(c -> itemsChestsAdd(c, false))
+
+                        .then(argument("position", PositionArgument.blockPos())
+                            // Add chest at given block
+                            .executes(c -> itemsChestsAdd(c, true))
+                        )
                     )
-                )
 
-                .then(literal("remove")
-                    .then(argument("index", IntegerArgumentType.integer(1))
-                        .executes(this::itemsRemove)
+                    // Removes a chest at an index
+                    .then(literal("remove")
+                        .then(argument("index", IntegerArgumentType.integer(1))
+                            .executes(this::itemsChestsRemove)
+                        )
                     )
-                )
 
-                .then(literal("add")
-                    .executes(c -> {
-                      var player = c.getSource().asPlayer();
-                      var item = Commands.getHeldItem(player);
-
-                      Holder<Challenge> holder
-                          = c.getArgument("challenge", Holder.class);
-
-                      return itemsAdd(c, item, holder);
-                    })
-
-                    .then(argument("item", UsageUtil.ITEM_ARGUMENT)
-                        .executes(c -> {
-                          var item = c.getArgument("item", ItemStack.class);
-                          Holder<Challenge> holder
-                              = c.getArgument("challenge", Holder.class);
-
-                          return itemsAdd(c, item, holder);
-                        })
+                    // Clears all chests
+                    .then(literal("clear")
+                        .executes(this::itemsChestsClear)
                     )
                 )
 
@@ -278,14 +266,6 @@ public class CommandChallenges extends FtcCommand {
                           return itemsSetActive(c, item, holder);
                         })
                     )
-                )
-
-                .then(literal("recursively_add_items_in_faced_chest")
-                    .executes(this::itemsFill)
-                )
-
-                .then(literal("clear")
-                    .executes(this::itemsClear)
                 )
             )
         )
@@ -405,10 +385,9 @@ public class CommandChallenges extends FtcCommand {
     return 0;
   }
 
-  /* ------------------------------- ITEMS -------------------------------- */
-
   private int completeAll(CommandContext<CommandSource> c)
-      throws CommandSyntaxException {
+      throws CommandSyntaxException
+  {
     var user = Arguments.getUser(c, "user");
     var manager = ChallengeManager.getInstance();
     var streak = c.getArgument("category", StreakCategory.class);
@@ -435,117 +414,7 @@ public class CommandChallenges extends FtcCommand {
     return 0;
   }
 
-  private int itemsRemove(CommandContext<CommandSource> c)
-      throws CommandSyntaxException {
-    int index = IntegerArgumentType.getInteger(c, "index");
-    Holder<Challenge> holder = c.getArgument("challenge", Holder.class);
-    ensureItemChallenge(holder);
-
-    ChallengeItemContainer container = ChallengeManager.getInstance()
-        .getStorage()
-        .loadContainer(holder);
-
-    Commands.ensureIndexValid(index, container.getPotentials().size());
-
-    var removed = container.getPotentials().remove(index - 1);
-
-    c.getSource().sendAdmin(
-        Text.format(
-            "Removed challenge item {0, item} at index {1, number}",
-            removed, index
-        )
-    );
-    return 0;
-  }
-
-  private int itemsList(CommandContext<CommandSource> c, boolean addNbtTag)
-      throws CommandSyntaxException {
-    Holder<Challenge> holder = c.getArgument("challenge", Holder.class);
-    ensureItemChallenge(holder);
-
-    ChallengeItemContainer container = ChallengeManager.getInstance()
-        .getStorage()
-        .loadContainer(holder);
-
-    if (container.isEmpty()) {
-      throw Exceptions.NOTHING_TO_LIST;
-    }
-
-    var it = container.getPotentials().listIterator();
-    while (it.hasNext()) {
-      var n = it.next();
-
-      Component line = Text.format(
-          "{0, number}) {1, item}",
-          it.nextIndex(), n
-      );
-
-      if (addNbtTag) {
-        line = line
-            .append(Component.text(": "))
-            .append(Text.displayTag(ItemStacks.save(n), false));
-      }
-
-      c.getSource().sendMessage(line);
-    }
-
-    return 0;
-  }
-
-  private int itemsFill(CommandContext<CommandSource> c)
-      throws CommandSyntaxException {
-    var player = c.getSource().asPlayer();
-    var target = player.getTargetBlockExact(5);
-
-    if (target == null
-        || !(target.getState() instanceof InventoryHolder invHolder)
-    ) {
-      throw Exceptions.format("Not looking at an inventory-holder block");
-    }
-
-    Holder<Challenge> holder = c.getArgument("challenge", Holder.class);
-    ensureItemChallenge(holder);
-    ItemChallenge item = (ItemChallenge) holder.getValue();
-
-    var storage = ChallengeManager.getInstance().getStorage();
-    var container = storage.loadContainer(holder);
-
-    container.fillFrom(invHolder.getInventory());
-
-    if (item.getTargetItem().isEmpty()) {
-      var next = container.next(Util.RANDOM);
-      container.setActive(next);
-      container.getUsed().add(next);
-      item.setTargetItem(next);
-    }
-
-    storage.saveContainer(container);
-
-    c.getSource().sendAdmin(
-        Text.format("Filled {0}'s potential items", holder.getKey())
-    );
-    return 0;
-  }
-
-  private int itemsClear(CommandContext<CommandSource> c)
-      throws CommandSyntaxException {
-    Holder<Challenge> holder = c.getArgument("challenge", Holder.class);
-    ensureItemChallenge(holder);
-
-    var storage = ChallengeManager.getInstance()
-        .getStorage();
-
-    var container = storage.loadContainer(holder);
-    container.clear();
-    storage.saveContainer(container);
-
-    c.getSource().sendAdmin(
-        Text.format("Cleared item container of {0}",
-            holder.getKey()
-        )
-    );
-    return 0;
-  }
+  /* ------------------------------- ITEMS -------------------------------- */
 
   private int itemsSetActive(CommandContext<CommandSource> c,
                              ItemStack item,
@@ -575,28 +444,116 @@ public class CommandChallenges extends FtcCommand {
     return 0;
   }
 
-  private int itemsAdd(CommandContext<CommandSource> c,
-                       ItemStack item,
-                       Holder<Challenge> holder
-  ) throws CommandSyntaxException {
+  private int itemsChestsClear(CommandContext<CommandSource> c)
+      throws CommandSyntaxException
+  {
+    Holder<Challenge> holder = c.getArgument("challenge", Holder.class);
     ensureItemChallenge(holder);
 
-    var challenge = (ItemChallenge) holder.getValue();
+    var storage = ChallengeManager.getInstance().getStorage();
+    var container = storage.loadContainer(holder);
+    container.getChests().clear();
+    storage.saveContainer(container);
+
+    c.getSource().sendAdmin(
+        Text.format("Cleared item data of {0}", holder.getKey())
+    );
+    return 0;
+  }
+
+  private int itemsChestsList(CommandContext<CommandSource> c)
+      throws CommandSyntaxException
+  {
+    Holder<Challenge> holder = c.getArgument("challenge", Holder.class);
+    ensureItemChallenge(holder);
+
     var storage = ChallengeManager.getInstance().getStorage();
     var container = storage.loadContainer(holder);
 
-    container.getPotentials().add(item);
+    var writer = TextWriters.newWriter();
 
-    if (challenge.getTargetItem().isEmpty()) {
-      challenge.setTargetItem(item);
-      container.setActive(item);
+    var world = container.getChestWorld();
+    writer.field("World", world == null ? "NOT SET" : world.getName());
+    writer.field("Chest locations", "{");
+
+    var indented = writer.withIndent();
+    var it = container.getChests().listIterator();
+
+    while (it.hasNext()) {
+      int index = it.nextIndex();
+      var n = it.next();
+
+      indented.field(index + "", n);
+    }
+
+    writer.line("}");
+
+    c.getSource().sendMessage(writer);
+    return 0;
+  }
+
+  private int itemsChestsRemove(CommandContext<CommandSource> c)
+      throws CommandSyntaxException
+  {
+    Holder<Challenge> holder = c.getArgument("challenge", Holder.class);
+    ensureItemChallenge(holder);
+
+    var storage = ChallengeManager.getInstance().getStorage();
+    var container = storage.loadContainer(holder);
+    int index = c.getArgument("index", Integer.class);
+
+    Commands.ensureIndexValid(index, container.getChests().size());
+    var pos = container.getChests().remove(index - 1);
+
+    c.getSource().sendAdmin(
+        Text.format(
+            "Removed item source at {0} (index: {1, number}) from {2}",
+            pos, index, holder.getKey()
+        )
+    );
+    return 0;
+  }
+
+  private int itemsChestsAdd(CommandContext<CommandSource> c, boolean posSet)
+      throws CommandSyntaxException
+  {
+    Holder<Challenge> holder = c.getArgument("challenge", Holder.class);
+    ensureItemChallenge(holder);
+
+    var storage = ChallengeManager.getInstance().getStorage();
+    var container = storage.loadContainer(holder);
+
+    Location l;
+
+    if (posSet) {
+      l = PositionArgument.getLocation(c, "position");
+    } else {
+      var player = c.getSource().asPlayer();
+      var facingBlock = player.getTargetBlockExact(5);
+
+      if (facingBlock == null || facingBlock.isEmpty()) {
+        throw Exceptions.format("Not looking at a container block");
+      }
+
+      l = facingBlock.getLocation();
+    }
+
+    var block = l.getBlock();
+    if (!(block.getState() instanceof InventoryHolder)) {
+      throw Exceptions.format("Not facing a container block");
+    }
+
+    container.getChests().add(Vectors.intFrom(l));
+
+    if (container.getChestWorld() == null) {
+      container.setChestWorld(l.getWorld());
     }
 
     storage.saveContainer(container);
 
     c.getSource().sendAdmin(
-        Text.format("Added {0, item} to {1}",
-            item,
+        Text.format("Added item source {0, vector} to {1}",
+            l,
             holder.getKey()
         )
     );

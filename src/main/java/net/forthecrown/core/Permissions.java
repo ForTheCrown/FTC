@@ -146,7 +146,10 @@ public final class Permissions {
       MARKETS                 = register("ftc.markets"),
       MARKET_WARNING          = registerPrefixed(MARKETS, "warning"),
 
-      DEFAULT                 = register("ftc.default");
+      DEFAULT                 = register("ftc.default"),
+
+      CLAIMING                = register("ftc.claiming"),
+      CLAIM_ADMIN             = registerPrefixed(CLAIMING, "override_flags");
 
   public static final TieredPermission MAX_HOMES = TieredPermission.builder()
       .prefix("ftc.homes.")

@@ -188,7 +188,6 @@ public class ItemChallenge implements Challenge {
             return null;
           }
 
-          var formatter = getPlaceholderFormatter();
           var builder = ItemStacks.toBuilder(baseItem)
               .setName(getName())
               .clearLore()
@@ -209,7 +208,7 @@ public class ItemChallenge implements Challenge {
             builder.addLore("");
 
             for (var c : getDescription()) {
-              builder.addLore(formatter.format(c, user));
+              builder.addLore(replacePlaceholders(c, user));
             }
           }
 

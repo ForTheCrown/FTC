@@ -14,7 +14,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.forthecrown.core.FTC;
-import net.forthecrown.core.script2.Script;
 import net.forthecrown.user.User;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -66,10 +65,9 @@ public class JsonChallenge implements Challenge {
   public String activate(boolean reset) {
     registerListener();
 
-    if (getListener().getScript() != null) {
-      getListener().getScript()
-          .invokeIfExists(METHOD_ON_ACTIVATE, getListener().getHandle());
-    }
+    getListener().consumeScript(s -> {
+      s.invokeIfExists(METHOD_ON_ACTIVATE, getListener().getHandle());
+    });
 
     return "";
   }
@@ -78,13 +76,10 @@ public class JsonChallenge implements Challenge {
   public void deactivate() {
     unregisterListener();
 
-    if (getListener().getScript() != null) {
-      getListener().getScript()
-          .invokeIfExists(METHOD_ON_RESET, getListener().getHandle());
-
-      getListener().getScript().close();
-      listener.script = null;
-    }
+    listener.consumeScript(s -> {
+      s.invokeIfExists(METHOD_ON_RESET, listener.getHandle());
+    });
+    listener.closeScript();
   }
 
   public void registerListener() {
@@ -92,7 +87,7 @@ public class JsonChallenge implements Challenge {
       return;
     }
 
-    reloadListener();
+    listener.reloadScript(script);
 
     if (eventClass != null) {
       Bukkit.getPluginManager()
@@ -121,25 +116,6 @@ public class JsonChallenge implements Challenge {
     listenerRegistered = false;
   }
 
-  public void reloadListener() {
-    if (Strings.isNullOrEmpty(script)) {
-      listener.script = null;
-      return;
-    }
-
-    if (listener.script != null) {
-      listener.script.load();
-    } else {
-      listener.script = Script.read(script);
-    }
-
-    listener.script.getMirror()
-        .put("_challengeHandle", listener.handle);
-
-    listener.script.getMirror()
-        .put("_challenge", this);
-  }
-
   @Override
   public boolean canComplete(User user) {
     if (getListener().getScript() == null) {
@@ -160,10 +136,9 @@ public class JsonChallenge implements Challenge {
 
   @Override
   public void onComplete(User user) {
-    if (getListener().getScript() != null) {
-      getListener().getScript()
-          .invokeIfExists(METHOD_ON_COMPLETE, user);
-    }
+    listener.consumeScript(s -> {
+      s.invokeIfExists(METHOD_ON_COMPLETE, user);
+    });
 
     Challenge.super.onComplete(user);
   }

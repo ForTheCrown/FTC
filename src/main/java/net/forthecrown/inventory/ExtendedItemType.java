@@ -33,7 +33,7 @@ public interface ExtendedItemType<T extends ExtendedItem> extends FtcKeyed {
     return item.clone();
   }
 
-  default @Nullable T get(@NotNull ItemStack itemStack) {
+  default @Nullable T get(@Nullable ItemStack itemStack) {
     if (ItemStacks.isEmpty(itemStack)) {
       return null;
     }

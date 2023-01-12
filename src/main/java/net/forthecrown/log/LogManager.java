@@ -57,8 +57,6 @@ public class LogManager {
   public List<LogEntry> queryLogs(LogQuery query) {
     DateRange searchRange = query.getSearchRange();
 
-    LOGGER.debug("searchRange={}, logRange={}", searchRange, logRange);
-
     if (!logRange.overlaps(searchRange)) {
       return ObjectLists.emptyList();
     }
@@ -66,8 +64,6 @@ public class LogManager {
     QueryResultBuilder builder = new QueryResultBuilder(query);
     queryTiming.startTiming();
     searchRange = logRange.overlap(searchRange);
-
-    LOGGER.debug("searchRange after crop={}", searchRange);
 
     // While within search range, query logs of specific day
     // and then move the date backwards by one

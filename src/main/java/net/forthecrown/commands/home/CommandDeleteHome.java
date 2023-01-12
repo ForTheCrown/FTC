@@ -43,6 +43,10 @@ public class CommandDeleteHome extends FtcCommand {
 
     factory.usage("<home>")
         .addInfo("Deletes <home>");
+
+    factory.usage("<player>:<home>")
+        .setPermission(Permissions.HOME_OTHERS)
+        .addInfo("Deletes a <player>'s <home>");
   }
 
   @Override

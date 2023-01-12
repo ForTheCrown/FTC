@@ -92,7 +92,9 @@ public final class TabList {
         playerNameSize += TextInfo.getPxWidth(String.valueOf(score));
       }
 
-      playerNameSize += TextInfo.getPxWidth(Text.plain(u.listDisplayName(true)));
+      playerNameSize += TextInfo.getPxWidth(
+          Text.plain(u.listDisplayName(true, true))
+      );
       largestPlayerName = Math.max(largestPlayerName, playerNameSize);
     }
 

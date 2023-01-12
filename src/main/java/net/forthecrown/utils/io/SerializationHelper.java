@@ -12,6 +12,8 @@ import net.forthecrown.core.FTC;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import org.apache.logging.log4j.Logger;
+import org.tomlj.Toml;
+import org.tomlj.TomlTable;
 
 public final class SerializationHelper {
 
@@ -79,6 +81,25 @@ public final class SerializationHelper {
 
   public static boolean readTagFile(Path file, Consumer<CompoundTag> loadCallback) {
     return readFile(file, TAG_READER, loadCallback);
+  }
+
+  public static boolean readTomlFile(Path file, Consumer<TomlTable> consumer) {
+    return readFile(file, Toml::parse, result -> {
+      if (!result.errors().isEmpty()) {
+        result.errors().forEach(LOGGER::error);
+        return;
+      }
+
+      consumer.accept(result);
+    });
+  }
+
+  public static boolean readTomlAsJson(Path file, Consumer<JsonWrapper> callback) {
+    return readTomlFile(file, table -> {
+      JsonObject obj = TomlUtil.toJson(table);
+      JsonWrapper json = JsonWrapper.wrap(obj);
+      callback.accept(json);
+    });
   }
 
   public static boolean readJsonFile(Path file, Consumer<JsonWrapper> loadCallback) {

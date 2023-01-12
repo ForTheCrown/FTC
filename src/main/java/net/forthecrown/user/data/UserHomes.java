@@ -244,27 +244,19 @@ public class UserHomes extends UserComponent {
 
   /**
    * Suggests the homes this component holds
-   *
-   * @param builder         The builder to suggest to
-   * @param prependUsername Whether to add the user's name onto the beginning of the suggestions
+   * @param builder The builder to suggest to
    */
-  public void suggestHomeNames(SuggestionsBuilder builder, boolean prependUsername) {
+  public void suggestHomeNames(SuggestionsBuilder builder) {
     var token = builder.getRemainingLowerCase();
-    var prefix = prependUsername ? getUser().getNickOrName() + ":" : "";
 
     for (var e : homes.entrySet()) {
-      var name = prefix + e.getKey();
+      var name = e.getKey();
 
       if (CompletionProvider.startsWith(token, name)) {
         var l = e.getValue();
 
         // Suggest name with the location as the hover text
-        builder.suggest(
-            name,
-            CmdUtil.toTooltip(
-                Text.prettyLocation(l, true)
-            )
-        );
+        builder.suggest(name, CmdUtil.toTooltip(Text.prettyLocation(l, true)));
       }
     }
   }

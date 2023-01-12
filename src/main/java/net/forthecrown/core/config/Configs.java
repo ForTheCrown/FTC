@@ -120,6 +120,7 @@ public final class Configs {
             Vector3i.class,
             JsonUtils.createAdapter(Vectors::writeJson, Vectors::read3i)
         )
+
         .registerTypeAdapter(
             Vector3d.class,
             JsonUtils.createAdapter(Vectors::writeJson, Vectors::read3d)

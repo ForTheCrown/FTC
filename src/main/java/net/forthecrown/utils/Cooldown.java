@@ -15,9 +15,7 @@ import org.jetbrains.annotations.NotNull;
  * A class that helps adding cooldowns to things.
  */
 public final class Cooldown {
-
-  private Cooldown() {
-  }
+  private Cooldown() {}
 
   /**
    * The general category, literally just "general"

@@ -33,18 +33,19 @@ public class PotionEffectAbility extends WeaponAbility {
   }
 
   @Override
-  public void onRightClick(Player player, @Nullable Entity clicked) {
+  public boolean onRightClick(Player player, @Nullable Entity clicked) {
     int time = getDuration();
     PotionEffect effect = new PotionEffect(
-        effectType, time, level, false, true, true
+        effectType, time, level - 1, false, true, true
     );
 
     player.addPotionEffect(effect);
+    return true;
   }
 
   @Override
-  public void onLeftClick(Player player, @Nullable Entity clicked) {
-
+  public boolean onLeftClick(Player player, @Nullable Entity clicked) {
+    return false;
   }
 
   @Override

@@ -35,7 +35,7 @@ public class LoginEffects {
   }
 
   public static Component getDisplayName(User user, Audience viewer) {
-      return user.listDisplayName(true)
+      return user.listDisplayName(true, false)
           .color(NamedTextColor.YELLOW);
   }
 }

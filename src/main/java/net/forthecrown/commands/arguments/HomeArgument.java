@@ -4,41 +4,31 @@ import static net.forthecrown.royalgrenadier.GrenadierUtils.correctReader;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import net.forthecrown.commands.manager.Exceptions;
-import net.forthecrown.commands.manager.FtcSuggestions;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
-import net.forthecrown.royalgrenadier.VanillaMappedArgument;
-import net.forthecrown.user.User;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.Users;
-import org.bukkit.entity.Player;
 
-public class HomeArgument implements ArgumentType<HomeParseResult>, VanillaMappedArgument {
-
-  HomeArgument() {
-  }
+public class HomeArgument implements ArgumentType<HomeParseResult> {
+  HomeArgument() {}
 
   @Override
   public HomeParseResult parse(StringReader reader) throws CommandSyntaxException {
     int cursor = reader.getCursor();
-    String name = reader.readUnquotedString();
+    String name = readName(reader);
 
     if (reader.canRead() && reader.peek() == ':') {
       reader.skip();
 
-      String homeName = reader.readUnquotedString();
+      String homeName = readName(reader);
       var entry = UserManager.get().getUserLookup().get(name);
 
       if (entry == null) {
@@ -55,42 +45,69 @@ public class HomeArgument implements ArgumentType<HomeParseResult>, VanillaMappe
   public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
                                                             SuggestionsBuilder builder
   ) {
-    String remaining = builder.getRemaining().toLowerCase();
     CommandSource source = (CommandSource) context.getSource();
-    List<String> suggestions = new ArrayList<>();
+    StringReader reader = new StringReader(builder.getInput());
+    reader.setCursor(builder.getStart());
 
+    var name = readName(reader);
+
+    // Source can view other players' homes
     if (source.hasPermission(Permissions.HOME_OTHERS)) {
-      boolean containsDelimiter = remaining.contains(":");
-      FtcSuggestions.suggestPlayerNames((CommandSource) context.getSource(), builder, true);
+      var entry = UserManager.get()
+          .getUserLookup()
+          .get(name);
 
-      if (containsDelimiter) {
-        String name = remaining.substring(0, remaining.indexOf(':'));
-        var entry = UserManager.get()
-            .getUserLookup()
-            .get(name);
+      // If valid name given
+      if (entry != null) {
 
-        if (entry != null) {
-          User user = Users.get(entry);
-          user.getHomes().suggestHomeNames(builder, true);
+        // If ':' type in, skip it,
+        if (reader.canRead() && reader.peek() == ':') {
+          reader.skip();
+          builder = builder.createOffset(reader.getCursor());
         }
+        // Else do a lil hack to get Brigadier to prepend ':'
+        // to all suggestions
+        else {
+          builder = builder.createOffset(reader.getCursor());
+          builder.suggest(":");
+
+          var newBuilder = builder.createOffset(reader.getCursor() + 1);
+          newBuilder.add(builder);
+
+          builder = newBuilder;
+        }
+
+        var user = Users.get(entry);
+        user.getHomes().suggestHomeNames(builder);
+
+        return builder.buildFuture();
       }
     }
 
+    // Suggest source's home names
     if (source.isPlayer()) {
-      User user = Users.get(source.asOrNull(Player.class));
-      user.getHomes().suggestHomeNames(builder, false);
+      var user = Users.get(source.asPlayerOrNull());
+      user.getHomes().suggestHomeNames(builder);
     }
 
-    return CompletionProvider.suggestMatching(builder, suggestions);
+    return builder.buildFuture();
+  }
+
+  private String readName(StringReader reader) {
+    int start = reader.getCursor();
+
+    while (reader.canRead()
+        && reader.peek() != ':'
+        && !Character.isWhitespace(reader.peek())
+    ) {
+      reader.skip();
+    }
+
+    return reader.getString().substring(start, reader.getCursor());
   }
 
   @Override
   public Collection<String> getExamples() {
-    return Arrays.asList("home", "BotulToxin:home", "Robinoh:nether", "base", "farm");
-  }
-
-  @Override
-  public ArgumentType<?> getVanillaArgumentType() {
-    return StringArgumentType.string();
+    return Arrays.asList("home", "JulieWoolie:home", "Robinoh:nether", "base", "farm");
   }
 }

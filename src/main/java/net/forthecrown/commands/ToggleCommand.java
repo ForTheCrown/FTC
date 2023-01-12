@@ -128,6 +128,15 @@ public class ToggleCommand extends FtcCommand {
   }
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("", getDescription());
+
+    factory.usage("<player>")
+        .setPermission(Permissions.ADMIN)
+        .addInfo("Toggles %s for a <player>", getProperty().getKey());
+  }
+
+  @Override
   protected void createCommand(BrigadierCommand command) {
     command
         // /<command>

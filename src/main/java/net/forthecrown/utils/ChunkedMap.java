@@ -45,9 +45,6 @@ public class ChunkedMap<T extends BoundsHolder> {
 
   /* -------------------------- INSTANCE FIELDS --------------------------- */
 
-  // Both of the following maps are on 2 lines because my right-margin is
-  // set to 80 lol, and by god, am I going to keep my code below that
-
   /**
    * Chunk pos to chunk entry list map.
    * <p>

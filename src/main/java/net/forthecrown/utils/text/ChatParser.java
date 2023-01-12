@@ -2,6 +2,7 @@ package net.forthecrown.utils.text;
 
 import static net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.SECTION_CHAR;
 
+import java.util.function.Predicate;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 import lombok.Getter;
@@ -13,8 +14,9 @@ import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.permissions.Permissible;
+import org.bukkit.permissions.Permission;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -112,8 +114,8 @@ public class ChatParser {
    * This is used by {@link #replaceColorCodes(String)} to replace all ampersand color codes with
    * section codes
    */
-  private static final Pattern COLOR_CHAR_PATTERN = Pattern.compile(
-      "&((#[0-9a-fA-F]{6})|([0-9a-fA-FK-Ok-orRxX]))");
+  private static final Pattern COLOR_CHAR_PATTERN
+      = Pattern.compile("(\\\\|)&((#[0-9a-fA-F]{6})|([0-9a-fA-FK-Ok-orRxX]))");
 
   /**
    * Pattern used to render gradient tokens
@@ -122,8 +124,8 @@ public class ChatParser {
    *
    * @see #replaceGradients(Component)
    */
-  private static final Pattern GRADIENT_PATTERN = Pattern.compile(
-      "<gradient=([a-zA-Z0-9_# ])+,([a-zA-Z0-9_# ])+:(.)+?>");
+  private static final Pattern GRADIENT_PATTERN
+      = Pattern.compile("<gradient=([a-zA-Z0-9_# ])+,([a-zA-Z0-9_# ])+:(.)+?>");
 
   /**
    * A renderer which renders input with the {@link #ALL_FLAGS} flags
@@ -175,45 +177,75 @@ public class ChatParser {
   /**
    * Creates a renderer tailored to the given sender.
    * <p>
-   * The resulting renderer will be {@link #TOTAL_RENDERER} if the sender is null or if the sender
-   * has all the permissions required, those permissions are as follows:
+   * The resulting renderer will be {@link #TOTAL_RENDERER} if the sender is
+   * null or if the sender has all the permissions required, those permissions
+   * are as follows:
    * <p>
    * {@link Permissions#CHAT_COLORS} for chat colors
    * <p>
    * {@link Permissions#CHAT_EMOTES} for emotes
    * <p>
    * {@link Permissions#CHAT_IGNORE_CASE} to ignore upper case filtering
+   * <p>
+   * {@link Permissions#CHAT_LINKS} to enable translating links
+   * into click events
+   * <p>
+   * {@link Permissions#CHAT_CLEAN_LINKS} to allow links to blend in with text,
+   * otherwise all links are translated into cyan-colored underlined texts.
+   * <p>
+   * {@link Permissions#CHAT_GRADIENTS} to translate gradients
    *
    * @param sender The sender to create the renderer for
-   * @return
+   * @return The created parser
    */
   public static ChatParser of(Permissible sender) {
     if (sender == null) {
       return TOTAL_RENDERER;
     }
 
-    return of(
-        sender.hasPermission(Permissions.CHAT_COLORS),
-        sender.hasPermission(Permissions.CHAT_EMOTES),
-        sender.hasPermission(Permissions.CHAT_IGNORE_CASE),
-        sender.hasPermission(Permissions.CHAT_GRADIENTS),
-        sender.hasPermission(Permissions.CHAT_LINKS),
-        sender.hasPermission(Permissions.CHAT_CLEAN_LINKS)
-    );
+    return of(sender::hasPermission);
   }
 
+  /**
+   * Creates a renderer tailored to the given sender.
+   * <p>
+   * The resulting renderer will be {@link #TOTAL_RENDERER} if the sender is
+   * null or if the sender has all the permissions required, those permissions
+   * are as follows:
+   * <p>
+   * {@link Permissions#CHAT_COLORS} for chat colors
+   * <p>
+   * {@link Permissions#CHAT_EMOTES} for emotes
+   * <p>
+   * {@link Permissions#CHAT_IGNORE_CASE} to ignore upper case filtering
+   * <p>
+   * {@link Permissions#CHAT_LINKS} to enable translating links
+   * into click events
+   * <p>
+   * {@link Permissions#CHAT_CLEAN_LINKS} to allow links to blend in with text,
+   * otherwise all links are translated into cyan-colored underlined texts.
+   * <p>
+   * {@link Permissions#CHAT_GRADIENTS} to translate gradients
+   *
+   * @param sender The sender to create the renderer for
+   * @return The created parser
+   */
   public static ChatParser of(User sender) {
     if (sender == null) {
       return TOTAL_RENDERER;
     }
 
+    return of(sender::hasPermission);
+  }
+
+  private static ChatParser of(Predicate<Permission> predicate) {
     return of(
-        sender.hasPermission(Permissions.CHAT_COLORS),
-        sender.hasPermission(Permissions.CHAT_EMOTES),
-        sender.hasPermission(Permissions.CHAT_IGNORE_CASE),
-        sender.hasPermission(Permissions.CHAT_GRADIENTS),
-        sender.hasPermission(Permissions.CHAT_LINKS),
-        sender.hasPermission(Permissions.CHAT_CLEAN_LINKS)
+        predicate.test(Permissions.CHAT_COLORS),
+        predicate.test(Permissions.CHAT_EMOTES),
+        predicate.test(Permissions.CHAT_IGNORE_CASE),
+        predicate.test(Permissions.CHAT_GRADIENTS),
+        predicate.test(Permissions.CHAT_LINKS),
+        predicate.test(Permissions.CHAT_CLEAN_LINKS)
     );
   }
 
@@ -340,7 +372,7 @@ public class ChatParser {
 
     for (int i = 0; i < s.length(); i++) {
       if (Character.isUpperCase(s.charAt(i))) {
-        upperCaseCount++;
+        ++upperCaseCount;
       }
 
       // More than half the characters are uppercase
@@ -366,7 +398,13 @@ public class ChatParser {
    * Replaces the first character of the given result's group with a secion character
    */
   private static String replaceCode(MatchResult result) {
-    return SECTION_CHAR + result.group().substring(1);
+    var group = result.group();
+
+    if (group.startsWith("\\")) {
+      return group;
+    }
+
+    return SECTION_CHAR + group.substring(1);
   }
 
   /**

@@ -2,7 +2,7 @@ package net.forthecrown.inventory.weapon.ability;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.forthecrown.core.config.GeneralConfig;
+import net.forthecrown.inventory.weapon.SwordConfig;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.kyori.adventure.text.Component;
 import net.minecraft.nbt.CompoundTag;
@@ -14,8 +14,9 @@ import org.spongepowered.math.GenericMath;
 @Getter @Setter
 public abstract class WeaponAbility {
   public static final String TAG_LEVEL = "level";
+  public static final int START_LEVEL = 1;
 
-  protected int level;
+  protected int level = START_LEVEL;
   private final WeaponAbilityType type;
 
   public WeaponAbility(WeaponAbilityType type) {
@@ -27,7 +28,7 @@ public abstract class WeaponAbility {
   public void write(TextWriter writer) {
     writer.write(displayName());
 
-    if (level > 1) {
+    if (level > START_LEVEL) {
       writer.formatted(" {0, number, -roman}", level);
     }
   }
@@ -36,15 +37,33 @@ public abstract class WeaponAbility {
 
   protected int scaledCooldown(int baseDuration) {
     float level = getLevel();
-    float mod = GeneralConfig.swordAbilityCooldownScalar / level;
+    float mod = SwordConfig.swordAbilityCooldownScalar / level;
     return GenericMath.floor(baseDuration * mod);
   }
 
   /* ----------------------------- CALLBACKS ------------------------------ */
 
-  public abstract void onRightClick(Player player, @Nullable Entity clicked);
+  /**
+   * Right-click callback, triggered when the player right-clicks, aka
+   * interacts, with a block, entity or air.
+   *
+   * @param player The player that right-clicked
+   * @param clicked The right-clicked entity,
+   *
+   * @return True, if the item should be placed on cooldown, false otherwise
+   */
+  public abstract boolean onRightClick(Player player, @Nullable Entity clicked);
 
-  public abstract void onLeftClick(Player player, @Nullable Entity clicked);
+  /**
+   * Left-click callback, triggered when the player left-clicks a block, entity
+   * or air.
+   *
+   * @param player The player that left-clicked
+   * @param clicked The clicked entity, null, if a block or air was clicked
+   *
+   * @return True, if the item should be placed on cooldown, false otherwise
+   */
+  public abstract boolean onLeftClick(Player player, @Nullable Entity clicked);
 
   /* --------------------------- SERIALIZATION ---------------------------- */
 

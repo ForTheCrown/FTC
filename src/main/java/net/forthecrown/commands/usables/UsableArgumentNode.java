@@ -12,6 +12,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.commands.manager.Commands;
 import net.forthecrown.commands.manager.Exceptions;
+import net.forthecrown.commands.manager.FtcCommand.UsageFactory;
 import net.forthecrown.commands.manager.Readers;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.grenadier.CmdUtil;
@@ -29,6 +30,49 @@ public class UsableArgumentNode<T extends UsageInstance, H extends UsageTypeHold
 {
 
   private final UsageTypeAccessor<T, H> accessor;
+
+  public void populateUsages(UsageFactory factory, String holderName) {
+    String name = accessor.getName().toLowerCase();
+    String plural = name + "s";
+
+    factory.usage("")
+        .addInfo("Lists all %s a %s has", plural, holderName);
+
+    factory.usage("clear")
+        .addInfo("Clears all %s in a %s", plural, holderName);
+
+    factory.usage(String.format("add <%s type> [<%s value>]", name, name))
+        .addInfo("Adds a <%s type> to a %s", name, holderName)
+        .addInfo(
+            "<%s value> allows you to specify data for the <%s type>",
+            name, name
+        )
+        .addInfo("to use. The format of data required here, is determined")
+        .addInfo("by the <%s type>", name);
+
+    factory.usage(String.format("add -first <%s type> [<%s value>]", name, name))
+        .addInfo(
+            "Inserts a <%s type> to a %s's %s list's first place",
+            name, holderName, name
+        )
+        .addInfo(
+            "[<%s value>] allows you to specify data for the <%s type>",
+            name, name
+        )
+        .addInfo("to use. The format of data required here, is determined")
+        .addInfo("by the <%s type>", name);
+
+    var remove = factory.withPrefix("remove");
+    remove.usage("<index: number(1..)> [-at <index: number(1..)>]")
+        .addInfo(
+            "Removes a %s value from a %s at an <index>",
+            name, holderName
+        );
+
+    remove.usage("-between <start index> <end index>")
+        .addInfo("Removes all %s values between the <start index>", name)
+        .addInfo("and <end index>");
+  }
 
   public LiteralArgumentBuilder<CommandSource> createArguments(
       UsageHolderProvider<? extends H> provider

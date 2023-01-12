@@ -53,7 +53,7 @@ public class ItemNameNode extends ItemModifierNode {
                 meta.displayName(null);
                 c.getSource().sendAdmin(Messages.CLEARED_ITEM_NAME);
               } else {
-                meta.displayName(Text.wrapForItems(name));
+                meta.displayName(optionallyWrap(name, c, "name"));
                 c.getSource().sendAdmin(Messages.setItemName(name));
               }
 

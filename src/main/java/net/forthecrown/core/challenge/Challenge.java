@@ -3,9 +3,11 @@ package net.forthecrown.core.challenge;
 import com.google.common.collect.ImmutableList;
 import net.forthecrown.core.FTC;
 import net.forthecrown.user.User;
+import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.forthecrown.utils.text.writer.TextWriters;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import org.jetbrains.annotations.Nullable;
@@ -38,10 +40,9 @@ public interface Challenge {
    */
   default Component displayName(@Nullable User viewer) {
     TextWriter writer = TextWriters.newWriter();
-    var formatter = getPlaceholderFormatter();
 
     for (Component component : getDescription()) {
-      writer.line(formatter.format(component, viewer));
+      writer.line(component);
     }
 
     int streak = Challenges.queryStreak(this, viewer)
@@ -58,9 +59,22 @@ public interface Challenge {
       reward.write(writer, streak);
     }
 
-    return formatter.format(getName(), viewer)
+    var displayName = getName()
         .color(NamedTextColor.YELLOW)
         .hoverEvent(writer.asComponent());
+
+    return replacePlaceholders(displayName, viewer);
+  }
+
+  default Component replacePlaceholders(Component component, User user) {
+    float goal = getGoal(user);
+
+    return component.replaceText(
+        TextReplacementConfig.builder()
+            .matchLiteral("%goal")
+            .replacement(Text.formatNumber(goal))
+            .build()
+    );
   }
 
   /**
@@ -86,13 +100,6 @@ public interface Challenge {
     return getResetInterval() == ResetInterval.DAILY
         ? StreakCategory.DAILY
         : StreakCategory.WEEKLY;
-  }
-
-  /**
-   * Gets the placeholder tag formatter for this challenge
-   */
-  default ChallengePlaceholders getPlaceholderFormatter() {
-    return ChallengePlaceholders.of(this);
   }
 
   /**

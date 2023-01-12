@@ -11,18 +11,22 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
+import java.util.UUID;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.core.FTC;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.Logger;
 
 public final class PathUtil {
-
-  private PathUtil() {
-  }
+  private PathUtil() {}
 
   private static final Logger LOGGER = FTC.getLogger();
+
+  public static final Pattern UUID_PATTERN
+      = Pattern.compile("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$");
 
   /**
    * Gets the plugin's data folder
@@ -278,6 +282,37 @@ public final class PathUtil {
           exc.getMessage()
       );
     }
+  }
+
+  public static boolean isFilenameUUID(Path path) {
+    var name = FilenameUtils.getName(path.toString());
+    var trimmed = FilenameUtils.removeExtension(name);
+    return UUID_PATTERN.matcher(trimmed).matches();
+  }
+
+  public static DataResult<UUID> getFilenameUUID(Path path) {
+    var name = FilenameUtils.getName(path.toString());
+    var trimmed = FilenameUtils.removeExtension(name);
+
+    var matcher = UUID_PATTERN.matcher(trimmed);
+
+    if (!matcher.find()) {
+      return Results.errorResult("Filename %s is not a UUID filename", path);
+    }
+
+    var arr = matcher.results()
+        .map(result -> UUID.fromString(result.group()))
+        .toArray(UUID[]::new);
+
+    if (arr.length > 1) {
+      return Results.partialResult(
+          arr[0],
+          "Path %s contained more than 1 UUID",
+          path
+      );
+    }
+
+    return DataResult.success(arr[0]);
   }
 
   /* ---------------------------- SUB CLASSES ----------------------------- */

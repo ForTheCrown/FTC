@@ -5,6 +5,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -38,6 +40,9 @@ public class ClickContext {
    * The slot being clicked
    */
   private final int slot;
+
+  /** Raw inventory slot, usable in {@link #getView()} */
+  private final int rawSlot;
 
   /**
    * The item stack which is current on the cursor
@@ -76,14 +81,19 @@ public class ClickContext {
   @Setter
   private int cooldownTime;
 
-  public ClickContext(MenuInventory inventory, Player player, int slot, ItemStack cursorItem,
-                      ClickType type
-  ) {
+  private final InventoryView view;
+
+  /** The node being clicked */
+  MenuNode node;
+
+  public ClickContext(MenuInventory inventory, InventoryClickEvent event) {
     this.inventory = inventory;
-    this.player = player;
-    this.slot = slot;
-    this.cursorItem = cursorItem;
-    this.clickType = type;
+    this.player = (Player) event.getWhoClicked();
+    this.slot = event.getSlot();
+    this.rawSlot = event.getRawSlot();
+    this.cursorItem = event.getCursor();
+    this.clickType = event.getClick();
+    this.view = event.getView();
 
     this.cancelEvent = true;
     this.cooldownTime = DEFAULT_COOLDOWN;

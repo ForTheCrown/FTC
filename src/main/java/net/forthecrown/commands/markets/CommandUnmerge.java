@@ -19,6 +19,7 @@ public class CommandUnmerge extends FtcCommand {
     setDescription("Unmerges the shop you own with the shop it's merged with");
     setPermission(Permissions.MARKETS);
     setAliases("marketunmerge", "shopunmerge", "unmergeshop", "unmergemarket");
+    simpleUsages();
 
     register();
   }

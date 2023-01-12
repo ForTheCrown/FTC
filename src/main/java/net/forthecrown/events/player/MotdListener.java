@@ -1,10 +1,12 @@
 package net.forthecrown.events.player;
 
+import static net.kyori.adventure.text.Component.empty;
+import static net.kyori.adventure.text.Component.newline;
+import static net.kyori.adventure.text.Component.text;
+
 import com.destroystokyo.paper.event.server.PaperServerListPingEvent;
 import java.util.Iterator;
-import net.forthecrown.core.FTC;
-import net.forthecrown.core.Messages;
-import net.forthecrown.core.ServerIcons;
+import net.forthecrown.core.ServerListDisplay;
 import net.forthecrown.core.config.GeneralConfig;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
@@ -30,8 +32,12 @@ public class MotdListener implements Listener {
       event.setMaxPlayers(newMax);
     }
 
-    event.motd(motd());
-    event.setServerIcon(ServerIcons.getInstance().getCurrent());
+    var pair = ServerListDisplay.getInstance().getCurrent();
+    event.motd(motd(pair.right()));
+
+    if (pair.first() != null) {
+      event.setServerIcon(pair.first());
+    }
 
     Iterator<Player> iterator = event.iterator();
     while (iterator.hasNext()) {
@@ -45,36 +51,23 @@ public class MotdListener implements Listener {
     }
   }
 
-  Component motd() {
-    return Component.text()
+  Component motd(Component afterDash) {
+    return text()
         .color(NamedTextColor.GRAY)
 
-        .append(Component.text("For The Crown")
-            .style(Style.style(NamedTextColor.GOLD, TextDecoration.BOLD)))
-        .append(Component.text(" - "))
-        .append(afterDashText())
+        .append(text(
+            "For The Crown",
+            Style.style(NamedTextColor.GOLD, TextDecoration.BOLD)
+        ))
+        .append(
+            afterDash == null
+                ? empty()
+                : text(" - ").append(afterDash)
+        )
 
-        .append(Component.newline())
-        .append(Component.text("Currently on " + Bukkit.getMinecraftVersion()))
+        .append(newline())
+        .append(text("Currently on " + Bukkit.getMinecraftVersion()))
 
         .build();
-  }
-
-  Component afterDashText() {
-    if (FTC.inDebugMode()) {
-      return Component.text("Test server").color(NamedTextColor.GREEN);
-    }
-
-    if (Bukkit.hasWhitelist()) {
-      return Component.text("Maintenance").color(NamedTextColor.RED);
-    }
-
-    if (Util.RANDOM.nextInt(50) == 45) {
-      return Component.text("You're amazing ")
-          .append(Messages.HEART)
-          .color(NamedTextColor.RED);
-    }
-
-    return Component.text("Now with guilds!").color(NamedTextColor.YELLOW);
   }
 }

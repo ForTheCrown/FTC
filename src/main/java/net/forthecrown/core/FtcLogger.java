@@ -1,7 +1,6 @@
 package net.forthecrown.core;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import net.forthecrown.core.config.GeneralConfig;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Marker;
@@ -16,10 +15,14 @@ import org.apache.logging.log4j.spi.ExtendedLogger;
  * plugin itself is in debug mode, determined by {@link FTC#inDebugMode()}.
  */
 @Getter
-@RequiredArgsConstructor
 public class FtcLogger extends AbstractLogger {
 
   private final ExtendedLogger pluginLogger;
+
+  public FtcLogger(ExtendedLogger pluginLogger) {
+    super(pluginLogger.getName(), pluginLogger.getMessageFactory());
+    this.pluginLogger = pluginLogger;
+  }
 
   @Override
   public boolean isEnabled(Level level, Marker marker, Message message, Throwable t) {
@@ -145,7 +148,7 @@ public class FtcLogger extends AbstractLogger {
 
   @Override
   public Level getLevel() {
-    if (FTC.inDebugMode()) {
+    if (FTC.inDebugMode() || GeneralConfig.debugLoggerEnabled) {
       return Level.DEBUG;
     }
 

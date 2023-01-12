@@ -45,7 +45,7 @@ public class CommandShopTrust extends FtcCommand {
   @Override
   public void populateUsages(UsageFactory factory) {
     factory.usage("<user>")
-        .addInfo("Trusts/untrusts the given user");
+        .addInfo("Trusts/untrusts a <user>");
   }
 
   @Override

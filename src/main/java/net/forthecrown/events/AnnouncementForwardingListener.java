@@ -20,7 +20,11 @@ public class AnnouncementForwardingListener {
       return;
     }
 
-    if (event.getChannel() == null || event.getChannel().getIdLong() != id) {
+    if (event.getChannel() == null
+        || event.getChannel().getIdLong() != id
+        || event.getAuthor().isBot()
+        || event.getAuthor().isSystem()
+    ) {
       return;
     }
 

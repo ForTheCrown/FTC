@@ -26,6 +26,11 @@ public class InteractableCommands {
     }
 
     @Override
+    public void populateUsages(UsageFactory factory) {
+
+    }
+
+    @Override
     protected void createCommand(BrigadierCommand command) {
       for (var n : NODES) {
         n.register();

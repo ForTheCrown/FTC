@@ -22,6 +22,7 @@ import org.bukkit.craftbukkit.v1_19_R2.block.CraftBlockEntityState;
 import org.bukkit.craftbukkit.v1_19_R2.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_19_R2.entity.CraftEntity;
 import org.bukkit.entity.Player;
+import org.spongepowered.math.vector.Vector3d;
 
 /**
  * Utility class for accessing vanilla code
@@ -117,6 +118,11 @@ public final class VanillaAccess {
     var state = getState(data);
     state = state.rotate(toVanilla(rotation));
     return state.createCraftBlockData();
+  }
+
+  public static void setPosRaw(org.bukkit.entity.Entity entity, Vector3d dest) {
+    var vanilla = getEntity(entity);
+    vanilla.setPosRaw(dest.x(), dest.y(), dest.z());
   }
 
   /**

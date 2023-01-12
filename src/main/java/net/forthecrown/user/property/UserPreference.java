@@ -25,6 +25,11 @@ public interface UserPreference {
 
       GSitAPI.setCanPlayerSit(user.getPlayer(), state);
     }
+
+    @Override
+    public String getKey() {
+      return "playerRiding";
+    }
   };
 
   UserPreference DYNMAP_HIDE = new UserPreference() {
@@ -47,8 +52,15 @@ public interface UserPreference {
       FtcDynmap.getDynmap()
           .setPlayerVisiblity(user.getName(), !state);
     }
+
+    @Override
+    public String getKey() {
+      return "dynmapHide";
+    }
   };
 
   boolean getState(User user);
   void setState(User user, boolean state);
+
+  String getKey();
 }

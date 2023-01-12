@@ -12,6 +12,8 @@ import net.forthecrown.inventory.ExtendedItems;
 import net.forthecrown.useables.Usables;
 import net.forthecrown.useables.command.Kit;
 import net.forthecrown.user.User;
+import net.forthecrown.user.UserLookup;
+import net.forthecrown.user.UserLookupEntry;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.Users;
 import net.forthecrown.user.data.TimeField;
@@ -31,14 +33,16 @@ public class PlayerJoinListener implements Listener {
   @EventHandler(ignoreCancelled = true)
   public void onPlayerJoin(PlayerJoinEvent event) {
     var player = event.getPlayer();
+    UserLookup lookup = UserManager.get().getUserLookup();
+    UserLookupEntry entry = lookup.getEntry(player.getUniqueId());
 
-    if (!player.hasPlayedBefore()) {
-      UserManager.get()
-          .getUserLookup()
-          .createEntry(player);
+    // If entry is null then it's a new player or a player whose
+    // cache entry was deleted or doesn't exist for some reason
+    if (entry == null) {
+      entry = lookup.createEntry(player);
     }
 
-    User user = Users.get(player);
+    User user = Users.get(entry);
     boolean nameChanged = user.onJoin();
     TabList.update();
 
@@ -72,18 +76,20 @@ public class PlayerJoinListener implements Listener {
     event.joinMessage(null);
     user.sendMessage(Messages.WELCOME_BACK);
 
-    if (!user.get(Properties.VANISHED)) {
-      if (nameChanged) {
-        String lastName = user.getPreviousNames()
-            .get(user.getPreviousNames().size() - 1);
+    if (user.get(Properties.VANISHED)) {
+      return;
+    }
 
-        sendLogMessage(audience -> {
-          Component name = LoginEffects.getDisplayName(user, audience);
-          return Messages.newNameJoinMessage(name, lastName);
-        });
-      } else {
-        sendLoginMessage(user);
-      }
+    if (nameChanged) {
+      String lastName = user.getPreviousNames()
+          .get(user.getPreviousNames().size() - 1);
+
+      sendLogMessage(audience -> {
+        Component name = LoginEffects.getDisplayName(user, audience);
+        return Messages.newNameJoinMessage(name, lastName);
+      });
+    } else {
+      sendLoginMessage(user);
     }
   }
 

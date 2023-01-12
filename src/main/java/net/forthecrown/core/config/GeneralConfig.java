@@ -33,8 +33,7 @@ public @UtilityClass class GeneralConfig {
       broadcastDelay              = 12000;
 
   public static float
-      durabilityWarnThreshold     = 0.1F,
-      swordAbilityCooldownScalar  = 1.5f;
+      durabilityWarnThreshold     = 0.1F;
 
   public static boolean
       userCacheSuggestions        = true,
@@ -42,7 +41,6 @@ public @UtilityClass class GeneralConfig {
       logNormalShop               = false,
       crownEventActive            = false,
       hulkSmashPoles              = true,
-      allowNonOwnerSwords         = false,
       useAsyncTpForPlayers        = false,
       staffLogEnabled             = false,
       announcePunishments         = false,

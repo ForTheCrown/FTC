@@ -7,8 +7,6 @@ import lombok.Data;
 import lombok.Getter;
 import net.forthecrown.guilds.GuildManager;
 import net.forthecrown.user.User;
-import net.forthecrown.utils.Util;
-import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.TextJoiner;
@@ -16,7 +14,6 @@ import net.forthecrown.utils.text.format.UnitFormat;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.inventory.ItemStack;
 
 @Getter
 @Builder(builderClassName = "Builder")
@@ -36,8 +33,7 @@ public class Reward {
   public static final Reward EMPTY = new Reward(
       StreakBasedValue.EMPTY,
       StreakBasedValue.EMPTY,
-      StreakBasedValue.EMPTY,
-      null
+      StreakBasedValue.EMPTY
   );
 
   /* -------------------------- INSTANCE FIELDS --------------------------- */
@@ -57,19 +53,7 @@ public class Reward {
    */
   private final StreakBasedValue guildExp;
 
-  /**
-   * Item given to player
-   */
-  private final ItemStack item;
-
   /* ------------------------------ METHODS ------------------------------- */
-
-  /**
-   * Gets the reward item, null, if no item set
-   */
-  public ItemStack getItem() {
-    return ItemStacks.isEmpty(item) ? null : item.clone();
-  }
 
   /**
    * Tests if the reward is empty
@@ -81,26 +65,20 @@ public class Reward {
 
     return rhines == StreakBasedValue.EMPTY
         && gems == StreakBasedValue.EMPTY
-        && guildExp == StreakBasedValue.EMPTY
-        && ItemStacks.isEmpty(item);
+        && guildExp == StreakBasedValue.EMPTY;
   }
 
   /**
    * Tests if the reward is empty for the given streak value
    */
   public boolean isEmpty(int streak) {
-    if (isEmpty()) {
-      return true;
-    }
-
     int rhines = this.rhines.getInt(streak);
     int gems = this.gems.getInt(streak);
     int guildExp = this.guildExp.getInt(streak);
 
     return rhines < 1
         && gems < 1
-        && guildExp < 1
-        && ItemStacks.isEmpty(item);
+        && guildExp < 1;
   }
 
   /**
@@ -154,16 +132,6 @@ public class Reward {
       }
     }
 
-    if (ItemStacks.notEmpty(item)) {
-      Util.giveOrDropItem(
-          user.getInventory(),
-          user.getLocation(),
-          item.clone()
-      );
-
-      joiner.add(Text.itemDisplayName(item));
-    }
-
     user.sendMessage(joiner);
   }
 
@@ -182,11 +150,11 @@ public class Reward {
     int guildExp = this.guildExp.getInt(streak);
 
     if (rhines > 0) {
-      writer.field("Rhines", Text.NUMBER_FORMAT.format(rhines));
+      writer.field("Rhines", Text.formatNumber(rhines));
     }
 
     if (gems > 0) {
-      writer.field("Gems", Text.NUMBER_FORMAT.format(gems));
+      writer.field("Gems", Text.formatNumber(gems));
     }
 
     if (guildExp > 0) {
@@ -206,10 +174,6 @@ public class Reward {
         writer.field("Guild Exp", Text.formatNumber(guildExp));
       }
     }
-
-    if (ItemStacks.notEmpty(item)) {
-      writer.field("Item", Text.itemAndAmount(item));
-    }
   }
 
   /* --------------------------- SERIALIZATION ---------------------------- */
@@ -221,9 +185,6 @@ public class Reward {
         .rhines(StreakBasedValue.read(json.get(KEY_RHINES)))
         .gems(StreakBasedValue.read(json.get(KEY_GEMS)))
         .guildExp(StreakBasedValue.read(json.get(KEY_GUILDEXP)))
-
-        .item(json.getItem(KEY_ITEM))
-
         .build();
   }
 }

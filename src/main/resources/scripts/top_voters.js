@@ -1,13 +1,12 @@
 // Imports
-const ArmorStandLeaderboard = Java.type("net.forthecrown.utils.stand.ArmorStandLeaderboard");
-const LineFormatter = Java.type("net.forthecrown.utils.stand.ArmorStandLeaderboard.LineFormatter");
-const UnitFormat = Java.type("net.forthecrown.utils.text.format.UnitFormat");
-const Worlds = Java.type("net.forthecrown.core.Worlds");
-const U_Manager = Java.type("net.forthecrown.user.UserManager");
-const EventPrio = Java.type("org.bukkit.event.EventPriority");
-const Runnable = Java.type("java.lang.Runnable");
-const PostVoteEvent = Java.type("com.bencodez.votingplugin.events.PlayerPostVoteEvent");
-
+import "@ftc.utils.stand.ArmorStandLeaderboard";
+import "@ftc.utils.stand.ArmorStandLeaderboard.LineFormatter";
+import "@ftc.utils.text.format.UnitFormat";
+import "@ftc.core.Worlds";
+import "@ftc.user.UserManager";
+import "@bukkit.event.EventPriority";
+import "@jlang.Runnable";
+import "com.bencodez.votingplugin.events.PlayerPostVoteEvent"
 
 // Leaderboard
 const leaderboard = new ArmorStandLeaderboard(
@@ -35,18 +34,18 @@ updateFromUserMap();
 leaderboard.spawn();
 
 // Listen to vote events to know when to update map
-events.register("onVote", PostVoteEvent, EventPrio.MONITOR);
+events.register("onVote", PlayerPostVoteEvent, EventPriority.MONITOR);
 
 // Update leaderboard values by copying values from vote map
 function updateFromUserMap() {
-    let voteMap = U_Manager.get().getVotes();
+    let voteMap = UserManager.get().getVotes();
 
     voteMap.forEach(entry => {
         leaderboard.getValues().put(entry.getUniqueId(), entry.getValue())
     });
 }
 
-function onVote(/* PlayerPostVoteEvent */ event) {
+function onVote(/* PlayerPlayerPostVoteEvent */ event) {
     // Kill, and then respawn the leaderboard
     scheduler.run(task => {
         // Clear existing values in the map and then

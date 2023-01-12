@@ -126,7 +126,7 @@ public class Registry<V> implements Iterable<V> {
   private Holder<V>[] byId = EMPTY_ARRAY;
 
   @Getter
-  private RegistryIndex<V, ?> index;
+  private RegistryListener<V> listener;
 
   /**
    * True, if the registry has been frozen and was made immutable, false otherwise
@@ -284,8 +284,8 @@ public class Registry<V> implements Iterable<V> {
     byKey.put(holder.getKey(), holder);
     var existing = byValue.put(holder.getValue(), holder);
 
-    if (index != null) {
-      index.onRegister(holder);
+    if (listener != null) {
+      listener.onRegister(holder);
     }
 
     if (existing != null) {
@@ -405,6 +405,10 @@ public class Registry<V> implements Iterable<V> {
     byKey.remove(holder.getKey());
     byValue.remove(holder.getValue());
 
+    if (listener != null) {
+      listener.onUnregister(holder);
+    }
+
     return true;
   }
 
@@ -447,6 +451,10 @@ public class Registry<V> implements Iterable<V> {
   public void clear() throws IllegalArgumentException {
     testFrozen();
 
+    if (listener != null) {
+      byKey.values().forEach(listener::onUnregister);
+    }
+
     byValue.clear();
     byKey.clear();
     byId = EMPTY_ARRAY;
@@ -481,35 +489,31 @@ public class Registry<V> implements Iterable<V> {
     }
   }
 
-  /* ----------------------------- INDEXING ------------------------------- */
+  /* ----------------------------- LISTENING ------------------------------ */
 
   /**
-   * Sets the registry's indexer.
+   * Sets the registry's listener.
    * <p>
-   * The indexer's job is to provide an additional mapping for entries
-   * registered into this registry.
-   * <p>
-   * A registry's indexer can only be set once, afterwards, any attempted
-   * changes to an indexer, will result in an exception being thrown
+   * A registry listener can only be set once, afterwards, any attempted
+   * changes to a listener, will result in an exception being thrown
    *
-   * @param index The indexer to set
-   * @param <T> The Indexer's type
+   * @param listener The listener to set
    * @throws IllegalArgumentException If an indexer is already set
    */
-  public <T> void setIndex(RegistryIndex<V, T> index)
+  public void setListener(RegistryListener<V> listener)
       throws IllegalArgumentException
   {
-    Objects.requireNonNull(index);
+    Objects.requireNonNull(listener);
 
-    if (this.index != null) {
-      throw Util.newException("Registry indexer already set!");
+    if (this.listener != null) {
+      throw Util.newException("Registry listener already set!");
     }
 
-    this.index = index;
+    this.listener = listener;
 
     if (!isEmpty()) {
       byKey.values()
-          .forEach(index::onRegister);
+          .forEach(listener::onRegister);
     }
   }
 

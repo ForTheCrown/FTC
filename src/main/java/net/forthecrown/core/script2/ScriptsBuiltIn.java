@@ -7,6 +7,7 @@ import net.forthecrown.core.Messages;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.Util;
+import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.math.Bounds3i;
 import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.utils.math.WorldBounds3i;
@@ -34,19 +35,19 @@ public final class ScriptsBuiltIn {
   private ScriptsBuiltIn() {}
 
   private static final Class[] DEFAULT_CLASSES = {
-      Util.class, FTC.class,
-      Vector3i.class, Vector3d.class,
-      Vector2i.class, Vector2d.class,
-      WorldBounds3i.class, Bounds3i.class,
-      WorldVec3i.class, Cooldown.class,
-      Bukkit.class, Material.class,
-      EntityType.class, Vectors.class,
-      Location.class, Component.class,
-      Text.class, NamedTextColor.class,
-      Messages.class, Style.class,
-      Users.class, HoverEvent.class,
+      Util.class,           FTC.class,
+      Vector3i.class,       Vector3d.class,
+      Vector2i.class,       Vector2d.class,
+      WorldBounds3i.class,  Bounds3i.class,
+      WorldVec3i.class,     Cooldown.class,
+      Bukkit.class,         Material.class,
+      EntityType.class,     Vectors.class,
+      Location.class,       Component.class,
+      Text.class,           NamedTextColor.class,
+      Messages.class,       Style.class,
+      Users.class,          HoverEvent.class,
       TextDecoration.class, ClickEvent.class,
-      TextColor.class
+      TextColor.class,      ItemStacks.class
   };
 
   public static void populate(String name, NashornScriptEngine engine) {

@@ -3,6 +3,7 @@ package net.forthecrown.inventory.weapon;
 import static net.forthecrown.utils.text.Text.nonItalic;
 
 import java.util.UUID;
+import net.forthecrown.core.config.ConfigManager;
 import net.forthecrown.core.registry.Keys;
 import net.forthecrown.dungeons.enchantments.FtcEnchants;
 import net.forthecrown.inventory.ExtendedItemType;
@@ -43,6 +44,8 @@ public class RoyalSwordType implements ExtendedItemType<RoyalSword> {
   public RoyalSwordType() {
     SwordRanks.init();
     WeaponAbilities.init();
+
+    ConfigManager.get().registerConfig(SwordConfig.class);
   }
 
   @Pattern(Keys.VALID_KEY_REGEX)

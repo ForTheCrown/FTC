@@ -96,7 +96,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class User implements ForwardingAudience.Single,
-    HoverEventSource<Component>, Identity {
+    HoverEventSource<Component>, Identity
+{
 
   /**
    * The user's unique ID
@@ -1196,7 +1197,7 @@ public class User implements ForwardingAudience.Single,
   public void updateTabName() throws UserOfflineException {
     ensureOnline();
 
-    Component displayName = listDisplayName(true);
+    Component displayName = listDisplayName(true, true);
     getPlayer().playerListName(displayName);
 
     // Mmm yes, let's put our API on an insecure HTTP protocol instead
@@ -1228,8 +1229,8 @@ public class User implements ForwardingAudience.Single,
    *
    * @return The user's TAB display name
    */
-  public Component listDisplayName(boolean prependRank) {
-    return Users.createListName(this, getTabName(), prependRank);
+  public Component listDisplayName(boolean prependRank, boolean allowAfk) {
+    return Users.createListName(this, getTabName(), prependRank, allowAfk);
   }
 
   public Component getTabName() {

@@ -10,13 +10,13 @@ import org.apache.logging.log4j.Logger;
 
 @Getter
 @RequiredArgsConstructor
-public class RegistryIndex<V, I> {
+public class RegistryIndex<V, I> implements RegistryListener<V> {
   private static final Logger LOGGER = FTC.getLogger();
 
   private final Map<I, Holder<V>> index = new Object2ObjectOpenHashMap<>();
   private final IndexGetter<I, V> getter;
 
-  void onRegister(Holder<V> holder) {
+  public void onRegister(Holder<V> holder) {
     I val = getter.get(holder);
 
     if (val == null) {
@@ -30,6 +30,17 @@ public class RegistryIndex<V, I> {
           holder.getKey()
       );
     }
+  }
+
+  @Override
+  public void onUnregister(Holder<V> value) {
+    var val = getter.get(value);
+
+    if (val == null) {
+      return;
+    }
+
+    index.remove(val);
   }
 
   public Optional<Holder<V>> lookup(I val) {

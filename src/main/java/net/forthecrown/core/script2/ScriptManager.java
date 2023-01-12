@@ -3,6 +3,7 @@ package net.forthecrown.core.script2;
 import static net.forthecrown.utils.io.FtcJar.ALLOW_OVERWRITE;
 import static net.forthecrown.utils.io.FtcJar.OVERWRITE_IF_NEWER;
 
+import com.google.gson.JsonElement;
 import it.unimi.dsi.fastutil.objects.ObjectLists;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,6 +11,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.Getter;
@@ -23,8 +25,10 @@ import net.forthecrown.events.Events;
 import net.forthecrown.utils.MonthDayPeriod;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.io.FtcJar;
+import net.forthecrown.utils.io.JsonWrapper;
 import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.utils.io.SerializationHelper;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -119,19 +123,26 @@ public class ScriptManager {
         // Constantly loaded script
         if (element.isJsonPrimitive()) {
           Script script = Script.of(element.getAsString());
-          loadedScript = new LoadedScript(null, script);
+          loadedScript = new LoadedScript(null, script, null);
         }
         // Script loaded during a specific period
         else {
-          var obj = element.getAsJsonObject();
+          JsonWrapper obj = JsonWrapper.wrap(element.getAsJsonObject());
           MonthDayPeriod period = null;
+          String[] args = ArrayUtils.EMPTY_STRING_ARRAY;
 
           if (obj.has("period")) {
             period = MonthDayPeriod.load(obj.get("period"));
           }
 
+          if (obj.has("args")) {
+            args = obj.getArray(
+                "args", JsonElement::getAsString, String[]::new
+            );
+          }
+
           Script script = Script.of(obj.get("script").getAsString());
-          loadedScript = new LoadedScript(period, script);
+          loadedScript = new LoadedScript(period, script, args);
         }
 
         LOGGER.debug("Loaded active script {}", e.getKey());
@@ -146,7 +157,7 @@ public class ScriptManager {
         continue;
       }
 
-      s.script().load();
+      s.script().load(s.args());
     }
   }
 
@@ -166,7 +177,7 @@ public class ScriptManager {
         }
 
         LOGGER.debug("Loading script {}", script.getName());
-        script.load();
+        script.load(s.args());
       } else if (script.isCompiled()) {
         LOGGER.debug("Closing script {}", script.getName());
         script.close();
@@ -194,7 +205,7 @@ public class ScriptManager {
 
   public NashornScriptEngine createEngine(String... args) {
     return (NashornScriptEngine) factory.getScriptEngine(
-        args,
+        Objects.requireNonNullElse(args, ArrayUtils.EMPTY_STRING_ARRAY),
         getClassLoader(),
         this::canAccessClass
     );

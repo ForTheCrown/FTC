@@ -390,7 +390,7 @@ public interface Messages {
    * @return The formatted message
    */
   static Component chatMessage(User sender, Component message, boolean prependRank) {
-    return chatMessage(sender.listDisplayName(prependRank), message);
+    return chatMessage(sender.listDisplayName(prependRank, false), message);
   }
 
   static Component chatMessage(Component displayName, Component message) {

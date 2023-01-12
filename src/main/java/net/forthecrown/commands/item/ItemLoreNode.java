@@ -14,7 +14,6 @@ import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.Messages;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
-import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.Range;
 
@@ -70,7 +69,7 @@ public class ItemLoreNode extends ItemModifierNode {
 
                   var message = c.getArgument("text", Component.class);
 
-                  lore.add(Text.wrapForItems(message));
+                  lore.add(optionallyWrap(message, c, "text"));
                   held.lore(lore);
 
                   c.getSource().sendAdmin(Messages.addedLore(message));

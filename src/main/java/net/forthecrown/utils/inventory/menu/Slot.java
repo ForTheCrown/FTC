@@ -34,7 +34,7 @@ public class Slot {
    */
   public static final Slot ZERO = new Slot(0, 0);
 
-  /* ----------------------------- INSTANCE FIELDS ------------------------------ */
+  /* -------------------------- INSTANCE FIELDS --------------------------- */
 
   /**
    * The slot's column (x) position
@@ -51,7 +51,7 @@ public class Slot {
    */
   private final int index;
 
-  /* ----------------------------- CONSTRUCTOR ------------------------------ */
+  /* ---------------------------- CONSTRUCTOR ----------------------------- */
 
   private Slot(int column, int row) {
     // Ensure both column and row are in
@@ -72,7 +72,7 @@ public class Slot {
     this.index = toIndex(column, row);
   }
 
-  /* ----------------------------- STATIC FUNCTIONS ------------------------------ */
+  /* -------------------------- STATIC FUNCTIONS -------------------------- */
 
   /**
    * Gets the slot value of the given column (x) and row (y)
@@ -114,7 +114,7 @@ public class Slot {
     return (row * COLUMN_SIZE) + column;
   }
 
-  /* ----------------------------- INSTANCE METHODS ------------------------------ */
+  /* ------------------------- INSTANCE METHODS --------------------------- */
 
   /**
    * Adds the given amount to this slot's column (X) and row (Y) positions

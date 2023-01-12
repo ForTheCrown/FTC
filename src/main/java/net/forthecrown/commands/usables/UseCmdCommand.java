@@ -28,7 +28,9 @@ import net.forthecrown.useables.command.Kit;
 import net.forthecrown.useables.command.Warp;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.text.Text;
+import net.forthecrown.utils.text.TextJoiner;
 import net.forthecrown.utils.text.writer.TextWriters;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -54,16 +56,42 @@ public abstract class UseCmdCommand<T extends CommandUsable> extends FtcCommand 
     this.argument = argument;
     this.adminPermission = adminPermission;
 
-    // Create list command too, name only requires
-    // s at the end to pluralize it
-    new CommandUseCmdList<>(name, argument);
-
     register();
+  }
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("")
+        .addInfo("Lists all %ss", getName());
+
+    factory.usage("create <name>")
+        .setPermission(adminPermission)
+        .addInfo("Creates a new %s", getName());
   }
 
   @Override
   protected void createCommand(BrigadierCommand command) {
     command
+        .executes(c -> {
+          var user = getUserSender(c);
+          var list = argument.getManager().getUsable(user.getPlayer());
+
+          if (list.isEmpty()) {
+            throw Exceptions.NOTHING_TO_LIST;
+          }
+
+          user.sendMessage(
+              Text.format("{0, class}s: &e{1}",
+                  NamedTextColor.GRAY,
+
+                  argument.getTypeClass(),
+                  TextJoiner.onComma()
+                      .add(list.stream().map(CommandUsable::displayName))
+              )
+          );
+          return 0;
+        })
+
         .then(literal("create")
             .requires(source -> source.hasPermission(adminPermission))
 
@@ -165,6 +193,8 @@ public abstract class UseCmdCommand<T extends CommandUsable> extends FtcCommand 
           Arguments.KITS,
           "Giving {0, user} kit {1}"
       );
+
+      setDescription("Obtains the specified kit or views all available kits.");
     }
 
     @Override
@@ -326,6 +356,8 @@ public abstract class UseCmdCommand<T extends CommandUsable> extends FtcCommand 
           Arguments.WARPS,
           "Warping {0, user} to {1}"
       );
+
+      setDescription("List all warps or warp to the specified location.");
     }
 
     @Override

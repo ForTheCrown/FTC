@@ -152,14 +152,14 @@ public class FtcHelpMap {
   ) throws CommandSyntaxException {
     List<HelpEntry> entries = new LinkedList<>();
 
-    if (Strings.isNullOrEmpty(tag)) {
+    if (Strings.isNullOrEmpty(tag) || tag.equalsIgnoreCase("all")) {
       entries.addAll(getAll());
-    } else {
-      entries.addAll(lookup(normalize(tag)));
-    }
 
-    // Remove the ones the source doesn't have permission to see
-    entries.removeIf(entry -> !entry.test(source));
+      // Remove the ones the source doesn't have permission to see
+      entries.removeIf(entry -> !entry.test(source));
+    } else {
+      entries.addAll(lookup(normalize(tag), source));
+    }
 
     TextWriter writer = TextWriters.newWriter();
     writer.setFieldStyle(Style.style(NamedTextColor.YELLOW));
@@ -199,11 +199,13 @@ public class FtcHelpMap {
     return writer.asComponent();
   }
 
-  private Collection<HelpEntry> lookup(String tag) {
+  private Collection<HelpEntry> lookup(String tag, CommandSource source) {
     // Try just calling the keyword lookup
     Collection<HelpEntry> result = keywordLookup.getOrDefault(
         tag, Collections.emptyList()
     );
+
+    result.removeIf(entry -> !entry.test(source));
 
     if (!result.isEmpty()) {
       return result;
@@ -216,6 +218,10 @@ public class FtcHelpMap {
     LevenshteinDistance distance = new LevenshteinDistance(max);
 
     for (var v: getAll()) {
+      if (!v.test(source)) {
+        continue;
+      }
+
       var keywords = v.getKeywords();
 
       for (var keyword: keywords) {

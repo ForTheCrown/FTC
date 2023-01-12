@@ -34,7 +34,7 @@ public class MarketReset {
   /**
    * The depth of the market's template below the actual market
    */
-  public static final int TEMPLATE_DEPTH = 40;
+  public static final int TEMPLATE_DEPTH = 70;
 
   /* ----------------------------- INSTANCE FIELDS ------------------------------ */
 

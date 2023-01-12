@@ -12,7 +12,7 @@ public class RoomComponents {
   static {
     INDEX = new RegistryIndex<>(holder -> holder.getValue().getType());
     REGISTRY = Registries.newRegistry();
-    REGISTRY.setIndex(INDEX);
+    REGISTRY.setListener(INDEX);
   }
 
   public static <T extends RoomComponent> RoomComponentType<T> of(Class<T> type) {

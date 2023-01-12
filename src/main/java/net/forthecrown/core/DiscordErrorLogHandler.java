@@ -1,5 +1,7 @@
 package net.forthecrown.core;
 
+import static github.scarsz.discordsrv.dependencies.jda.api.entities.Message.MAX_CONTENT_LENGTH;
+
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import github.scarsz.discordsrv.util.DiscordUtil;
@@ -26,10 +28,14 @@ public class DiscordErrorLogHandler extends Handler {
     TextChannel channel = DiscordSRV.getPlugin()
         .getDestinationTextChannelForGameChannelName("error-log");
 
+    if (formattedMessage.length() >= MAX_CONTENT_LENGTH) {
+      formattedMessage = formattedMessage.substring(0, MAX_CONTENT_LENGTH - 1);
+    }
+
     StringBuilder builder = new StringBuilder()
         .append(formattedMessage);
 
-    if (thrown != null) {
+    if (thrown != null && formattedMessage.length() < MAX_CONTENT_LENGTH - 30) {
       builder.append("\n```\n");
       MessageWriter mWriter = new MessageWriter(builder);
       PrintWriter writer = new PrintWriter(mWriter);
@@ -37,8 +43,16 @@ public class DiscordErrorLogHandler extends Handler {
       builder.append("\n```");
     }
 
-    System.out.print("Log message:\n");
     System.out.print("Length=" + builder.length() + "\n");
+
+    if (builder.length() >= MAX_CONTENT_LENGTH) {
+      System.err.printf(
+          "Couldn't output error message to discord, over %s char limit\n",
+          MAX_CONTENT_LENGTH
+      );
+
+      return;
+    }
 
     if (channel == null) {
       FtcDiscord.staffLog(levelName, builder.toString());

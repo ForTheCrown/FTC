@@ -21,6 +21,7 @@ public class CommandUnclaimShop extends FtcCommand {
     setAliases("unclaimmarket");
     setDescription("Makes you unclaim your shop in Hazelguard");
     setPermission(Permissions.MARKETS);
+    simpleUsages();
 
     register();
   }

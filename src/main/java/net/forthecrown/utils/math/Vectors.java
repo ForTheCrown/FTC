@@ -145,7 +145,7 @@ public class Vectors {
     double x = v.x();
     double z = v.z();
     double atan2 = TrigMath.atan2(-x, z);
-    return Math.toDegrees((atan2 + TrigMath.TWO_PI) % +TrigMath.TWO_PI);
+    return Math.toDegrees((atan2 + TrigMath.TWO_PI) % TrigMath.TWO_PI);
   }
 
   public double getPitch(Vector3d v) {

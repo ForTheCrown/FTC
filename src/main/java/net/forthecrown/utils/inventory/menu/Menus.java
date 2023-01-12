@@ -3,8 +3,11 @@ package net.forthecrown.utils.inventory.menu;
 import static net.forthecrown.utils.inventory.menu.Slot.COLUMN_SIZE;
 import static net.forthecrown.utils.inventory.menu.Slot.ROW_SIZE;
 
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Supplier;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.kyori.adventure.text.Component;
+import net.minecraft.nbt.LongTag;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
@@ -21,9 +24,7 @@ import org.jetbrains.annotations.Nullable;
  * @see MenuNodeItem
  */
 public final class Menus {
-
-  private Menus() {
-  }
+  private Menus() {}
 
   /* ----------------------------- CONSTANTS ------------------------------ */
 
@@ -45,8 +46,14 @@ public final class Menus {
   /**
    * Default border item, gray stained-glass pane
    */
-  private static final ItemStack DEFAULT_BORDER = createBorderItem(
-      Material.GRAY_STAINED_GLASS_PANE);
+  private static final ItemStack DEFAULT_BORDER
+      = createBorderItem(Material.GRAY_STAINED_GLASS_PANE);
+
+  /**
+   * Incremented number placed into item NBT data to prevent it stacking with
+   * other items
+   */
+  private static final AtomicLong STACK_PREVENTION_LONG = new AtomicLong(0L);
 
   /* ----------------------------- FUNCTIONS ------------------------------ */
 
@@ -155,9 +162,22 @@ public final class Menus {
    * @return The created node
    */
   public static MenuNode createOpenNode(Menu menu, MenuNodeItem item) {
+    return createOpenNode(() -> menu, item);
+  }
+
+  /**
+   * Creates a node that opens the given menu and is displayed using the given item
+   *
+   * @param supplier The menu the node opens
+   * @param item The item the node uses
+   * @return The created node
+   */
+  public static MenuNode createOpenNode(Supplier<Menu> supplier, MenuNodeItem item) {
     return MenuNode.builder()
         .setItem(item)
         .setRunnable((user, context, click) -> {
+          var menu = supplier.get();
+
           if (menu != null) {
             menu.open(user, context);
           }
@@ -231,5 +251,20 @@ public final class Menus {
   public static MenuBuilder builder(int size, @NotNull String title)
       throws IllegalArgumentException {
     return builder(size).setTitle(title);
+  }
+
+  /**
+   * Makes the given item be unstackable with any other items
+   * @param item The item to make unstackable
+   */
+  public static void makeUnstackable(ItemStack item) {
+    item.editMeta(meta -> {
+      long stackPreventionId = STACK_PREVENTION_LONG.getAndIncrement();
+      ItemStacks.setTagElement(
+          meta,
+          "NO_STACKING",
+          LongTag.valueOf(stackPreventionId)
+      );
+    });
   }
 }

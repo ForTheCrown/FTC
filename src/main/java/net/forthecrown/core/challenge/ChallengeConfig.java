@@ -3,7 +3,7 @@ package net.forthecrown.core.challenge;
 import lombok.experimental.UtilityClass;
 import net.forthecrown.core.config.ConfigData;
 
-@ConfigData(filePath = "challenges.json")
+@ConfigData(filePath = "challenges.toml")
 public @UtilityClass class ChallengeConfig {
 
   public int

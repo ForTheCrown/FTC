@@ -3,6 +3,7 @@ package net.forthecrown.utils.inventory.menu;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
+import java.util.EnumSet;
 import lombok.Getter;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.FTC;
@@ -13,7 +14,6 @@ import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.kyori.adventure.text.Component;
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
@@ -41,11 +41,6 @@ public class Menu implements InventoryHolder, MenuCloseConsumer {
   private final int size;
 
   /**
-   * True, if items can be removed from the inventory and added it to it by users
-   */
-  private final boolean itemMovingAllowed;
-
-  /**
    * Inventory index 2 menu node map. Immutable
    */
   private final Int2ObjectMap<MenuNode> nodes;
@@ -66,13 +61,18 @@ public class Menu implements InventoryHolder, MenuCloseConsumer {
    */
   private final MenuNode border;
 
+  private final ExternalClickConsumer externalClickCallback;
+
+  private final EnumSet<MenuFlag> flags;
+
   /* ----------------------------- CONSTRUCTOR ------------------------------ */
 
   Menu(MenuBuilder builder) {
     this.title = builder.title;
     this.size = builder.size;
+    this.externalClickCallback = builder.externalClickCallback;
 
-    this.itemMovingAllowed = builder.itemMovingAllowed;
+    this.flags = builder.flags;
 
     this.nodes = Int2ObjectMaps.unmodifiable(builder.nodes);
 
@@ -83,16 +83,21 @@ public class Menu implements InventoryHolder, MenuCloseConsumer {
 
   /* ----------------------------- FUNCTIONS ------------------------------ */
 
+  public boolean hasFlag(MenuFlag flag) {
+    return flags.contains(flag);
+  }
+
   public void open(User user) {
     open(user, Context.EMPTY);
   }
 
   public void open(User user, Context context) {
+    var inventory = createInventory(user, context);
+
     if (openCallback != null) {
-      openCallback.onOpen(user, context);
+      openCallback.onOpen(user, context, inventory);
     }
 
-    var inventory = createInventory(user, context);
     user.getPlayer().openInventory(inventory);
   }
 
@@ -124,25 +129,43 @@ public class Menu implements InventoryHolder, MenuCloseConsumer {
             return;
           }
 
+          if (hasFlag(MenuFlag.PREVENT_ITEM_STACKING)) {
+            Menus.makeUnstackable(item);
+          }
+
           inv.setItem(slot, item);
         });
 
     return inv;
   }
 
+  public void onExternalClick(InventoryClickEvent event) {
+    ExternalClickContext context = new ExternalClickContext(event);
+
+    if (event.isShiftClick() && !hasFlag(MenuFlag.ALLOW_SHIFT_CLICKING)) {
+      context.cancelEvent(true);
+    }
+
+    if (externalClickCallback != null) {
+      externalClickCallback.onShiftClick(
+          context,
+          context.getMenuInventory().getContext()
+      );
+    }
+
+    event.setCancelled(context.cancelEvent());
+  }
+
   public void onMenuClick(InventoryClickEvent event) {
     ClickContext click = new ClickContext(
         (MenuInventory) event.getClickedInventory(),
-        (Player) event.getWhoClicked(),
-        event.getSlot(),
-        event.getCursor(),
-        event.getClick()
+        event
     );
 
     Context context = click.getInventory().getContext();
     User user = Users.get(click.getPlayer());
 
-    if (itemMovingAllowed) {
+    if (hasFlag(MenuFlag.ALLOW_ITEM_MOVING)) {
       event.setCancelled(false);
       click.cancelEvent(false);
     } else {
@@ -151,6 +174,10 @@ public class Menu implements InventoryHolder, MenuCloseConsumer {
     }
 
     if (Cooldown.contains(user, COOLDOWN_CATEGORY)) {
+      // On cooldown, node can't allow or prevent item moving, thus just
+      // flat out disable it here
+      event.setCancelled(true);
+
       return;
     }
 
@@ -167,14 +194,19 @@ public class Menu implements InventoryHolder, MenuCloseConsumer {
         }
       }
 
+      click.node = node;
       node.onClick(user, context, click);
+    } catch (CommandSyntaxException exc) {
+      Exceptions.handleSyntaxException(user, exc);
+    } catch (Throwable t) {
+      FTC.getLogger().error("Error running menu click!", t);
+    } finally {
+      if (click.cancelEvent()) {
+        event.setCancelled(true);
+      }
 
       if (click.shouldCooldown()) {
         Cooldown.add(user, COOLDOWN_CATEGORY, click.getCooldownTime());
-      }
-
-      if (click.cancelEvent()) {
-        event.setCancelled(true);
       }
 
       if (click.shouldClose()) {
@@ -182,10 +214,6 @@ public class Menu implements InventoryHolder, MenuCloseConsumer {
       } else if (click.shouldReloadMenu()) {
         open(user, context);
       }
-    } catch (CommandSyntaxException exc) {
-      Exceptions.handleSyntaxException(user, exc);
-    } catch (Throwable t) {
-      FTC.getLogger().error("Error running menu click!", t);
     }
   }
 

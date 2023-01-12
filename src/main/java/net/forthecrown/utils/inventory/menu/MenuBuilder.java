@@ -4,6 +4,7 @@ import static net.forthecrown.utils.inventory.menu.Menus.DEFAULT_INV_SIZE;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import java.util.EnumSet;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -33,12 +34,7 @@ public class MenuBuilder {
    */
   int size = DEFAULT_INV_SIZE;
 
-  /**
-   * Determines if inside the given inventory can be moved around and if items can be moved in and
-   * out of the menu
-   */
-  @Setter
-  boolean itemMovingAllowed;
+  final EnumSet<MenuFlag> flags = EnumSet.noneOf(MenuFlag.class);
 
   /**
    * Slot 2 menu node map for all current nodes in the builder
@@ -63,7 +59,19 @@ public class MenuBuilder {
   @Setter
   MenuNode border;
 
+  /**
+   * Callback activated when the user clicks outside the menu inventory,
+   * while a menu is open
+   */
+  @Setter
+  ExternalClickConsumer externalClickCallback;
+
   /* ----------------------------- METHODS ------------------------------ */
+
+  public MenuBuilder addFlag(MenuFlag flag) {
+    flags.add(flag);
+    return this;
+  }
 
   /**
    * Adds the given node to the menu

@@ -25,6 +25,7 @@ import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.guilds.GuildManager;
 import net.forthecrown.guilds.unlockables.Unlockables;
 import net.forthecrown.inventory.ExtendedItems;
+import net.forthecrown.inventory.weapon.ability.menu.AbilityAnimation;
 import net.forthecrown.log.LogManager;
 import net.forthecrown.structure.Structures;
 import net.forthecrown.useables.Usables;
@@ -90,6 +91,7 @@ final class BootStrap {
     // Bunch of miscellaneous modules
     init(ChatEmotes.class);
     init(ExtendedItems.class);
+    init(AbilityAnimation::getInstance);
     init(Cosmetics.class);
     init(Usables::getInstance);
     init(ResourceWorldTracker::get);
@@ -124,7 +126,7 @@ final class BootStrap {
     init(Events.class);
 
     init(ScriptManager::getInstance);
-    init(ServerIcons::getInstance);
+    init(ServerListDisplay::getInstance);
 
     // Save and load the banner words list
     FTC.getPlugin().saveResource("banned_words.json", true);
