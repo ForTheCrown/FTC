@@ -81,7 +81,7 @@ public class WorldChunkMap<T extends BoundsHolder> {
     return getOverlapping(bounds3i.getWorld(), bounds3i);
   }
 
-  public Set<T> getOverlapping(World world, AbstractBounds3i bounds3i) {
+  public Set<T> getOverlapping(World world, AbstractBounds3i<?> bounds3i) {
     var worldMap = getWorld(world);
 
     if (worldMap == null) {
@@ -95,6 +95,7 @@ public class WorldChunkMap<T extends BoundsHolder> {
     return findNearest(Vectors.doubleFrom(location), location.getWorld());
   }
 
+  @SuppressWarnings("unchecked")
   public ObjectDoublePair<T> findNearest(Vector3d pos, World world) {
     var worldMap = getWorld(world);
 

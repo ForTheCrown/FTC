@@ -126,7 +126,7 @@ public class UserRank implements ComponentLike {
 
           builder.setName(getTruncatedPrefix())
               .addFlags(
-                  ItemFlag.HIDE_POTION_EFFECTS,
+                  ItemFlag.HIDE_ITEM_SPECIFICS,
                   ItemFlag.HIDE_ATTRIBUTES,
                   ItemFlag.HIDE_DYE
               );

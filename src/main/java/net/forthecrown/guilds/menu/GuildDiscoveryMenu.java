@@ -110,7 +110,7 @@ public class GuildDiscoveryMenu extends ListPage<Guild> {
 
     builder.clearLore()
         .clearEnchants()
-        .setFlags(ItemFlag.HIDE_POTION_EFFECTS);
+        .setFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
 
     builder.setName(entry.displayName());
 

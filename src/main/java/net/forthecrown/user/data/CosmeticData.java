@@ -25,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Holds the active and available data for the cosmetics of a user.
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class CosmeticData extends UserComponent {
   /* ----------------------------- CONSTANTS ------------------------------ */
 
@@ -160,7 +161,10 @@ public class CosmeticData extends UserComponent {
       return Collections.emptyList();
     }
 
-    return Collections.unmodifiableSet(entry.getAvailable());
+    var available = entry.getAvailable();
+    assert available != null : "Available null after passing null check?";
+
+    return Collections.unmodifiableSet(available);
   }
 
   /**
@@ -175,6 +179,7 @@ public class CosmeticData extends UserComponent {
       return;
     }
 
+    assert entry.available != null;
     entry.available.clear();
   }
 

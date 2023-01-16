@@ -145,8 +145,7 @@ public class Streak {
 
     if (obj.has(KEY_TIMES)) {
       JsonUtils.stream(json.getArray(KEY_TIMES))
-          .map(JsonUtils::readDate)
-          .mapToLong(Date::getTime)
+          .mapToLong(JsonUtils::readTimestamp)
           .forEach(completionTimes::add);
 
       sort();

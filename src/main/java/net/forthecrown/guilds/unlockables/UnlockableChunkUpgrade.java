@@ -175,7 +175,7 @@ public enum UnlockableChunkUpgrade implements Unlockable {
         .setBaseEffect(data)
         .setName(text(name, NamedTextColor.YELLOW))
         .addLore(text(description, NamedTextColor.GRAY))
-        .setFlags(ItemFlag.HIDE_POTION_EFFECTS)
+        .setFlags(ItemFlag.HIDE_ITEM_SPECIFICS)
         .build();
   }
 
@@ -185,7 +185,7 @@ public enum UnlockableChunkUpgrade implements Unlockable {
         .setColor(Color.fromRGB(255, 213, 0))
         .setName(text("Haste", NamedTextColor.YELLOW))
         .addLore(text("Increase mining speed in guild chunks by 1 level.", NamedTextColor.GRAY))
-        .setFlags(ItemFlag.HIDE_POTION_EFFECTS)
+        .setFlags(ItemFlag.HIDE_ITEM_SPECIFICS)
         .build();
   }
 
@@ -195,7 +195,7 @@ public enum UnlockableChunkUpgrade implements Unlockable {
         .setColor(Color.fromRGB(50, 50, 50))
         .setName(text("Resistance", NamedTextColor.YELLOW))
         .addLore(text("Reduce damage taken in guild chunks by 1 level.", NamedTextColor.GRAY))
-        .setFlags(ItemFlag.HIDE_POTION_EFFECTS)
+        .setFlags(ItemFlag.HIDE_ITEM_SPECIFICS)
         .build();
   }
 }

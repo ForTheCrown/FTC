@@ -112,7 +112,7 @@ public class MainGuildMenu extends MenuPage {
             .decoration(TextDecoration.ITALIC, false)
     ));
 
-    meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS); // Hide applied banner patterns
+    meta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS); // Hide applied banner patterns
     formattedBanner.setItemMeta(meta);
 
     return formattedBanner;

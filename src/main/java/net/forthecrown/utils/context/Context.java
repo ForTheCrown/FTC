@@ -49,6 +49,7 @@ public class Context {
    * @param <T>    The option's type
    * @return The gotten value
    */
+  @SuppressWarnings("unchecked")
   public <T> @Nullable T get(@NotNull ContextOption<T> option) {
     validateOption(option);
     return (T) options[option.getIndex()];
@@ -64,7 +65,7 @@ public class Context {
     return this;
   }
 
-  private void validateOption(ContextOption option) {
+  private void validateOption(ContextOption<?> option) {
     Validate.isTrue(contextSet.has(option), "Invalid option, not contained in parent set");
   }
 

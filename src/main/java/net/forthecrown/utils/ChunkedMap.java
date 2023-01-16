@@ -40,6 +40,7 @@ public class ChunkedMap<T extends BoundsHolder> {
   /**
    * Constant returned by {@link #findNearest(Vector3d)} when no near object was found
    */
+  @SuppressWarnings("rawtypes")
   public static final ObjectDoublePair NO_NEAREST
       = ObjectDoublePair.of(null, -1.0D);
 
@@ -92,7 +93,7 @@ public class ChunkedMap<T extends BoundsHolder> {
   /**
    * Iterates through the chunks of the given bounds
    */
-  private static void forEachChunk(AbstractBounds3i bounds3i,
+  private static void forEachChunk(AbstractBounds3i<?> bounds3i,
                                    LongConsumer consumer
   ) {
     // Min chunk pos
@@ -136,7 +137,7 @@ public class ChunkedMap<T extends BoundsHolder> {
    * @param bounds3i The bounds to find overlapping entries for
    * @return All overlapping entries, empty, if none found
    */
-  public @NotNull Set<T> getOverlapping(@NotNull AbstractBounds3i bounds3i) {
+  public @NotNull Set<T> getOverlapping(@NotNull AbstractBounds3i<?> bounds3i) {
     Objects.requireNonNull(bounds3i, "Bounds");
 
     // If we're empty, return empty
@@ -209,7 +210,7 @@ public class ChunkedMap<T extends BoundsHolder> {
    * <b>Be aware!</b> If the bounds of the underlying entry change,
    * then they will not be updated within this map until it's updated.
    * <p>
-   * By updated, I mean calling {@link #add(BoundsHolder)} again with the object's bounds updated.
+   * By updated, I mean calling this method again with the object's bounds updated.
    *
    * @param value The entry to add
    * @return True, if the map changed as a result of this method call, false otherwise
@@ -264,6 +265,7 @@ public class ChunkedMap<T extends BoundsHolder> {
    * @param point The point to find the nearest to
    * @return The nearest result.
    */
+  @SuppressWarnings("unchecked")
   public @NotNull ObjectDoublePair<T> findNearest(@NotNull Vector3d point) {
     Objects.requireNonNull(point);
 
@@ -364,7 +366,7 @@ public class ChunkedMap<T extends BoundsHolder> {
 
   /* ---------------------------- SUB CLASSES ----------------------------- */
 
-  private record Entry<T>(T value, AbstractBounds3i bounds3i) {
+  private record Entry<T>(T value, AbstractBounds3i<?> bounds3i) {
 
   }
 

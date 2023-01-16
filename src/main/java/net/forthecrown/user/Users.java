@@ -137,19 +137,9 @@ public @UtilityClass class Users {
    * All users are saved before being potentially unloaded
    */
   public void unloadOffline() {
-    var it = UserManager.get()
-        .getLoaded()
-        .entrySet()
-        .iterator();
-
-    while (it.hasNext()) {
-      User u = it.next().getValue();
-      u.save();
-
-      if (!u.isOnline()) {
-        it.remove();
-      }
-    }
+    var loaded = UserManager.get().getLoaded();
+    loaded.forEach((uuid, user) -> user.save());
+    loaded.values().removeIf(user -> !user.isOnline());
   }
 
   public void updateVanished() {

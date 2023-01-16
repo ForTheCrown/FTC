@@ -190,6 +190,7 @@ public class WorldBounds3i extends AbstractBounds3i<WorldBounds3i> implements It
     return getEntitiesByType(clazz, null);
   }
 
+  @SuppressWarnings("unchecked")
   public <T extends Entity> Collection<T> getEntitiesByType(Class<T> clazz,
                                                             Predicate<T> predicate
   ) {

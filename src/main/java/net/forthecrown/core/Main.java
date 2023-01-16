@@ -22,10 +22,6 @@ public final class Main extends JavaPlugin implements Namespaced {
   public void onEnable() {
     setDebugMode();
 
-    if (FTC.debugLoggingEnabled()) {
-      getLog4JLogger().debug("DEBUG");
-    }
-
     // Register dynmap hook connection thing
     DynmapUtil.registerListener();
 

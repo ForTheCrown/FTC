@@ -100,6 +100,8 @@ java {
 
 compileJava {
     options.compilerArgs += "-Xlint:all"
+    options.compilerArgs += "-Xmaxwarns"
+    options.compilerArgs += "300"
 }
 
 processResources {

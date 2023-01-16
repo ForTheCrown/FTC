@@ -249,6 +249,7 @@ public abstract class BaseItemBuilder<T extends BaseItemBuilder<T>>
     return editMeta(ItemMeta.class, consumer);
   }
 
+  @SuppressWarnings("unchecked")
   public <M extends ItemMeta> T editMeta(Class<M> metaClass,
                                          Consumer<M> consumer
   ) {
@@ -266,6 +267,7 @@ public abstract class BaseItemBuilder<T extends BaseItemBuilder<T>>
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   protected T clone() {
     try {
       return (T) super.clone();

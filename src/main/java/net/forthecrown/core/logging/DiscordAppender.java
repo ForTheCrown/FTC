@@ -1,23 +1,19 @@
 package net.forthecrown.core.logging;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.ErrorHandler;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
 
 public class DiscordAppender extends AbstractAppender {
+  static final String APPENDER_NAME = DiscordAppender.class.getSimpleName();
 
   public DiscordAppender() {
-    super("DiscordAppender", null, null, false, null);
+    super(APPENDER_NAME, null, null, false, null);
     setStarted();
   }
 
   @Override
   public void append(LogEvent event) {
-    if (event.getLevel().intLevel() > Level.ERROR.intLevel()) {
-      return;
-    }
-
     DiscordErrorLogHandler.INSTANCE.onLog(
         event.getMessage().getFormattedMessage(),
         event.getThrown(),

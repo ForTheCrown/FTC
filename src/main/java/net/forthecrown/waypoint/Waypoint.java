@@ -251,6 +251,7 @@ public class Waypoint implements BoundsHolder {
 
   /* ---------------------------- PROPERTIES ----------------------------- */
 
+  @SuppressWarnings("unchecked")
   public <T> T get(WaypointProperty<T> property) {
     if (!has(property)) {
       return property.getDefaultValue();
@@ -385,7 +386,7 @@ public class Waypoint implements BoundsHolder {
 
     if (hasProperties()) {
       CompoundTag propTag = new CompoundTag();
-      ArrayIterator it = ArrayIterator.unmodifiable(properties);
+      ArrayIterator<Object> it = ArrayIterator.unmodifiable(properties);
 
       while (it.hasNext()) {
         int id = it.nextIndex();
@@ -399,6 +400,7 @@ public class Waypoint implements BoundsHolder {
                 return;
               }
 
+              @SuppressWarnings("unchecked")
               Tag pTag = (Tag) property.getSerializer()
                   .serialize(NbtOps.INSTANCE, next);
 
@@ -421,6 +423,7 @@ public class Waypoint implements BoundsHolder {
     }
   }
 
+  @SuppressWarnings("unchecked")
   public void load(CompoundTag tag) {
     this.type = WaypointTypes.REGISTRY
         .readTagOrThrow(tag.get(TAG_TYPE));

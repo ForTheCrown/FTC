@@ -11,15 +11,19 @@ import "@worldedit.math.BlockVector3";
 
 /* -------------------------------------------------------------------------- */
 
+const TICKS_PER_SECOND = 20;
+
 // Settings
 const settings = {
   wgRegion: "raid_village",
   defaultLootTable: "empty",
-  lootDespawnDelay: 12_000,
-  viewerUpdateIntervalTicks: 10 * 20 // Every 10 seconds
+  lootDespawnDelay: (10 * 60 * TICKS_PER_SECOND), // 10 Minutes
+  viewerUpdateIntervalTicks: 10 * TICKS_PER_SECOND // Every 10 seconds
 };
 
 // Compile scripts and set members
+// compile(): inbuilt function to load scripts with a file path
+//  relative to this one
 const bossbar = compile("bossbar.js");
 const ticking = compile("ticking.js");
 ticking.main = this;
@@ -33,6 +37,7 @@ ticking();
 // Registers the raid trigger listener to spawn loot and then later despawn the
 // same loot
 events.register("onRaidStart", RaidTriggerEvent);
+
 function onRaidStart(event) {
   let region = getWorldGuardRegion();
   let raidLocation = event.getRaid().getLocation();

@@ -62,6 +62,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings("deprecation")
 public class Guild
     implements ForwardingAudience,
     InventoryHolder,

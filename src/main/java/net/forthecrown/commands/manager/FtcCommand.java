@@ -7,6 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 import lombok.Getter;
@@ -73,9 +74,15 @@ public abstract class FtcCommand extends AbstractCommand {
   }
 
   public void simpleUsages() {
-    usages.add(new Usage("").addInfo(getDescription()));
+    usages.add(new Usage("").addInfo(
+        Objects.requireNonNull(
+            getDescription(),
+            "Called before description was set"
+        )
+    ));
   }
 
+  @SuppressWarnings("unchecked")
   public @NotNull HoverEvent<Component> asHoverEvent(CommandSource source) {
     TextWriter writer = TextWriters.newWriter();
     writer.setFieldStyle(Style.style(NamedTextColor.GRAY));
@@ -119,6 +126,7 @@ public abstract class FtcCommand extends AbstractCommand {
     }
   }
 
+  @SuppressWarnings("unchecked")
   public void writeUsages(TextWriter writer,
                           CommandSource source,
                           boolean includeTitle

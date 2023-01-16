@@ -181,16 +181,6 @@ public final class JsonUtils {
     return arr;
   }
 
-  public static JsonArray writeIntArray(int... arr) {
-    JsonArray array = new JsonArray(arr.length);
-
-    for (int j : arr) {
-      array.add(j);
-    }
-
-    return array;
-  }
-
   public static Date readDate(JsonElement element) {
     try {
       return DATE_FORMAT.parse(element.getAsString());
@@ -273,7 +263,7 @@ public final class JsonUtils {
   public static <T> TypeAdapter<T> createAdapter(Function<T, JsonElement> serializer,
                                                  Function<JsonElement, T> deserializer
   ) {
-    return new TypeAdapter<T>() {
+    return new TypeAdapter<>() {
       @Override
       public void write(JsonWriter out, T value) throws IOException {
         var element = serializer.apply(value);
@@ -296,6 +286,7 @@ public final class JsonUtils {
     return (JsonArray) JsonOps.INSTANCE.createList(stream);
   }
 
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public static class EnumTypeAdapter implements TypeAdapterFactory {
 
     @Override

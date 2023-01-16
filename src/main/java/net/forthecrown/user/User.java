@@ -238,6 +238,7 @@ public class User implements ForwardingAudience.Single,
    * @param <T>  The component's type
    * @return The gotten or created component
    */
+  @SuppressWarnings("unchecked") // The T doesn't even exist in runtime, stop screaming
   public <T extends UserComponent> @NotNull T getComponent(ComponentType<T> type) {
     var index = type.getIndex();
     components = ObjectArrays.ensureCapacity(components, index + 1);
@@ -271,7 +272,7 @@ public class User implements ForwardingAudience.Single,
    * @param type The type to test for
    * @return True, if this user has a component with the given type
    */
-  public boolean hasComponent(ComponentType type) {
+  public boolean hasComponent(ComponentType<?> type) {
     if (type == null) {
       return false;
     }
@@ -303,7 +304,7 @@ public class User implements ForwardingAudience.Single,
    * @return True, if the user has any non-null components, false otherwise
    */
   public boolean hasComponents() {
-    if (components.length <= 0) {
+    if (components.length == 0) {
       return false;
     }
 
@@ -446,7 +447,10 @@ public class User implements ForwardingAudience.Single,
     }
 
     // Update IP
-    ip = getPlayer().getAddress().getHostString();
+    var socketAddress = getPlayer().getAddress();
+    if (socketAddress != null) {
+      ip = socketAddress.getHostString();
+    }
 
     // Show join info, if we should
     var joinInfo = JoinInfo.display();
@@ -493,8 +497,7 @@ public class User implements ForwardingAudience.Single,
     // Tell admin if this user has notes
     if (Punishments.hasNotes(this)) {
       var writer = TextWriters.newWriter();
-      var notes = Punishments.entry(this)
-          .getNotes();
+      var notes = Punishments.entry(this).getNotes();
 
       EntryNote.writeNotes(notes, writer, this);
 
@@ -626,7 +629,6 @@ public class User implements ForwardingAudience.Single,
     }
 
     sendMessage(
-        senderUser == null ? Identity.nil() : senderUser,
         Messages.mailReceived(
             text, senderUser,
             !MailAttachment.isEmpty(message.getAttachment())
@@ -937,8 +939,10 @@ public class User implements ForwardingAudience.Single,
         .build();
 
     if (lpManager.isLoaded(getUniqueId())) {
-      return lpManager.getUser(getUniqueId())
-          .getCachedData()
+      var cachedData = lpManager.getUser(getUniqueId());
+      assert cachedData != null : "User has no LP cache data";
+
+      return cachedData.getCachedData()
           .getPermissionData(options)
           .checkPermission(name)
           .asBoolean();
@@ -1266,8 +1270,8 @@ public class User implements ForwardingAudience.Single,
    *
    * @see PropertyMap#flip(BoolProperty)
    */
-  public boolean flip(BoolProperty property) {
-    return getProperties().flip(property);
+  public void flip(BoolProperty property) {
+    getProperties().flip(property);
   }
 
   /**
@@ -1346,7 +1350,10 @@ public class User implements ForwardingAudience.Single,
     var player = getPlayer();
 
     if (godMode) {
-      player.setHealth(getPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+      var attr = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+      assert attr != null : "Player has no Max Health attribute";
+
+      player.setHealth(attr.getValue());
       player.setFoodLevel(20);
     }
 

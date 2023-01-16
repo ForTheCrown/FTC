@@ -679,9 +679,9 @@ public final class Text {
 
     @Getter
     private final String prefix;
-    private final Map<Argument, String> values = new HashMap<>();
+    private final Map<Argument<?>, String> values = new HashMap<>();
 
-    public ArgJoiner add(Argument argument, String val) {
+    public ArgJoiner add(Argument<?> argument, String val) {
       values.put(argument, val);
       return this;
     }

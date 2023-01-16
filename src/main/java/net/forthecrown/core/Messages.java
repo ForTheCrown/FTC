@@ -58,7 +58,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.chat.Keybinds;
 import org.apache.commons.lang3.Range;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -233,13 +232,6 @@ public interface Messages {
    * use a message argument while testing if the input is meant to be a clear command or not
    */
   TextComponent DASH_CLEAR = text("-clear");
-
-  /**
-   * The "[Claim the items!]" button holiday mail messages show
-   */
-  TextComponent HOLIDAYS_GO_CLAIM = text("[Claim the items right now!]", NamedTextColor.AQUA)
-      .hoverEvent(CLICK_ME)
-      .clickEvent(runCommand("/mail claim 1"));
 
   /**
    * Text informing the viewer of lacking permissions
@@ -684,10 +676,6 @@ public interface Messages {
    */
   TextComponent CANNOT_SEND_MCHAT = text("Cannot send Marriage Chat message", NamedTextColor.GRAY);
 
-  TextComponent BOTH_ALLOW_RIDING = text("You must both allow riding", NamedTextColor.GRAY);
-
-  TextComponent CANNOT_RIDE_HERE = text("Cannot ride here!", NamedTextColor.GRAY);
-
   /**
    * Creates a message that says you are now married to the given user
    *
@@ -803,7 +791,7 @@ public interface Messages {
   }
 
   /**
-   * Creates an AFK message stating the the viewer went AFK.
+   * Creates an AFK message stating the viewer went AFK.
    * <p>
    * if <code>reason == null</code> {@link #AFK_SELF} is returned instead.
    *
@@ -2482,8 +2470,8 @@ public interface Messages {
         shop.getExampleItem(),
         shop.getPrice(),
 
-        keybind(Keybinds.SNEAK),
-        keybind(Keybinds.USE)
+        keybind("key.sneak"),
+        keybind("key.use")
     );
   }
 
@@ -2492,9 +2480,12 @@ public interface Messages {
   // ------------------------
 
   Component HOME_WAYPOINT_SET = text(
-      "Set home waypoint." +
-          "\nUse /invite <player> to invite others " +
-          "\nUse /home to come to this waypoint when near another waypoint.",
+      """
+      Set home waypoint.
+      Use /invite <player> to invite others\s
+      Use /home to come to this waypoint when near another waypoint.
+      """,
+
       NamedTextColor.YELLOW
   );
 

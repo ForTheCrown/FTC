@@ -21,6 +21,7 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import org.bukkit.OfflinePlayer;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A general utility class for easisly accessing methods for the punishment and pardoning of users
@@ -87,7 +88,7 @@ public final class Punishments {
    * @param sender The sender to get the entry of
    * @return The sender's entry, null, if the sender is not a player or a user
    */
-  public static PunishEntry entry(Audience sender) {
+  public static @NotNull PunishEntry entry(Audience sender) {
     UUID uuid = null;
 
     if (sender instanceof OfflinePlayer player) {

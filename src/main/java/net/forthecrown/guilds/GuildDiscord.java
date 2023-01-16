@@ -219,6 +219,7 @@ public class GuildDiscord {
     webHookMessage(channel, builder.build());
   }
 
+  @SuppressWarnings("unchecked")
   private void webHookMessage(TextChannel channel, Message message) {
     Objects.requireNonNull(message, "Message null");
 
@@ -429,12 +430,11 @@ public class GuildDiscord {
         publicRole,
         visibility.allowPermissions,
         visibility.denyPermissions
-    );
+    ).submit();
   }
 
   public static boolean isArchived(TextChannel channel) {
-    return channel.getMemberPermissionOverrides()
-        .isEmpty();
+    return channel.getMemberPermissionOverrides().isEmpty();
   }
 
   public static Category guildsTextCategory() {
@@ -477,14 +477,6 @@ public class GuildDiscord {
         Permission.MESSAGE_WRITE,
         Permission.MESSAGE_READ
     );
-  }
-
-  public void deleteChannel() {
-    getChannel().ifPresent(channel -> {
-      channel.delete().submit().thenAccept(unused -> {
-        channelId = NULL_ID;
-      });
-    });
   }
 
   public CompletableFuture<Void> archiveChannel(final String reason) {

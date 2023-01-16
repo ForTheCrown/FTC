@@ -85,6 +85,7 @@ public class Registry<V> implements Iterable<V> {
   /**
    * An empty and immutable holder array
    */
+  @SuppressWarnings("rawtypes")
   private static final Holder[] EMPTY_ARRAY = new Holder[0];
 
   /**
@@ -123,6 +124,7 @@ public class Registry<V> implements Iterable<V> {
   /**
    * ID to entry lookup array
    */
+  @SuppressWarnings("unchecked")
   private Holder<V>[] byId = EMPTY_ARRAY;
 
   @Getter
@@ -451,6 +453,7 @@ public class Registry<V> implements Iterable<V> {
    *
    * @throws IllegalStateException If the registry is frozen
    */
+  @SuppressWarnings("unchecked")
   public void clear() throws IllegalArgumentException {
     testFrozen();
 

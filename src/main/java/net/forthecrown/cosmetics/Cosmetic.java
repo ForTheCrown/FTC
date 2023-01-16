@@ -24,6 +24,7 @@ public abstract class Cosmetic {
   protected final Slot slot;
 
   @Getter
+  @SuppressWarnings("rawtypes")
   protected final CosmeticType type;
 
   @Getter

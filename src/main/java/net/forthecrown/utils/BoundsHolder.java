@@ -12,5 +12,5 @@ public interface BoundsHolder {
    *
    * @return This object's bounds
    */
-  AbstractBounds3i getBounds();
+  AbstractBounds3i<?> getBounds();
 }
