@@ -8,6 +8,7 @@ import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.FTC;
 import net.forthecrown.guilds.GuildConfig;
 import net.forthecrown.guilds.GuildPermission;
+import net.forthecrown.guilds.menu.GuildMenus;
 import net.forthecrown.utils.Time;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.inventory.menu.MenuNode;
@@ -107,7 +108,6 @@ public class UnlockableDiscordRole implements Unlockable {
             }
 
             var roleOpt = guild.getDiscord().getRole();
-            click.shouldReloadMenu(true);
 
             if (roleOpt.isEmpty()) {
               guild.getDiscord().createRole().whenComplete((role, throwable) -> {
@@ -125,6 +125,12 @@ public class UnlockableDiscordRole implements Unlockable {
                     NamedTextColor.GOLD,
                     user
                 ));
+
+                GuildMenus.open(
+                    GuildMenus.MAIN_MENU.getUpgradesMenu().getDiscordMenu(),
+                    user,
+                    guild
+                );
               });
               return;
             }
@@ -133,15 +139,31 @@ public class UnlockableDiscordRole implements Unlockable {
               return;
             }
 
-            guild.getDiscord().deleteRole();
+            guild.getDiscord().deleteRole().whenComplete((unused, error) -> {
+              if (error != null) {
+                guild.sendMessage(
+                    Component.text("Failed to delete role, internal error",
+                        NamedTextColor.RED
+                    )
+                );
 
-            guild.sendMessage(
-                Text.format(
-                    "&e{0, user}&r deleted the guild's Discord role",
-                    NamedTextColor.GRAY,
-                    user
-                )
-            );
+                return;
+              }
+
+              guild.sendMessage(
+                  Text.format(
+                      "&e{0, user}&r deleted the guild's Discord role",
+                      NamedTextColor.GRAY,
+                      user
+                  )
+              );
+
+              GuildMenus.open(
+                  GuildMenus.MAIN_MENU.getUpgradesMenu().getDiscordMenu(),
+                  user,
+                  guild
+              );
+            });
           });
         })
 

@@ -87,6 +87,9 @@ public class AbilityMenus extends MenuPage {
   public static final ContextOption<Location> SLIME_POSITION
       = SET.newOption();
 
+  public static final ContextOption<Boolean> WARNED
+      = SET.newOption(false);
+
   @Getter
   private static final AbilityMenus instance = new AbilityMenus();
 
@@ -219,6 +222,27 @@ public class AbilityMenus extends MenuPage {
                   RoyalSword sword = ExtendedItems.ROYAL_SWORD.get(item);
 
                   WeaponAbility existingAbility = sword.getAbility();
+
+                  // Warn if overriding existing ability
+                  if (existingAbility != null
+                      && existingAbility.getType() != abilityType.getValue()
+                      && !context.getOrThrow(WARNED)
+                  ) {
+                    context.set(WARNED, true);
+
+                    user.sendMessage(
+                        Text.format(
+                            "Your sword has the {0} ability, "
+                                + "adding {1} will override the first ability!"
+                                + "\n&eClick again to override ability",
+
+                            existingAbility.getType().fullDisplayName(),
+                            abilityType.getValue().fullDisplayName()
+                        )
+                    );
+
+                    return;
+                  }
 
                   // Apply ability upgrade or apply ability to sword if existing
                   // one is null or different

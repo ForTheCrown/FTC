@@ -2,7 +2,7 @@ package net.forthecrown.useables.test;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.commands.manager.Commands;
+import net.forthecrown.commands.arguments.RegistryArguments;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.useables.CheckHolder;
 import net.forthecrown.useables.ConstructType;
@@ -56,7 +56,7 @@ public class TestRank extends UsageTest {
   public static TestRank parse(StringReader reader, CommandSource source)
       throws CommandSyntaxException
   {
-    return new TestRank(Commands.RANK.parse(reader).getValue());
+    return new TestRank(RegistryArguments.RANKS.parse(reader).getValue());
   }
 
   @UsableConstructor(ConstructType.TAG)

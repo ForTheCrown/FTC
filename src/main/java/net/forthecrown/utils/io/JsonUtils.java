@@ -207,6 +207,28 @@ public final class JsonUtils {
     return new JsonPrimitive(DATE_FORMAT.format(date));
   }
 
+  public static long readTimestamp(JsonElement element) {
+    return readTimestamp(element, -1L);
+  }
+
+  public static long readTimestamp(JsonElement element, long def) {
+    if (element == null || !element.isJsonPrimitive()) {
+      return def;
+    }
+
+    JsonPrimitive primitive = element.getAsJsonPrimitive();
+
+    if (primitive.isString()) {
+      return readDate(element).getTime();
+    }
+
+    return primitive.getAsLong();
+  }
+
+  public static JsonElement writeTimestamp(long time) {
+    return writeDate(new Date(time));
+  }
+
   public static Component readText(JsonElement element) {
     if (element instanceof JsonPrimitive primitive && primitive.isString()) {
       return Text.renderString(primitive.getAsString());

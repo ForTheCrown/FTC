@@ -205,7 +205,7 @@ public final class Util {
     return new IllegalArgumentException(String.format(format, args));
   }
 
-  public static Set<Method> getAllMethods(Class c) {
+  public static Set<Method> getAllMethods(Class<?> c) {
     Set<Method> methods = new ObjectOpenHashSet<>();
     Class<?> type = c;
 

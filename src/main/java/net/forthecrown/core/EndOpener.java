@@ -48,8 +48,7 @@ public class EndOpener {
   private static final Logger LOGGER = FTC.getLogger();
   private static final EndOpener INSTANCE = new EndOpener();
 
-  private EndOpener() {
-  }
+  private EndOpener() {}
 
   public static EndOpener get() {
     return INSTANCE;
@@ -134,6 +133,8 @@ public class EndOpener {
             }
 
             LOGGER.info("Placed end exit portal and gateways");
+            StaffChat.send(Component.text("End reset finished"), false);
+            FtcDiscord.staffLog(C_END, "End reset finished");
           });
         });
   }

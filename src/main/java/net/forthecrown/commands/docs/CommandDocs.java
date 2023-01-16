@@ -142,6 +142,12 @@ public class CommandDocs {
   }
 
   public void createDocumentation(FtcCommand command) {
+    var pName = command.getClass().getPackageName();
+
+    if (pName.contains("test") || pName.contains("click")) {
+      return;
+    }
+
     String name = command.getHelpListName();
     String perm = command.getPerm();
     String desc = command.getDescription();

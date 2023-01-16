@@ -9,9 +9,9 @@ import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import lombok.Getter;
@@ -24,10 +24,10 @@ import net.forthecrown.core.module.OnSave;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.core.registry.Registries;
 import net.forthecrown.core.registry.Registry;
+import net.forthecrown.datafix.ChallengesLogFix;
+import net.forthecrown.datafix.Transformers;
 import net.forthecrown.economy.Economy;
-import net.forthecrown.log.DateRange;
-import net.forthecrown.log.LogManager;
-import net.forthecrown.log.LogQuery;
+import net.forthecrown.user.User;
 import net.forthecrown.utils.Time;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.inventory.menu.Menu;
@@ -44,12 +44,17 @@ public class ChallengeManager {
   @Getter
   private LocalDate date;
 
-  private final List<Challenge> activeChallenges = new ObjectArrayList<>();
+  private final List<Holder<Challenge>> activeChallenges = new ObjectArrayList<>();
 
-  private final Map<UUID, ChallengeEntry> entries = new Object2ObjectOpenHashMap<>();
+  private final Map<UUID, ChallengeEntry> entries
+      = new Object2ObjectOpenHashMap<>();
 
   @Getter
-  private final Registry<Challenge> challengeRegistry = Registries.newRegistry();
+  private final Registry<Challenge> challengeRegistry
+      = Registries.newRegistry();
+
+  private final EnumMap<ResetInterval, Long> resetTimes
+      = new EnumMap<>(ResetInterval.class);
 
   @Getter
   private final ChallengeDataStorage storage;
@@ -74,15 +79,15 @@ public class ChallengeManager {
         .registerConfig(ChallengeConfig.class);
   }
 
-  public ChallengeEntry getEntry(UUID uuid) {
-    return entries.get(uuid);
+  public ChallengeEntry getEntry(User user) {
+    return getEntry(user.getUniqueId());
   }
 
-  public ChallengeEntry getOrCreateEntry(UUID uuid) {
+  public ChallengeEntry getEntry(UUID uuid) {
     return entries.computeIfAbsent(uuid, ChallengeEntry::new);
   }
 
-  public List<Challenge> getActiveChallenges() {
+  public List<Holder<Challenge>> getActiveChallenges() {
     return Collections.unmodifiableList(activeChallenges);
   }
 
@@ -137,7 +142,9 @@ public class ChallengeManager {
   public void reset(ResetInterval interval) {
     Set<Challenge> current = new ObjectOpenHashSet<>();
 
-    activeChallenges.removeIf(challenge -> {
+    activeChallenges.removeIf(holder -> {
+      var challenge = holder.getValue();
+
       if (challenge.getResetInterval() != interval) {
         return false;
       }
@@ -148,7 +155,7 @@ public class ChallengeManager {
       return true;
     });
 
-    entries.values().forEach(entry -> entry.onReset(interval));
+    entries.values().forEach(entry -> entry.onReset(interval, this));
 
     if (!interval.shouldRefill()) {
       return;
@@ -185,11 +192,13 @@ public class ChallengeManager {
         required
     );
 
+    resetTimes.put(interval, System.currentTimeMillis());
+
     picked.forEach(holder -> {
       activate(holder, true);
     });
 
-    LOGGER.debug("Reset all {} challenges, added {} new ones",
+    LOGGER.info("Reset all {} challenges, added {} new ones",
         interval, picked.size()
     );
   }
@@ -218,7 +227,7 @@ public class ChallengeManager {
   }
 
   public void activate(Holder<Challenge> holder, boolean resetting) {
-    activeChallenges.add(holder.getValue());
+    activeChallenges.add(holder);
 
     var extra = holder.getValue()
         .activate(resetting);
@@ -229,7 +238,7 @@ public class ChallengeManager {
   }
 
   public void clear() {
-    activeChallenges.forEach(Challenge::deactivate);
+    activeChallenges.forEach(holder -> holder.getValue().deactivate());
     activeChallenges.clear();
 
     entries.clear();
@@ -246,24 +255,24 @@ public class ChallengeManager {
     storage.loadChallenges(challengeRegistry);
     storage.loadItemChallenges(challengeRegistry);
 
-    LOGGER.debug("creating challenge item menu");
     var shop = Economy.get().getSellShop();
     itemChallengeMenu = Challenges.createItemMenu(challengeRegistry, shop);
   }
 
   @OnSave
   public void save() {
-    storage.saveEntries(entries.values(), challengeRegistry);
+    storage.saveEntries(entries.values());
+    storage.saveActive(activeChallenges, resetTimes);
   }
 
   @OnLoad
   public void load() {
-    LOGGER.debug("load() in {} called", getClass().getSimpleName());
-
     clear();
     loadChallenges();
 
-    storage.loadEntries(challengeRegistry)
+    Transformers.runTransformer(new ChallengesLogFix(storage));
+
+    storage.loadEntries()
         .resultOrPartial(LOGGER::error)
         .ifPresent(entries1 -> {
           for (var e : entries1) {
@@ -271,68 +280,35 @@ public class ChallengeManager {
           }
         });
 
-    loadActive();
+    storage.loadActive(activeChallenges, resetTimes, challengeRegistry);
+
+    resetIfRequired(ResetInterval.DAILY);
+    resetIfRequired(ResetInterval.WEEKLY);
   }
 
-  private static DateRange getQueryRange() {
-    var now = LocalDate.now();
-    return DateRange.between(
-        now.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)),
-        now
-    );
-  }
+  private void resetIfRequired(ResetInterval interval) {
+    long time = resetTimes.getOrDefault(interval, 0L);
+    LocalDate now;
 
-  private void loadActive() {
-    var list = LogManager.getInstance()
-        .queryLogs(
-            LogQuery.builder(ChallengeLogs.ACTIVE)
-                .queryRange(getQueryRange())
-
-                .field(ChallengeLogs.A_TYPE)
-                .add(Objects::nonNull)
-
-                .entryPredicate(entry -> {
-                  var type = entry.get(ChallengeLogs.A_TYPE);
-
-                  if (type != ResetInterval.DAILY) {
-                    return true;
-                  }
-
-                  var time = entry.getDate();
-
-                  var local = Time.localTime(time);
-                  var now = LocalDate.now();
-
-                  return local.getDayOfWeek() == now.getDayOfWeek();
-                })
-
-                .build()
-        );
-
-    if (list.isEmpty()) {
-      reset(ResetInterval.DAILY);
-      reset(ResetInterval.WEEKLY);
-
-      return;
+    if (interval == ResetInterval.WEEKLY) {
+      now = date.with(
+          TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)
+      );
+    } else {
+      now = date;
     }
 
-    list.forEach(entry -> {
-      String key = entry.get(ChallengeLogs.A_CHALLENGE);
+    long epochDay = now.toEpochDay();
+    long timeDay = Time.localDate(time).toEpochDay();
 
-      challengeRegistry.getHolder(key)
-          .ifPresentOrElse(
-              challenge -> {
-                activate(challenge, false);
-                LOGGER.debug("Loaded active challenge {}", key);
-              },
+    var list  = activeChallenges.stream()
+        .filter(holder -> holder.getValue().getResetInterval() == interval)
+        .toList();
 
-              () -> {
-                LOGGER.warn(
-                    "Unknown challenge found in data logs: '{}'",
-                    key
-                );
-              }
-          );
-    });
+    if (epochDay < timeDay || list.isEmpty()) {
+      reset(interval);
+    } else {
+      list.forEach(holder -> holder.getValue().activate(false));
+    }
   }
 }

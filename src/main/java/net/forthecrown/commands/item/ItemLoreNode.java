@@ -31,8 +31,10 @@ public class ItemLoreNode extends ItemModifierNode {
     factory.usage("clear")
         .addInfo("Clears your held item's lore");
 
-    factory.usage("add <text>")
-        .addInfo("Adds the <text> to your held item's lore");
+    ItemNameNode.namingNote(
+        factory.usage("add <text>")
+            .addInfo("Adds the <text> to your held item's lore")
+    );
 
     factory.usage("remove <index>")
         .addInfo("Removes the lore on the given line");

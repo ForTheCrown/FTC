@@ -2,11 +2,11 @@ package net.forthecrown.core.script2;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -15,17 +15,17 @@ import javax.script.Bindings;
 import javax.script.CompiledScript;
 import javax.script.ScriptContext;
 import javax.script.ScriptException;
+import lombok.AccessLevel;
 import lombok.Getter;
 import net.forthecrown.core.FTC;
 import net.forthecrown.core.script2.ScriptSource.FileSource;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
-import org.openjdk.nashorn.api.scripting.JSObject;
 import org.openjdk.nashorn.api.scripting.NashornScriptEngine;
 import org.openjdk.nashorn.api.scripting.ScriptObjectMirror;
 
 @Getter
-public class Script implements Closeable, JSObject {
+public class Script implements Closeable {
 
   public static final String
       METHOD_ON_CLOSE = "__onClose";
@@ -58,6 +58,9 @@ public class Script implements Closeable, JSObject {
 
   /** Script's self instance */
   private ScriptObjectMirror mirror;
+
+  @Getter(AccessLevel.PACKAGE)
+  private Set<WrappedScript> loadedSubScripts = new ObjectOpenHashSet<>();
 
   /* ---------------------------- CONSTRUCTORS ---------------------------- */
 
@@ -378,6 +381,10 @@ public class Script implements Closeable, JSObject {
       engine.put("scheduler", tasks);
       engine.put("events", events);
       engine.put("args", args);
+      engine.put("_script", this);
+      engine.put("workingDirectory", getWorkingDirectory());
+
+      engine.put("compile", ScriptsBuiltIn.compileFunction(this));
 
       this.engine = engine;
       this.mirror = (ScriptObjectMirror)
@@ -493,6 +500,11 @@ public class Script implements Closeable, JSObject {
 
     invokeIfExists(METHOD_ON_CLOSE);
 
+    loadedSubScripts.forEach(wrappedScript -> {
+      wrappedScript.getScript().close();
+    });
+    loadedSubScripts.clear();
+
     events.close();
     tasks.close();
 
@@ -538,112 +550,5 @@ public class Script implements Closeable, JSObject {
   @Override
   public String toString() {
     return source.getName();
-  }
-
-  /* ------------------------- JSObject DELEGATES ------------------------- */
-
-  @Override
-  public Object call(Object thiz, Object... args) {
-    ensureCompiled();
-    return mirror.call(thiz, args);
-  }
-
-  @Override
-  public Object newObject(Object... args) {
-    ensureCompiled();
-    return mirror.newObject(args);
-  }
-
-  @Override
-  public Object eval(String s) {
-    ensureCompiled();
-    return mirror.eval(s);
-  }
-
-  @Override
-  public Object getMember(String name) {
-    ensureCompiled();
-    return mirror.getMember(name);
-  }
-
-  @Override
-  public Object getSlot(int index) {
-    ensureCompiled();
-    return mirror.getSlot(index);
-  }
-
-  @Override
-  public boolean hasMember(String name) {
-    ensureCompiled();
-    return mirror.hasMember(name);
-  }
-
-  @Override
-  public boolean hasSlot(int slot) {
-    ensureCompiled();
-    return mirror.hasSlot(slot);
-  }
-
-  @Override
-  public void removeMember(String name) {
-    ensureCompiled();
-    mirror.removeMember(name);
-  }
-
-  @Override
-  public void setMember(String name, Object value) {
-    ensureCompiled();
-    mirror.setMember(name, value);
-  }
-
-  @Override
-  public void setSlot(int index, Object value) {
-    ensureCompiled();
-    mirror.setSlot(index, value);
-  }
-
-  @Override
-  public Set<String> keySet() {
-    ensureCompiled();
-    return mirror.keySet();
-  }
-
-  @Override
-  public Collection<Object> values() {
-    ensureCompiled();
-    return mirror.values();
-  }
-
-  @Override
-  public boolean isInstance(Object instance) {
-    ensureCompiled();
-    return mirror.isInstance(instance);
-  }
-
-  @Override
-  public boolean isInstanceOf(Object clazz) {
-    ensureCompiled();
-    return mirror.isInstanceOf(clazz);
-  }
-
-  @Override
-  public String getClassName() {
-    ensureCompiled();
-    return mirror.getClassName();
-  }
-
-  @Override
-  public boolean isFunction() {
-    return false;
-  }
-
-  @Override
-  public boolean isStrictFunction() {
-    return false;
-  }
-
-  @Override
-  public boolean isArray() {
-    return false;
   }
 }

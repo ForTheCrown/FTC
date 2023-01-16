@@ -130,23 +130,25 @@ public abstract class FtcCommand extends AbstractCommand {
     LinkedList<Usage> usages = (LinkedList<Usage>) getUsages().clone();
     usages.removeIf(usage -> !usage.getCondition().test(source));
 
-    if (!usages.isEmpty()) {
-      if (includeTitle) {
-        writer.newLine();
-        writer.newLine();
-        writer.field("Usages", "");
+    if (usages.isEmpty()) {
+      return;
+    }
+
+    if (includeTitle) {
+      writer.newLine();
+      writer.newLine();
+      writer.field("Usages", "");
+    }
+
+    for (var n : usages) {
+      writer.line(n.argumentsWithPrefix("/" + getHelpListName()));
+
+      if (!ArrayUtils.isEmpty(n.getInfo())) {
+        writer.write(":");
       }
 
-      for (var n : usages) {
-        writer.line(n.argumentsWithPrefix("/" + getHelpListName()));
-
-        if (!ArrayUtils.isEmpty(n.getInfo())) {
-          writer.write(":");
-        }
-
-        Arrays.stream(n.getInfo())
-            .forEach(s -> writer.line("  " + s, NamedTextColor.GRAY));
-      }
+      Arrays.stream(n.getInfo())
+          .forEach(s -> writer.line("  " + s, NamedTextColor.GRAY));
     }
   }
 
@@ -216,10 +218,6 @@ public abstract class FtcCommand extends AbstractCommand {
 
     public String argumentsWithPrefix(String prefix) {
       return prefix + (Strings.isNullOrEmpty(arguments) ? "" : " " + arguments);
-    }
-
-    public void write(String prefix, TextWriter writer) {
-
     }
   }
 }

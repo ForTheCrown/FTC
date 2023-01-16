@@ -35,10 +35,13 @@ public class ItemDataNode extends ItemModifierNode {
 
   @Override
   public void populateUsages(UsageFactory factory) {
-    factory.usage("view [<nbt pat>]")
+    factory.usage("view [<nbt path>]")
         .addInfo("Displays the item's data")
         .addInfo("If <nbt path> is set, then it'll only display the data")
-        .addInfo("at that path");
+        .addInfo("at that path, otherwise the entire item's NBT is shown");
+
+    factory.usage("give_command")
+        .addInfo("Creates a /give command for the item you're holding");
 
     factory.usage("merge <compound tag>")
         .addInfo("Merges the <compound tag> into the item's tag")

@@ -282,6 +282,8 @@ public class Registry<V> implements Iterable<V> {
 
     byId[holder.getId()] = holder;
     byKey.put(holder.getKey(), holder);
+    holder.setRegistry(this);
+
     var existing = byValue.put(holder.getValue(), holder);
 
     if (listener != null) {
@@ -409,6 +411,7 @@ public class Registry<V> implements Iterable<V> {
       listener.onUnregister(holder);
     }
 
+    holder.setRegistry(null);
     return true;
   }
 

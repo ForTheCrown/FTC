@@ -32,6 +32,14 @@ public class ScriptResult {
     return Optional.ofNullable(exception);
   }
 
+  public ScriptResult throwIfError() {
+    if (error().isPresent()) {
+      throw new IllegalStateException(error().get());
+    }
+
+    return this;
+  }
+
   /**
    * Logs the error message this result represents, if there is an error message
    * @return This

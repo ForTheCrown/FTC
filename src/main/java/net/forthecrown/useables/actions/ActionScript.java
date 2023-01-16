@@ -35,7 +35,6 @@ public class ActionScript extends UsageAction {
   @Override
   public void onUse(Player player, ActionHolder holder) {
     try (var _script = getScript(script, holder)) {
-      _script.eval();
       _script.invoke("onUse", Users.get(player));
     }
   }
@@ -56,6 +55,7 @@ public class ActionScript extends UsageAction {
       _script.put("_location", ent.getLocation());
     });
 
+    _script.eval().throwIfError();
     return _script;
   }
 

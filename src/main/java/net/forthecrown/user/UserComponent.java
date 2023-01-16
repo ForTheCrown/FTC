@@ -25,7 +25,7 @@ public abstract class UserComponent {
    * @see Components
    */
   @Getter
-  private final ComponentType type;
+  private final ComponentType<?> type;
 
   /**
    * Loads the component from the given JSON element

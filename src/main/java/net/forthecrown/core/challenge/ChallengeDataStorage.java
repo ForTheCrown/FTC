@@ -3,19 +3,22 @@ package net.forthecrown.core.challenge;
 import static net.forthecrown.utils.io.FtcJar.ALLOW_OVERWRITE;
 import static net.forthecrown.utils.io.FtcJar.OVERWRITE_IF_NEWER;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import com.mojang.serialization.DataResult;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.stream.Stream;
 import lombok.Getter;
 import net.forthecrown.core.FTC;
 import net.forthecrown.core.registry.Holder;
@@ -44,6 +47,7 @@ public class ChallengeDataStorage {
   private final Path itemChallengesFile;
   private final Path userDataFile;
   private final Path streakScriptFile;
+  private final Path resetDataFile;
 
   public ChallengeDataStorage(Path directory) {
     this.directory = directory;
@@ -55,7 +59,8 @@ public class ChallengeDataStorage {
     this.challengesFile = directory.resolve("challenges.toml");
     this.itemChallengesFile = directory.resolve("item_challenges.toml");
     this.userDataFile = directory.resolve("user_data.json");
-    this.streakScriptFile = directory.resolve("streak_scripts.json");
+    this.streakScriptFile = directory.resolve("streak_scripts.toml");
+    this.resetDataFile = directory.resolve("reset_data.json");
   }
 
   void ensureDefaultsExist() {
@@ -78,7 +83,7 @@ public class ChallengeDataStorage {
   public Set<String> getScripts(StreakCategory category) {
     Set<String> result = new ObjectOpenHashSet<>();
 
-    SerializationHelper.readJsonFile(streakScriptFile, json -> {
+    SerializationHelper.readTomlAsJson(streakScriptFile, json -> {
       var element = json.get(category.name().toLowerCase());
 
       if (element == null) {
@@ -154,7 +159,7 @@ public class ChallengeDataStorage {
 
   /* ----------------------------- USER DATA ------------------------------ */
 
-  public DataResult<List<ChallengeEntry>> loadEntries(Registry<Challenge> challenges) {
+  public DataResult<List<ChallengeEntry>> loadEntries() {
     return SerializationHelper.readJson(getUserDataFile())
         .map(object -> {
           List<ChallengeEntry> entries = new ObjectArrayList<>();
@@ -173,37 +178,7 @@ public class ChallengeDataStorage {
             ChallengeEntry entry = new ChallengeEntry(uuid);
 
             var eObj = JsonWrapper.wrap(e.getValue().getAsJsonObject());
-
-            if (eObj.has(KEY_HIGHEST_STREAK)) {
-              int highestStreak = eObj.getInt(KEY_HIGHEST_STREAK);
-              entry.setHighestStreak(highestStreak);
-
-              eObj.remove(KEY_HIGHEST_STREAK);
-            }
-
-            for (var p : e.getValue().getAsJsonObject().entrySet()) {
-              if (!p.getValue().isJsonPrimitive()
-                  || !((JsonPrimitive) p.getValue()).isNumber()
-              ) {
-                LOGGER.warn("Found non-number in {}'s data", uuid);
-                continue;
-              }
-
-              float progress = p.getValue()
-                  .getAsNumber()
-                  .floatValue();
-
-              challenges.get(p.getKey())
-                  .ifPresentOrElse(challenge -> {
-                    entry.getProgress()
-                        .put(challenge, progress);
-                  }, () -> {
-                    LOGGER.warn(
-                        "Unknown challenge {} in {} data",
-                        p.getKey(), uuid
-                    );
-                  });
-            }
+            entry.deserialize(eObj);
 
             entries.add(entry);
           }
@@ -213,31 +188,14 @@ public class ChallengeDataStorage {
         });
   }
 
-  public void saveEntries(Collection<ChallengeEntry> entries,
-                          Registry<Challenge> challenges
-  ) {
+  public void saveEntries(Collection<ChallengeEntry> entries) {
     SerializationHelper.writeJsonFile(getUserDataFile(), wrapper -> {
       for (var e : entries) {
         JsonWrapper json = JsonWrapper.create();
+        e.serialize(json);
 
-        for (var p : e.getProgress().object2FloatEntrySet()) {
-          if (p.getFloatValue() <= 0) {
-            continue;
-          }
-
-          if (e.getHighestStreak() > 0) {
-            json.add(KEY_HIGHEST_STREAK, e.getHighestStreak());
-          }
-
-          challenges.getHolderByValue(p.getKey())
-              .ifPresentOrElse(holder -> {
-                json.add(holder.getKey(), p.getFloatValue());
-              }, () -> {
-                LOGGER.warn(
-                    "Unregistered challenge found in {}",
-                    e.getId()
-                );
-              });
+        if (json.isEmpty()) {
+          continue;
         }
 
         wrapper.add(e.getId().toString(), json);
@@ -275,5 +233,71 @@ public class ChallengeDataStorage {
         getItemFile(container.getChallengeKey()),
         container::save
     );
+  }
+
+  /* ------------------------------ ACTIVE -------------------------------- */
+
+  public void saveActive(Collection<Holder<Challenge>> holders,
+                         Map<ResetInterval, Long> lastResets
+  ) {
+    SerializationHelper.writeJsonFile(getResetDataFile(), wrapper -> {
+      EnumMap<ResetInterval, JsonArray> savedMap
+          = new EnumMap<>(ResetInterval.class);
+
+      for (var h: holders) {
+        var c = h.getValue();
+        var arr = savedMap.computeIfAbsent(
+            c.getResetInterval(),
+            interval -> new JsonArray()
+        );
+
+        arr.add(h.getKey());
+      }
+
+      savedMap.forEach((interval, array) -> {
+        JsonWrapper json = JsonWrapper.create();
+        long lastReset = lastResets.getOrDefault(interval, 0L);
+
+        if (lastReset != 0) {
+          json.addTimeStamp("lastReset", lastReset);
+        }
+
+        json.add("values", array);
+        wrapper.add(interval.name().toLowerCase(), json);
+      });
+    });
+  }
+
+  public void loadActive(Collection<Holder<Challenge>> holders,
+                         Map<ResetInterval, Long> lastResets,
+                         Registry<Challenge> registry
+  ) {
+    holders.clear();
+    lastResets.clear();
+
+    SerializationHelper.readJsonFile(getResetDataFile(), wrapper -> {
+      wrapper.entrySet().forEach(e -> {
+        ResetInterval interval = ResetInterval.valueOf(e.getKey().toUpperCase());
+        JsonWrapper json = JsonWrapper.wrap(e.getValue().getAsJsonObject());
+
+        lastResets.put(interval, json.getTimeStamp("lastReset"));
+
+        JsonArray arr = json.getArray("values");
+        JsonUtils.stream(arr)
+            .map(JsonElement::getAsString)
+            .flatMap(s -> {
+              var opt = registry.getHolder(s);
+
+              if (opt.isEmpty()) {
+                LOGGER.warn("Unknown challenge {} found in active.json", s);
+                return Stream.empty();
+              }
+
+              return Stream.of(opt.get());
+            })
+
+            .forEach(holders::add);
+      });
+    });
   }
 }

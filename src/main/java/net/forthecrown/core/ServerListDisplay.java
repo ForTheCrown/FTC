@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -43,6 +44,9 @@ import org.bukkit.util.CachedServerIcon;
 public class ServerListDisplay {
   private static final Logger LOGGER = FTC.getLogger();
 
+  public static final Comparator<Holder<Entry>> ENTRY_COMPARATOR
+      = makeComparator(); // I dislike Java sometimes
+
   @Getter
   private static final ServerListDisplay instance = new ServerListDisplay();
 
@@ -66,6 +70,13 @@ public class ServerListDisplay {
     this.loaderFile = PathUtil.pluginPath("serverlist.toml");
 
     saveDefaults();
+  }
+
+  private static Comparator<Holder<Entry>> makeComparator() {
+    Comparator<Holder<Entry>> comparator
+        = Comparator.comparingInt(value -> value.getValue().getPriority());
+
+    return comparator.reversed();
   }
 
   void saveDefaults() {
@@ -110,6 +121,8 @@ public class ServerListDisplay {
           return period == null || period.contains(today);
         })
         .forEach(dateCache::add);
+
+    dateCache.sort(ENTRY_COMPARATOR);
   }
 
   public Pair<CachedServerIcon, Component> getCurrent() {
@@ -168,7 +181,7 @@ public class ServerListDisplay {
         JsonElement element = e.getValue();
 
         if (element.isJsonPrimitive() || element.isJsonArray()) {
-          icon = new Entry(null, readIconList(element), null, null);
+          icon = new Entry(null, readIconList(element), null, null, 0);
         } else {
           var json = JsonWrapper.wrap(element.getAsJsonObject());
 
@@ -179,6 +192,7 @@ public class ServerListDisplay {
           MonthDayPeriod period = ALL;
           Script condition = null;
           Component motdPart = null;
+          int prio = json.getInt("priority", 0);
 
           if (json.has("condition")) {
             condition = Script.read(json.get("condition"), true);
@@ -201,7 +215,7 @@ public class ServerListDisplay {
             continue;
           }
 
-          icon = new Entry(period, icons, condition, motdPart);
+          icon = new Entry(period, icons, condition, motdPart, prio);
         }
 
         if (icon.icons.isEmpty()) {
@@ -269,6 +283,7 @@ public class ServerListDisplay {
     private final List<CachedServerIcon> icons;
     private final Script condition;
     private final Component motdPart;
+    private final int priority;
 
     public CachedServerIcon get(Random random) {
       if (icons.isEmpty()) {
@@ -297,12 +312,13 @@ public class ServerListDisplay {
 
     @Override
     public String toString() {
-      return "%s[condition=%s, motd=%s, period=%s, iconsSize=%s]".formatted(
+      return "%s[condition=%s, motd=%s, period=%s, iconsSize=%s, priority=%s]".formatted(
           getClass().getSimpleName(),
           getCondition(),
           getMotdPart() == null ? null : Text.plain(getMotdPart()),
           getPeriod(),
-          getIcons().size()
+          getIcons().size(),
+          getPriority()
       );
     }
   }

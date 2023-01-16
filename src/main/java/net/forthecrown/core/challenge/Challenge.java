@@ -45,8 +45,10 @@ public interface Challenge {
       writer.line(component);
     }
 
-    int streak = Challenges.queryStreak(this, viewer)
-        .orElse(0);
+    int streak = ChallengeManager.getInstance()
+        .getEntry(viewer.getUniqueId())
+        .getStreak(getStreakCategory())
+        .get();
 
     var reward = getReward();
     if (!reward.isEmpty(streak)) {
@@ -111,7 +113,11 @@ public interface Challenge {
    * Gets the effective goal for the given user
    */
   default float getGoal(User user) {
-    int streak = Challenges.queryStreak(this, user).orElse(0);
+    int streak = ChallengeManager.getInstance()
+        .getEntry(user)
+        .getStreak(getStreakCategory())
+        .get();
+
     return getGoal().getValue(streak);
   }
 
@@ -128,8 +134,10 @@ public interface Challenge {
    * By default, this will simply give the {@link #getReward()} to the player
    */
   default void onComplete(User user) {
-    int streak = Challenges.queryStreak(this, user)
-        .orElse(0);
+    int streak = ChallengeManager.getInstance()
+        .getEntry(user)
+        .getStreak(getStreakCategory())
+        .get();
 
     if (getReward().isEmpty(streak)) {
       return;

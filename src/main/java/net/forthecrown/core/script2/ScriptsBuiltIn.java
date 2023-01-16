@@ -1,8 +1,9 @@
 package net.forthecrown.core.script2;
 
+import java.nio.file.Files;
+import java.util.function.Function;
 import jdk.dynalink.beans.StaticClass;
 import net.forthecrown.core.FTC;
-import net.forthecrown.core.FtcLogger;
 import net.forthecrown.core.Messages;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.Cooldown;
@@ -21,6 +22,7 @@ import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -50,12 +52,30 @@ public final class ScriptsBuiltIn {
       TextColor.class,      ItemStacks.class
   };
 
+  public static Function<String, WrappedScript> compileFunction(Script script) {
+    return scriptName -> {
+      var file = script.getWorkingDirectory().resolve(scriptName);
+
+      if (!Files.exists(file)) {
+        throw new IllegalStateException(
+            "File " + scriptName + " doesn't exist"
+        );
+      }
+
+      Script loaded = Script.of(file).compile();
+      var wrapped = new WrappedScript(loaded);
+      script.getLoadedSubScripts().add(wrapped);
+
+      return wrapped;
+    };
+  }
+
   public static void populate(String name, NashornScriptEngine engine) {
     for (var c : DEFAULT_CLASSES) {
       engine.put(c.getSimpleName(), StaticClass.forClass(c));
     }
 
-    FtcLogger logger = new FtcLogger(LogManager.getContext().getLogger(name));
+    Logger logger = LogManager.getLogger(name);
     engine.put("logger", logger);
   }
 }

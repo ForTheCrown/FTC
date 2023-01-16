@@ -15,6 +15,7 @@ import java.util.Objects;
 import net.forthecrown.commands.click.ClickableTextNode;
 import net.forthecrown.commands.click.ClickableTexts;
 import net.forthecrown.commands.manager.Exceptions;
+import net.forthecrown.core.registry.Holder;
 import net.forthecrown.economy.TransactionType;
 import net.forthecrown.economy.Transactions;
 import net.forthecrown.user.User;
@@ -82,7 +83,7 @@ public class ChallengeBook {
         .setTitle("Challenge progress");
 
     ChallengeEntry entry = ChallengeManager.getInstance()
-        .getOrCreateEntry(user.getUniqueId());
+        .getEntry(user.getUniqueId());
 
     mainPage(builder, entry);
 
@@ -104,13 +105,15 @@ public class ChallengeBook {
         summary = new EnumMap<>(ResetInterval.class);
 
     // Count completed challenges by their category
-    for (var c : ChallengeManager.getInstance().getActiveChallenges()) {
+    for (var holder : ChallengeManager.getInstance().getActiveChallenges()) {
+      var c = holder.getValue();
+
       // Item challenges are only shown in /shop
       if (c instanceof ItemChallenge) {
         continue;
       }
 
-      boolean completed = Challenges.hasCompleted(c, entry.getId());
+      boolean completed = entry.hasCompleted(c);
 
       IntIntPair pair = summary.computeIfAbsent(
           c.getResetInterval(),
@@ -155,14 +158,16 @@ public class ChallengeBook {
                                     ChallengeEntry entry,
                                     ResetInterval interval
   ) {
-    List<Challenge> activeList = new ObjectArrayList<>();
+    List<Holder<Challenge>> activeList = new ObjectArrayList<>();
     activeList.addAll(
         ChallengeManager.getInstance()
             .getActiveChallenges()
     );
 
     // Remove challenges that don't match this category
-    activeList.removeIf(challenge -> {
+    activeList.removeIf(holder -> {
+      var challenge = holder.getValue();
+
       return challenge.getResetInterval() != interval
           || challenge instanceof ItemChallenge;
     });
@@ -173,11 +178,11 @@ public class ChallengeBook {
     }
 
     // Challenge 2 isCompleted map
-    Object2BooleanMap<Challenge>
+    Object2BooleanMap<Holder<Challenge>>
         completed = new Object2BooleanOpenHashMap<>();
 
     for (var c : activeList) {
-      boolean isCompleted = Challenges.hasCompleted(c, entry.getId());
+      boolean isCompleted = entry.hasCompleted(c);
       completed.put(c, isCompleted);
     }
 
@@ -192,10 +197,9 @@ public class ChallengeBook {
       var c = e.getKey();
       boolean isCompleted = e.getBooleanValue();
 
-      float progress = entry.getProgress()
-          .getFloat(c);
+      float progress = entry.getProgress(e.getKey());
 
-      float goal = c.getGoal(entry.getUser());
+      float goal = c.getValue().getGoal(entry.getUser());
 
       ++totalRequired;
 
@@ -233,10 +237,8 @@ public class ChallengeBook {
       var c = e.getKey();
       boolean isCompleted = e.getBooleanValue();
 
-      float progress = entry.getProgress()
-          .getFloat(c);
-
-      float goal = c.getGoal(entry.getUser());
+      float progress = entry.getProgress(e.getKey());
+      float goal = c.getValue().getGoal(entry.getUser());
 
       // Ensure that if the challenge is completed, it always
       // shows the goal, not more, not less
@@ -244,11 +246,11 @@ public class ChallengeBook {
         progress = goal;
       }
 
-      Component displayName = c.displayName(entry.getUser())
+      Component displayName = c.getValue().displayName(entry.getUser())
           .color(null);
 
       // Hard coded exception for the pay challenge
-      if (Objects.equals(payChallenge, c) && !isCompleted) {
+      if (Objects.equals(payChallenge, c.getValue()) && !isCompleted) {
         displayName = displayName.append(space())
             .append(PAY_NODE.prompt(entry.getUser()));
       }

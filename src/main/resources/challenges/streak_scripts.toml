@@ -1,0 +1,4 @@
+# Declares script callbacks for streak categories (items, daily, weekly) when a
+# player increases their streak in that category
+
+items = "streakReward.js"

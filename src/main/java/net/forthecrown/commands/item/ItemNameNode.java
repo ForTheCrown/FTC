@@ -22,11 +22,21 @@ public class ItemNameNode extends ItemModifierNode {
 
   @Override
   public void populateUsages(UsageFactory factory) {
-    factory.usage("<name>")
-        .addInfo("Sets the name of the item you're holding");
+    namingNote(
+        factory.usage("<name>")
+            .addInfo("Sets the name of the item you're holding")
+    );
 
     factory.usage("-clear")
         .addInfo("Clears the name of the item you're holding");
+  }
+
+  static void namingNote(Usage usage) {
+    usage.addInfo("Note:")
+        .addInfo("If the <name> is a JSON component (eg: {\"text\":\"Item Name\"})")
+        .addInfo("The name won't automatically become non-italic")
+        .addInfo("and white, you'll be required to manually set them to")
+        .addInfo("that configuration");
   }
 
   @Override

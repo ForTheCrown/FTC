@@ -74,7 +74,6 @@ dependencies {
     compileOnly 'com.fastasyncworldedit:FastAsyncWorldEdit-Core:2.4.9'
 
     //Grenadier, Dynmap and GSit
-    libJar('Grenadier-1.5.3-dev')
     libJar('Dynmap')
     libJar('GSit-1.2.8')
     libJar('VotingPlugin')
@@ -83,6 +82,7 @@ dependencies {
     // Directly shaded libraries
     implementation "org.spongepowered:math:2.1.0-SNAPSHOT"
     implementation files("/libs/McAssetExtractor-1.0.jar")
+    implementation files("/libs/Grenadier-1.6.1-dev.jar")
 
     // Libraries downloaded by Bukkit
     compileOnly nashornDependency
@@ -96,6 +96,10 @@ void libJar(String s) {
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+}
+
+compileJava {
+    options.compilerArgs += "-Xlint:all"
 }
 
 processResources {
@@ -290,8 +294,11 @@ public class JarAttributeSync {
         Files.walkFileTree(resourceDirectory, walker)
         fs.close()
 
-        Files.copy(jarFile, jarFile.getParent().resolve("attributes_updated.jar"),
-                StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES
+        Files.copy(
+                jarFile,
+                jarFile.getParent().resolve("attributes_updated.jar"),
+                StandardCopyOption.REPLACE_EXISTING,
+                StandardCopyOption.COPY_ATTRIBUTES
         )
     }
 

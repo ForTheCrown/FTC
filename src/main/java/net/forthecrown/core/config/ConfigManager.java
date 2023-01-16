@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -83,6 +84,8 @@ public class ConfigManager {
             return;
           }
 
+          invokeStaticIfExists(f.configClass(), "onLoad");
+
           Object value = Configs.GSON.fromJson(json.get(field.getName()), field.getType());
           field.set(null, value);
         });
@@ -108,10 +111,28 @@ public class ConfigManager {
       );
     });
 
+    invokeStaticIfExists(f.configClass(), "onSave");
+
     try {
       JsonUtils.writeFile(json, path);
     } catch (IOException exc) {
       LOGGER.error("Couldn't serialize file '{}'", path, exc);
+    }
+  }
+
+  private static void invokeStaticIfExists(Class c, String name) {
+    try {
+      var onSave = c.getDeclaredMethod(name);
+      onSave.setAccessible(true);
+      onSave.invoke(null);
+    } catch (ReflectiveOperationException exc) {
+      if (!(exc instanceof NoSuchMethodException)) {
+        if (exc instanceof InvocationTargetException e) {
+          exc = e;
+        }
+
+        LOGGER.error("Couldn't invoke onSave in {}", c, exc);
+      }
     }
   }
 

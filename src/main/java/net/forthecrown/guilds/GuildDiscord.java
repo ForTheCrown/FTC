@@ -16,6 +16,7 @@ import github.scarsz.discordsrv.dependencies.jda.api.entities.Icon;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Icon.IconType;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Member;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Message;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.Message.MentionType;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Role;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Webhook;
@@ -37,6 +38,7 @@ import lombok.experimental.Accessors;
 import net.forthecrown.core.FTC;
 import net.forthecrown.guilds.unlockables.UnlockableRoleColor;
 import net.forthecrown.user.User;
+import net.forthecrown.utils.Util;
 import net.forthecrown.utils.io.FtcJar;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.forthecrown.utils.text.Text;
@@ -71,6 +73,13 @@ public class GuildDiscord {
       
         - Love, Steven
       """;
+
+  public static EnumSet<MentionType> ALLOWED_MENTIONS = Util.make(() -> {
+    var all = EnumSet.allOf(MentionType.class);
+    all.remove(MentionType.USER);
+    all.remove(MentionType.EVERYONE);
+    return all;
+  });
 
   public static final String WEBHOOK_NAME = "Steven, the Guild Commissioner";
 
@@ -154,18 +163,42 @@ public class GuildDiscord {
       return;
     }
 
-    getChannel().ifPresent(channel -> {
+    // Only forward to non archived channels
+    channelIfNotArchived().ifPresent(channel -> {
       String text = Text.toDiscord(msg);
       webHookMessage(channel, text, true);
     });
   }
 
   public void forwardGuildChat(User sender, Component message) {
-    getChannel().ifPresent(channel -> {
+    // Only forward to non archived channels
+    channelIfNotArchived().ifPresent(channel -> {
       String text = Text.toDiscord(message);
       String name = Text.toDiscord(sender.getTabName());
 
-      webHookMessage(channel, name + " **>** " + text, false);
+      MessageBuilder builder = new MessageBuilder();
+
+//      Silent mentioning doesn't exist in discord :(
+//      https://support.discord.com/hc/en-us/community/posts/360039210411--Suggestion-Mentioning-without-pinging
+//      It's been asked for doe lol
+//
+//      This only works on PC, on phones the mentioned user shows up as
+//      'invalid-user' Not good enough. This would've been great for guild chat
+//      so the name in the message would actually be up-to-date
+//
+//      var discordId = sender.getDiscordId();
+//      if (!Strings.isNullOrEmpty(discordId)) {
+//        Member member = getDiscordGuild().getMemberById(discordId);
+//
+//        builder.setAllowedMentions(ALLOWED_MENTIONS)
+//            .append(member);
+//      } else {
+        builder.append(name);
+//      }
+
+      builder.append(" **>** ").append(text);
+
+      webHookMessage(channel, builder.build());
     });
   }
 
@@ -193,14 +226,18 @@ public class GuildDiscord {
       channel = getChannel().orElseThrow();
     }
 
-    LOGGER.debug("message={}", message);
-
     getOrCreateWebhook(channel)
         .thenAccept(webhook -> {
           WebhookClient<Void> client = (WebhookClient<Void>) webhook;
-          client.sendMessage(message).submit();
+          client.sendMessage(message)
+              .submit()
+              .exceptionally(throwable -> {
+                return null;
+              });
         });
   }
+
+  /* ----------------------------- WEBHOOKS ------------------------------- */
 
   private CompletableFuture<Webhook> getOrCreateWebhook(TextChannel channel) {
     return getWebhook().orElseGet(() -> createWebhook(channel));
@@ -223,6 +260,7 @@ public class GuildDiscord {
 
     return channel.createWebhook(WEBHOOK_NAME)
         .setAvatar(icon)
+        .reason("FTC: Guild webhook")
         .submit()
         .whenComplete((webhook, throwable) -> {
           if (throwable == null) {
@@ -254,12 +292,20 @@ public class GuildDiscord {
     return Optional.ofNullable(getJDA().getRoleById(roleId));
   }
 
-  public void deleteRole() {
-    getRole().ifPresent(role -> {
-      role.delete().submit();
-      roleId = NULL_ID;
-      lastRoleUpdate = System.currentTimeMillis();
-    });
+  public CompletableFuture<Void> deleteRole() {
+    var role = getRole().orElseThrow();
+
+    return role.delete()
+        .submit()
+        .whenComplete((unused, throwable) -> {
+          if (throwable != null) {
+            LOGGER.error("Couldn't delete role of guild {}", guild, throwable);
+            return;
+          }
+
+          roleId = NULL_ID;
+          lastRoleUpdate = System.currentTimeMillis();
+        });
   }
 
   public CompletableFuture<Role> createRole() {
@@ -295,6 +341,7 @@ public class GuildDiscord {
         .setMentionable(true)
         .setHoisted(true)
         .setIcon(icon)
+        .reason("FTC: Guild role")
         .submit()
         .whenComplete((role, throwable) -> {
           if (throwable != null) {
@@ -405,7 +452,7 @@ public class GuildDiscord {
           memberOverridePerms()
       );
 
-      var cat = action.complete();
+      var cat = action.reason("FTC: Create guild category").complete();
       GuildConfig.guildsChannelCategory = cat.getIdLong();
 
       return cat;
@@ -434,54 +481,66 @@ public class GuildDiscord {
 
   public void deleteChannel() {
     getChannel().ifPresent(channel -> {
-      channel.delete().submit();
-      channelId = 0L;
+      channel.delete().submit().thenAccept(unused -> {
+        channelId = NULL_ID;
+      });
     });
   }
 
-  public void archiveChannel(final String reason) {
-    channelIfNotArchived().ifPresent(channel -> {
-      String suffix = Strings.isNullOrEmpty(reason)
-          ? ""
-          : "-" + reason.replaceAll(" ", "-");
+  public CompletableFuture<Void> archiveChannel(final String reason) {
+    var channel = channelIfNotArchived().orElseThrow();
+    String suffix = Strings.isNullOrEmpty(reason)
+        ? ""
+        : "-" + reason.replaceAll(" ", "-");
 
-      var manager = channel.getManager()
-          .setName(guild.getName() + "-Archived" + suffix);
+    var manager = channel.getManager()
+        .setName(guild.getName() + "-Archived" + suffix);
 
-      forEachDiscordMember(manager::removePermissionOverride);
+    forEachDiscordMember(manager::removePermissionOverride);
 
-      webHookMessage(channel, CHANNEL_OPENING_MESSAGE, false);
+    webHookMessage(channel, CHANNEL_OPENING_MESSAGE, false);
 
-      manager.submit();
-      lastChannelUpdate = System.currentTimeMillis();
-    });
-  }
-
-  public void unarchiveChannel() {
-    getChannel().ifPresent(channel -> {
-      if (!isArchived(channel)) {
+    return manager.submit().whenComplete((unused, throwable) -> {
+      if (throwable != null) {
+        LOGGER.error("Error archiving channel for guild {}", guild, throwable);
         return;
       }
 
       lastChannelUpdate = System.currentTimeMillis();
-      var mananger = channel.getManager()
-          .setName(guild.getName());
-
-      forEachDiscordMember(member -> {
-        mananger.putPermissionOverride(
-            member,
-            memberOverridePerms(),
-            null
-        );
-      });
-
-      mananger.submit();
     });
   }
 
-  public void createChannel() {
-    if (getChannel().isPresent()) {
-      return;
+  public CompletableFuture<Void> unarchiveChannel() {
+    var channel = getChannel().orElseThrow();
+    if (!isArchived(channel)) {
+      return CompletableFuture.completedFuture(null);
+    }
+
+    var mananger = channel.getManager()
+        .setName(guild.getName());
+
+    forEachDiscordMember(member -> {
+      mananger.putPermissionOverride(
+          member,
+          memberOverridePerms(),
+          null
+      );
+    });
+
+    return mananger.submit().whenComplete((unused, throwable) -> {
+      if (throwable != null) {
+        LOGGER.error("Error archiving channel for guild {}", guild, throwable);
+        return;
+      }
+
+      lastChannelUpdate = System.currentTimeMillis();
+    });
+  }
+
+  public CompletableFuture<TextChannel> createChannel() {
+    var opt = getChannel();
+    if (opt.isPresent()) {
+      return CompletableFuture.completedFuture(opt.get());
     }
 
     var action = guildsTextCategory()
@@ -495,12 +554,22 @@ public class GuildDiscord {
       );
     });
 
-    action.submit().thenAccept(channel -> {
-      channelId = channel.getIdLong();
-      lastChannelUpdate = System.currentTimeMillis();
+    return action.reason("FTC: Create channel for guild")
+        .submit()
+        .whenComplete((channel, throwable) -> {
+          if (throwable != null) {
+            LOGGER.error(
+                "Couldn't create channel for guild {}", guild, throwable
+            );
 
-      webHookMessage(channel, CHANNEL_OPENING_MESSAGE, false);
-    });
+            return;
+          }
+
+          channelId = channel.getIdLong();
+          lastChannelUpdate = System.currentTimeMillis();
+
+          webHookMessage(channel, CHANNEL_OPENING_MESSAGE, false);
+        });
   }
 
   /* --------------------------- SERIALIZATION ---------------------------- */

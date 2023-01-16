@@ -1,5 +1,7 @@
 package net.forthecrown.utils.io;
 
+import static java.util.regex.Pattern.CASE_INSENSITIVE;
+
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.DataResult;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -17,7 +19,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.core.FTC;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.Logger;
 
 public final class PathUtil {
@@ -26,7 +27,10 @@ public final class PathUtil {
   private static final Logger LOGGER = FTC.getLogger();
 
   public static final Pattern UUID_PATTERN
-      = Pattern.compile("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$");
+      = Pattern.compile(
+          "[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}",
+          CASE_INSENSITIVE
+        );
 
   /**
    * Gets the plugin's data folder
@@ -285,24 +289,18 @@ public final class PathUtil {
   }
 
   public static boolean isFilenameUUID(Path path) {
-    var name = FilenameUtils.getName(path.toString());
-    var trimmed = FilenameUtils.removeExtension(name);
-    return UUID_PATTERN.matcher(trimmed).matches();
+    return UUID_PATTERN.matcher(path.getFileName().toString()).find();
   }
 
   public static DataResult<UUID> getFilenameUUID(Path path) {
-    var name = FilenameUtils.getName(path.toString());
-    var trimmed = FilenameUtils.removeExtension(name);
-
-    var matcher = UUID_PATTERN.matcher(trimmed);
-
-    if (!matcher.find()) {
-      return Results.errorResult("Filename %s is not a UUID filename", path);
-    }
-
+    var matcher = UUID_PATTERN.matcher(path.getFileName().toString());
     var arr = matcher.results()
         .map(result -> UUID.fromString(result.group()))
         .toArray(UUID[]::new);
+
+    if (arr.length < 1) {
+      return Results.errorResult("File %s is not a UUID file", path);
+    }
 
     if (arr.length > 1) {
       return Results.partialResult(

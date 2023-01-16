@@ -4,13 +4,10 @@ import net.forthecrown.core.module.ModuleServices;
 import net.forthecrown.core.module.OnDisable;
 import net.forthecrown.core.module.OnSave;
 import net.kyori.adventure.key.Namespaced;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.jetbrains.annotations.NotNull;
 
 public final class Main extends JavaPlugin implements Namespaced {
 
@@ -20,12 +17,14 @@ public final class Main extends JavaPlugin implements Namespaced {
       OLD_NAMESPACE = "ftccore";
 
   boolean debugMode;
-  FtcLogger logger;
 
   @Override
   public void onEnable() {
     setDebugMode();
-    ensureLoggerExists();
+
+    if (FTC.debugLoggingEnabled()) {
+      getLog4JLogger().debug("DEBUG");
+    }
 
     // Register dynmap hook connection thing
     DynmapUtil.registerListener();
@@ -37,7 +36,6 @@ public final class Main extends JavaPlugin implements Namespaced {
 
   @Override
   public void onLoad() {
-    setDebugMode();
     FtcFlags.init();
   }
 
@@ -48,23 +46,6 @@ public final class Main extends JavaPlugin implements Namespaced {
 
     ModuleServices.run(OnSave.class);
     ModuleServices.run(OnDisable.class);
-  }
-
-  private void ensureLoggerExists() {
-    if (logger != null) {
-      return;
-    }
-
-    Bukkit.getLogger().addHandler(DiscordErrorLogHandler.INSTANCE);
-
-    for (var p: Bukkit.getPluginManager().getPlugins()) {
-      p.getLogger().addHandler(DiscordErrorLogHandler.INSTANCE);
-    }
-
-    logger = new FtcLogger(
-        LogManager.getContext()
-            .getLogger(getLogger().getName())
-    );
   }
 
   private void setDebugMode() {
@@ -78,11 +59,5 @@ public final class Main extends JavaPlugin implements Namespaced {
   @Override
   public @NonNull String namespace() {
     return NAMESPACE;
-  }
-
-  @Override
-  public @NotNull Logger getLog4JLogger() {
-    ensureLoggerExists();
-    return logger;
   }
 }

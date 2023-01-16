@@ -406,13 +406,14 @@ public class Guild
   }
 
   public void addExp(int amount) {
-    if (amount < 0) {
-      return;
-    }
+    setExp(this.totalExp + amount);
+  }
 
-    this.totalExp += amount;
+  public void setExp(long amount) {
+    this.totalExp = amount;
 
-    GuildManager.get().getExpTop()
+    GuildManager.get()
+        .getExpTop()
         .set(getId(), (int) totalExp);
   }
 

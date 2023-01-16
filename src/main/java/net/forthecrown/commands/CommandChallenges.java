@@ -126,15 +126,29 @@ public class CommandChallenges extends FtcCommand {
         .addInfo("Sets an [item] to be a <challenge>'s active item")
         .addInfo("If [item] is not set, then your held item is used");
 
+    items.usage("reroll")
+        .addInfo("Forces a <challenge> to re-roll it's chosen item");
+
     var chests = items.withPrefix("chests");
 
     chests.usage("")
-        .addInfo("Lists all chests a <challenge> is getting items from");
+        .addInfo("Lists all chests a <challenge> is getting items from")
+        .addInfo("Note:")
+        .addInfo("Chests are the 'item sources' from which item challenges")
+        .addInfo("pick their items at random. These chests have to exist in")
+        .addInfo("in the actual world");
 
     chests.usage("add [<block: x,y,z>]")
         .addInfo("Adds a chest item source to a <challenge>")
         .addInfo("If <block> is not set, the block you are looking at")
         .addInfo("is used instead");
+
+    chests.usage("remove <index>")
+        .addInfo("Removes a chest item source from a <challenge> at <index>")
+        .addInfo("To find the <index> do /challenges items <challenge> chests");
+
+    chests.usage("clear")
+        .addInfo("Clears all chest item sources from a <challenge>");
   }
 
   @Override
@@ -192,7 +206,7 @@ public class CommandChallenges extends FtcCommand {
                 writer.formattedLine(
                     "{0}) {1}",
                     it.nextIndex(),
-                    next.displayName(user)
+                    next.getValue().displayName(user)
                 );
               }
 
@@ -218,6 +232,10 @@ public class CommandChallenges extends FtcCommand {
                           .map(Holder::getKey)
                   );
                 })
+
+                .then(literal("reroll")
+                    .executes(this::itemsReroll)
+                )
 
                 .then(literal("chests")
 
@@ -340,7 +358,8 @@ public class CommandChallenges extends FtcCommand {
   }
 
   private int trigger(CommandContext<CommandSource> c)
-      throws CommandSyntaxException {
+      throws CommandSyntaxException
+  {
     User user = Arguments.getUser(c, "user");
     Holder<Challenge> holder = c.getArgument("challenge", Holder.class);
 
@@ -360,9 +379,9 @@ public class CommandChallenges extends FtcCommand {
     return 0;
   }
 
-  private int givePoints(CommandContext<CommandSource> c,
-                         float points
-  ) throws CommandSyntaxException {
+  private int givePoints(CommandContext<CommandSource> c, float points)
+      throws CommandSyntaxException
+  {
     User user = Arguments.getUser(c, "user");
     Holder<Challenge> holder = c.getArgument("challenge", Holder.class);
 
@@ -371,7 +390,7 @@ public class CommandChallenges extends FtcCommand {
     }
 
     ChallengeManager.getInstance()
-        .getOrCreateEntry(user.getUniqueId())
+        .getEntry(user)
         .addProgress(holder, points);
 
     c.getSource().sendAdmin(
@@ -392,16 +411,14 @@ public class CommandChallenges extends FtcCommand {
     var manager = ChallengeManager.getInstance();
     var streak = c.getArgument("category", StreakCategory.class);
 
-    var entry = manager.getOrCreateEntry(user.getUniqueId());
+    var entry = manager.getEntry(user);
 
     for (var chal : manager.getActiveChallenges()) {
-      if (chal.getStreakCategory() != streak) {
+      if (chal.getValue().getStreakCategory() != streak) {
         continue;
       }
 
-      Challenges.apply(chal, holder -> {
-        entry.addProgress(holder, chal.getGoal(user));
-      });
+      entry.addProgress(chal, chal.getValue().getGoal(user));
     }
 
     c.getSource().sendAdmin(
@@ -420,6 +437,8 @@ public class CommandChallenges extends FtcCommand {
                              ItemStack item,
                              Holder<Challenge> holder
   ) throws CommandSyntaxException {
+    item = item.clone();
+
     ensureItemChallenge(holder);
     ItemChallenge challenge = (ItemChallenge) holder.getValue();
 
@@ -439,6 +458,24 @@ public class CommandChallenges extends FtcCommand {
         Text.format("Set active item of {0} to {1, item}",
             holder.getKey(),
             item
+        )
+    );
+    return 0;
+  }
+
+  private int itemsReroll(CommandContext<CommandSource> c)
+      throws CommandSyntaxException
+  {
+    Holder<Challenge> holder = c.getArgument("challenge", Holder.class);
+    ensureItemChallenge(holder);
+
+    ItemChallenge challenge = (ItemChallenge) holder.getValue();;
+    var rerolled = challenge.activate(true);
+
+    c.getSource().sendAdmin(
+        Text.format("Re-rolled {0}'s target item to {1}",
+            holder.getKey(),
+            rerolled
         )
     );
     return 0;
@@ -480,8 +517,8 @@ public class CommandChallenges extends FtcCommand {
     var it = container.getChests().listIterator();
 
     while (it.hasNext()) {
-      int index = it.nextIndex();
       var n = it.next();
+      int index = it.nextIndex();
 
       indented.field(index + "", n);
     }

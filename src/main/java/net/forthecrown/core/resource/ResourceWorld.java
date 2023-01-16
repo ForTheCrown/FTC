@@ -448,12 +448,12 @@ public class ResourceWorld {
 
   @OnDayChange
   void onDayChange() {
-    if (!enabled) {
-      LOGGER.info("Resource world auto reset is disabled, not running");
+    if (!Time.isPast(resetInterval + lastReset)) {
       return;
     }
 
-    if (!Time.isPast(resetInterval + lastReset)) {
+    if (!enabled) {
+      LOGGER.info("Resource world auto reset is disabled, not running");
       return;
     }
 
@@ -509,7 +509,7 @@ public class ResourceWorld {
         }
       }
 
-      LOGGER.info("Took {} attempts to find valid seed", safeGuard);
+      LOGGER.info("Took {} attempts to find seed", safeGuard);
 
       seedSearchActive = false;
       return seed;
@@ -566,7 +566,9 @@ public class ResourceWorld {
     return true;
   }
 
-  private boolean isAreaGood(int x, int z, NoiseBasedChunkGenerator gen, int baseY,
+  private boolean isAreaGood(int x, int z,
+                             NoiseBasedChunkGenerator gen,
+                             int baseY,
                              RandomState randomState
   ) {
     int blockX = QuartPos.toBlock(x);
@@ -592,8 +594,9 @@ public class ResourceWorld {
         && dif >= -MAX_Y_DIF;
   }
 
-
-  private boolean hasBiomes(NoiseBasedChunkGenerator gen, int halfSize, int y,
+  private boolean hasBiomes(NoiseBasedChunkGenerator gen,
+                            int halfSize,
+                            int y,
                             RandomState randomState
   ) {
     int max = QuartPos.fromBlock(halfSize);

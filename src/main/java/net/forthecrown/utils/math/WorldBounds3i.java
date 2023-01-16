@@ -151,7 +151,7 @@ public class WorldBounds3i extends AbstractBounds3i<WorldBounds3i> implements It
 
 
   @Override
-  public boolean contains(AbstractBounds3i o) {
+  public boolean contains(AbstractBounds3i<?> o) {
     if (o instanceof WorldBounds3i w) {
       if (!world.equals(w.getWorld())) {
         return false;
@@ -162,7 +162,7 @@ public class WorldBounds3i extends AbstractBounds3i<WorldBounds3i> implements It
   }
 
   @Override
-  public boolean overlaps(AbstractBounds3i o) {
+  public boolean overlaps(AbstractBounds3i<?> o) {
     if (o instanceof WorldBounds3i w) {
       if (!world.equals(w.getWorld())) {
         return false;

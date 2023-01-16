@@ -174,7 +174,7 @@ public class ItemChallenge implements Challenge {
 
     Challenges.apply(this, holder -> {
       ChallengeManager.getInstance()
-          .getOrCreateEntry(player.getUniqueId())
+          .getEntry(player.getUniqueId())
           .addProgress(holder, item.getAmount());
     });
   }
@@ -193,7 +193,10 @@ public class ItemChallenge implements Challenge {
               .clearLore()
               .addFlags(ItemFlag.HIDE_ENCHANTS);
 
-          if (Challenges.hasCompleted(this, user.getUniqueId())) {
+          var entry = ChallengeManager.getInstance()
+              .getEntry(user.getUniqueId());
+
+          if (entry.hasCompleted(this)) {
             builder.addEnchant(Enchantment.BINDING_CURSE, 1)
                 .addLore("&aAlready completed!");
           } else {
@@ -212,8 +215,7 @@ public class ItemChallenge implements Challenge {
             }
           }
 
-          int streak = Challenges.queryStreak(this, user)
-              .orElse(0);
+          int streak = entry.getStreak(getStreakCategory()).get();
 
           if (!getReward().isEmpty(streak)) {
             var writer = TextWriters.loreWriter();
@@ -241,7 +243,10 @@ public class ItemChallenge implements Challenge {
             return;
           }
 
-          if (Challenges.hasCompleted(this, user.getUniqueId())) {
+          var entry = ChallengeManager.getInstance()
+              .getEntry(user.getUniqueId());
+
+          if (entry.hasCompleted(this)) {
             throw Exceptions.format("Challenge already completed");
           }
 

@@ -1,5 +1,6 @@
 package net.forthecrown.log;
 
+import com.google.common.base.Strings;
 import java.time.LocalDate;
 import java.time.chrono.ChronoLocalDate;
 import java.util.Iterator;
@@ -12,12 +13,24 @@ import org.jetbrains.annotations.NotNull;
 
 @Getter
 public class DateRange implements Iterable<LocalDate> {
+  public static final long MILLIS_PER_DAY = 86_400_000;
+
+  public static final int BEFORE = -1;
+  public static final int INSIDE =  0;
+  public static final int AFTER =   1;
+
   private final long minEpoch;
   private final long maxEpoch;
+
+  private final long millisMin;
+  private final long millisMax;
 
   public DateRange(long minEpoch, long maxEpoch) {
     this.minEpoch = Math.min(minEpoch, maxEpoch);
     this.maxEpoch = Math.max(minEpoch, maxEpoch);
+
+    this.millisMin = MILLIS_PER_DAY * this.minEpoch;
+    this.millisMax = (MILLIS_PER_DAY * this.maxEpoch) + MILLIS_PER_DAY;
   }
 
   public static DateRange between(ChronoLocalDate d1, ChronoLocalDate d2) {
@@ -65,6 +78,14 @@ public class DateRange implements Iterable<LocalDate> {
         minEpoch - days,
         maxEpoch - days
     );
+  }
+
+  public int containsMillis(long millis) {
+    return (millis < millisMin) ? BEFORE : (millis > millisMax) ? AFTER : INSIDE;
+  }
+
+  public String millisToString() {
+    return Strings.lenientFormat("[%s..%s]", millisMin, millisMax);
   }
 
   @NotNull

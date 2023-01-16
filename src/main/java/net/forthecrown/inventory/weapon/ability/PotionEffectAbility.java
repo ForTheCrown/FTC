@@ -17,6 +17,8 @@ public class PotionEffectAbility extends WeaponAbility {
       TAG_DURATION = "duration",
       TAG_EFFECT = "effectType";
 
+  public static final int BASE_DURATION = 40;
+
   private final PotionEffectType effectType;
   private int duration;
 
@@ -25,6 +27,7 @@ public class PotionEffectAbility extends WeaponAbility {
   ) {
     super(type);
     this.effectType = effectType;
+    this.duration = BASE_DURATION;
   }
 
   @Override

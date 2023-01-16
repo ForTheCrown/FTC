@@ -33,14 +33,17 @@ public class ChallengeHandle {
     var manager = ChallengeManager.getInstance();
 
     Challenges.apply(challenge, holder -> {
-      manager.getOrCreateEntry(player.getUniqueId())
+      manager.getEntry(player.getUniqueId())
           .addProgress(holder, (float) score);
     });
   }
 
   public boolean hasCompleted(Object playerObject) {
     var player = getPlayer(playerObject);
-    return Challenges.hasCompleted(challenge, player.getUniqueId());
+    var entry = ChallengeManager.getInstance()
+        .getEntry(player.getUniqueId());
+
+    return entry.hasCompleted(challenge);
   }
 
   static Player getPlayer(Object arg) {

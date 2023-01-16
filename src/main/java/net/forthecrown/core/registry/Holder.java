@@ -1,7 +1,9 @@
 package net.forthecrown.core.registry;
 
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -36,4 +38,8 @@ public final class Holder<V> {
    */
   @EqualsAndHashCode.Exclude
   private final @NotNull V value;
+
+  /** The registry this holder is bound to */
+  @Setter(AccessLevel.PACKAGE)
+  Registry<V> registry;
 }

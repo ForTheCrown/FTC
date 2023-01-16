@@ -37,6 +37,11 @@ public class CommandMarriageChat extends FtcCommand {
    */
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("<message>", "Chats with your spouse");
+  }
+
+  @Override
   protected void createCommand(BrigadierCommand command) {
     command
         .then(argument("message", Arguments.MESSAGE)

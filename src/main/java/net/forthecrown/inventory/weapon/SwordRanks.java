@@ -22,6 +22,7 @@ public class SwordRanks {
 
   static final SwordRank[] RANKS = createRanks();
 
+  // Called reflectively in BootStrap to force class loading
   static void init() {
   }
 

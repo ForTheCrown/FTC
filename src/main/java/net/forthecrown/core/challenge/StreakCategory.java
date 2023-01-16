@@ -36,6 +36,11 @@ public enum StreakCategory {
     public DateRange moveRange(DateRange dateRange) {
       return dateRange.minus(7L);
     }
+
+    @Override
+    public boolean causesReset(ResetInterval interval) {
+      return interval == ResetInterval.WEEKLY;
+    }
   },
 
   /**
@@ -52,5 +57,9 @@ public enum StreakCategory {
 
   public DateRange moveRange(DateRange dateRange) {
     return dateRange.minus(1L);
+  }
+
+  public boolean causesReset(ResetInterval interval) {
+    return interval == ResetInterval.DAILY;
   }
 }

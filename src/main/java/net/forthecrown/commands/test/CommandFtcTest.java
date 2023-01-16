@@ -130,7 +130,7 @@ public class CommandFtcTest extends FtcCommand {
                           streak,
 
                           ChallengeManager.getInstance()
-                              .getOrCreateEntry(user.getUniqueId())
+                              .getEntry(user.getUniqueId())
                       );
 
                       event.callEvent();

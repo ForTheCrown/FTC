@@ -19,6 +19,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BlockStateMeta;
 import org.spongepowered.math.vector.Vector3i;
 
 /**
@@ -168,7 +169,11 @@ public class ChallengeItemContainer {
   ) {
     var meta = item.getItemMeta();
 
-    if (!(meta instanceof InventoryHolder holder)) {
+    if (!(meta instanceof BlockStateMeta stateMeta)) {
+      return item;
+    }
+
+    if (!(stateMeta.getBlockState() instanceof InventoryHolder holder)) {
       return item;
     }
 

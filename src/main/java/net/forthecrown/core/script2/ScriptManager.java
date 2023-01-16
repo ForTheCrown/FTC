@@ -57,7 +57,7 @@ public class ScriptManager {
   /**
    * The JSON file from which scripts are loaded
    */
-  private final Path loaderJson;
+  private final Path loaderFile;
 
   /**
    * Factory to create script engines
@@ -66,14 +66,14 @@ public class ScriptManager {
       factory = new NashornScriptEngineFactory();
 
   /**
-   * Currently loaded scripts, specified in <code>loader.json</code>
+   * Currently loaded scripts, specified in <code>loader.toml</code>
    */
   private final Registry<LoadedScript>
       loadedScripts = Registries.newRegistry();
 
   public ScriptManager() {
     this.directory = PathUtil.getPluginDirectory("scripts");
-    loaderJson = directory.resolve("loader.json");
+    loaderFile = directory.resolve("loader.toml");
 
     //Set the language to ECMA Script 6 mode
     System.setProperty("nashorn.args.prepend", "--language=es6");
@@ -86,12 +86,14 @@ public class ScriptManager {
           ALLOW_OVERWRITE | OVERWRITE_IF_NEWER
       );
     } catch (IOException exc) {
-      LOGGER.error("Couldn't save default scripts! {}", exc);
+      LOGGER.error("Couldn't save default scripts!", exc);
     }
   }
 
   @OnLoad
   public void load() {
+    JsPreProcessor.placeHolders = null;
+
     loadedScripts.forEach(script -> {
       // Prevent script closing errors from
       // preventing script clear
@@ -106,11 +108,11 @@ public class ScriptManager {
     });
     loadedScripts.clear();
 
-    if (!Files.exists(loaderJson)) {
+    if (!Files.exists(loaderFile)) {
       return;
     }
 
-    SerializationHelper.readJsonFile(loaderJson, wrapper -> {
+    SerializationHelper.readTomlAsJson(loaderFile, wrapper -> {
       for (var e : wrapper.entrySet()) {
         if (!Keys.isValidKey(e.getKey())) {
           LOGGER.warn("'{}' is an invalid key", e.getKey());
@@ -141,7 +143,7 @@ public class ScriptManager {
             );
           }
 
-          Script script = Script.of(obj.get("script").getAsString());
+          Script script = Script.read(obj.get("script"), false);
           loadedScript = new LoadedScript(period, script, args);
         }
 
@@ -157,7 +159,7 @@ public class ScriptManager {
         continue;
       }
 
-      s.script().load(s.args());
+      s.load();
     }
   }
 
@@ -172,12 +174,11 @@ public class ScriptManager {
         if (script.isCompiled()) {
           // Invoke the day change callback, if it exists
           script.invokeIfExists("__onDayChange", time);
-
           continue;
         }
 
         LOGGER.debug("Loading script {}", script.getName());
-        script.load(s.args());
+        s.load();
       } else if (script.isCompiled()) {
         LOGGER.debug("Closing script {}", script.getName());
         script.close();

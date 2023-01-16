@@ -106,26 +106,13 @@ public class GuildDataStorage {
 
     try (var stream = Files.newDirectoryStream(getDirectory())) {
       for (var p : stream) {
-        if (p.equals(getChunkFile())
-            || p.equals(getArchiveDirectory())
-            || p.equals(getModifiers())
-            || p.equals(getIcons())
-            || p.toString().contains("config.json")
-        ) {
+        if (!PathUtil.isFilenameUUID(p)) {
           continue;
         }
 
-        try {
-          UUID id = UUID.fromString(
-              p.getFileName()
-                  .toString()
-                  .replaceAll(".json", "")
-          );
-
-          result.add(id);
-        } catch (IllegalArgumentException exc) {
-          LOGGER.error("Couldn't parse file {} to UUID", p, exc);
-        }
+        PathUtil.getFilenameUUID(p)
+            .resultOrPartial(LOGGER::error)
+            .ifPresent(result::add);
       }
     } catch (IOException exc) {
       LOGGER.error("Couldn't iterate guild directory", exc);

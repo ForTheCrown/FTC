@@ -30,6 +30,8 @@ public class Transformers {
   // A list of all current data transformers
   // Add and remove entries from here as needed
   private static final DataUpdater[] CURRENT_TRANSFORMERS = {
+      new DirCleanup(),
+      new ChallengeItemContainerFix()
   };
 
   private static final Set<String> COMPLETED_TRANSFORMERS = new HashSet<>();
@@ -39,6 +41,10 @@ public class Transformers {
   }
 
   public static boolean shouldRun(DataUpdater c) {
+    if (COMPLETED_TRANSFORMERS.isEmpty()) {
+      load();
+    }
+
     return !COMPLETED_TRANSFORMERS.contains(c.getClass().getName());
   }
 

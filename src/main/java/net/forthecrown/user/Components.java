@@ -118,7 +118,6 @@ public final class Components {
    * The current title, tier and any available titles a user may have
    *
    * @see UserTitles
-   * @see RankTitle
    * @see RankTier
    */
   public static final ComponentType<UserTitles> TITLES = create("rankData", UserTitles.class);

@@ -2,7 +2,7 @@ package net.forthecrown.user;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import java.nio.file.Files;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +20,7 @@ import net.forthecrown.core.registry.Keys;
 import net.forthecrown.user.data.UserRanks;
 import net.forthecrown.utils.UUID2IntMap;
 import net.forthecrown.utils.UUID2IntMap.KeyValidator;
+import net.forthecrown.utils.io.FtcJar;
 import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.utils.io.SerializableObject;
 import net.forthecrown.utils.io.SerializationHelper;
@@ -125,8 +126,10 @@ public final class UserManager implements SerializableObject {
   private void readExtraRanks() {
     Path rankJson = directory.resolve("ranks.toml");
 
-    if (!Files.exists(rankJson)) {
-      return;
+    try {
+      FtcJar.saveResources("ranks.toml", rankJson);
+    } catch (IOException exc) {
+      LOGGER.error("Couldn't save {} defaults!", rankJson, exc);
     }
 
     SerializationHelper.readTomlAsJson(rankJson, wrapper -> {

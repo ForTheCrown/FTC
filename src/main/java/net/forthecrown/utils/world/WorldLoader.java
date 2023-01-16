@@ -1,8 +1,8 @@
 package net.forthecrown.utils.world;
 
-import com.google.common.collect.Queues;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Deque;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -300,13 +300,17 @@ public @UtilityClass class WorldLoader {
     }
 
     private void complete() {
-      // Shutdown this loader instance
-      onCancel();
-      progress.onFinish();
-      WorldLoader.complete(world);
-
       // Complete the result callback
       result.complete(world);
+      progress.onFinish();
+
+      // Shutdown this loader instance
+      close();
+    }
+
+    private void close() {
+      WorldLoader.complete(world);
+      onCancel();
     }
 
     @Override
@@ -314,7 +318,12 @@ public @UtilityClass class WorldLoader {
       LOGGER.info("Started load of world: " + world.getName());
 
       if (GeneralConfig.chunkLoaderRunsInSeries) {
-        EXECUTOR.execute(this::loadSingleSectioned);
+        try {
+          EXECUTOR.execute(this::loadSingleSectioned);
+        } catch (Throwable t) {
+          result.completeExceptionally(t);
+          close();
+        }
       } else {
         // Start all sections
         for (LoadSection s : sections) {
@@ -326,7 +335,7 @@ public @UtilityClass class WorldLoader {
     // Method called to load the current world one section at a time
     // instead of having all sections run in parallel
     private void loadSingleSectioned() {
-      Deque<LoadSection> queue = Queues.newArrayDeque();
+      Deque<LoadSection> queue = new LinkedList<>();
 
       // Fill deque
       for (var s : sections) {
@@ -420,8 +429,7 @@ public @UtilityClass class WorldLoader {
                 // We're just generating the chunks beforehand, not
                 // trying to overwhelm the server here
                 if (!Bukkit.isPrimaryThread()) {
-                  VanillaAccess.getServer()
-                      .execute(() -> chunk.unload(true));
+                  VanillaAccess.getServer().execute(() -> chunk.unload(true));
                 } else {
                   chunk.unload(true);
                 }

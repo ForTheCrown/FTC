@@ -83,15 +83,17 @@ public final class Challenges {
     DataLogs.log(COMPLETED, entry);
   }
 
-  public static boolean hasCompleted(Challenge challenge, UUID uuid) {
+  @Deprecated
+  public static boolean legacy_hasCompleted(Challenge challenge, UUID uuid) {
     return ChallengeManager.getInstance()
         .getChallengeRegistry()
         .getHolderByValue(challenge)
-        .map(holder -> hasCompleted(holder, uuid))
+        .map(holder -> legacy_hasCompleted(holder, uuid))
         .orElse(false);
   }
 
-  public static boolean hasCompleted(Holder<Challenge> challenge, UUID uuid) {
+  @Deprecated
+  public static boolean legacy_hasCompleted(Holder<Challenge> challenge, UUID uuid) {
     var reset = challenge.getValue()
         .getResetInterval();
 
@@ -124,10 +126,21 @@ public final class Challenges {
     apply(challengeName, challenge -> challenge.trigger(input));
   }
 
-  public static boolean isActive(Challenge challenge) {
+  @Deprecated
+  public static boolean legacy_isActive(Challenge challenge) {
     return ChallengeManager.getInstance()
         .getActiveChallenges()
         .contains(challenge);
+  }
+
+  public static boolean isActive(Challenge challenge) {
+    var manager = ChallengeManager.getInstance();
+
+    return manager
+        .getChallengeRegistry()
+        .getHolderByValue(challenge)
+        .map(holder -> manager.getActiveChallenges().contains(holder))
+        .orElse(false);
   }
 
   public static void apply(Challenge challenge,
@@ -210,8 +223,10 @@ public final class Challenges {
               .setName("&bDaily Item Challenges")
               .setFlags(ItemFlag.HIDE_ATTRIBUTES);
 
-          int streak = queryStreak(StreakCategory.ITEMS, user)
-              .orElse(0);
+          int streak = ChallengeManager.getInstance()
+              .getEntry(user.getUniqueId())
+              .getStreak(StreakCategory.ITEMS)
+              .get();
 
           builder.addLore(
               Text.format(
@@ -226,17 +241,19 @@ public final class Challenges {
         .build();
   }
 
-  public static OptionalInt queryStreak(Challenge challenge, User user) {
+  @Deprecated
+  public static OptionalInt legacy_queryStreak(Challenge challenge, User user) {
     if (user == null
         || challenge.getResetInterval() == ResetInterval.MANUAL
     ) {
       return OptionalInt.empty();
     }
 
-    return queryStreak(challenge.getStreakCategory(), user);
+    return legacy_queryStreak(challenge.getStreakCategory(), user);
   }
 
-  public static OptionalInt queryStreak(StreakCategory category, User viewer) {
+  @Deprecated
+  public static OptionalInt legacy_queryStreak(StreakCategory category, User viewer) {
     if (viewer == null) {
       return OptionalInt.empty();
     }

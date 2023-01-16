@@ -1,18 +1,19 @@
 package net.forthecrown.core.script2;
 
-import it.unimi.dsi.fastutil.Pair;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.nio.ByteBuffer;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
+import net.forthecrown.utils.io.SerializationHelper;
 import org.apache.commons.io.IOUtils;
-import org.bukkit.Bukkit;
 
 public class JsPreProcessor {
   public static final Pattern IMPORT_PATTERN
       = Pattern.compile("(import +(['\"][@a-zA-Z0-9$_%.]+['\"](| )+(|;)+))");
+
+  static Map<String, String> placeHolders = null;
 
   public static StringReader preprocess(Reader reader) throws IOException {
     String s = IOUtils.toString(reader);
@@ -41,13 +42,9 @@ public class JsPreProcessor {
   private static String replaceImport(final String statement) {
     var s = statement.replaceAll("import", "")
         .replaceAll("['\"]", "")
-        .replaceAll("@ftc", "net.forthecrown")
-        .replaceAll("@bukkit", Bukkit.class.getPackageName())
-        .replaceAll("@fastutil", Pair.class.getPackageName())
-        .replaceAll("@jlang", Double.class.getPackageName())
-        .replaceAll("@jutil", List.class.getPackageName())
-        .replaceAll("@nio", ByteBuffer.class.getPackageName())
         .trim();
+
+    s = replacePlaceholders(s);
 
     if (s.endsWith(";")) {
       s = s.substring(0, s.length() - 1);
@@ -67,5 +64,34 @@ public class JsPreProcessor {
     }
 
     return "const " + className + " = Java.type(\"" + s + "\")";
+  }
+
+  private static String replacePlaceholders(final String importStatement) {
+    var map = getOrLoadPlaceholders();
+    String result = importStatement;
+
+    for (var e: map.entrySet()) {
+      result = result.replaceAll("@" + e.getKey(), e.getValue());
+    }
+
+    return result;
+  }
+
+  private static Map<String, String> getOrLoadPlaceholders() {
+    if (placeHolders == null) {
+      placeHolders = new HashMap<>();
+
+      var path = ScriptManager.getInstance()
+          .getDirectory()
+          .resolve("import_placeholders.toml");
+
+      SerializationHelper.readTomlAsJson(path, wrapper -> {
+        wrapper.entrySet().forEach(entry -> {
+          placeHolders.put(entry.getKey(), entry.getValue().getAsString());
+        });
+      });
+    }
+
+    return placeHolders;
   }
 }

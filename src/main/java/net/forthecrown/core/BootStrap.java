@@ -54,6 +54,8 @@ final class BootStrap {
   static void init() {
     RoyalCommandException.ENABLE_HOVER_STACK_TRACE = FTC.inDebugMode();
 
+    long freeMem = Runtime.getRuntime().freeMemory();
+
     // Guilds
     init(Unlockables.class);
     init(GuildManager::get);
@@ -144,6 +146,13 @@ final class BootStrap {
         .clear();
 
     Transformers.runCurrent();
+
+    long freeMemAfter = Runtime.getRuntime().freeMemory();
+    long lostMemory = freeMemAfter - freeMem;
+    LOGGER.info("Plugin initialization took {}MB or {} bytes",
+        lostMemory / 1024 / 1024,
+        lostMemory
+    );
   }
 
   static <T> void init(Supplier<T> supplier) {

@@ -1,4 +1,4 @@
-package net.forthecrown.core;
+package net.forthecrown.core.logging;
 
 import static github.scarsz.discordsrv.dependencies.jda.api.entities.Message.MAX_CONTENT_LENGTH;
 
@@ -12,6 +12,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import lombok.Getter;
+import net.forthecrown.core.FtcDiscord;
 import org.jetbrains.annotations.NotNull;
 
 public class DiscordErrorLogHandler extends Handler {
@@ -28,14 +29,17 @@ public class DiscordErrorLogHandler extends Handler {
     TextChannel channel = DiscordSRV.getPlugin()
         .getDestinationTextChannelForGameChannelName("error-log");
 
-    if (formattedMessage.length() >= MAX_CONTENT_LENGTH) {
-      formattedMessage = formattedMessage.substring(0, MAX_CONTENT_LENGTH - 1);
+    String prefix = "**" + levelName + "** [" + loggerName + "] ";
+    int maxLength = MAX_CONTENT_LENGTH - prefix.length() - 7;
+
+    if (formattedMessage.length() >= maxLength) {
+      formattedMessage = formattedMessage.substring(0, maxLength - 1);
     }
 
     StringBuilder builder = new StringBuilder()
         .append(formattedMessage);
 
-    if (thrown != null && formattedMessage.length() < MAX_CONTENT_LENGTH - 30) {
+    if (thrown != null && formattedMessage.length() < maxLength - 30) {
       builder.append("\n```\n");
       MessageWriter mWriter = new MessageWriter(builder);
       PrintWriter writer = new PrintWriter(mWriter);
@@ -45,7 +49,7 @@ public class DiscordErrorLogHandler extends Handler {
 
     System.out.print("Length=" + builder.length() + "\n");
 
-    if (builder.length() >= MAX_CONTENT_LENGTH) {
+    if (builder.length() >= maxLength) {
       System.err.printf(
           "Couldn't output error message to discord, over %s char limit\n",
           MAX_CONTENT_LENGTH
@@ -57,10 +61,7 @@ public class DiscordErrorLogHandler extends Handler {
     if (channel == null) {
       FtcDiscord.staffLog(levelName, builder.toString());
     } else {
-      DiscordUtil.queueMessage(
-          channel,
-          "**" + levelName + "** [" + loggerName + "]" + builder
-      );
+      DiscordUtil.queueMessage(channel, prefix + builder);
     }
   }
 
