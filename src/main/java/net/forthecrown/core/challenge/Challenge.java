@@ -118,10 +118,16 @@ public interface Challenge {
    * Gets the effective goal for the given user
    */
   default float getGoal(User user) {
-    int streak = ChallengeManager.getInstance()
-        .getEntry(user)
-        .getStreak(getStreakCategory())
-        .get();
+    int streak;
+
+    if (user != null) {
+      streak = ChallengeManager.getInstance()
+          .getEntry(user)
+          .getStreak(getStreakCategory())
+          .get();
+    } else {
+      streak = 0;
+    }
 
     return getGoal().getValue(streak);
   }
