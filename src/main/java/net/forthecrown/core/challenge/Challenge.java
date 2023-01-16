@@ -45,10 +45,15 @@ public interface Challenge {
       writer.line(component);
     }
 
-    int streak = ChallengeManager.getInstance()
-        .getEntry(viewer.getUniqueId())
-        .getStreak(getStreakCategory())
-        .get();
+    int streak;
+    if (viewer != null) {
+      streak = ChallengeManager.getInstance()
+          .getEntry(viewer.getUniqueId())
+          .getStreak(getStreakCategory())
+          .get();
+    } else {
+      streak = 0;
+    }
 
     var reward = getReward();
     if (!reward.isEmpty(streak)) {
