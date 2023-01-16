@@ -49,6 +49,8 @@ public class PlayerJoinListener implements Listener {
     PacketListeners.inject(player);
     AfkKicker.addOrDelay(user.getUniqueId());
 
+    Users.updateVanished();
+
     if (!player.hasPlayedBefore()) {
       player.teleport(GeneralConfig.getServerSpawn());
       event.joinMessage(Messages.firstJoin(user));

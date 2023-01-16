@@ -152,6 +152,10 @@ public @UtilityClass class Users {
     }
   }
 
+  public void updateVanished() {
+    getOnline().forEach(User::updateVanished);
+  }
+
   /* ----------------------- BLOCKED/IGNORE TESTING ----------------------- */
 
   /**
