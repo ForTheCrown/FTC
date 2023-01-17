@@ -5,6 +5,7 @@ import java.util.function.Function;
 import jdk.dynalink.beans.StaticClass;
 import net.forthecrown.core.FTC;
 import net.forthecrown.core.Messages;
+import net.forthecrown.core.Worlds;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.Util;
@@ -49,7 +50,8 @@ public final class ScriptsBuiltIn {
       Messages.class,       Style.class,
       Users.class,          HoverEvent.class,
       TextDecoration.class, ClickEvent.class,
-      TextColor.class,      ItemStacks.class
+      TextColor.class,      ItemStacks.class,
+      Worlds.class
   };
 
   public static Function<String, WrappedScript> compileFunction(Script script) {

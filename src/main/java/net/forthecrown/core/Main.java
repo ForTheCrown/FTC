@@ -3,6 +3,7 @@ package net.forthecrown.core;
 import net.forthecrown.core.module.ModuleServices;
 import net.forthecrown.core.module.OnDisable;
 import net.forthecrown.core.module.OnSave;
+import net.forthecrown.dungeons.enchantments.FtcEnchants;
 import net.kyori.adventure.key.Namespaced;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -33,6 +34,7 @@ public final class Main extends JavaPlugin implements Namespaced {
   @Override
   public void onLoad() {
     FtcFlags.init();
+    FtcEnchants.init();
   }
 
   @Override

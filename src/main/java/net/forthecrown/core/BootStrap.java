@@ -16,7 +16,6 @@ import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.datafix.Transformers;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.dungeons.DungeonManager;
-import net.forthecrown.dungeons.enchantments.FtcEnchants;
 import net.forthecrown.economy.Economy;
 import net.forthecrown.economy.Transactions;
 import net.forthecrown.events.Events;
@@ -82,7 +81,6 @@ final class BootStrap {
     init(Structures::get);
 
     // Dungeons
-    init(FtcEnchants.class);
     init(Bosses.class);
 
     // Only load dungeons for testing purposes
