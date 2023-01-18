@@ -5,8 +5,7 @@ import "@bukkit.boss.BarFlag";
 import "@bukkit.util.BoundingBox";
 import "@bukkit.entity.Player";
 
-let bossBar;
-let wgRegion;
+let bossBar = null;
 
 function ensureExists() {
   if (bossBar == null) {
@@ -16,25 +15,39 @@ function ensureExists() {
 
 function setProgress(progress) {
   ensureExists();
-  bossBar.setProgress(GenericMath.clamp(progress, 0, 1));
+
+  if (progress < 0) {
+    progress = 0;
+  } else if (progress > 1) {
+    progress = 1;
+  }
+
+  bossBar.setProgress(progress);
 }
 
-function createBossbar(wgRegion, world) {
+function createBossBar(region, world) {
   if (bossBar != null) {
     return;
   }
 
-  bossBar = Bukkit.createBossbar(
+  if (region == null) {
+      logger.warn("wgRegion == null");
+      return;
+  }
+
+  bossBar = Bukkit.createBossBar(
           "Time until loot despawns",
           BarColor.GREEN,
-          BarStyle.SEGEMENTED_10
+          BarStyle.SEGMENTED_10
   );
 
   updateViewers();
 }
 
 function destroy() {
-  ensureExists();
+  if (bossBar == null) {
+      return;
+  }
 
   bossBar.setVisible(false);
   bossBar.removeAll();
@@ -45,12 +58,20 @@ function updateViewers() {
   ensureExists();
   bossBar.removeAll();
 
+  let wgRegion = main.getWorldGuardRegion();
+  let world = Worlds.overworld();
+
+  if (wgRegion == null) {
+    logger.warn("Cannot update viewers, null region");
+    return;
+  }
+
   let min = wgRegion.getMinimumPoint();
   let max = wgRegion.getMaximumPoint();
 
   let bounds = new BoundingBox(
-      min.getX(), min.getY(), min.getZ(),
-      max.getX(), max.getY(), max.getZ()
+          min.getX(), min.getY(), min.getZ(),
+          max.getX(), max.getY(), max.getZ()
   );
 
   let entities = world.getNearbyEntities(bounds, entity => entity instanceof Player);

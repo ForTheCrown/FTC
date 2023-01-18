@@ -126,6 +126,7 @@ public class UserTimeTracker extends UserComponent {
     for (int i = 0; i < stamps.length; i++) {
       // Get time stamp by its ID
       var field = TIME_FIELDS.orNull(i);
+      assert field != null;
 
       // Don't serialize transient time stamps
       if (!field.isSerialized()) {

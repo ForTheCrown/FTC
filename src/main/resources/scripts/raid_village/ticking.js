@@ -11,22 +11,23 @@ function beginTicking() {
   }
 
   tickCount = 0;
+  logger.info("beginTicking: despawnDelay={}", settings.lootDespawnDelay);
 
   this.task = scheduler.runTimer(TICK_INTERVAL, TICK_INTERVAL, task => {
     tickCount += TICK_INTERVAL;
 
-    if (tickCount < main.settings.lootDespawnDelay) {
+    if (tickCount < settings.lootDespawnDelay) {
       main.tick(tickCount);
       return;
     }
 
     main.removeLootTables();
-    stopTicking();
+    task.cancel();
   });
 }
 
 function stopTicking() {
-  if (!isTicking()) {
+  if (task == null) {
     return;
   }
 

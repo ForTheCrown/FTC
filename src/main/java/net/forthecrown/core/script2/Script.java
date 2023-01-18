@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 import javax.script.Bindings;
 import javax.script.CompiledScript;
 import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -375,6 +376,12 @@ public class Script implements Closeable {
 
       NashornScriptEngine engine
           = ScriptManager.getInstance().createEngine(args);
+
+      engine.getContext().setAttribute(
+          ScriptEngine.FILENAME,
+          source.getName(),
+          ScriptContext.ENGINE_SCOPE
+      );
 
       // Add default values
       ScriptsBuiltIn.populate(source.getName(), engine);

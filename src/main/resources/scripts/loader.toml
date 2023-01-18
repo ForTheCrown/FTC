@@ -51,3 +51,6 @@ script = "streak_leaderboard.js"
 
 ["top_voter_leaderboard"]
 script = "top_voters.js"
+
+["raid_village"]
+script = "raid_village/main.js"

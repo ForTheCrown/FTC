@@ -30,12 +30,12 @@ public class ScriptTasks {
     return add(wrapper);
   }
 
-  public TaskWrapper runTimer(long initialDelayMillis,
-                              long delayMillis,
+  public TaskWrapper runTimer(long initialDelayTicks,
+                              long delayTicks,
                               Consumer<TaskWrapper> consumer
   ) {
     TaskWrapper wrapper = new TaskWrapper(consumer, this);
-    wrapper.task = Tasks.runTimer(wrapper::run, initialDelayMillis, delayMillis);
+    wrapper.task = Tasks.runTimer(wrapper::run, initialDelayTicks, delayTicks);
     return add(wrapper);
   }
 
@@ -69,7 +69,7 @@ public class ScriptTasks {
     }
 
     public int getTaskId() {
-      return task.getTaskId();
+      return task == null ? 0 : task.getTaskId();
     }
 
     public void cancel() {
