@@ -112,7 +112,7 @@ public class PeriodFormat implements ComponentLike {
 
     // If less than a second of time between the start and ends,
     // then just create a format with only the millis unit
-    if (time <= SECOND_IN_MILLIS) {
+    if (time < SECOND_IN_MILLIS) {
       builder.add(ChronoUnit.MILLIS, time);
     } else {
       // Otherwise loop through as many units as
