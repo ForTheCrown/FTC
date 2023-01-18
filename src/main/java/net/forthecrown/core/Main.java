@@ -1,5 +1,6 @@
 package net.forthecrown.core;
 
+import net.forthecrown.core.logging.FtcLog;
 import net.forthecrown.core.module.ModuleServices;
 import net.forthecrown.core.module.OnDisable;
 import net.forthecrown.core.module.OnSave;
@@ -22,6 +23,7 @@ public final class Main extends JavaPlugin implements Namespaced {
   @Override
   public void onEnable() {
     setDebugMode();
+    FtcLog.addDiscordAppender();
 
     // Register dynmap hook connection thing
     DynmapUtil.registerListener();

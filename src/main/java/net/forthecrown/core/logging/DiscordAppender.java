@@ -29,7 +29,7 @@ public class DiscordAppender extends AbstractAppender {
           msg,
           null,
           "ERROR",
-          "Global"
+          ""
       );
     }
 
@@ -39,7 +39,7 @@ public class DiscordAppender extends AbstractAppender {
           msg,
           t,
           "ERROR",
-          "Global"
+          ""
       );
     }
 
