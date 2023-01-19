@@ -287,6 +287,10 @@ public class ItemChallenge implements Challenge {
   private boolean matches(ItemStack item) {
     return getTargetItem()
         .map(target -> {
+          if (target.isSimilar(item)) {
+            return true;
+          }
+
           if (target.getType() != item.getType()) {
             return false;
           }
@@ -322,7 +326,10 @@ public class ItemChallenge implements Challenge {
             var targetProfile = skullMeta.getPlayerProfile();
 
             if (itemProfile == null || targetProfile == null) {
-              return false;
+              // Both must be null, if either is not null, then there's an issue,
+              // Null profile heads may be heads belonging to actual players,
+              // aka, the non-custom heads
+              return itemProfile == targetProfile;
             }
 
             var itemTextures = itemProfile.getTextures();
@@ -331,7 +338,8 @@ public class ItemChallenge implements Challenge {
             return Objects.equals(targetTextures, itemTextures);
           }
 
-          return target.isSimilar(item);
+          // isSimilar check happens above, so we can return false here
+          return false;
         })
 
         .orElse(false);
