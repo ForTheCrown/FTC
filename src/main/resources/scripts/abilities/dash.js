@@ -1,11 +1,5 @@
 import "@bukkit.Particle";
 
-import "org.spongepowered.math.imaginary.Quaterniond";
-import "org.spongepowered.math.vector.Vector3d";
-
-import "@jlang.Float";
-import "@jutil.ArrayList";
-
 const MULTIPLIER = 1.10;
 const ROUND_MIN = -0.07841;
 

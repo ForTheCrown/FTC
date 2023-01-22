@@ -1,5 +1,3 @@
-import "@bukkit.attribute.Attribute";
-
 const RADIUS = 1.5;
 
 function onRightClick(player, clicked) {
