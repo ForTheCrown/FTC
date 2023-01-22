@@ -57,13 +57,17 @@ public class PageFormat<T> {
    *
    * @param it The iterator to format
    * @return The formatted message
-   * @see #write(PageEntryIterator, TextWriter)
+   * @see #write(PageEntryIterator, TextWriter, Context)
    */
   public Component format(PageEntryIterator<T> it, Context context) {
     var writer = TextWriters.newWriter();
     write(it, writer, context);
 
     return writer.asComponent();
+  }
+
+  public Component format(PageEntryIterator<T> it) {
+    return format(it, Context.EMPTY);
   }
 
   /**

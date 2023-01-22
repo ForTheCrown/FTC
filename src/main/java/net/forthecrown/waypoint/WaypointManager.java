@@ -4,6 +4,8 @@ import static net.forthecrown.user.data.UserTimeTracker.UNSET;
 
 import com.google.common.base.Strings;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -230,6 +232,10 @@ public class WaypointManager extends SerializableObject.NbtDat {
     return byName.values()
         .stream()
         .map(waypoint -> waypoint.get(WaypointProperties.NAME));
+  }
+
+  public Collection<Waypoint> getWaypoints() {
+    return Collections.unmodifiableCollection(byId.values());
   }
 
   /* --------------------------- SERIALIZATION ---------------------------- */

@@ -45,7 +45,7 @@ public abstract class FtcCommand extends AbstractCommand {
     // don't need to know what kinds of commands we have
     permissionMessage(Messages.UNKNOWN_COMMAND);
 
-    setPermission(Permissions.registerCmd(name));
+    setPermission(Permissions.registerCmd(getName()));
     setDescription(DEFAULT_DESCRIPTION);
 
     FtcHelpMap.getInstance()

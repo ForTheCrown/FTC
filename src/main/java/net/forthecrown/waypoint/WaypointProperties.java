@@ -87,7 +87,7 @@ public class WaypointProperties {
       } else if (waypoint.getType() instanceof PlayerWaypointType) {
         Waypoints.setNameSign(
             waypoint,
-            Waypoints.getEffectiveName(waypoint)
+            waypoint.getEffectiveName()
         );
       }
     }
@@ -113,7 +113,7 @@ public class WaypointProperties {
 
       Waypoints.setNameSign(
           waypoint,
-          Waypoints.getEffectiveName(waypoint)
+          waypoint.getEffectiveName()
       );
     }
   };

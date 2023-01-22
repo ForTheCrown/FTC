@@ -119,6 +119,7 @@ import net.forthecrown.commands.user.UserCommands;
 import net.forthecrown.commands.waypoint.CommandCreateWaypoint;
 import net.forthecrown.commands.waypoint.CommandHomeWaypoint;
 import net.forthecrown.commands.waypoint.CommandInvite;
+import net.forthecrown.commands.waypoint.CommandListWaypoints;
 import net.forthecrown.commands.waypoint.CommandMoveIn;
 import net.forthecrown.commands.waypoint.CommandVisit;
 import net.forthecrown.commands.waypoint.CommandWaypoints;
@@ -277,6 +278,7 @@ public final class Commands {
     new CommandInvite();
     new CommandHomeWaypoint();
     new CommandCreateWaypoint();
+    new CommandListWaypoints();
 
     //emote, other emotes are initialized by cosmetics in CosmeticEmotes.init()
     new EmotePog();

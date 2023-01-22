@@ -48,7 +48,6 @@ import org.bukkit.block.Sign;
 import org.bukkit.block.data.type.Snow;
 import org.bukkit.block.data.type.WallSign;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.math.vector.Vector3i;
 
@@ -720,35 +719,6 @@ public final class Waypoints {
 
     WaypointManager.getInstance()
         .removeWaypoint(waypoint);
-  }
-
-  /**
-   * Gets the effective name of the waypoint.
-   * <p>
-   * What effective in this case means, is the name that should be displayed on the waypoint. If the
-   * given waypoint is owned by a guild, but has no custom name set, then this will return the
-   * guild's name. If a name is set, then it is returned always, even if the waypoint has a name,
-   *
-   * @param waypoint The waypoint to get the name of
-   * @return The gotten name, may be null
-   */
-  public static @Nullable String getEffectiveName(@NotNull Waypoint waypoint) {
-    if (!Strings.isNullOrEmpty(waypoint.get(WaypointProperties.NAME))) {
-      return waypoint.get(WaypointProperties.NAME);
-    }
-
-    var guildId = waypoint.get(WaypointProperties.GUILD_OWNER);
-    if (guildId == null) {
-      return null;
-    }
-
-    var guild = GuildManager.get().getGuild(guildId);
-
-    if (guild != null) {
-      return guild.getSettings().getName();
-    } else {
-      return null;
-    }
   }
 
   /**

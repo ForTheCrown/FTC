@@ -2,6 +2,7 @@ package net.forthecrown.waypoint;
 
 import static net.forthecrown.user.data.UserTimeTracker.UNSET;
 
+import com.google.common.base.Strings;
 import it.unimi.dsi.fastutil.longs.LongObjectPair;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
@@ -15,17 +16,28 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 import net.forthecrown.core.DynmapUtil;
+import net.forthecrown.core.Worlds;
 import net.forthecrown.core.config.GeneralConfig;
 import net.forthecrown.core.logging.Loggers;
+import net.forthecrown.guilds.GuildManager;
+import net.forthecrown.user.Users;
 import net.forthecrown.utils.ArrayIterator;
 import net.forthecrown.utils.BoundsHolder;
 import net.forthecrown.utils.Time;
 import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.math.Bounds3i;
 import net.forthecrown.utils.math.Vectors;
+import net.forthecrown.utils.text.Text;
+import net.forthecrown.utils.text.writer.TextWriter;
+import net.forthecrown.utils.text.writer.TextWriters;
 import net.forthecrown.waypoint.type.PlayerWaypointType;
 import net.forthecrown.waypoint.type.WaypointType;
 import net.forthecrown.waypoint.type.WaypointTypes;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.LongTag;
 import net.minecraft.nbt.NbtOps;
@@ -363,6 +375,103 @@ public class Waypoint implements BoundsHolder {
 
   public boolean isResident(UUID uuid) {
     return residents.containsKey(uuid);
+  }
+
+  /* ------------------------------ DISPLAY ------------------------------- */
+
+  public @Nullable Component displayName() {
+    var effectiveName = getEffectiveName();
+
+    if (Strings.isNullOrEmpty(effectiveName)) {
+      return null;
+    }
+
+    var color = getTextColor();
+    var writer = TextWriters.newWriter();
+    writer.setFieldStyle(Style.style(NamedTextColor.GRAY));
+
+    writeHover(writer);
+
+    return Text.format("[{0}]", color, effectiveName)
+        .hoverEvent(writer.asComponent())
+        .clickEvent(ClickEvent.suggestCommand("/visit " + effectiveName));
+  }
+
+  private void writeHover(TextWriter writer) {
+    writer.formattedLine("{0} Waypoint",
+        writer.getFieldStyle(),
+        getType().getDisplayName()
+    );
+
+    Component ownerDisplay = null;
+    UUID guildOwner = get(WaypointProperties.GUILD_OWNER);
+    UUID userOwner = get(WaypointProperties.GUILD_OWNER);
+
+    if (guildOwner != null) {
+      var guild = GuildManager.get().getGuild(guildOwner);
+
+      if (guild != null) {
+        ownerDisplay = guild.getSettings()
+            .getNameFormat()
+            .apply(guild);
+      }
+    } else if (userOwner != null) {
+      var user = Users.get(userOwner);
+      ownerDisplay = user.getTabName();
+    }
+
+    if (ownerDisplay != null) {
+      writer.field("Owner", ownerDisplay);
+    }
+
+    if (Worlds.overworld().equals(getWorld())) {
+      writer.field("Location", Text.format("{0, vector}", getPosition()));
+    }
+
+    int residents = getResidents().size();
+    if (residents > 0) {
+      writer.field("Residents", Text.formatNumber(residents));
+    }
+  }
+
+  private TextColor getTextColor() {
+    if (type == WaypointTypes.REGION_POLE) {
+      return NamedTextColor.YELLOW;
+    } else if (type == WaypointTypes.GUILD) {
+      return NamedTextColor.GOLD;
+    } else if (type == WaypointTypes.PLAYER) {
+      return NamedTextColor.WHITE;
+    } else  { // ADMIN waypoint type
+      return NamedTextColor.AQUA;
+    }
+  }
+
+  /**
+   * Gets the effective name of the waypoint.
+   * <p>
+   * What effective in this case means, is the name that should be displayed on the waypoint. If the
+   * given waypoint is owned by a guild, but has no custom name set, then this will return the
+   * guild's name. If a name is set, then it is returned always, even if the waypoint has a name,
+   *
+   * @return The gotten name, may be null
+   */
+  public @Nullable String getEffectiveName() {
+    if (!Strings.isNullOrEmpty(get(WaypointProperties.NAME))) {
+      return get(WaypointProperties.NAME);
+    }
+
+    var guildId = get(WaypointProperties.GUILD_OWNER);
+    if (guildId == null) {
+      return null;
+    }
+
+    var guild = GuildManager.get().getGuild(guildId);
+
+    if (guild != null) {
+      return guild.getSettings().getName();
+    } else {
+      return null;
+    }
   }
 
   /* --------------------------- SERIALIZATION ---------------------------- */
