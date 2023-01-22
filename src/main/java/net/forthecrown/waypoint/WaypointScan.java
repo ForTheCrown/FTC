@@ -9,14 +9,14 @@ import static net.forthecrown.waypoint.WaypointScan.Result.SUCCESS;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.waypoint.type.WaypointTypes;
 import org.apache.logging.log4j.Logger;
 
 public final class WaypointScan {
   private WaypointScan() {}
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   @Getter
   @RequiredArgsConstructor

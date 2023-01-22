@@ -1,7 +1,7 @@
 package net.forthecrown.useables;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.minecraft.nbt.CompoundTag;
 import org.bukkit.entity.Player;
 
@@ -65,7 +65,7 @@ public interface CheckHolder extends UsageTypeHolder {
     try {
        failed = getFail(player);
     } catch (Throwable t) {
-      FTC.getLogger().error("Couldn't run checkable tests!", t);
+      Loggers.getLogger().error("Couldn't run checkable tests!", t);
       return false;
     }
 

@@ -68,6 +68,7 @@ public class ChallengeParser {
         && !className.equalsIgnoreCase(EVENT_CUSTOM)
     ) {
       try {
+        @SuppressWarnings("rawtypes")
         Class eventClass = Class.forName(
             className, true,
 

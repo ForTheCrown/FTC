@@ -4,8 +4,7 @@ import java.util.Optional;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.Accessors;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 
 @Builder(builderClassName = "Builder")
 @RequiredArgsConstructor(staticName = "of")
@@ -16,13 +15,15 @@ public class ScriptResult {
   private final Script script;
 
   /** The name of them method that was executed */
-  @Getter
-  @Accessors(fluent = true)
-  private final Optional<String> method;
+  private final String method;
 
   private final Object result;
 
   private final Throwable exception;
+
+  public Optional<String> method() {
+    return Optional.ofNullable(method);
+  }
 
   public Optional<Object> result() {
     return Optional.ofNullable(result);
@@ -46,8 +47,8 @@ public class ScriptResult {
    */
   public ScriptResult logIfError() {
     error().ifPresent(e -> {
-      if (method.isEmpty()) {
-        FTC.getLogger().error(
+      if (method().isEmpty()) {
+        Loggers.getLogger().error(
             "Couldn't evaluate script {}", script.getName(),
             e
         );
@@ -55,9 +56,9 @@ public class ScriptResult {
         return;
       }
 
-      FTC.getLogger().error(
+      Loggers.getLogger().error(
           "Couldn't invoke method '{}' in '{}'",
-          method.get(),
+          method,
           script.getName(),
           e
       );
@@ -87,6 +88,16 @@ public class ScriptResult {
         return Optional.of(
             Boolean.parseBoolean(str)
         );
+      }
+
+      return Optional.empty();
+    });
+  }
+
+  public Optional<Integer> asInteger() {
+    return result().flatMap(o -> {
+      if (o instanceof Number number) {
+        return Optional.of(number.intValue());
       }
 
       return Optional.empty();

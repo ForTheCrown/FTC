@@ -1,7 +1,6 @@
 package net.forthecrown.core.script2;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.io.Closeable;
 import java.io.IOException;
@@ -18,7 +17,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import lombok.AccessLevel;
 import lombok.Getter;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.script2.ScriptSource.FileSource;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +30,7 @@ public class Script implements Closeable {
   public static final String
       METHOD_ON_CLOSE = "__onClose";
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   /**
    * The source where the script originates, could be raw JS code, or a file's
@@ -61,7 +60,7 @@ public class Script implements Closeable {
   private ScriptObjectMirror mirror;
 
   @Getter(AccessLevel.PACKAGE)
-  private Set<WrappedScript> loadedSubScripts = new ObjectOpenHashSet<>();
+  private final Set<WrappedScript> loadedSubScripts = new ObjectOpenHashSet<>();
 
   /* ---------------------------- CONSTRUCTORS ---------------------------- */
 
@@ -98,6 +97,10 @@ public class Script implements Closeable {
 
   public static Script ofCode(String code) {
     return new Script(ScriptSource.of(code));
+  }
+
+  public static Script of(ScriptSource source) {
+    return new Script(source);
   }
 
   /**
@@ -184,33 +187,7 @@ public class Script implements Closeable {
   /* ------------------------------ READING ------------------------------ */
 
   public static Script read(JsonElement element, boolean assumeRawJs) {
-    ScriptSource source;
-
-    if (element instanceof JsonObject obj) {
-      if (obj.has("js")) {
-        source = ScriptSource.of(obj.get("js").getAsString());
-      } else if (obj.has("path")) {
-        source = ScriptSource.of(
-            ScriptManager.getInstance()
-                .getScriptFile(obj.get("path").getAsString())
-        );
-      } else {
-        throw new IllegalStateException(
-            "Object did not have either 'path' or 'js' values"
-        );
-      }
-    } else {
-      var str = element.getAsString();
-
-      if (assumeRawJs) {
-        source = ScriptSource.of(str);
-      } else {
-        source = ScriptSource.of(
-            ScriptManager.getInstance().getScriptFile(str)
-        );
-      }
-    }
-
+    ScriptSource source = ScriptSource.readSource(element, assumeRawJs);
     return new Script(source);
   }
 
@@ -229,13 +206,13 @@ public class Script implements Closeable {
       return ScriptResult.builder()
           .result(result)
           .script(script)
-          .method(Optional.of(method))
+          .method(method)
           .build();
     } catch (Exception e) {
       return ScriptResult.builder()
           .exception(e)
           .script(script)
-          .method(Optional.of(method))
+          .method(method)
           .build()
           .logIfError();
     }
@@ -371,11 +348,11 @@ public class Script implements Closeable {
     }
 
     try {
-      Reader reader = source.produceReader();
+      Reader reader = source.openReader();
       reader = JsPreProcessor.preprocess(reader);
 
       NashornScriptEngine engine
-          = ScriptManager.getInstance().createEngine(args);
+          = ScriptManager.getInstance().createEngine();
 
       engine.getContext().setAttribute(
           ScriptEngine.FILENAME,
@@ -423,13 +400,11 @@ public class Script implements Closeable {
 
       return ScriptResult.builder()
           .script(this)
-          .method(Optional.empty())
           .result(obj)
           .build();
     } catch (Exception t) {
       return ScriptResult.builder()
           .script(this)
-          .method(Optional.empty())
           .result(null)
           .exception(t)
           .build()

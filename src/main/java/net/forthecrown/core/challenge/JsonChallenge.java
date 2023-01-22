@@ -10,10 +10,13 @@ import static net.forthecrown.core.challenge.Challenges.METHOD_ON_RESET;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.user.User;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -62,14 +65,14 @@ public class JsonChallenge implements Challenge {
   /* ------------------------------ METHODS ------------------------------- */
 
   @Override
-  public String activate(boolean reset) {
+  public CompletionStage<String> activate(boolean reset) {
     registerListener();
 
     getListener().consumeScript(s -> {
       s.invokeIfExists(METHOD_ON_ACTIVATE, getListener().getHandle());
     });
 
-    return "";
+    return CompletableFuture.completedFuture("");
   }
 
   @Override
@@ -153,7 +156,7 @@ public class JsonChallenge implements Challenge {
     }
 
     if (getListener().getScript() == null) {
-      FTC.getLogger().error(
+      Loggers.getLogger().error(
           "Cannot manually invoke script {}! No script set",
           getListener().getScript()
       );
@@ -167,7 +170,7 @@ public class JsonChallenge implements Challenge {
         return;
       }
 
-      FTC.getLogger().error(
+      Loggers.getLogger().error(
           "Cannot manually invoke script {}! Event class has "
               + "been specified!",
           getListener().getScript()
@@ -182,7 +185,7 @@ public class JsonChallenge implements Challenge {
         return;
       }
 
-      FTC.getLogger().error(
+      Loggers.getLogger().error(
           "Cannot manually invoke script {}! No onEvent method set",
           getListener().getScript()
       );

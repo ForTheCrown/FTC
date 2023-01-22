@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.utils.Tasks;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.scheduler.BukkitTask;
@@ -13,7 +13,7 @@ import org.bukkit.scheduler.BukkitTask;
 @Getter
 @RequiredArgsConstructor
 public class ScriptTasks {
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   private final Script script;
   private final List<TaskWrapper> tasks = new ObjectArrayList<>();

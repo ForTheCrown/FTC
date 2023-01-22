@@ -14,6 +14,7 @@ import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.utils.text.Text;
 import org.bukkit.entity.Player;
 
+@SuppressWarnings("unchecked")
 public class CommandDungeons extends FtcCommand {
 
   private static final String bossArg = "boss";

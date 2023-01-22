@@ -2,10 +2,10 @@ package net.forthecrown.events;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Worlds;
 import net.forthecrown.core.config.GeneralConfig;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.npc.Npcs;
 import net.forthecrown.dungeons.enchantments.FtcEnchants;
 import net.forthecrown.inventory.ExtendedItems;
@@ -113,7 +113,7 @@ public class CoreListener implements Listener {
       user.sendMessage(Messages.diedAt(loc));
     }
 
-    FTC.getLogger().info("! {} died at x={} y={} z={} world='{}'",
+    Loggers.getLogger().info("! {} died at x={} y={} z={} world='{}'",
         user.getName(),
         loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(),
         loc.getWorld().getName()

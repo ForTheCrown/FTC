@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 import lombok.Getter;
 import net.forthecrown.commands.manager.FtcSuggestions;
 import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.io.JsonUtils;
@@ -36,7 +37,7 @@ import org.bukkit.OfflinePlayer;
  */
 public class UserLookup extends SerializableObject.AbstractSerializer<JsonArray> {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   private static final Timing LOOKUP_TIMING = FTC.timing("User Lookup load");
 

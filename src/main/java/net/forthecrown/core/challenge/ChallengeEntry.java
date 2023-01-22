@@ -12,8 +12,8 @@ import java.util.UUID;
 import java.util.function.Function;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.Messages;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.core.script2.Script;
 import net.forthecrown.user.User;
@@ -29,7 +29,7 @@ public class ChallengeEntry {
       KEY_STREAKS = "streaks",
       KEY_COMPLETED = "completed";
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   @Getter
   private final UUID id;

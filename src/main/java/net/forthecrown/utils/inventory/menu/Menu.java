@@ -6,7 +6,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import java.util.EnumSet;
 import lombok.Getter;
 import net.forthecrown.commands.manager.Exceptions;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.inventory.FtcInventory;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
@@ -199,7 +199,7 @@ public class Menu implements InventoryHolder, MenuCloseConsumer {
     } catch (CommandSyntaxException exc) {
       Exceptions.handleSyntaxException(user, exc);
     } catch (Throwable t) {
-      FTC.getLogger().error("Error running menu click!", t);
+      Loggers.getLogger().error("Error running menu click!", t);
     } finally {
       if (click.cancelEvent()) {
         event.setCancelled(true);

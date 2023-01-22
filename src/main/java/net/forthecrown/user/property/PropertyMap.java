@@ -3,7 +3,7 @@ package net.forthecrown.user.property;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.ObjectArrays;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.user.ComponentType;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserComponent;
@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
  * A map of {@link UserProperty} properties
  */
 public class PropertyMap extends UserComponent {
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   /**
    * The backing object array that stores property values. What index corresponds to what property
@@ -177,7 +177,7 @@ public class PropertyMap extends UserComponent {
 
       // Test the property isn't null
       if (property == null) {
-        FTC.getLogger().warn("Found unknown user property: '{}', skipping", e.getKey());
+        Loggers.getLogger().warn("Found unknown user property: '{}', skipping", e.getKey());
         continue;
       }
 

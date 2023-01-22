@@ -7,6 +7,7 @@ import jdk.dynalink.beans.StaticClass;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.utils.Util;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
@@ -24,7 +25,7 @@ import org.openjdk.nashorn.internal.runtime.Context;
 @Getter
 @RequiredArgsConstructor
 public class ScriptEvents {
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   private final Script script;
   private final List<ExecutorWrapper> wrappers = new ObjectArrayList<>();

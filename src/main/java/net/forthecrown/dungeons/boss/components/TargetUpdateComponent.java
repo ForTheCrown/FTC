@@ -1,6 +1,6 @@
 package net.forthecrown.dungeons.boss.components;
 
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.dungeons.DungeonUtils;
 import net.forthecrown.dungeons.boss.BossContext;
 import net.forthecrown.dungeons.boss.SingleEntityBoss;
@@ -36,7 +36,7 @@ public class TargetUpdateComponent implements BossComponent<SingleEntityBoss> {
     Mob bossEntity = boss.getBossEntity();
 
     if (bossEntity == null) {
-      FTC.getLogger().warn("Boss entity is null");
+      Loggers.getLogger().warn("Boss entity is null");
       return;
     }
 

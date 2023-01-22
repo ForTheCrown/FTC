@@ -299,6 +299,7 @@ public class CosmeticData extends UserComponent {
         return false;
       }
 
+      assert available != null;
       return available.contains(effect);
     }
 
@@ -327,6 +328,7 @@ public class CosmeticData extends UserComponent {
         return false;
       }
 
+      assert available != null;
       return available.remove(effect);
     }
 
@@ -372,7 +374,8 @@ public class CosmeticData extends UserComponent {
       }
 
       if (!isAvailableEmpty()) {
-        json.addList(KEY_AVAILABLE, getAvailable(), t -> new JsonPrimitive(t.getSerialId()));
+        assert available != null;
+        json.addList(KEY_AVAILABLE, available, t -> new JsonPrimitive(t.getSerialId()));
       }
 
       return json.getSource();
@@ -380,7 +383,6 @@ public class CosmeticData extends UserComponent {
 
     /**
      * Deserializes an entry with the given type from the given JSON element.
-     * <p>
      *
      * @param element The element to deserialize from
      * @param type    The cosmetic type

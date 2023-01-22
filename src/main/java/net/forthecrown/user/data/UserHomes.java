@@ -9,7 +9,6 @@ import java.util.Objects;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.Getter;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CmdUtil;
 import net.forthecrown.grenadier.CompletionProvider;
@@ -22,13 +21,9 @@ import net.forthecrown.utils.text.Text;
 import net.forthecrown.waypoint.Waypoint;
 import net.forthecrown.waypoint.WaypointManager;
 import net.forthecrown.waypoint.Waypoints;
-import org.apache.logging.log4j.Logger;
 import org.bukkit.Location;
 
 public class UserHomes extends UserComponent {
-
-  private static final Logger LOGGER = FTC.getLogger();
-
   /* ----------------------------- CONSTANTS ------------------------------ */
 
   /**

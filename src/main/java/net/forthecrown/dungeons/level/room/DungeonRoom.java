@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import lombok.Getter;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.dungeons.level.DungeonLevel;
 import net.forthecrown.dungeons.level.DungeonPiece;
 import net.forthecrown.dungeons.level.PieceStyle;
@@ -25,7 +25,7 @@ public class DungeonRoom
     extends DungeonPiece
     implements RoomComponentAccess, Iterable<RoomComponent>
 {
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   public static final String
       TAG_SPAWNERS = "spawners",

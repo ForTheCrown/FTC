@@ -7,7 +7,7 @@ import it.unimi.dsi.fastutil.objects.ObjectLists;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.dungeons.DungeonManager;
 import net.forthecrown.dungeons.level.gate.AbsoluteGateData;
@@ -21,7 +21,7 @@ import org.apache.logging.log4j.Logger;
 public final class Gates {
   private Gates() {}
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   public static List<DungeonGate> createGates(DungeonRoom room,
                                               List<GateData> dataList,

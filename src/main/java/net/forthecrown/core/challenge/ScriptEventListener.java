@@ -4,7 +4,7 @@ import com.google.common.base.Strings;
 import java.util.function.Consumer;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.script2.Script;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.entity.Player;
@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 @RequiredArgsConstructor
 public class ScriptEventListener implements Listener, EventExecutor {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   Script script;
 

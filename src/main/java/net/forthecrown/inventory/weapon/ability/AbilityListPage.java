@@ -1,13 +1,11 @@
-package net.forthecrown.inventory.weapon.ability.menu;
+package net.forthecrown.inventory.weapon.ability;
 
-import static net.forthecrown.inventory.weapon.ability.menu.AbilityMenus.CURRENT_TYPE;
-import static net.forthecrown.inventory.weapon.ability.menu.AbilityMenus.RECIPE_PAGE;
+import static net.forthecrown.inventory.weapon.ability.AbilityMenus.CURRENT_TYPE;
+import static net.forthecrown.inventory.weapon.ability.AbilityMenus.RECIPE_PAGE;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.List;
 import java.util.stream.Collectors;
-import net.forthecrown.inventory.weapon.WeaponAbilities;
-import net.forthecrown.inventory.weapon.ability.WeaponAbilityType;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.inventory.ItemStacks;
@@ -35,7 +33,8 @@ public class AbilityListPage extends ListPage<WeaponAbilityType> {
 
   @Override
   protected List<WeaponAbilityType> getList(User user, Context context) {
-    return WeaponAbilities.REGISTRY
+    return SwordAbilityManager.getInstance()
+        .getRegistry()
         .values()
         .stream()
         .filter(type -> type.test(user))

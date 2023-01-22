@@ -8,8 +8,8 @@ import java.util.Objects;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.config.GeneralConfig;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.economy.Economy;
 import net.forthecrown.utils.LocationFileName;
 import net.forthecrown.utils.Tasks;
@@ -360,7 +360,7 @@ public class SignShop implements InventoryHolder {
     var state = getBlock().getState();
 
     if (!(state instanceof Sign sign)) {
-      FTC.getLogger().warn("Shop at {} is not a sign block", getPosition());
+      Loggers.getLogger().warn("Shop at {} is not a sign block", getPosition());
       return null;
     }
 

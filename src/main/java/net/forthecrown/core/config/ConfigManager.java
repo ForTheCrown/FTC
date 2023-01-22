@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 import java.util.Date;
 import java.util.Set;
 import jdk.jfr.Timestamp;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnLoad;
 import net.forthecrown.core.module.OnSave;
 import net.forthecrown.utils.io.JsonUtils;
@@ -22,7 +22,7 @@ import org.apache.logging.log4j.Logger;
 
 public class ConfigManager {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   private static final ConfigManager inst = new ConfigManager();
 

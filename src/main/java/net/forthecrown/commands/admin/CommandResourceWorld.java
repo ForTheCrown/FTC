@@ -263,9 +263,10 @@ public class CommandResourceWorld extends FtcCommand {
       }
 
       @Override
+      @SuppressWarnings({"rawtypes", "unchecked"})
       public Class<Holder<BlockStructure>> getTypeClass() {
-        Class holderClass = Holder.class;
-        return holderClass;
+        // Cast to a regular class so the raw class can be returned
+        return (Class) Holder.class;
       }
 
       @Override

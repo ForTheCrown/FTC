@@ -8,7 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.Consumer;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import org.apache.logging.log4j.Logger;
@@ -20,7 +20,7 @@ public final class SerializationHelper {
   private SerializationHelper() {
   }
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   public static final IoReader<CompoundTag>
       TAG_READER = file -> NbtIo.readCompressed(Files.newInputStream(file));

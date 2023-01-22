@@ -17,12 +17,12 @@ import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.Commands;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.BannedWords;
 import net.forthecrown.core.admin.Mute;
 import net.forthecrown.core.admin.Punishments;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.events.Events;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -495,7 +495,7 @@ public class CommandMail extends FtcCommand {
                 .getAllUsers()
                 .whenComplete((users, throwable) -> {
                   if (throwable != null) {
-                    FTC.getLogger().error("Couldn't load all users", throwable);
+                    Loggers.getLogger().error("Couldn't load all users", throwable);
                     return;
                   }
 
@@ -595,7 +595,7 @@ public class CommandMail extends FtcCommand {
         .whenComplete((users, throwable) -> {
           if (throwable != null) {
             source.sendAdmin("Error sending mail to all users, check console");
-            FTC.getLogger().error(throwable);
+            Loggers.getLogger().error(throwable);
 
             return;
           }

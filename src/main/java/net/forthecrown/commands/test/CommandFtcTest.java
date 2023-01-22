@@ -21,6 +21,7 @@ import net.forthecrown.core.FTC;
 import net.forthecrown.core.challenge.ChallengeManager;
 import net.forthecrown.core.challenge.StreakCategory;
 import net.forthecrown.core.challenge.StreakIncreaseEvent;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.ModuleServices;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.guilds.GuildManager;
@@ -43,7 +44,7 @@ import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
 
 public class CommandFtcTest extends FtcCommand {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   public CommandFtcTest() {
     super("FtcTest");

@@ -9,7 +9,6 @@ import github.scarsz.discordsrv.api.events.AccountUnlinkedEvent;
 import github.scarsz.discordsrv.api.events.DiscordGuildMessageReceivedEvent;
 import github.scarsz.discordsrv.objects.managers.AccountLinkManager;
 import github.scarsz.discordsrv.util.DiscordUtil;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.Messages;
 import net.forthecrown.guilds.GuildDiscord;
 import net.forthecrown.guilds.GuildManager;
@@ -17,12 +16,9 @@ import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.text.ChatParser;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.apache.logging.log4j.Logger;
 import org.bukkit.event.Listener;
 
 public class GuildDiscordListener implements Listener {
-  private static final Logger LOGGER = FTC.getLogger();
-
   @Subscribe
   public void onAccountLink(AccountLinkedEvent event) {
     User user = Users.get(event.getPlayer());

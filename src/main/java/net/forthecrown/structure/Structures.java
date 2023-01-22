@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import lombok.Getter;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnLoad;
 import net.forthecrown.core.module.OnSave;
 import net.forthecrown.core.registry.Holder;
@@ -16,7 +16,7 @@ import org.apache.logging.log4j.Logger;
 
 public final class Structures {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   private static final Structures inst = new Structures();
 
@@ -51,7 +51,7 @@ public final class Structures {
     }
 
     PathUtil.findAllFiles(directory, false)
-        .resultOrPartial(FTC.getLogger()::error)
+        .resultOrPartial(Loggers.getLogger()::error)
 
         .ifPresent(strings -> {
           strings.forEach(s -> {

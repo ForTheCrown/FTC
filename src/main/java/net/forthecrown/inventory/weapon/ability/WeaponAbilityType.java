@@ -10,12 +10,12 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.forthecrown.inventory.weapon.WeaponAbilities;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.inventory.BaseItemBuilder;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.text.TextJoiner;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.nbt.CompoundTag;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.inventory.ItemStack;
@@ -28,7 +28,7 @@ public class WeaponAbilityType implements Predicate<User> {
   private final ItemStack item;
   private final int maxLevel;
 
-  private final Predicate<User> userPredicate;
+  private final Predicate<User> condition;
 
   private final Component displayName;
   private final ImmutableList<Component> description;
@@ -38,7 +38,7 @@ public class WeaponAbilityType implements Predicate<User> {
     this.recipe = builder.items.build();
     this.item = builder.item;
     this.maxLevel = builder.maxLevel;
-    this.userPredicate = Objects.requireNonNull(builder.userPredicate);
+    this.condition = Objects.requireNonNull(builder.condition);
 
     this.displayName = Objects.requireNonNull(builder.displayName);
     this.description = builder.description.build();
@@ -54,8 +54,8 @@ public class WeaponAbilityType implements Predicate<User> {
     ;
   }
 
-  public static Builder builder(Factory factory) {
-    return new Builder(factory);
+  public static Builder builder() {
+    return new Builder();
   }
 
   public WeaponAbility create() {
@@ -74,8 +74,10 @@ public class WeaponAbilityType implements Predicate<User> {
 
   public Component fullDisplayName() {
     return displayName
+        .colorIfAbsent(NamedTextColor.YELLOW)
         .hoverEvent(
             TextJoiner.onNewLine()
+                .setColor(NamedTextColor.GRAY)
                 .add(description)
                 .asComponent()
         );
@@ -83,15 +85,17 @@ public class WeaponAbilityType implements Predicate<User> {
 
   public BaseItemBuilder<?> createDisplayItem() {
     var builder = ItemStacks.toBuilder(getItem());
-    builder.setName(getDisplayName());
-    description.forEach(builder::addLore);
+    builder.setName(getDisplayName().colorIfAbsent(NamedTextColor.YELLOW));
+    description.forEach(component -> {
+      builder.addLore(component.colorIfAbsent(NamedTextColor.GRAY));
+    });
 
     return builder;
   }
 
   @Override
   public boolean test(User input) {
-    return userPredicate.test(input);
+    return condition.test(input);
   }
 
   /* ------------------------- OBJECT OVERRIDES --------------------------- */
@@ -123,16 +127,19 @@ public class WeaponAbilityType implements Predicate<User> {
   @Accessors(chain = true, fluent = true)
   @RequiredArgsConstructor
   public static class Builder {
-    final Factory factory;
     final ImmutableList.Builder<ItemStack> items = ImmutableList.builder();
+
+    final ImmutableList.Builder<Component> description
+        = ImmutableList.builder();
+
+    Factory factory;
 
     ItemStack item;
     int maxLevel;
 
-    Predicate<User> userPredicate = user -> true;
+    Predicate<User> condition = user -> true;
 
     Component displayName;
-    ImmutableList.Builder<Component> description = ImmutableList.builder();
 
     public Builder addItem(ItemStack item) {
       Validate.isTrue(ItemStacks.notEmpty(item), "Empty item given");
@@ -141,14 +148,13 @@ public class WeaponAbilityType implements Predicate<User> {
       return this;
     }
 
-    public WeaponAbilityType build() {
-      return new WeaponAbilityType(this);
+    public Builder addDesc(Component c) {
+      description.add(c);
+      return this;
     }
 
-    public WeaponAbilityType registered(String key) {
-      var built = build();
-      WeaponAbilities.REGISTRY.register(key, built);
-      return built;
+    public WeaponAbilityType build() {
+      return new WeaponAbilityType(this);
     }
   }
 

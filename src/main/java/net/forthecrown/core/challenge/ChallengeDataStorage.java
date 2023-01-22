@@ -20,7 +20,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import lombok.Getter;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.core.registry.Keys;
 import net.forthecrown.core.registry.Registry;
@@ -34,7 +34,7 @@ import org.apache.logging.log4j.Logger;
 @Getter
 public class ChallengeDataStorage {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   private static final String
       KEY_HIGHEST_STREAK = "highest::streak";

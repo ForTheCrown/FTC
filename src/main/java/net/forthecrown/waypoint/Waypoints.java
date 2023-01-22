@@ -12,10 +12,10 @@ import net.forthecrown.commands.arguments.WaypointArgument;
 import net.forthecrown.commands.guild.GuildProvider;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.DynmapUtil;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.BannedWords;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.guilds.Guild;
 import net.forthecrown.guilds.GuildManager;
@@ -118,7 +118,7 @@ public final class Waypoints {
     var structure = getRegionPole();
 
     if (structure == null) {
-      FTC.getLogger().warn("No pole structure found in registry! Cannot place!");
+      Loggers.getLogger().warn("No pole structure found in registry! Cannot place!");
       return;
     }
 
@@ -713,7 +713,7 @@ public final class Waypoints {
       return;
     }
 
-    FTC.getLogger().info("Removing waypoint {}, reason: {}",
+    Loggers.getLogger().info("Removing waypoint {}, reason: {}",
         waypoint.identificationInfo(),
         scanResult.getReason()
     );

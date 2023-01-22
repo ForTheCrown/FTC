@@ -44,13 +44,13 @@ public class ActionScript extends UsageAction {
 
     _script.put("_holder", holder);
 
-    holder.as(UsableBlock.class).ifPresent(usableEntity -> {
-      _script.put("_location", usableEntity.getTileEntity().getLocation());
-      _script.put("_block", usableEntity.getBlock());
+    holder.as(UsableBlock.class).ifPresent(block -> {
+      _script.put("_location", block.getBlock().getLocation());
+      _script.put("_block", block.getBlock());
     });
 
-    holder.as(UsableEntity.class).ifPresent(usableEntity -> {
-      var ent = usableEntity.getEntity();
+    holder.as(UsableEntity.class).ifPresent(entity -> {
+      var ent = entity.getEntity();
       _script.put("_entity", ent);
       _script.put("_location", ent.getLocation());
     });

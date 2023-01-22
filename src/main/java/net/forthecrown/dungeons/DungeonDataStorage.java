@@ -13,7 +13,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
 import lombok.Getter;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.registry.Keys;
 import net.forthecrown.core.registry.Registry;
 import net.forthecrown.dungeons.level.PieceStyle;
@@ -30,7 +30,7 @@ import org.apache.logging.log4j.Logger;
 @Getter
 public class DungeonDataStorage {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   private static final String
       KEY_STRUCTURE = "structure",

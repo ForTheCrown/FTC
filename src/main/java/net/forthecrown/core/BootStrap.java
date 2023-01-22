@@ -8,6 +8,7 @@ import net.forthecrown.core.challenge.ChallengeLogs;
 import net.forthecrown.core.challenge.ChallengeManager;
 import net.forthecrown.core.config.ConfigManager;
 import net.forthecrown.core.config.Configs;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.ModuleServices;
 import net.forthecrown.core.resource.ResourceWorld;
 import net.forthecrown.core.resource.ResourceWorldTracker;
@@ -24,7 +25,8 @@ import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.guilds.GuildManager;
 import net.forthecrown.guilds.unlockables.Unlockables;
 import net.forthecrown.inventory.ExtendedItems;
-import net.forthecrown.inventory.weapon.ability.menu.AbilityAnimation;
+import net.forthecrown.inventory.weapon.ability.AbilityAnimation;
+import net.forthecrown.inventory.weapon.ability.SwordAbilityManager;
 import net.forthecrown.log.LogManager;
 import net.forthecrown.structure.Structures;
 import net.forthecrown.useables.Usables;
@@ -48,7 +50,7 @@ import org.apache.logging.log4j.Logger;
 final class BootStrap {
   private BootStrap() {}
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getPluginLogger();
 
   static void init() {
     RoyalCommandException.ENABLE_HOVER_STACK_TRACE = FTC.inDebugMode();
@@ -88,9 +90,12 @@ final class BootStrap {
       init(DungeonManager::getInstance);
     }
 
+    // Item stuff, like crown and royal sword
+    init(SwordAbilityManager::getInstance);
+    init(ExtendedItems.class);
+
     // Bunch of miscellaneous modules
     init(ChatEmotes.class);
-    init(ExtendedItems.class);
     init(AbilityAnimation::getInstance);
     init(Cosmetics.class);
     init(Usables::getInstance);
@@ -134,7 +139,7 @@ final class BootStrap {
 
     // Schedule and run module services
     ModuleServices.DAY_CHANGE.schedule();
-    ModuleServices.AUTO_SAVE.schedule();
+    ModuleServices.SAVE.schedule();
     ModuleServices.ON_ENABLE.run();
     ModuleServices.RELOAD.run();
 

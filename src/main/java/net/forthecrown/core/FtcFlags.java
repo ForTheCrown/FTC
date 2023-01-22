@@ -34,7 +34,8 @@ public final class FtcFlags {
   public static <T> T query(Location pos, Flag<T> flag) {
     return WorldGuard.getInstance()
         .getPlatform()
-        .getRegionContainer().createQuery()
+        .getRegionContainer()
+        .createQuery()
         .queryValue(BukkitAdapter.adapt(pos), null, flag);
   }
 }

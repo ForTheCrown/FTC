@@ -6,6 +6,7 @@ import jdk.dynalink.beans.StaticClass;
 import net.forthecrown.core.FTC;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Worlds;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.Util;
@@ -22,7 +23,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -77,7 +77,7 @@ public final class ScriptsBuiltIn {
       engine.put(c.getSimpleName(), StaticClass.forClass(c));
     }
 
-    Logger logger = LogManager.getLogger(name);
+    Logger logger = Loggers.getLogger(name);
     engine.put("logger", logger);
   }
 }

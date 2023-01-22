@@ -1,7 +1,7 @@
-package net.forthecrown.inventory.weapon.ability.menu;
+package net.forthecrown.inventory.weapon.ability;
 
-import static net.forthecrown.inventory.weapon.ability.menu.AbilityMenus.CURRENT_TYPE;
-import static net.forthecrown.inventory.weapon.ability.menu.AbilityMenus.RECIPE_PAGE;
+import static net.forthecrown.inventory.weapon.ability.AbilityMenus.CURRENT_TYPE;
+import static net.forthecrown.inventory.weapon.ability.AbilityMenus.RECIPE_PAGE;
 
 import java.util.List;
 import net.forthecrown.user.User;

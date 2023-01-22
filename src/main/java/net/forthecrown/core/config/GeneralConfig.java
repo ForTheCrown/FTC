@@ -8,20 +8,23 @@ import lombok.Setter;
 import lombok.experimental.UtilityClass;
 import net.forthecrown.core.FTC;
 import net.forthecrown.core.Worlds;
+import net.forthecrown.core.logging.DiscordAppender;
 import org.bukkit.Location;
 
 @ConfigData(filePath = "config.json")
 public @UtilityClass class GeneralConfig {
   /* ----------------------------- CONSTANTS ------------------------------ */
 
-  private static transient final Location DEFAULT_SPAWN = new Location(Worlds.overworld(), 267.5, 77.0, 267.5, -180.0F, 0.0f);
+  private static final Location DEFAULT_SPAWN
+      = new Location(Worlds.overworld(), 267.5, 77.0, 267.5, -180.0F, 0.0f);
 
   /* ----------------------------- CONFIG FIELDS ------------------------------ */
 
   public static String
       onFirstJoinKit              = "noobs",
       discordLink                 = "https://discord.gg/wXjHNdp",
-      defaultBanReason            = "This server is not for you";
+      defaultBanReason            = "This server is not for you",
+      discordAppenderLevel        = "ERROR";
 
   public static byte
       maxNickLength               = 16,
@@ -95,5 +98,9 @@ public @UtilityClass class GeneralConfig {
     return (serverSpawn == null
         ? serverSpawn = DEFAULT_SPAWN.clone()
         : serverSpawn).clone();
+  }
+
+  private static void onLoad() {
+    DiscordAppender.addToLogger();
   }
 }

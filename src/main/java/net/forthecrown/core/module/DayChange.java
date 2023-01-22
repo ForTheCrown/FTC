@@ -11,7 +11,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAdjuster;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.Time;
 import net.forthecrown.utils.text.format.PeriodFormat;
@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 public class DayChange extends ModuleService {
   /* ----------------------------- CONSTANTS ------------------------------ */
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   public static final TemporalAdjuster NEXT_DAY = temporal -> {
     return temporal.plus(1, DAYS)

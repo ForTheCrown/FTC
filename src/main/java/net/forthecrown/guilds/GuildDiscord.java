@@ -35,7 +35,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.guilds.unlockables.UnlockableRoleColor;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.Util;
@@ -48,7 +48,7 @@ import org.apache.logging.log4j.Logger;
 
 @Getter
 public class GuildDiscord {
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   public static final String
       KEY_CHANNEL = "channelId",

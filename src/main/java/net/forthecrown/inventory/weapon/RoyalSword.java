@@ -7,9 +7,9 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.inventory.ExtendedItem;
-import net.forthecrown.inventory.ExtendedItemType;
+import net.forthecrown.inventory.weapon.ability.SwordAbilityManager;
 import net.forthecrown.inventory.weapon.ability.WeaponAbility;
 import net.forthecrown.inventory.weapon.goals.WeaponGoal;
 import net.forthecrown.user.data.RankTier;
@@ -36,7 +36,7 @@ import org.bukkit.inventory.meta.ItemMeta;
  */
 @Getter
 public class RoyalSword extends ExtendedItem {
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   public static final String
       TAG_RANK = "rank",
@@ -61,12 +61,12 @@ public class RoyalSword extends ExtendedItem {
 
   private final Object2IntMap<String> progress = new Object2IntOpenHashMap<>();
 
-  public RoyalSword(ExtendedItemType<RoyalSword> type, CompoundTag tag) {
+  public RoyalSword(RoyalSwordType type, CompoundTag tag) {
     super(type, tag);
     load(tag);
   }
 
-  public RoyalSword(ExtendedItemType<RoyalSword> type, UUID owner) {
+  public RoyalSword(RoyalSwordType type, UUID owner) {
     super(type, owner);
   }
 
@@ -74,6 +74,10 @@ public class RoyalSword extends ExtendedItem {
   protected void onUpdate(ItemStack item, ItemMeta meta) {
     if (rank == null) {
       incrementRank(item);
+    }
+
+    if (ability != null) {
+      ability.onUpdate(item, meta, this);
     }
   }
 
@@ -306,7 +310,10 @@ public class RoyalSword extends ExtendedItem {
     }
 
     if (tag.contains(TAG_ABILITY_TYPE)) {
-      WeaponAbilities.REGISTRY.readTag(tag.get(TAG_ABILITY_TYPE))
+      SwordAbilityManager.getInstance()
+          .getRegistry()
+          .readTag(tag.get(TAG_ABILITY_TYPE))
+
           .ifPresentOrElse(type -> {
             CompoundTag abilityTag = tag.getCompound(TAG_ABILITY);
             setAbility(type.load(abilityTag));
@@ -328,7 +335,7 @@ public class RoyalSword extends ExtendedItem {
         WeaponGoal g = rank.getGoals().get(e.getKey());
 
         if (g == null) {
-          FTC.getLogger().warn("Unknown goal '{}', found in sword, owner={}",
+          Loggers.getLogger().warn("Unknown goal '{}', found in sword, owner={}",
               e.getKey(), getOwner()
           );
           continue;
@@ -368,7 +375,10 @@ public class RoyalSword extends ExtendedItem {
     }
 
     if (ability != null) {
-      WeaponAbilities.REGISTRY.writeTag(ability.getType())
+      SwordAbilityManager.getInstance()
+          .getRegistry()
+          .writeTag(ability.getType())
+
           .ifPresentOrElse(keyTag -> {
             CompoundTag abilityTag = new CompoundTag();
             ability.save(abilityTag);

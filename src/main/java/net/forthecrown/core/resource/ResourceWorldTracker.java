@@ -17,6 +17,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.core.FTC;
 import net.forthecrown.core.config.ResourceWorldConfig;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnSave;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.Time;
@@ -30,7 +31,7 @@ import org.spongepowered.math.vector.Vector3i;
 @RequiredArgsConstructor
 public class ResourceWorldTracker implements SerializableObject {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   /**
    * File format used by sections, custom

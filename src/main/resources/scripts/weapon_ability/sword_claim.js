@@ -1,4 +1,4 @@
-import "@ftc.inventory.weapon.ability.menu.AbilityAnimation";
+import "@ftc.inventory.weapon.ability.AbilityAnimation";
 import "@ftc.inventory.ExtendedItems";
 import "@ftc.utils.inventory.ItemStacks";
 

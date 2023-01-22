@@ -33,7 +33,7 @@ import org.spongepowered.math.vector.Vector3i;
 
 /**
  * A shop's entrance
- * <p></p>
+ * <p>
  * Used for setting and changing the shop's owner sign and purchase notice
  */
 @Getter

@@ -5,10 +5,11 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.math.Vectors;
@@ -28,7 +29,7 @@ import org.spongepowered.math.vector.Vector3i;
 @Getter
 @RequiredArgsConstructor
 public class ChallengeItemContainer {
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   public static final String
       TAG_ACTIVE = "active",
@@ -120,42 +121,44 @@ public class ChallengeItemContainer {
    * @return A random item, or null, if {@link #getPotentials()} is empty, or it
    *         took longer than {@link #MAX_SEARCH_ATTEMPTS} to find a valid item.
    */
-  public ItemStack next(Random random) {
+  public CompletableFuture<ItemStack> next(Random random) {
     List<ItemStack> potentials = getPotentials();
 
-    if (potentials.isEmpty()) {
-      return null;
-    } else if (potentials.size() == 1) {
-      // call findRandom on the single item, this method does not test
-      // if the returned item is in the used items list or not
-      return findRandom(potentials.get(0), random, new MutableInt());
-    }
+    return CompletableFuture.supplyAsync(() -> {
+      if (potentials.isEmpty()) {
+        return null;
+      } else if (potentials.size() == 1) {
+        // call findRandom on the single item, this method does not test
+        // if the returned item is in the used items list or not
+        return findRandom(potentials.get(0), random, new MutableInt());
+      }
 
-    ItemStack result = null;
+      ItemStack result = null;
 
-    // If this were C, this could be a simple int* but no, object
-    // Tracks how many iterations were made to find an item, if this
-    // passes the max search attempts constant, this method returns null
-    MutableInt loopCounter = new MutableInt();
+      // If this were C, this could be a simple int* but no, object
+      // Tracks how many iterations were made to find an item, if this
+      // passes the max search attempts constant, this method returns null
+      MutableInt loopCounter = new MutableInt();
 
-    while (ItemStacks.isEmpty(result) || used.contains(result)) {
-      result = findRandom(
-          potentials.get(random.nextInt(potentials.size())),
-          random,
-          loopCounter
-      );
-
-      if (loopCounter.intValue() > MAX_SEARCH_ATTEMPTS) {
-        LOGGER.warn(
-            "Couldn't find item in {} iterations, returning null",
-            MAX_SEARCH_ATTEMPTS
+      while (ItemStacks.isEmpty(result) || used.contains(result)) {
+        result = findRandom(
+            potentials.get(random.nextInt(potentials.size())),
+            random,
+            loopCounter
         );
 
-        return null;
-      }
-    }
+        if (loopCounter.intValue() > MAX_SEARCH_ATTEMPTS) {
+          LOGGER.warn(
+              "Couldn't find item in {} iterations, returning null",
+              MAX_SEARCH_ATTEMPTS
+          );
 
-    return result;
+          return null;
+        }
+      }
+
+      return result;
+    });
   }
 
   /**

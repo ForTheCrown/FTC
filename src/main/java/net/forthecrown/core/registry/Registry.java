@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import lombok.Getter;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.user.property.PropertyMap;
 import net.forthecrown.user.property.UserProperty;
 import net.forthecrown.utils.AbstractListIterator;
@@ -33,6 +33,7 @@ import net.forthecrown.utils.Util;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
+import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.intellij.lang.annotations.Pattern;
 import org.jetbrains.annotations.NotNull;
@@ -81,6 +82,8 @@ import org.jetbrains.annotations.Nullable;
  */
 public class Registry<V> implements Iterable<V> {
   /* ----------------------------- CONSTANTS ------------------------------ */
+
+  private static final Logger LOGGER = Loggers.getLogger();
 
   /**
    * An empty and immutable holder array
@@ -293,7 +296,7 @@ public class Registry<V> implements Iterable<V> {
     }
 
     if (existing != null) {
-      FTC.getLogger().warn(
+      LOGGER.warn(
           "Registry value hash collision! Entry '{}' replaced " +
               "'{}' in the value-lookup map",
 

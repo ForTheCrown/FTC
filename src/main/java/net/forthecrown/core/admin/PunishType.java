@@ -5,9 +5,9 @@ import static net.forthecrown.core.admin.Punishments.INDEFINITE_EXPIRY;
 import java.util.Date;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.config.GeneralConfig;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.registry.Registries;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.text.Text;
@@ -80,7 +80,7 @@ public enum PunishType {
       var cellOptional = Registries.JAILS.get(k);
 
       if (cellOptional.isEmpty()) {
-        FTC.getLogger().warn("Cannot jail {}, unknown jail name: '{}'",
+        Loggers.getLogger().warn("Cannot jail {}, unknown jail name: '{}'",
             user.getName(), k
         );
         return;

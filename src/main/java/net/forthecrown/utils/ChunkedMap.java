@@ -83,6 +83,7 @@ public class ChunkedMap<T extends BoundsHolder> {
    * The translation method used here is not implemented in vanilla minecraft, this is just a quick
    * way to turn a 3d position that's been bit-shifted to align to chunks, into a long
    */
+  @SuppressWarnings("deprecation")
   private static long toChunkLong(Vector3i blockPos) {
     int x = Vectors.toChunk(blockPos.x());
     int y = Vectors.toChunk(blockPos.y());
@@ -93,6 +94,7 @@ public class ChunkedMap<T extends BoundsHolder> {
   /**
    * Iterates through the chunks of the given bounds
    */
+  @SuppressWarnings("deprecation")
   private static void forEachChunk(AbstractBounds3i<?> bounds3i,
                                    LongConsumer consumer
   ) {

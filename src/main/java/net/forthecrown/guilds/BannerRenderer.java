@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import javax.imageio.ImageIO;
 import lombok.Getter;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.utils.io.PathUtil;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -32,7 +32,7 @@ import org.bukkit.inventory.meta.BannerMeta;
 
 @Getter
 public class BannerRenderer {
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   /** Banner texture width */
   public static final int BANNER_WIDTH = 20;

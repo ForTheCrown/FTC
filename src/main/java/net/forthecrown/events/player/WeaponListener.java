@@ -1,8 +1,11 @@
 package net.forthecrown.events.player;
 
+import net.forthecrown.core.FTC;
 import net.forthecrown.inventory.ExtendedItems;
 import net.forthecrown.inventory.weapon.RoyalSword;
+import net.forthecrown.inventory.weapon.ability.SwordAbilityManager;
 import net.forthecrown.inventory.weapon.SwordConfig;
+import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -38,22 +41,41 @@ public class WeaponListener implements Listener {
     ) {
       sword.damage(damager, event, item);
     }
+
+    onInteract(damager, event.getEntity(), null, true);
   }
 
   @EventHandler(ignoreCancelled = true)
   public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
-    onInteract(event, event.getRightClicked(), false);
+    onInteract(event, event.getRightClicked(), null, false);
   }
 
   // Don't ignore cancelled, by default,
   // interactions with air blocks will be cancelled
   @EventHandler
   public void onPlayerInteract(PlayerInteractEvent event) {
-    onInteract(event, null, event.getAction().isLeftClick());
+    onInteract(event, null, event.getClickedBlock(), event.getAction().isLeftClick());
   }
 
-  private void onInteract(PlayerEvent event, Entity entity, boolean leftClick) {
-    var player = event.getPlayer();
+  private void onInteract(PlayerEvent event,
+                          Entity entity,
+                          Block block,
+                          boolean leftClick
+  ) {
+    onInteract(event.getPlayer(), entity, block, leftClick);
+  }
+
+  private void onInteract(Player player,
+                          Entity entity,
+                          Block block,
+                          boolean leftClick
+  ) {
+    if (!SwordAbilityManager.getInstance().isEnabled()
+        && !FTC.inDebugMode()
+    ) {
+      return;
+    }
+
     var item = player.getInventory().getItemInMainHand();
     RoyalSword sword = ExtendedItems.ROYAL_SWORD.get(item);
 
@@ -68,12 +90,12 @@ public class WeaponListener implements Listener {
     }
 
     boolean giveCooldown = leftClick
-        ? ability.onLeftClick(player, entity)
-        : ability.onRightClick(player, entity);
+        ? ability.onLeftClick(player, entity, block)
+        : ability.onRightClick(player, entity, block);
 
-    int cooldownTicks = ability.getCooldownTicks();
+    long cooldownTicks = ability.getCooldownTicks();
     if (cooldownTicks > 0 && giveCooldown) {
-      player.setCooldown(item.getType(), cooldownTicks);
+      player.setCooldown(item.getType(), Math.toIntExact(cooldownTicks));
     }
   }
 }

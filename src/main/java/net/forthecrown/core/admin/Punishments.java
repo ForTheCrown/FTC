@@ -5,11 +5,11 @@ import static net.forthecrown.core.FtcDiscord.C_PUNISH;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import net.forthecrown.core.Announcer;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.FtcDiscord;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.config.GeneralConfig;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.Util;
@@ -136,7 +136,7 @@ public final class Punishments {
 
     var lengthString = length == INDEFINITE_EXPIRY ? "Eternal" : PeriodFormat.of(length).toString();
 
-    FTC.getLogger().info("{} punished {} with {}, reason: {}, length: {}",
+    Loggers.getLogger().info("{} punished {} with {}, reason: {}, length: {}",
         source.textName(), target.getName(),
         type.name().toLowerCase(),
         reason,

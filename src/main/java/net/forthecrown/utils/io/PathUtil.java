@@ -19,12 +19,13 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import org.apache.logging.log4j.Logger;
 
 public final class PathUtil {
   private PathUtil() {}
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   public static final Pattern UUID_PATTERN
       = Pattern.compile(

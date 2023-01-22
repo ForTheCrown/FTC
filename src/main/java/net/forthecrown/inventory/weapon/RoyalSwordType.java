@@ -43,8 +43,6 @@ public class RoyalSwordType implements ExtendedItemType<RoyalSword> {
 
   public RoyalSwordType() {
     SwordRanks.init();
-    WeaponAbilities.init();
-
     ConfigManager.get().registerConfig(SwordConfig.class);
   }
 
@@ -65,7 +63,7 @@ public class RoyalSwordType implements ExtendedItemType<RoyalSword> {
   }
 
   @Override
-  public @NotNull BaseItemBuilder createBaseItem() {
+  public @NotNull BaseItemBuilder<?> createBaseItem() {
     return ItemStacks.builder(Material.WOODEN_SWORD)
         .setNameRaw(RANK_1_NAME)
         .setUnbreakable(true)

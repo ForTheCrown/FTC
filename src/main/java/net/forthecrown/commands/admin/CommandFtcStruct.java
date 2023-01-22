@@ -59,6 +59,7 @@ import org.bukkit.entity.Player;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
 
+@SuppressWarnings("unchecked")
 public class CommandFtcStruct extends FtcCommand {
   /* ----------------------------- CREATION ARGUMENTS ------------------------------ */
 
@@ -290,8 +291,6 @@ public class CommandFtcStruct extends FtcCommand {
             .then(literal("remove")
                 .executes(c -> {
                   Holder<BlockStructure> holder = c.getArgument("structure", Holder.class);
-                  BlockStructure structure = holder.getValue();
-
                   var structures = Structures.get();
 
                   if (!structures.getRegistry().remove(holder.getId())) {

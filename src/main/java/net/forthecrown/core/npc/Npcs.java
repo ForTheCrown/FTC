@@ -2,7 +2,7 @@ package net.forthecrown.core.npc;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.Exceptions;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.registry.Keys;
 import net.forthecrown.core.registry.Registries;
 import org.apache.commons.lang3.Validate;
@@ -21,7 +21,7 @@ public final class Npcs {
     var npc = Registries.NPCS.get(id);
 
     if (npc.isEmpty()) {
-      FTC.getLogger().warn("Unknown NPC key: " + id);
+      Loggers.getLogger().warn("Unknown NPC key: " + id);
       return cancelled;
     }
 

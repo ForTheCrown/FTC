@@ -21,6 +21,7 @@ import java.util.OptionalInt;
 import java.util.UUID;
 import java.util.function.Consumer;
 import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.core.registry.Registry;
 import net.forthecrown.economy.sell.SellShop;
@@ -202,7 +203,7 @@ public final class Challenges {
         continue;
       }
 
-      FTC.getLogger().debug("Adding item challenge to shop menu: {}",
+      Loggers.getLogger().debug("Adding item challenge to shop menu: {}",
           h.getKey()
       );
 

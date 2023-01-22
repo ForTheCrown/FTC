@@ -1,4 +1,4 @@
-package net.forthecrown.inventory.weapon.ability.menu;
+package net.forthecrown.inventory.weapon.ability;
 
 import static net.forthecrown.inventory.weapon.SwordConfig.swordAnim_initialDistance;
 
@@ -8,8 +8,8 @@ import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.Worlds;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnDisable;
 import net.forthecrown.cosmetics.travel.TravelUtil;
 import net.forthecrown.inventory.weapon.SwordConfig;
@@ -40,7 +40,7 @@ import org.spongepowered.math.vector.Vector2f;
 import org.spongepowered.math.vector.Vector3d;
 
 public class AbilityAnimation {
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   public static final float PARTICLE_Y_OFFSET = 1.25F;
   public static final int CIRCLE_POINTS = 4;

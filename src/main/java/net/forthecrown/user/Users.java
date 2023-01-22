@@ -12,7 +12,6 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import lombok.experimental.UtilityClass;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.Messages;
 import net.forthecrown.grenadier.CommandSource;
@@ -32,7 +31,9 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Utility class for methods related to users
  */
-public @UtilityClass class Users {
+public final class Users {
+  private Users() {}
+
   /* ---------------------------- USER GETTERS ---------------------------- */
 
   /**
@@ -43,7 +44,7 @@ public @UtilityClass class Users {
    * @throws IllegalArgumentException If the player has not played on this
    *                                  server before
    */
-  public User get(OfflinePlayer base) throws IllegalArgumentException {
+  public static User get(OfflinePlayer base) throws IllegalArgumentException {
     return get(base.getUniqueId());
   }
 
@@ -54,7 +55,7 @@ public @UtilityClass class Users {
    * @return The loaded user, null, if the User attached to the given UUID is
    * not loaded
    */
-  public User getLoadedUser(UUID base) {
+  public static User getLoadedUser(UUID base) {
     return UserManager.get().getLoaded().get(base);
   }
 
@@ -67,7 +68,7 @@ public @UtilityClass class Users {
    * @throws IllegalArgumentException If the given UUID does not belong to a
    *                                  user that has played on this server
    */
-  public User get(@NotNull UUID base) throws IllegalArgumentException {
+  public static User get(@NotNull UUID base) throws IllegalArgumentException {
     Validate.notNull(base, "UUID cannot be null");
     UserLookupEntry entry = UserManager.get()
         .getUserLookup()
@@ -85,7 +86,8 @@ public @UtilityClass class Users {
    * @return The gotten/created user
    * @throws IllegalArgumentException If the given profile is null
    */
-  public User get(UserLookupEntry profile) throws IllegalArgumentException {
+  public static User get(UserLookupEntry profile)
+      throws IllegalArgumentException {
     return UserManager.get().getUser(profile);
   }
 
@@ -95,7 +97,7 @@ public @UtilityClass class Users {
    * @param name The name/nickname/valid oldname of the user
    * @return The user, will throw an exception
    */
-  public User get(String name) {
+  public static User get(String name) {
     return get(
         UserManager.get()
             .getUserLookup()
@@ -114,7 +116,7 @@ public @UtilityClass class Users {
    * @param uuid The UUID to test
    * @return True, if the UUID belongs to a player, false otherwise
    */
-  public boolean isPlayerId(UUID uuid) {
+  public static boolean isPlayerId(UUID uuid) {
     return UserManager.get().getUserLookup().getEntry(uuid) != null;
   }
 
@@ -123,7 +125,7 @@ public @UtilityClass class Users {
    *
    * @return All online users
    */
-  public Set<User> getOnline() {
+  public static Set<User> getOnline() {
     return new ObjectOpenHashSet<>(
         UserManager.get()
             .getOnline()
@@ -136,13 +138,13 @@ public @UtilityClass class Users {
    * <p>
    * All users are saved before being potentially unloaded
    */
-  public void unloadOffline() {
+  public static void unloadOffline() {
     var loaded = UserManager.get().getLoaded();
     loaded.forEach((uuid, user) -> user.save());
     loaded.values().removeIf(user -> !user.isOnline());
   }
 
-  public void updateVanished() {
+  public static void updateVanished() {
     getOnline().forEach(User::updateVanished);
   }
 
@@ -167,10 +169,10 @@ public @UtilityClass class Users {
    * separated, false otherwise
    * @see #testBlockedMessage(User, User, String, String)
    */
-  public boolean testBlocked(User sender,
-                             User target,
-                             String senderIgnoredFormat,
-                             String targetIgnoredFormat
+  public static boolean testBlocked(User sender,
+                                    User target,
+                                    String senderIgnoredFormat,
+                                    String targetIgnoredFormat
   ) {
     var optional = testBlockedMessage(
         sender, target,
@@ -203,10 +205,10 @@ public @UtilityClass class Users {
    *                                had blocked the other
    * @see #testBlockedMessage(User, User, String, String)
    */
-  public void testBlockedException(User sender,
-                                   User target,
-                                   String senderIgnoredFormat,
-                                   String targetIgnoredFormat
+  public static void testBlockedException(User sender,
+                                          User target,
+                                          String senderIgnoredFormat,
+                                          String targetIgnoredFormat
   ) throws CommandSyntaxException {
     var optional = testBlockedMessage(
         sender, target,
@@ -241,10 +243,10 @@ public @UtilityClass class Users {
    * @return Corresponding ignore message, empty, if not blocked or separated in
    * any way
    */
-  public Optional<String> testBlockedMessage(User sender,
-                                             User target,
-                                             String senderIgnoredFormat,
-                                             String targetIgnoredFormat
+  public static Optional<String> testBlockedMessage(User sender,
+                                                    User target,
+                                                    String senderIgnoredFormat,
+                                                    String targetIgnoredFormat
   ) {
     if (sender.equals(target)) {
       return Optional.empty();
@@ -273,7 +275,7 @@ public @UtilityClass class Users {
    * @return True, if either has blocked the other or they've been separated,
    * false otherwise
    */
-  public boolean areBlocked(User sender, User target) {
+  public static boolean areBlocked(User sender, User target) {
     if (sender.equals(target)) {
       return false;
     }
@@ -293,7 +295,7 @@ public @UtilityClass class Users {
    * @param user   The first user
    * @param target The second user
    */
-  public void marry(User user, User target) {
+  public static void marry(User user, User target) {
     UserInteractions inter = user.getInteractions();
     UserInteractions tInter = target.getInteractions();
 
@@ -323,7 +325,7 @@ public @UtilityClass class Users {
    * @param uuid The ID of the player to test
    * @return True, if the player has a vanilla data file, false if it does not
    */
-  public boolean hasVanillaData(UUID uuid) {
+  public static boolean hasVanillaData(UUID uuid) {
     Path path = Paths.get("world", "playerdata", uuid.toString() + ".dat");
     return Files.exists(path);
   }
@@ -337,7 +339,7 @@ public @UtilityClass class Users {
    * @param audience The audience to test
    * @return True, if they allow ranks in their chat, false otherwise
    */
-  public boolean allowsRankedChat(Audience audience) {
+  public static boolean allowsRankedChat(Audience audience) {
     if (audience instanceof CommandSource source) {
       return allowsRankedChat(source.asBukkit());
     }
@@ -367,13 +369,12 @@ public @UtilityClass class Users {
    * @param prependRank True, whether to allow a rank prefix, false otherwise
    * @param allowAfk    If the '[AFK]' suffix is allowed in the created display
    *                    name
-   *
    * @return The created 'list' display name.
    */
-  public Component createListName(User user,
-                                  Component displayName,
-                                  boolean prependRank,
-                                  boolean allowAfk
+  public static Component createListName(User user,
+                                         Component displayName,
+                                         boolean prependRank,
+                                         boolean allowAfk
   ) {
     var builder = text();
     var prefix = user.getEffectivePrefix(prependRank);

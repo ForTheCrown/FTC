@@ -20,6 +20,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 
+@SuppressWarnings("unused")
 public final class UserRanks {
   private UserRanks() {}
 
@@ -282,7 +283,7 @@ public final class UserRanks {
         .build();
   }
 
-  public static DataResult<UserRank> parse(JsonElement element) {
+  public static DataResult<UserRank> deserialize(JsonElement element) {
     if (element == null || !element.isJsonObject()) {
       return DataResult.error("Invalid JSON: " + element);
     }
@@ -297,11 +298,8 @@ public final class UserRanks {
     var builder = UserRank.builder()
         .truncatedPrefix(prefix)
         .genderEquivalentKey(json.getString("genderEquivalent"))
-        .hidden(json.getBool("hidden", false));
-
-    if (json.getBool("defaultTitle", false)) {
-      builder.asDefault();
-    }
+        .hidden(json.getBool("hidden", false))
+        .defaultTitle(json.getBool("defaultTitle", false));
 
     if (json.has("tier")) {
       builder.tier(json.getEnum("tier", RankTier.class));

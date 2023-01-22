@@ -14,9 +14,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletionStage;
 import lombok.Getter;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.config.ConfigManager;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnDayChange;
 import net.forthecrown.core.module.OnEnable;
 import net.forthecrown.core.module.OnLoad;
@@ -36,7 +37,7 @@ import org.apache.logging.log4j.Logger;
 
 public class ChallengeManager {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   @Getter
   private static final ChallengeManager instance = new ChallengeManager();
@@ -229,11 +230,21 @@ public class ChallengeManager {
   public void activate(Holder<Challenge> holder, boolean resetting) {
     activeChallenges.add(holder);
 
-    var extra = holder.getValue()
-        .activate(resetting);
+    CompletionStage<String> extra = holder.getValue().activate(resetting);
 
     if (resetting) {
-      Challenges.logActivation(holder, extra);
+      extra.whenComplete((s, throwable) -> {
+        if (throwable != null) {
+          LOGGER.error(
+              "Couldn't call activate() on challenge {}",
+              holder.getKey(), throwable
+          );
+
+          return;
+        }
+
+        Challenges.logActivation(holder, s);
+      });
     }
   }
 

@@ -10,8 +10,8 @@ import java.util.UUID;
 import java.util.stream.Stream;
 import lombok.Getter;
 import net.forthecrown.core.DynmapUtil;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.config.ConfigManager;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnDayChange;
 import net.forthecrown.core.module.OnEnable;
 import net.forthecrown.guilds.Guild;
@@ -27,7 +27,7 @@ import org.apache.logging.log4j.Logger;
 
 public class WaypointManager extends SerializableObject.NbtDat {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   /**
    * The waypoint manager singleton instance

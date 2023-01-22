@@ -10,8 +10,8 @@ import lombok.RequiredArgsConstructor;
 import net.forthecrown.commands.arguments.SuggestionFunction;
 import net.forthecrown.commands.manager.FtcSuggestions;
 import net.forthecrown.commands.manager.Readers;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.Permissions;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.Suggester;
@@ -24,7 +24,7 @@ import org.bukkit.permissions.Permission;
 @RequiredArgsConstructor(staticName = "of")
 public class MessageSuggestions {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
   private static final String GRADIENT_START = "<gradient";
 
   private final CommandSender sender;
@@ -290,6 +290,7 @@ public class MessageSuggestions {
     return get(c, builder, override, null);
   }
 
+  @SuppressWarnings("unchecked")
   public static <S> CompletableFuture<Suggestions> get(CommandContext<S> c,
                                                        SuggestionsBuilder builder,
                                                        boolean override,

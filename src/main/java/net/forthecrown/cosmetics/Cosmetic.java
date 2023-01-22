@@ -16,6 +16,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 public abstract class Cosmetic {
 
   @Getter

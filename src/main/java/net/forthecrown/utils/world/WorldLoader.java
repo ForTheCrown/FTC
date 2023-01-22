@@ -9,8 +9,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import lombok.experimental.UtilityClass;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.config.GeneralConfig;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnDisable;
 import net.forthecrown.utils.VanillaAccess;
 import net.forthecrown.utils.math.Vectors;
@@ -35,7 +35,7 @@ import org.spongepowered.math.GenericMath;
  */
 public @UtilityClass class WorldLoader {
 
-  private final Logger LOGGER = FTC.getLogger();
+  private final Logger LOGGER = Loggers.getLogger();
 
   /**
    * The amount of chunks that have to be loaded before the logger logs a progress update message

@@ -10,16 +10,13 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import net.forthecrown.core.FTC;
 import net.forthecrown.log.DateRange;
 import net.forthecrown.utils.Time;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
-import org.apache.logging.log4j.Logger;
 
 @RequiredArgsConstructor
 public class Streak {
-  private static final Logger LOGGER = FTC.getLogger();
 
   public static final String
       KEY_TIMES   = "completionTimes",
@@ -59,12 +56,6 @@ public class Streak {
   }
 
   public int get() {
-    LOGGER.debug("cachedStreak={} completionTimes.size()={}, highest={}",
-        cachedStreak,
-        completionTimes.size(),
-        highest
-    );
-
     if (completionTimes.isEmpty()) {
       return NO_STREAK;
     }
@@ -102,8 +93,6 @@ public class Streak {
 
       optional = false;
     }
-
-    LOGGER.debug("Final streak result={}", streak);
 
     if (streak == NO_STREAK) {
       cachedStreak = NOT_COMPUTED;

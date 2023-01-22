@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.dungeons.DungeonWorld;
 import net.forthecrown.dungeons.LevelManager.LevelCell;
 import net.forthecrown.dungeons.level.gate.DungeonGate;
@@ -32,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
 public class DungeonLevel implements Iterable<DungeonPiece> {
   /* ----------------------------- CONSTANTS ------------------------------ */
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   public static final String
       TAG_PIECES = "pieces",

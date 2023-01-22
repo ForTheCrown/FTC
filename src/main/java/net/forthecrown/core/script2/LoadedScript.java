@@ -1,12 +1,12 @@
 package net.forthecrown.core.script2;
 
 import java.time.LocalDate;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.utils.MonthDayPeriod;
 import org.apache.logging.log4j.Logger;
 
 record LoadedScript(MonthDayPeriod period, Script script, String[] args) {
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   public boolean shouldBeActive(LocalDate date) {
     if (period == null) {

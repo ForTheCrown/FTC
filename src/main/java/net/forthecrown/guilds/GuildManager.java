@@ -25,9 +25,9 @@ import java.util.UUID;
 import lombok.Getter;
 import net.forthecrown.core.Announcer;
 import net.forthecrown.core.DynmapUtil;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.config.ConfigManager;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnDayChange;
 import net.forthecrown.core.module.OnEnable;
 import net.forthecrown.core.module.OnLoad;
@@ -337,7 +337,7 @@ public class GuildManager {
       Guild guild = storage.loadGuild(uuid);
 
       LongSet chunks = storage.loadChunks(uuid)
-          .resultOrPartial(FTC.getLogger()::error)
+          .resultOrPartial(Loggers.getLogger()::error)
           .orElseGet(LongSets::emptySet);
 
       addGuild(guild, chunks);

@@ -15,8 +15,8 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 import net.forthecrown.core.DynmapUtil;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.config.GeneralConfig;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.utils.ArrayIterator;
 import net.forthecrown.utils.BoundsHolder;
 import net.forthecrown.utils.Time;
@@ -44,7 +44,7 @@ import org.spongepowered.math.vector.Vector3i;
  */
 public class Waypoint implements BoundsHolder {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   static final String
       TAG_POS = "position",

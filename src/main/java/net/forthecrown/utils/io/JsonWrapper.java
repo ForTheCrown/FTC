@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -136,11 +137,11 @@ public final class JsonWrapper {
     return parsed == null ? def : parsed;
   }
 
-  public <T> Collection<T> getList(String name, Function<JsonElement, T> func) {
+  public <T> List<T> getList(String name, Function<JsonElement, T> func) {
     return getList(name, func, Collections.emptyList());
   }
 
-  public <T> Collection<T> getList(String name, Function<JsonElement, T> func, Collection<T> def) {
+  public <T> List<T> getList(String name, Function<JsonElement, T> func, List<T> def) {
     if (missingOrNull(name)) {
       return def;
     }
@@ -395,9 +396,14 @@ public final class JsonWrapper {
     source.add(name, array);
   }
 
-  public <T> T[] getArray(String name, Function<JsonElement, T> parser,
+  public <T> T[] getArray(String name,
+                          Function<JsonElement, T> parser,
                           IntFunction<T[]> arrayCreator
   ) {
+    if (missingOrNull(name)) {
+      return arrayCreator.apply(0);
+    }
+
     JsonArray array = getArray(name);
     T[] arr = arrayCreator.apply(array.size());
 

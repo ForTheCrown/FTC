@@ -8,7 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnLoad;
 import net.forthecrown.core.module.OnSave;
 import net.forthecrown.utils.io.PathUtil;
@@ -25,7 +25,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class Transformers {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   // A list of all current data transformers
   // Add and remove entries from here as needed
@@ -99,7 +99,7 @@ public class Transformers {
 
     if (DataUpdater.LOGGER.getOutput() != null) {
       DataUpdater.LOGGER.close();
-      FTC.getLogger().info("Completed all data updaters");
+      Loggers.getLogger().info("Completed all data updaters");
     }
   }
 
@@ -110,7 +110,7 @@ public class Transformers {
 
     if (DataUpdater.LOGGER.getOutput() == null) {
       DataUpdater.LOGGER.initFilePrinter();
-      FTC.getLogger().info("Running current data updaters!");
+      Loggers.getLogger().info("Running current data updaters!");
     }
 
     if (!c.runUpdater()) {

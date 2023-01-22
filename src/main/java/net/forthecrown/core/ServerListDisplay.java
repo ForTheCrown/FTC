@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.Random;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnDayChange;
 import net.forthecrown.core.module.OnLoad;
 import net.forthecrown.core.registry.Holder;
@@ -42,7 +43,7 @@ import org.bukkit.util.CachedServerIcon;
  */
 @Getter
 public class ServerListDisplay {
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   public static final Comparator<Holder<Entry>> ENTRY_COMPARATOR
       = makeComparator(); // I dislike Java sometimes

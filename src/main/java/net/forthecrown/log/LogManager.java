@@ -8,6 +8,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import lombok.Getter;
 import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnDayChange;
 import net.forthecrown.core.module.OnLoad;
 import net.forthecrown.core.module.OnSave;
@@ -20,7 +21,7 @@ public class LogManager {
   @Getter
   private static final LogManager instance = new LogManager();
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   /* -------------------------- INSTANCE FIELDS --------------------------- */
 

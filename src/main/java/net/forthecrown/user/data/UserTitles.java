@@ -7,7 +7,7 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 import lombok.Getter;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.user.ComponentType;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserComponent;
@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
  * @see #ensureSynced()
  */
 public class UserTitles extends UserComponent {
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   public static final String
       KEY_TITLE = "title",
@@ -287,11 +287,11 @@ public class UserTitles extends UserComponent {
           continue;
         }
 
-        FTC.getLogger().info("Adding tier {} to {}", tier, user.getName());
+        Loggers.getLogger().info("Adding tier {} to {}", tier, user.getName());
         setTier(tier, false);
         return;
       } else if (hasTier(tier)) {
-        FTC.getLogger().info("Adding group {} to {}, due to title/group sync",
+        Loggers.getLogger().info("Adding group {} to {}, due to title/group sync",
             tier.getLuckPermsGroup(), user.getName()
         );
 

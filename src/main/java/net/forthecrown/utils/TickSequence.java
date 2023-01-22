@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import lombok.Getter;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import org.bukkit.scheduler.BukkitTask;
 
 /**
@@ -60,7 +60,7 @@ public class TickSequence {
     try {
       node.runnable.run();
     } catch (Exception e) {
-      FTC.getLogger().error("Couldn't run sequence node", e);
+      Loggers.getLogger().error("Couldn't run sequence node", e);
     }
 
     if (nodeIndex >= nodes.size()) {

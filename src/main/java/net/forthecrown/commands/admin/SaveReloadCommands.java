@@ -15,6 +15,7 @@ import net.forthecrown.economy.Economy;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.guilds.GuildManager;
+import net.forthecrown.inventory.weapon.ability.SwordAbilityManager;
 import net.forthecrown.log.LogManager;
 import net.forthecrown.structure.Structures;
 import net.forthecrown.useables.Usables;
@@ -217,6 +218,11 @@ public class SaveReloadCommands extends FtcCommand {
     SCRIPTS(
         null,
         ScriptManager.getInstance()::load
+    ),
+
+    SWORD_ABILITIES(
+        null,
+        SwordAbilityManager.getInstance()::loadAbilities
     ),
 
     CONFIG(

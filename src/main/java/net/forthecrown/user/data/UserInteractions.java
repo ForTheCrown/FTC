@@ -233,7 +233,7 @@ public class UserInteractions extends UserComponent {
    * Finds a request by a given user in the given teleport request list
    *
    * @param requests    The list to search
-   * @param user        The user to search fro
+   * @param user        The user to search for
    * @param checkSender True, if this search should test the given user against the requests' sender
    *                    or target.
    * @return The found request, null, if none was found
@@ -259,41 +259,38 @@ public class UserInteractions extends UserComponent {
    * Removes an incoming TP request from the given sender
    *
    * @param from The user that sent the request
-   * @return True, if an element was removed from the list, false otherwise.
    */
-  public boolean removeIncoming(User from) {
-    return removeRequest(incoming, true, from);
+  public void removeIncoming(User from) {
+    removeRequest(incoming, true, from);
   }
 
   /**
    * Removes an outgoing TP request from the given receiver
    *
    * @param to The user that received the request
-   * @return True, if an element was removed from the list, false otherwise.
    */
-  public boolean removeOutgoing(User to) {
-    return removeRequest(outgoing, false, to);
+  public void removeOutgoing(User to) {
+    removeRequest(outgoing, false, to);
   }
 
   /**
    * Removes a request from the given request list
    *
    * @param requests    The request list to remove from
-   * @param checkSender True, if it should check the request's sender to find a valid request to
-   *                    remove
+   * @param checkSender True, if it should check the request's sender to find a
+   *                    valid request to remove
    * @param user        The user to remove the request of
-   * @return True, if an element was removed from the list, false otherwise.
    */
-  private static boolean removeRequest(List<TeleportRequest> requests, boolean checkSender,
-                                       User user
+  private static void removeRequest(List<TeleportRequest> requests, boolean checkSender,
+                                    User user
   ) {
     var request = findRequest(requests, user, checkSender);
 
     if (request == null) {
-      return false;
+      return;
     }
 
-    return requests.remove(request);
+    requests.remove(request);
   }
 
   /**

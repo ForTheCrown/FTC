@@ -10,7 +10,6 @@ public class ModuleServices {
       SERVICES = Registries.newRegistry();
 
   public static final ModuleService
-      SAVE       = ModuleService.of(OnSave.class),
       RELOAD     = ModuleService.of(OnLoad.class),
       ON_ENABLE  = ModuleService.of(OnEnable.class),
       ON_DISABLE = ModuleService.of(OnDisable.class);
@@ -19,7 +18,7 @@ public class ModuleServices {
       DAY_CHANGE = new DayChange();
 
   public static final AutoSave
-      AUTO_SAVE  = new AutoSave();
+      SAVE = new AutoSave();
 
   static {
     SERVICES.register("save", SAVE);
@@ -27,7 +26,6 @@ public class ModuleServices {
     SERVICES.register("on_enable", ON_ENABLE);
     SERVICES.register("on_disable", ON_DISABLE);
     SERVICES.register("day_change", DAY_CHANGE);
-    SERVICES.register("auto_save", AUTO_SAVE);
   }
 
   public static void run(Class<? extends Annotation> type) {

@@ -197,7 +197,7 @@ public class DirectMessage {
           .append(formattedText)
           .build();
 
-      this.target.sendMessage(sender, receiverMessage);
+      this.target.sendMessage(receiverMessage);
     }
 
     //If soft or no mute, send to sender
@@ -208,7 +208,7 @@ public class DirectMessage {
           .append(formattedText)
           .build();
 
-      this.sender.sendMessage(target, senderMessage);
+      this.sender.sendMessage(senderMessage);
     }
   }
 

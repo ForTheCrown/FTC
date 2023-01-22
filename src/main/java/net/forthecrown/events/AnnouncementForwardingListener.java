@@ -5,6 +5,7 @@ import static net.kyori.adventure.text.Component.text;
 import github.scarsz.discordsrv.api.Subscribe;
 import github.scarsz.discordsrv.api.events.DiscordGuildMessageReceivedEvent;
 import net.forthecrown.core.Announcer;
+import net.forthecrown.core.Messages;
 import net.forthecrown.core.config.GeneralConfig;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -37,6 +38,7 @@ public class AnnouncementForwardingListener {
 
             text("[Click here to view]", NamedTextColor.AQUA)
                 .clickEvent(ClickEvent.openUrl(jumpTo))
+                .hoverEvent(Messages.CLICK_ME)
         )
     );
   }

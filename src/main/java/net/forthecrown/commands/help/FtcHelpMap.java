@@ -20,7 +20,7 @@ import net.forthecrown.commands.manager.Commands;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcCommand.Usage;
 import net.forthecrown.commands.manager.FtcCommand.UsageFactory;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.utils.context.Context;
@@ -42,7 +42,7 @@ import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.apache.logging.log4j.Logger;
 
 public class FtcHelpMap {
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   @Getter
   private static final FtcHelpMap instance = new FtcHelpMap();

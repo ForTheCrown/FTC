@@ -17,7 +17,7 @@ import java.time.format.TextStyle;
 import java.time.temporal.ChronoField;
 import java.util.Optional;
 import lombok.Getter;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.utils.io.SerializationHelper;
 import org.apache.commons.io.file.PathUtils;
 import org.apache.logging.log4j.Logger;
@@ -25,7 +25,7 @@ import org.apache.logging.log4j.Logger;
 @Getter
 public class DataStorage {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   /* ----------------------- FILE NAME FORMATTERS ------------------------- */
 

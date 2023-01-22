@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.registry.Holder;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.Logger;
@@ -24,7 +24,7 @@ import org.apache.logging.log4j.Logger;
 @Getter
 public class LogSchema {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   private final SchemaField[] fields;
 

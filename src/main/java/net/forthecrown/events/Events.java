@@ -4,6 +4,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import github.scarsz.discordsrv.DiscordSRV;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnEnable;
 import net.forthecrown.events.economy.AutoSellListener;
 import net.forthecrown.events.economy.MarketListener;
@@ -142,7 +143,7 @@ public final class Events {
 
       Exceptions.handleSyntaxException(sender, e);
     } catch (Throwable e) {
-      FTC.getLogger().error(
+      Loggers.getLogger().error(
           "Error executing event {}",
           event.getEventName(),
           e

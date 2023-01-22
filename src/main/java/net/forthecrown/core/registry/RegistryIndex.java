@@ -5,13 +5,13 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import org.apache.logging.log4j.Logger;
 
 @Getter
 @RequiredArgsConstructor
 public class RegistryIndex<V, I> implements RegistryListener<V> {
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   private final Map<I, Holder<V>> index = new Object2ObjectOpenHashMap<>();
   private final IndexGetter<I, V> getter;

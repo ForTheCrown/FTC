@@ -12,8 +12,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.IntSupplier;
 import lombok.Getter;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.config.GeneralConfig;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnLoad;
 import net.forthecrown.core.module.OnSave;
 import net.forthecrown.core.registry.Keys;
@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 public final class UserManager implements SerializableObject {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   private static final UserManager INSTANCE = new UserManager();
 
@@ -54,9 +54,10 @@ public final class UserManager implements SerializableObject {
   /**
    * User serializer
    * <p>
-   * This is still an interface incase we ever need to change serialization formats again or start
-   * serializing to a database instead of a file system. If we do need to do that, then we can just
-   * switch out the current implementation of this serializer
+   * This is still an interface in-case we ever need to change serialization
+   * formats again or start serializing to a database instead of a file system.
+   * If we do need to do that, then we can just switch out the current
+   * implementation of this serializer
    */
   private final UserSerializer serializer;
 
@@ -86,11 +87,11 @@ public final class UserManager implements SerializableObject {
   private final UUID2IntMap gems;
 
   /**
-   * The directory of that user files are in, not to be confused with the user data file directory
-   * where individual user files are kept.
+   * The directory of that user files are in, not to be confused with the user
+   * data file directory where individual user files are kept.
    * <p>
-   * This is the directory where the {@link UUID2IntMap}s are stored and where {@link AltUsers} is
-   * stored.
+   * This is the directory where the {@link UUID2IntMap}s are stored and where
+   * {@link AltUsers} is stored.
    */
   private final Path directory;
 
@@ -133,7 +134,7 @@ public final class UserManager implements SerializableObject {
     }
 
     SerializationHelper.readTomlAsJson(rankJson, wrapper -> {
-      for (var e: wrapper.entrySet()) {
+      for (var e : wrapper.entrySet()) {
         if (!Keys.isValidKey(e.getKey())) {
           LOGGER.warn("{} is an invalid registry key", e.getKey());
           continue;
@@ -146,10 +147,10 @@ public final class UserManager implements SerializableObject {
           continue;
         }
 
-        // IDK if it matters, but even though there's a init call in
+        // IDK if it matters, but even though there's an init call in
         // Bootstrap, this is at the moment, the first call to this class
         // during startup, meaning this call loads the class
-        UserRanks.parse(e.getValue())
+        UserRanks.deserialize(e.getValue())
             .resultOrPartial(s -> {
               LOGGER.warn("Couldn't parse rank at {}: {}", e.getKey(), s);
             })
@@ -234,8 +235,8 @@ public final class UserManager implements SerializableObject {
   }
 
   /**
-   * Removes the user by the given ID from this manager, aka, unloading it without saving the user
-   * first.
+   * Removes the user by the given ID from this manager, aka, unloading it
+   * without saving the user first.
    *
    * @param uuid The ID to remove, aka, unload
    */
@@ -245,18 +246,21 @@ public final class UserManager implements SerializableObject {
   }
 
   /**
-   * Gets ALL offline and online users that have an entry in the {@link UserLookup}.
+   * Gets ALL offline and online users that have an entry in the
+   * {@link UserLookup}.
    * <p>
-   * This WILL load all user files and as such is run asynchronously to prevent overwhelming the
-   * main thread and possibly causing a server crash.
+   * This WILL load all user files and as such is run asynchronously to prevent
+   * overwhelming the main thread and possibly causing a server crash.
    * <p>
-   * During the execution of this method, this method also tests that all {@link UserLookup} entries
-   * are 'valid', meaning that the entry represents a player that has logged onto the server before.
-   * If any entry is found that is 'invalid', then this method will call
-   * {@link UserLookup#clearInvalid()} before it returns the loaded list.
+   * During the execution of this method, this method also tests that all
+   * {@link UserLookup} entries are 'valid', meaning that the entry represents a
+   * player that has logged onto the server before. If any entry is found that
+   * is 'invalid', then this method will call {@link UserLookup#clearInvalid()}
+   * before it returns the loaded list.
    * <p>
-   * It is <b>highly</b> advisable to call {@link Users#unloadOffline()} after any iteration or
-   * modification of this method's resulting users is finished to not take up too much memory.
+   * It is <b>highly</b> advisable to call {@link Users#unloadOffline()} after
+   * any iteration or modification of this method's resulting users is finished
+   * to not take up too much memory.
    *
    * @return A completable future completed once all users have been loaded
    */

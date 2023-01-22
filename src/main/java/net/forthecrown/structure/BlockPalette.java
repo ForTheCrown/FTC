@@ -10,7 +10,7 @@ import java.util.Map;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.math.Vectors;
 import net.minecraft.nbt.CompoundTag;
@@ -69,7 +69,7 @@ public class BlockPalette {
           var info = FunctionInfo.parse(origin, cmd);
           structure.functions.add(info);
         } catch (CommandSyntaxException exc) {
-          FTC.getLogger().error("Couldn't parse function block at {}:",
+          Loggers.getLogger().error("Couldn't parse function block at {}:",
               Vectors.from(b), exc
           );
         }
@@ -94,7 +94,7 @@ public class BlockPalette {
       this.entities.add(info);
     }
 
-    FTC.getLogger().info("Scanned {} blocks and {} entities", blocks, entities.size());
+    Loggers.getLogger().info("Scanned {} blocks and {} entities", blocks, entities.size());
   }
 
   public void place(StructurePlaceConfig config) {

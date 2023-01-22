@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.utils.Util;
 
@@ -38,7 +38,7 @@ public class LogQuery implements Predicate<LogEntry> {
           return false;
         }
       } catch (Throwable t) {
-        FTC.getLogger().error(
+        Loggers.getLogger().error(
             "Error testing field '{}' on entry, value={}",
             f.name(),
             entry.get(f),

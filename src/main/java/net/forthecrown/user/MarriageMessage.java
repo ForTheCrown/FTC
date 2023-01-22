@@ -114,13 +114,13 @@ public class MarriageMessage {
     // If mute status allows sender to see
     // then tell sender they just send message
     if (mute.isVisibleToSender()) {
-      sender.sendMessage(target, formatted);
+      sender.sendMessage(formatted);
     }
 
     // If the sender isn't muted at all, send
     // target message
     if (mute.isVisibleToOthers()) {
-      target.sendMessage(sender, formatted);
+      target.sendMessage(formatted);
     }
   }
 }

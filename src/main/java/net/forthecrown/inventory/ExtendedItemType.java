@@ -18,7 +18,7 @@ public interface ExtendedItemType<T extends ExtendedItem> extends FtcKeyed {
 
   @NotNull T load(@NotNull CompoundTag item);
 
-  @NotNull BaseItemBuilder createBaseItem();
+  @NotNull BaseItemBuilder<?> createBaseItem();
 
   default boolean shouldRemainInInventory() {
     return true;

@@ -6,10 +6,13 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.forthecrown.commands.manager.Exceptions;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.inventory.ItemStacks;
@@ -102,7 +105,7 @@ public class ItemChallenge implements Challenge {
   }
 
   @Override
-  public String activate(boolean resetting) {
+  public CompletionStage<String> activate(boolean resetting) {
     var manager = ChallengeManager.getInstance();
     var storage = manager.getStorage();
 
@@ -111,29 +114,43 @@ public class ItemChallenge implements Challenge {
         .getHolderByValue(this)
         .orElseThrow();
 
-    String result = null;
     var container = storage.loadContainer(holder);
 
     if (resetting) {
-      var random = container.next(Util.RANDOM);
+      var future = container.next(Util.RANDOM);
 
-      if (ItemStacks.notEmpty(random)) {
-        container.getUsed().add(random);
-        container.setActive(random);
-        setTargetItem(random);
+      return future.whenComplete((item, exception) -> {
+        if (exception != null) {
+          Loggers.getLogger().error(
+              "Error getting random challenge item:",
+              exception
+          );
 
-        result = ItemStacks.toNbtString(random);
-      } else {
-        container.setActive(null);
-        setTargetItem(null);
-      }
+          return;
+        }
 
-      storage.saveContainer(container);
+        if (ItemStacks.notEmpty(item)) {
+          container.getUsed().add(item);
+          container.setActive(item);
+          setTargetItem(item);
+        } else {
+          container.setActive(null);
+          setTargetItem(null);
+        }
+
+        storage.saveContainer(container);
+      }).thenApply(itemStack -> {
+        if (ItemStacks.isEmpty(itemStack)) {
+          return "";
+        }
+
+        return ItemStacks.toNbtString(itemStack);
+      });
     } else {
       setTargetItem(container.getActive());
     }
 
-    return result;
+    return CompletableFuture.completedFuture("");
   }
 
   @Override

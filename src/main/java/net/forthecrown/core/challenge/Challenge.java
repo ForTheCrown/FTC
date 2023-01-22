@@ -1,7 +1,8 @@
 package net.forthecrown.core.challenge;
 
 import com.google.common.collect.ImmutableList;
-import net.forthecrown.core.FTC;
+import java.util.concurrent.CompletionStage;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.writer.TextWriter;
@@ -159,7 +160,7 @@ public interface Challenge {
     // Find the challenge's entry and then use it's key to log the
     // user completing this challenge
     Challenges.apply(this, holder -> {
-      FTC.getLogger().info("{} completed the {} challenge",
+      Loggers.getLogger().info("{} completed the {} challenge",
           user.getName(), holder.getKey()
       );
     });
@@ -179,7 +180,7 @@ public interface Challenge {
    * @return Extra info to display in the {@link net.forthecrown.log.DataLog} for activated
    * challenges
    */
-  String activate(boolean reset);
+  CompletionStage<String> activate(boolean reset);
 
   /**
    * Triggers this challenge.

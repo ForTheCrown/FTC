@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnDayChange;
 import net.forthecrown.core.module.OnLoad;
 import net.forthecrown.core.registry.Keys;
@@ -38,7 +39,7 @@ import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
 @Getter
 public class ScriptManager {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   private static final Set<String> ILLEGAL_CLASSES = Set.of(
       BukkitScheduler.class.getName(),

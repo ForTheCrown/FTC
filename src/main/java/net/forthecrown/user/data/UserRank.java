@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.forthecrown.commands.manager.Exceptions;
+import net.forthecrown.core.registry.Keys;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.inventory.menu.MenuNode;
 import net.forthecrown.utils.inventory.menu.Slot;
@@ -19,6 +20,7 @@ import org.apache.commons.lang3.Validate;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
+import org.intellij.lang.annotations.Pattern;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
@@ -30,6 +32,7 @@ public class UserRank implements ComponentLike {
   private final Component truncatedPrefix;
 
   /** The registry key of the opposite gender variant of this rank */
+  @Pattern(Keys.VALID_KEY_REGEX)
   private final String genderEquivalentKey;
 
   /** This rank's menu slot, may be null */
@@ -61,6 +64,10 @@ public class UserRank implements ComponentLike {
     this.description = builder.description.build();
     this.defaultTitle = builder.defaultTitle;
     this.hidden = builder.hidden;
+
+    if (!Strings.isNullOrEmpty(genderEquivalentKey)) {
+      Keys.ensureValid(genderEquivalentKey);
+    }
 
     if (defaultTitle) {
       Objects.requireNonNull(
@@ -201,7 +208,10 @@ public class UserRank implements ComponentLike {
   public static class Builder {
     private RankTier tier;
     private Component truncatedPrefix;
+
+    @Pattern(Keys.VALID_KEY_REGEX)
     private String genderEquivalentKey;
+
     private Slot menuSlot;
 
     private boolean defaultTitle = false;

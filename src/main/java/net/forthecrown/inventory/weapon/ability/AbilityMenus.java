@@ -1,4 +1,4 @@
-package net.forthecrown.inventory.weapon.ability.menu;
+package net.forthecrown.inventory.weapon.ability;
 
 import static net.kyori.adventure.text.Component.text;
 
@@ -16,9 +16,6 @@ import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.inventory.ExtendedItems;
 import net.forthecrown.inventory.weapon.RoyalSword;
-import net.forthecrown.inventory.weapon.WeaponAbilities;
-import net.forthecrown.inventory.weapon.ability.WeaponAbility;
-import net.forthecrown.inventory.weapon.ability.WeaponAbilityType;
 import net.forthecrown.user.User;
 import net.forthecrown.user.property.Properties;
 import net.forthecrown.utils.Tasks;
@@ -444,7 +441,7 @@ public class AbilityMenus extends MenuPage {
     }
 
     Optional<Either<Holder<WeaponAbilityType>, String>> first
-        = WeaponAbilities.REGISTRY.entries()
+        = SwordAbilityManager.getInstance().getRegistry().entries()
         .stream()
         .filter(holder -> {
           if (!holder.getValue().test(user)) {

@@ -19,7 +19,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.forthecrown.utils.io.SerializableObject;
@@ -34,7 +34,7 @@ import org.jetbrains.annotations.Nullable;
 public class UUID2IntMap extends SerializableObject.Json
     implements Iterable<UUID2IntMap.Entry>
 {
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   /**
    * The minimum value that can be stored in user maps, the value is 0
@@ -84,7 +84,7 @@ public class UUID2IntMap extends SerializableObject.Json
 
   public UUID2IntMap(Path filePath, IntSupplier defaultSupplier) {
     super(filePath);
-    this.defaultSupplier = defaultSupplier;
+    this.defaultSupplier = Objects.requireNonNull(defaultSupplier);
   }
 
   /**

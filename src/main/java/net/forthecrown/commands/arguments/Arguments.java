@@ -60,12 +60,14 @@ public interface Arguments {
     return result.get(c.getSource(), true);
   }
 
+  @SuppressWarnings("unchecked")
   static Waypoint getWaypoint(CommandContext<CommandSource> c, String argument)
       throws CommandSyntaxException {
     ParseResult<Waypoint> result = c.getArgument(argument, ParseResult.class);
     return result.get(c.getSource(), true);
   }
 
+  @SuppressWarnings("unchecked")
   static Waypoint getWaypointNoChecks(CommandContext<CommandSource> c, String argument)
       throws CommandSyntaxException {
     ParseResult<Waypoint> result = c.getArgument(argument, ParseResult.class);

@@ -10,8 +10,8 @@ import java.util.EnumSet;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.config.GeneralConfig;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.user.ComponentType;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserComponent;
@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class UserShopData extends UserComponent implements Iterable<UserShopData.Entry> {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   /**
    * The JSON key of the auto sell material list
@@ -74,7 +74,7 @@ public class UserShopData extends UserComponent implements Iterable<UserShopData
    * Sets the amount of rhines earned from the given material
    * <p>
    * If the given value is less than or equal to 0, this will remove the given material instead of
-   * setting it's value
+   * setting its value
    *
    * @param material The material to set the value of
    * @param value    The amount of rhines earned from the given material

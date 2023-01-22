@@ -2,7 +2,7 @@ package net.forthecrown.events.player;
 
 import io.papermc.paper.adventure.ChatDecorationProcessor;
 import java.util.Objects;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.user.packet.PacketCall;
 import net.forthecrown.user.packet.PacketHandler;
 import net.forthecrown.user.packet.PacketListener;
@@ -17,7 +17,7 @@ import org.bukkit.event.player.PlayerKickEvent;
 
 public class ChatPacketListener implements PacketListener {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   @PacketHandler
   public void onChat(ServerboundChatPacket packet, PacketCall call) {

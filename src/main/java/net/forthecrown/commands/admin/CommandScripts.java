@@ -7,8 +7,8 @@ import java.nio.file.Path;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.Permissions;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.script2.Script;
 import net.forthecrown.core.script2.ScriptLoadException;
 import net.forthecrown.core.script2.ScriptManager;
@@ -147,7 +147,7 @@ public class CommandScripts extends FtcCommand {
         .getScriptFile(script);
 
     PathUtil.safeDelete(path)
-        .resultOrPartial(FTC.getLogger()::error);
+        .resultOrPartial(Loggers.getLogger()::error);
 
     c.getSource().sendAdmin(
         Text.format("Deleting script '{0}'", script)

@@ -1,5 +1,6 @@
 package net.forthecrown.commands;
 
+import com.google.common.base.Strings;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -18,6 +19,7 @@ import net.forthecrown.core.challenge.Challenges;
 import net.forthecrown.core.challenge.ItemChallenge;
 import net.forthecrown.core.challenge.ResetInterval;
 import net.forthecrown.core.challenge.StreakCategory;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
@@ -470,14 +472,31 @@ public class CommandChallenges extends FtcCommand {
     ensureItemChallenge(holder);
 
     ItemChallenge challenge = (ItemChallenge) holder.getValue();;
-    var rerolled = challenge.activate(true);
+    challenge.activate(true).whenComplete((s, throwable) -> {
+         if (throwable != null) {
+           Loggers.getLogger().error(
+               "Error rerolling item for {}",
+               holder.getKey(),
+               throwable
+           );
 
-    c.getSource().sendAdmin(
-        Text.format("Re-rolled {0}'s target item to {1}",
-            holder.getKey(),
-            rerolled
-        )
-    );
+           c.getSource().sendAdmin("Error rerolling item, check console");
+           return;
+         }
+
+         if (Strings.isNullOrEmpty(s)) {
+           c.getSource().sendAdmin("Failed to reroll: no valid item found");
+           return;
+         }
+
+         c.getSource().sendAdmin(
+             Text.format("Re-rolled {0}'s target item to {1}",
+                 holder.getKey(),
+                 s
+             )
+         );
+    });
+
     return 0;
   }
 

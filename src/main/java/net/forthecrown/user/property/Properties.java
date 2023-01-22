@@ -1,5 +1,6 @@
 package net.forthecrown.user.property;
 
+import net.forthecrown.core.TabList;
 import net.forthecrown.core.module.OnEnable;
 import net.forthecrown.core.registry.Registries;
 import net.forthecrown.core.registry.Registry;
@@ -22,14 +23,14 @@ public class Properties {
   /**
    * The amount a user will sell in /shop.
    */
-  public static final EnumProperty<SellAmount>
-      SELL_AMOUNT = new EnumProperty<>("sellAmount", SellAmount.PER_1);
+  public static final EnumProperty<SellAmount> SELL_AMOUNT
+      = new EnumProperty<>("sellAmount", SellAmount.PER_1);
 
-  public static final EnumProperty<MemberSort>
-      MEMBER_SORT = new EnumProperty<>("memberSort", MemberSort.BY_RANK);
+  public static final EnumProperty<MemberSort> MEMBER_SORT
+      = new EnumProperty<>("memberSort", MemberSort.BY_RANK);
 
-  public static final EnumProperty<DiscoverySort>
-      DISCOVERY_SORT = new EnumProperty<>("guildDiscovery", DiscoverySort.BY_NAME);
+  public static final EnumProperty<DiscoverySort> DISCOVERY_SORT
+      = new EnumProperty<>("guildDiscovery", DiscoverySort.BY_NAME);
 
   /**
    * Determines whether a user is allowed to send and receive command emotes such as '/kiss'.
@@ -189,6 +190,7 @@ public class Properties {
    */
   SKIP_ABILITY_ANIM = new BoolProperty("skipAbilityAnimation", false),
 
+  /** Currently unused */
   BYPASS_TRUST = new BoolProperty("bypassClaimTrust", false);
 
   /**
@@ -229,6 +231,10 @@ public class Properties {
     @Override
     public void onUpdate(User user) {
       user.updateVanished();
+
+      // Tablist contains player count, so update it
+      // to add/remove the vanished player from the count
+      TabList.update();
     }
   };
 

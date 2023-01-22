@@ -36,6 +36,7 @@ import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.core.config.EndConfig;
 import net.forthecrown.core.config.GeneralConfig;
 import net.forthecrown.core.config.JoinInfo;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.events.dynamic.HulkSmashListener;
 import net.forthecrown.grenadier.CommandSource;
@@ -566,7 +567,7 @@ public class User implements ForwardingAudience.Single,
     }
 
     // Log play time
-    logTime().resultOrPartial(FTC.getLogger()::warn)
+    logTime().resultOrPartial(Loggers.getLogger()::warn)
         .ifPresent(integer -> {
           UserManager.get()
               .getPlayTime()
@@ -956,7 +957,7 @@ public class User implements ForwardingAudience.Single,
           .checkPermission(name)
           .asBoolean();
     } catch (ExecutionException | InterruptedException e) {
-      FTC.getLogger().error("Couldn't fetch permission data from LuckPerms", e);
+      Loggers.getLogger().error("Couldn't fetch permission data from LuckPerms", e);
     }
 
     return false;

@@ -32,6 +32,7 @@ import net.forthecrown.core.FTC;
 import net.forthecrown.core.FtcDiscord;
 import net.forthecrown.core.Worlds;
 import net.forthecrown.core.admin.StaffChat;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnDayChange;
 import net.forthecrown.structure.BlockStructure;
 import net.forthecrown.structure.StructurePlaceConfig;
@@ -82,7 +83,7 @@ import org.spongepowered.math.vector.Vector3i;
 @Getter
 public class ResourceWorld {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   private static final ResourceWorld INSTANCE = new ResourceWorld();
 

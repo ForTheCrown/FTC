@@ -2,7 +2,7 @@ package net.forthecrown.useables.test;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.types.WorldArgument;
 import net.forthecrown.useables.CheckHolder;
@@ -32,7 +32,7 @@ public class TestWorld extends UsageTest {
     super(TYPE);
 
     if (world == null) {
-      FTC.getLogger().warn("Found unknown world while creating world usage test!");
+      Loggers.getLogger().warn("Found unknown world while creating world usage test!");
       this.world = null;
     } else {
       this.world = world.getKey();

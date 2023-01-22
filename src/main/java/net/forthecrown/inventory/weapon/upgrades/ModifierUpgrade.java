@@ -21,8 +21,10 @@ public record ModifierUpgrade(double speed, double attack) implements WeaponUpgr
     // Thank you Bukkit, for not providing an API for this
     // Good lord, all this for some base attribute values
     // This was a pain to figure out btw
-    Item type = BuiltInRegistries.ITEM
-        .get(CraftNamespacedKey.toMinecraft(item.getType().getKey()));
+    Item type = BuiltInRegistries.ITEM.get(
+        CraftNamespacedKey.toMinecraft(item.getType().getKey())
+    );
+
     SwordItem swordItem = (SwordItem) type;
 
     double speedBase = -2.1D;

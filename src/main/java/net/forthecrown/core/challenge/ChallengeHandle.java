@@ -4,7 +4,7 @@ import java.util.Objects;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.Util;
@@ -16,7 +16,7 @@ import org.bukkit.entity.Player;
 @RequiredArgsConstructor
 public class ChallengeHandle {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   private final JsonChallenge challenge;
 
