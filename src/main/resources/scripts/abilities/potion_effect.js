@@ -32,8 +32,7 @@ function parseArgs() {
       .ofType(Integer.class);
 
   const giveTargetArg = parser.accepts("give-target", "If set, gives the target the potion effect, instead of the player");
-
-  const clickArg = parser.accepts("left-click", "If set, listens to left clicks instead of right clicks");
+  const leftClickArg = parser.accepts("left-click", "If set, listens to left clicks instead of right clicks");
 
   const out = System.out;
   let set = null;
@@ -55,16 +54,16 @@ function parseArgs() {
     throw "No potion duration set with '--duration=<value>'"
   }
 
-  if (set.hasArgument(giveTargetArg)) {
+  if (set.has(giveTargetArg)) {
     giveTarget = true;
+  }
+
+  if (set.has(leftClickArg)) {
+    triggeredByRight = false;
   }
 
   if (set.hasArgument(amplifierArg)) {
     amplifier = set.valueOf(amplifierArg);
-  }
-
-  if (set.hasArgument(clickArg)) {
-    triggeredByRight = false;
   }
 
   if (set.hasArgument(durationArg)) {

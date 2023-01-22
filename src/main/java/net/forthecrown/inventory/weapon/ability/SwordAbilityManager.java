@@ -238,7 +238,7 @@ public class SwordAbilityManager {
     if (input.contains(":")) {
       LocalTime localTime = LocalTime.parse(input);
       long nano = localTime.toNanoOfDay();
-      return TimeUnit.NANOSECONDS.toMillis(nano);
+      return Time.millisToTicks(TimeUnit.NANOSECONDS.toMillis(nano));
     }
 
     try {
