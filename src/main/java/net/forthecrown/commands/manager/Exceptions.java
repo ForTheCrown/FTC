@@ -408,6 +408,9 @@ public interface Exceptions {
   CommandSyntaxException NON_AUTO_APPEAL = create(
       "Can only appeal automatic evictions, this is a staff-created eviction");
 
+  CommandSyntaxException ALTS_CANNOT_OWN
+      = create("Alt-accounts cannot own shops");
+
   static CommandSyntaxException marketTargetStatus(User target) {
     return format("{0, user} cannot change shop ownership at this time.", target);
   }
@@ -483,8 +486,6 @@ public interface Exceptions {
   // --- SECTION: USERS ---
   // ----------------------
 
-  CommandSyntaxException NO_USERS_FOUND = create("No users found");
-
   static CommandSyntaxException unknownUser(StringReader reader, int cursor, String name) {
     return unknown("user",
         GrenadierUtils.correctReader(reader, cursor),
@@ -538,10 +539,6 @@ public interface Exceptions {
 
   CommandSyntaxException CANNOT_INVITE_SELF = create(
       "Cannot invite yourself"
-  );
-
-  CommandSyntaxException RESIDENTS_HIDDEN = create(
-      "This region's residents are hidden"
   );
 
   CommandSyntaxException WAYPOINTS_WRONG_WORLD = create(
@@ -716,10 +713,6 @@ public interface Exceptions {
 
   CommandSyntaxException CANNOT_PAY_SELF = create("You cannot pay yourself.");
 
-  static CommandSyntaxException targetPayDisabled(User user) {
-    return format("{0, user} has disabled paying.", user);
-  }
-
   // ----------------------------------
   // --- SECTION: USER INTERACTIONS ---
   // ----------------------------------
@@ -795,19 +788,11 @@ public interface Exceptions {
 
   CommandSyntaxException NO_ATTR_MODS = create("No attribute modifiers to remove");
 
-  CommandSyntaxException HOLIDAY_NO_REWARDS = create(
-      "Holiday has no rewards to give, no gems, rhines or items"
-  );
-
   CommandSyntaxException NOT_HOLDING_ROYAL_SWORD = create(
       "You must be holding a royal sword"
   );
 
   CommandSyntaxException NO_SIGN_COPY = create("No sign copied");
-
-  CommandSyntaxException IGNORING_STAFF_CHAT = create(
-      "You are ingoring staff chat, do '/sct_visible' to use it again"
-  );
 
   static CommandSyntaxException structureExists(NamespacedKey key) {
     return format("Structure named '{0, key}' already exists", key);
@@ -861,10 +846,6 @@ public interface Exceptions {
 
   CommandSyntaxException REQUIRES_INPUT = create("This type requires input to parse");
 
-  static CommandSyntaxException requiresInput(String thing) {
-    return format("{0} requires input", thing);
-  }
-
   // ---------------------------
   // --- SECTION: CMD EMOTES ---
   // ---------------------------
@@ -916,10 +897,6 @@ public interface Exceptions {
 
   CommandSyntaxException G_NO_PERM_WAYPOINT = create(
       "Cannot change guild waypoint! You do not have permission"
-  );
-
-  CommandSyntaxException G_WAYPOINT_ALREADY_EXISTS = create(
-      "Guild already has a waypoint, remove old one to make a new one!"
   );
 
   CommandSyntaxException G_EXTERNAL_WAYPOINT = create(

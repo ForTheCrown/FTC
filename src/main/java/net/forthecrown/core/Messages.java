@@ -2611,8 +2611,6 @@ public interface Messages {
       .hoverEvent(CLICK_ME)
       .clickEvent(runCommand("/marketappeal"));
 
-  TextComponent MARKET_BOUGHT = text("You bought this shop!", NamedTextColor.YELLOW);
-
   Component UNCLAIM_CONFIRM = format(
       "Are you sure you wish to unclaim your shop? {0}" +
           "\n&cEverything inside will be removed and you won't be able to get it back",
@@ -2631,6 +2629,13 @@ public interface Messages {
       NamedTextColor.RED);
 
   TextComponent MARKET_APPEALED_EVICTION = text("Eviction appealed!", NamedTextColor.YELLOW);
+
+  static Component marketBought(int price) {
+    return format("You bought this shop for &6{0, rhines}&r.",
+        NamedTextColor.YELLOW,
+        price
+    );
+  }
 
   static Component shopTrustSender(User target) {
     return format("Trusted &e{0, user}&r.",

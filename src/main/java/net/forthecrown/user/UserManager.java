@@ -100,7 +100,7 @@ public final class UserManager implements SerializableObject {
 
     // Create user manager helpers
     serializer = new UserJsonSerializer(directory.resolve("data"));
-    alts = new AltUsers(directory.resolve("alts.json"), this);
+    alts = new AltUsers(directory.resolve("alts.json"));
     userLookup = new UserLookup(directory.resolve("profiles.json"));
 
     // Create user data maps
@@ -227,11 +227,7 @@ public final class UserManager implements SerializableObject {
   public User getUser(UserLookupEntry profile) {
     Objects.requireNonNull(profile, "Null player profile given!");
     UUID base = profile.getUniqueId();
-
-    return getLoaded().computeIfAbsent(base, uuid -> {
-      var main = alts.getMain(uuid);
-      return main != null ? new UserAlt(uuid, main) : new User(uuid);
-    });
+    return getLoaded().computeIfAbsent(base, User::new);
   }
 
   /**

@@ -21,11 +21,16 @@ public class InventoryMenuListener implements Listener {
     if (event.getClickedInventory() == null
         || event.getClickedInventory() instanceof PlayerInventory
     ) {
-      menu.onExternalClick(event);
+      try (var ignored = menu.getExternalClickTiming().startTiming()) {
+        menu.onExternalClick(event);
+      }
+
       return;
     }
 
-    menu.onMenuClick(event);
+    try (var ignored = menu.getClickTiming().startTiming()) {
+      menu.onMenuClick(event);
+    }
   }
 
   @EventHandler(ignoreCancelled = true)

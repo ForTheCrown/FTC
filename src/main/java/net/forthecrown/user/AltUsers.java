@@ -14,11 +14,9 @@ import org.bukkit.entity.Player;
 public class AltUsers extends SerializableObject.Json {
 
   private final Map<UUID, UUID> alt2Main = new Object2ObjectOpenHashMap<>();
-  private final UserManager manager;
 
-  public AltUsers(Path filePath, UserManager manager) {
+  public AltUsers(Path filePath) {
     super(filePath);
-    this.manager = manager;
   }
 
   public void save(JsonWrapper json) {
@@ -65,18 +63,6 @@ public class AltUsers extends SerializableObject.Json {
     return false;
   }
 
-  public boolean isMainForAny(UUID id, Collection<Player> players) {
-    List<UUID> alts = getAlts(id);
-
-    for (Player p : players) {
-      if (alts.contains(p.getUniqueId())) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
   public List<UUID> getAlts(UUID main) {
     List<UUID> list = new ObjectArrayList<>();
 
@@ -93,7 +79,7 @@ public class AltUsers extends SerializableObject.Json {
   public void addEntry(UUID alt, UUID main) {
     alt2Main.put(alt, main);
 
-    var user = Users.getLoadedUser(alt);
+    /*var user = Users.getLoadedUser(alt);
 
     // If user is offline or not loaded... for some reason
     // Don't do stuff
@@ -105,12 +91,13 @@ public class AltUsers extends SerializableObject.Json {
     // (getUser automatically returns an alt user
     //  if the user is an alt)
     manager.unload(user);
-    Users.get(alt);
+    Users.get(alt);*/
   }
 
   public void removeEntry(UUID alt) {
     alt2Main.remove(alt);
 
+    /*
     // Same logic as addEntry(UUID, UUID),
     // except with LOADED_ALTS this time
     var user = Users.getLoadedUser(alt);
@@ -119,6 +106,6 @@ public class AltUsers extends SerializableObject.Json {
     }
 
     manager.unload(user);
-    Users.get(alt);
+    Users.get(alt);*/
   }
 }

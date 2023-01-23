@@ -12,6 +12,7 @@ import net.forthecrown.economy.market.MarketShop;
 import net.forthecrown.economy.market.Markets;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.User;
+import net.forthecrown.user.UserManager;
 
 public class CommandTransferShop extends FtcCommand {
 
@@ -97,6 +98,11 @@ public class CommandTransferShop extends FtcCommand {
 
     if (!Markets.canChangeStatus(target)) {
       throw Exceptions.marketTargetStatus(target);
+    }
+
+    var alts = UserManager.get().getAlts();
+    if (alts.isAlt(target.getUniqueId())) {
+      throw Exceptions.ALTS_CANNOT_OWN;
     }
   }
 }

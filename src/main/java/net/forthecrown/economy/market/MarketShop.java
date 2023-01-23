@@ -11,7 +11,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -26,10 +25,10 @@ import net.forthecrown.economy.Economy;
 import net.forthecrown.economy.TransactionType;
 import net.forthecrown.economy.Transactions;
 import net.forthecrown.user.User;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.user.Users;
 import net.forthecrown.user.data.MailMessage;
 import net.forthecrown.user.data.TimeField;
-import net.forthecrown.user.data.UserMarketData;
 import net.forthecrown.utils.Time;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.io.JsonUtils;
@@ -50,8 +49,8 @@ import org.spongepowered.math.vector.Vector3i;
 /**
  * A market shop represents a single player's shop in the spawn region.
  * <p>
- * This system mostly functions by tying these markets to WorldGuard regions and syncing the
- * market's data to the region.
+ * This system mostly functions by tying these markets to WorldGuard regions and
+ * syncing the market's data to the region.
  */
 @RequiredArgsConstructor
 public class MarketShop {
@@ -60,14 +59,13 @@ public class MarketShop {
   public static final int UNSET_PRICE = -1;
 
   /**
-   * The maximum number of scans a shop can have before it starts testing to see if the members
-   * should be evicted.
+   * The maximum number of scans a shop can have before it starts testing to see
+   * if the members should be evicted.
    */
   public static final int MAX_SCANS = 3;
 
   // JSON Keys
   public static final String
-      KEY_NAME = "name",
       KEY_PRICE = "price",
       KEY_ENTRANCES = "entrances",
       KEY_CONNECTED = "connected",
@@ -98,7 +96,8 @@ public class MarketShop {
 
   /**
    * The time stamp of when this shop was purchased, or
-   * {@link net.forthecrown.user.data.UserTimeTracker#UNSET}, if the shop currently has no owner
+   * {@link net.forthecrown.user.data.UserTimeTracker#UNSET}, if the shop
+   * currently has no owner
    */
   @Getter
   @Setter
@@ -136,8 +135,9 @@ public class MarketShop {
   private MarketEviction eviction;
 
   /**
-   * The market's price, {@link #UNSET_PRICE} if unset, calling {@link #getPrice()} when the price
-   * is unset will return {@link MarketConfig#defaultPrice}
+   * The market's price, {@link #UNSET_PRICE} if unset, calling
+   * {@link #getPrice()} when the price is unset will return
+   * {@link MarketConfig#defaultPrice}
    */
   private int price = UNSET_PRICE;
 
@@ -172,7 +172,9 @@ public class MarketShop {
     return Component.text('[' + getName() + ']')
         .color(NamedTextColor.AQUA)
         .hoverEvent(Component.text("Click for info"))
-        .clickEvent(ClickEvent.runCommand("/rg -w \"world\" info " + getName()));
+        .clickEvent(
+            ClickEvent.runCommand("/rg -w \"world\" info " + getName())
+        );
   }
 
   /**
@@ -207,8 +209,9 @@ public class MarketShop {
   }
 
   /**
-   * Gets this shop's price, if this market's {@link #price} field is equal to {@link #UNSET_PRICE}
-   * then this method will return {@link MarketConfig#defaultPrice} instead.
+   * Gets this shop's price, if this market's {@link #price} field is equal to
+   * {@link #UNSET_PRICE} then this method will return
+   * {@link MarketConfig#defaultPrice} instead.
    *
    * @return The shop's effective price
    */
@@ -226,8 +229,8 @@ public class MarketShop {
   /**
    * Sets the shop's eviction data
    * <p>
-   * If there is an already ongoing eviction, it will be cancelled and the given eviction will be
-   * set and started in its stead.
+   * If there is an already ongoing eviction, it will be cancelled and the given
+   * eviction will be set and started in its stead.
    *
    * @param eviction The eviction data to set
    */
@@ -248,7 +251,8 @@ public class MarketShop {
   /**
    * Resets the shop using the data in {@link #getReset()}
    *
-   * @return True, if shop was successfully reset, false if {@link #reset} == null
+   * @return True, if shop was successfully reset, false if {@link #reset} ==
+   * null
    */
   public boolean reset() {
     //Figure out positions for pasting
@@ -267,11 +271,15 @@ public class MarketShop {
    * @throws CommandSyntaxException If the user cannot purchase this shop
    */
   public void attemptPurchase(User user) throws CommandSyntaxException {
-    UserMarketData ownership = user.getMarketData();
-
     //If they already own a shop
     if (Markets.ownsShop(user)) {
       throw Exceptions.MARKET_ALREADY_OWNER;
+    }
+
+    // Alt accounts are not allowed to purchase market shops
+    var alts = UserManager.get().getAlts();
+    if (alts.isAlt(user.getUniqueId())) {
+      throw Exceptions.ALTS_CANNOT_OWN;
     }
 
     // If the shop already has an owner, could be triggered in the
@@ -282,7 +290,7 @@ public class MarketShop {
     }
 
     //Check if they can even buy it
-    Markets.checkCanPurchase(ownership);
+    Markets.checkCanPurchase(user.getMarketData());
     int price = getPrice();
 
     //Check if they can afford it
@@ -301,7 +309,7 @@ public class MarketShop {
         .log();
 
     //Claim it
-    user.sendMessage(Messages.MARKET_BOUGHT);
+    user.sendMessage(Messages.marketBought(price));
     claim(user);
   }
 
@@ -309,8 +317,9 @@ public class MarketShop {
    * Claims this shop for the given user
    * <p>
    * This method will update user's {@link TimeField#MARKET_LAST_ACTION} and
-   * {@link TimeField#MARKET_OWNERSHIP_STARTED} fields. This will also make a copy of the shop 40
-   * blocks under the market itself and then set that to be the shop's {@link #reset}
+   * {@link TimeField#MARKET_OWNERSHIP_STARTED} fields. This will also make a
+   * copy of the shop 40 blocks under the market itself and then set that to be
+   * the shop's {@link #reset}
    * <p>
    * This also updates the shop's entrances and world guard region
    *
@@ -355,14 +364,15 @@ public class MarketShop {
   }
 
   /**
-   * Unclaims the shop and updates the worldguard region, shop entrances and user time field as well
-   * as clearing the scans list and co-owners list.
+   * Unclaims the shop and updates the worldguard region, shop entrances and
+   * user time field as well as clearing the scans list and co-owners list.
    * <p>
-   * If <code>complete == true</code>, then the shop is also reset and the owner's
-   * {@link TimeField#MARKET_OWNERSHIP_STARTED} field is removed.
+   * If <code>complete == true</code>, then the shop is also reset and the
+   * owner's {@link TimeField#MARKET_OWNERSHIP_STARTED} field is removed.
    *
-   * @param complete True to remove the user's {@link TimeField#MARKET_OWNERSHIP_STARTED} field and
-   *                 to reset the shop.
+   * @param complete True to remove the user's
+   *                 {@link TimeField#MARKET_OWNERSHIP_STARTED} field and to
+   *                 reset the shop.
    * @throws IllegalArgumentException If the shop has no owner
    */
   public void unclaim(boolean complete) throws IllegalArgumentException {
@@ -397,9 +407,10 @@ public class MarketShop {
   }
 
   /**
-   * Transfers this shop to the given target. This used to be a separate method for a reason,
-   * however it nows just calls {@link #unclaim(boolean)} with the boolean parameter as false, and
-   * then calls {@link #claim(User)} for the given user.
+   * Transfers this shop to the given target. This used to be a separate method
+   * for a reason, however it nows just calls {@link #unclaim(boolean)} with the
+   * boolean parameter as false, and then calls {@link #claim(User)} for the
+   * given user.
    *
    * @param target The user to transfer the shop to
    * @throws IllegalArgumentException If the shop has no owner
@@ -412,11 +423,12 @@ public class MarketShop {
   /* ----------------------------- MERGING ------------------------------ */
 
   /**
-   * Merges this shop with the given shop and syncs the world guard data of both shops
+   * Merges this shop with the given shop and syncs the world guard data of both
+   * shops
    *
    * @param other The shop to merge with
-   * @throws IllegalArgumentException Thrown either if the shop is already merged, or if the given
-   *                                  shop is this shop
+   * @throws IllegalArgumentException Thrown either if the shop is already
+   *                                  merged, or if the given shop is this shop
    */
   public void merge(MarketShop other) throws IllegalArgumentException {
     Validate.isTrue(!isMerged(), "Shop is already merged");
@@ -430,7 +442,8 @@ public class MarketShop {
   }
 
   /**
-   * Unmerges the shop and syncs the data of both shops to their world guard regions
+   * Unmerges the shop and syncs the data of both shops to their world guard
+   * regions
    *
    * @throws IllegalArgumentException If the shop is not merged
    */
@@ -452,14 +465,17 @@ public class MarketShop {
    * @return This shop's merged shop, or null, if not merged
    */
   public MarketShop getMerged() {
-    return Util.isNullOrBlank(mergedName) ? null : Economy.get().getMarkets().get(mergedName);
+    return Util.isNullOrBlank(mergedName)
+        ? null
+        : Economy.get().getMarkets().get(mergedName);
   }
 
   /**
    * Sets the shop this shop is merged with
    * <p>
-   * Be aware, this is just a setter for a single value, if you're looking for a setter to keep data
-   * between shops synced, use {@link #merge(MarketShop)} and {@link #unmerge()}
+   * Be aware, this is just a setter for a single value, if you're looking for a
+   * setter to keep data between shops synced, use {@link #merge(MarketShop)}
+   * and {@link #unmerge()}
    *
    * @param shop The shop to set, null, to unmerge
    */
@@ -541,18 +557,21 @@ public class MarketShop {
   /**
    * Begins an eviction of this shop.
    * <p>
-   * This will alert the user their shop has been marked for eviction with either a message and/or
-   * sending them a mail, depending on if they're online.
+   * This will alert the user their shop has been marked for eviction with
+   * either a message and/or sending them a mail, depending on if they're
+   * online.
    * <p>
    * Otherwise, it just creates an {@link MarketEviction} instance and calls
    * {@link #setEviction(MarketEviction)}.
    *
    * @param evictionDate The timestamp of when the eviction will occur
    * @param reason       The reason for the eviction
-   * @param source       The text name of the entity issuing the eviction, will either be the staff
-   *                     member's playername of {@link MarketEviction#SOURCE_AUTOMATIC} if it's an
+   * @param source       The text name of the entity issuing the eviction, will
+   *                     either be the staff member's playername of
+   *                     {@link MarketEviction#SOURCE_AUTOMATIC} if it's an
    *                     automatic eviction.
-   * @throws IllegalArgumentException If the shop has no owner or is already marked for eviction
+   * @throws IllegalArgumentException If the shop has no owner or is already
+   *                                  marked for eviction
    */
   public void beginEviction(long evictionDate,
                             Component reason,
@@ -593,11 +612,13 @@ public class MarketShop {
    * <p>
    * Will also inform the user that their shop eviction has been cancelled.
    *
-   * @throws IllegalArgumentException If the shop has no owner or is NOT marked for eviction
+   * @throws IllegalArgumentException If the shop has no owner or is NOT marked
+   *                                  for eviction
    */
   public void stopEviction() throws IllegalArgumentException {
     Validate.isTrue(hasOwner(), "Shop has no owner");
-    Validate.isTrue(markedForEviction(), "Shop '%s' is not marked for eviction", getName());
+    Validate.isTrue(markedForEviction(), "Shop '%s' is not marked for eviction",
+        getName());
 
     setEviction(null);
 
@@ -628,16 +649,18 @@ public class MarketShop {
   }
 
   /**
-   * Called by {@link MarketManager#onDayChange(ZonedDateTime)} to test if the market should start
-   * the automatic eviction process.
+   * Called by {@link MarketManager#onDayChange()} to test if the market should
+   * start the automatic eviction process.
    * <p>
    * This will first test if the user has been online in the past
-   * {@link MarketConfig#maxOfflineTime} time, if not, then it begins the eviction with the
-   * {@link Messages#MARKET_EVICT_INACTIVE} message as the reason for the eviction.
+   * {@link MarketConfig#maxOfflineTime} time, if not, then it begins the
+   * eviction with the {@link Messages#MARKET_EVICT_INACTIVE} message as the
+   * reason for the eviction.
    * <p>
-   * If the aforementioned test passes, then this will scan the shop's signshops, if there is not
-   * enough of them, or if the rate of stocked shop to unstocked shop is higher than
-   * {@link MarketConfig#minStockRequired}, then this begins the automatic eviction.
+   * If the aforementioned test passes, then this will scan the shop's
+   * signshops, if there is not enough of them, or if the rate of stocked shop
+   * to unstocked shop is higher than {@link MarketConfig#minStockRequired},
+   * then this begins the automatic eviction.
    */
   public void validateOwnership() {
     if (!hasOwner()) {
@@ -695,7 +718,8 @@ public class MarketShop {
 
     for (var s : scans) {
       int totalShops = s.stockedCount() + s.unstockedCount();
-      double requiredStock = totalShops * GenericMath.clamp(MarketConfig.minStockRequired, 0, 1);
+      double requiredStock =
+          totalShops * GenericMath.clamp(MarketConfig.minStockRequired, 0, 1);
 
       // If there is enough shops and if enough are in stock
       // skip this scan
@@ -733,8 +757,8 @@ public class MarketShop {
   }
 
   /**
-   * Syncs this shop's members and owner to the world guard, factoring in the shop's merged shop as
-   * well.
+   * Syncs this shop's members and owner to the world guard, factoring in the
+   * shop's merged shop as well.
    */
   public void syncWorldGuard() {
     var members = worldGuard.getMembers();
@@ -830,6 +854,7 @@ public class MarketShop {
 
     if (json.has(KEY_CURRENT_OWNER)) {
       JsonWrapper ownership = json.getWrapped(KEY_CURRENT_OWNER);
+      assert ownership != null;
 
       owner = ownership.getUUID(KEY_OWNER);
       purchaseDate = ownership.getTimeStamp(KEY_PURCHASE_DATE, UNSET);
@@ -845,7 +870,9 @@ public class MarketShop {
       memberEditingAllowed = ownership.getBool(KEY_EDITING, true);
 
       if (ownership.has(KEY_EVICTION)) {
-        setEviction(MarketEviction.deserialize(ownership.get(KEY_EVICTION), this));
+        setEviction(
+            MarketEviction.deserialize(ownership.get(KEY_EVICTION), this)
+        );
       } else {
         setEviction(null);
       }

@@ -17,7 +17,8 @@ public class UserCommands extends CmdUtil {
       new UserTitlesNode(),
       new UserCosmeticsNode(),
       new UserEarningsNode(),
-      new UserTabNode()
+      new UserTabNode(),
+      new UserAltNode()
   };
 
   public static void createCommands() {

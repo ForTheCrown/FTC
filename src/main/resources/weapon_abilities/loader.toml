@@ -157,8 +157,8 @@
 # description = [ "Does a thing" ]
 # maxLevel = 3
 # baseCooldown = 00:00:05
+# useLimit = "250 + (tier * 10)"
 # item = "{id:'minecraft:stick',Count:32b}"
-# recipe = [ "{id:'minecraft:wooden_axe',Count:64b}" ]
 # script = "abilities/ability_script.js"
 # ------------------------------------------------------------------------------
 

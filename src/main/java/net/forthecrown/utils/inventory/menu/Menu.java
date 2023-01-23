@@ -1,11 +1,15 @@
 package net.forthecrown.utils.inventory.menu;
 
+import co.aikar.timings.Timing;
+import co.aikar.timings.Timings;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import java.util.EnumSet;
+import java.util.Objects;
 import lombok.Getter;
 import net.forthecrown.commands.manager.Exceptions;
+import net.forthecrown.core.FTC;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.inventory.FtcInventory;
 import net.forthecrown.user.User;
@@ -13,6 +17,7 @@ import net.forthecrown.user.Users;
 import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.inventory.ItemStacks;
+import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -65,10 +70,15 @@ public class Menu implements InventoryHolder, MenuCloseConsumer {
 
   private final EnumSet<MenuFlag> flags;
 
+  private final Timing clickTiming;
+  private final Timing openTiming;
+  private final Timing externalClickTiming;
+  private final Timing nodeRunTiming;
+
   /* ----------------------------- CONSTRUCTOR ------------------------------ */
 
   Menu(MenuBuilder builder) {
-    this.title = builder.title;
+    this.title = Objects.requireNonNull(builder.title);
     this.size = builder.size;
     this.externalClickCallback = builder.externalClickCallback;
 
@@ -79,6 +89,15 @@ public class Menu implements InventoryHolder, MenuCloseConsumer {
     this.openCallback = builder.openCallback;
     this.closeCallback = builder.closeCallback;
     this.border = builder.border;
+
+    String title = Text.plain(this.title);
+    var p = FTC.getPlugin();
+
+    this.clickTiming = Timings.of(p, title + " Click");
+    this.nodeRunTiming = Timings.of(p, title + " Click.NodeRuntime", clickTiming);
+
+    this.openTiming = Timings.of(p, title + " InvCreate");
+    this.externalClickTiming = Timings.of(p, title + " ExternalClick");
   }
 
   /* ----------------------------- FUNCTIONS ------------------------------ */
@@ -92,11 +111,14 @@ public class Menu implements InventoryHolder, MenuCloseConsumer {
   }
 
   public void open(User user, Context context) {
+    getOpenTiming().startTiming();
     var inventory = createInventory(user, context);
 
     if (openCallback != null) {
       openCallback.onOpen(user, context, inventory);
     }
+
+    getOpenTiming().stopTiming();
 
     user.getPlayer().openInventory(inventory);
   }
@@ -195,12 +217,16 @@ public class Menu implements InventoryHolder, MenuCloseConsumer {
       }
 
       click.node = node;
+
+      getNodeRunTiming().startTiming();
       node.onClick(user, context, click);
     } catch (CommandSyntaxException exc) {
       Exceptions.handleSyntaxException(user, exc);
     } catch (Throwable t) {
       Loggers.getLogger().error("Error running menu click!", t);
     } finally {
+      getNodeRunTiming().stopTiming();
+
       if (click.cancelEvent()) {
         event.setCancelled(true);
       }
