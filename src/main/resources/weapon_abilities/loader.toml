@@ -1,5 +1,8 @@
 # Dynamically loads sword abilities
 #
+# The recipe list for each item is stored inside the 'items.txt' in this
+# directory
+#
 # ------------------------------------------------------------------------------
 # Format:
 # ------------------------------------------------------------------------------
@@ -15,20 +18,6 @@
 #
 # examples:
 # - item = "{id:'minecraft:ender_pearl',Count:1b}"
-# ------------------------------------------------------------------------------
-# 'recipe' (required):
-#  An array of item NBTs. These items are required to craft the ability and then
-#  apply it onto a sword
-#
-#  Please see the previous 'item' section for how to easily get NBT data for
-#  items
-#
-# examples:
-# - recipe = [ "{id:'mincraft:ender_pearl',Count:1b}" ]
-# - recipe = [
-#     "{id:'mincraft:ender_pearl',Count:1b}",
-#     "{id:'mincraft:stone_pickaxe',Count:1b}"
-#   ]
 # ------------------------------------------------------------------------------
 # 'displayName' (required):
 #  The display name shown to users
@@ -54,6 +43,25 @@
 #
 # examples:
 # - maxLevel = 5
+# ------------------------------------------------------------------------------
+# 'advancement' (optional):
+#  The advancement required for the ability
+#
+# examples:
+# - advancement = "minecraft:monsters_hunted"
+# ------------------------------------------------------------------------------
+# 'useLimit' (optional, if genericUseLimit is not set):
+#  Sets the amount of times the ability can be used before it degrades away.
+#
+#  This value accepts either an integer or a JavaScript expression as valid
+#  values. The JS expression must return an integer.
+#
+#  The expression will have access to 2 bindings, a 'user' and a 'tier' value.
+#  The 'tier' value is the user's tier mapped to an integer value of 0 to 3
+#
+# examples:
+# - useLimit = 14
+# - useLimit = "200 + (tier * 15)"
 # ------------------------------------------------------------------------------
 # baseCooldown (required, if 'genericBaseCooldown' is not set):
 #  The base cooldown, in ticks, the ability has. This base is scaled with the
@@ -105,20 +113,6 @@
 # - script = { path = "path/to/script.js" }
 # - script = { js = "print("Hello, world!")" }
 # ------------------------------------------------------------------------------
-# 'condition' (optional):
-#  If a string, assumes input is raw JavaScript, else you can specify if it's a
-#  script path, or a JavaScript code. This value is optional, if not set,
-#  condition will always be true.
-#
-#  The objects placed into the script's bindings are:
-#  - user: the user being tested
-#  - Permissions: Auto-Import of 'net.forthecrown.core.Permissions'
-#
-# examples:
-# - condition = "user.getGuild() != null"
-# - condition = { path = "path/to/script.js" }
-# - condition = { js = "false == false" }
-# ------------------------------------------------------------------------------
 # Script parameters and functions:
 # ------------------------------------------------------------------------------
 # args: binding object, the String[] of arguments supplied by 'inputArgs'
@@ -142,12 +136,13 @@
 # onSave(compoundTag): (optional)
 #  Called when the ability is saved, optional function
 #
-# getCooldown(): (optional)
+# getCooldown(swordRank): (optional)
 #  Called to get a cooldown, optional function
 #  If this function isn't declared, uses the baseCooldown and scales it
 #  to get a cooldown.
 #  This method is allowed to return the same types as the 'baseCooldown' value
 #  in this file.
+#  swordRank is the SwordRank object of the sword that holds the ability
 #
 # displayName(): (optional)
 #  Called to create the ability's displayName, if not declared, uses the
@@ -164,7 +159,6 @@
 # baseCooldown = 00:00:05
 # item = "{id:'minecraft:stick',Count:32b}"
 # recipe = [ "{id:'minecraft:wooden_axe',Count:64b}" ]
-# condition = "user.hasPermission(Permissions.ADMIN)"
 # script = "abilities/ability_script.js"
 # ------------------------------------------------------------------------------
 
@@ -184,6 +178,8 @@ genericMaxLevel = 5
 # Base cooldown value that applies to all abilities, unless they override it
 # with their own value
 genericBaseCooldown = "3s"
+
+genericUseLimit = "250 + (tier * 50)"
 # ------------------------------------------------------------------------------
 
 
@@ -192,44 +188,46 @@ genericBaseCooldown = "3s"
 # ------------------------------------------------------------------------------
 ['ender_pearl']
 displayName = "Ender Pearl"
-description = [ "Throws an Ender Pearl on Right-Click" ]
+description = [
+  "Throws an Ender Pearl on Right-Click"
+]
+advancement = "minecraft:adventure/bullseye"
 maxLevel = 3
 script = "abilities/ender_pearl.js"
 item = "{id:\"minecraft:ender_pearl\",Count:1b}"
-recipe = [
-  "{id:\"minecraft:ender_pearl\",Count:1b}"
-]
 
 ["twirl"]
 displayName = "Twirl"
-description = [ "Damages all entities around you in a swirl" ]
+description = [
+  "Damages all entities around you in a swirl"
+]
+useLimit = "150 + (tier * 50)"
+advancement = "minecraft:nether/loot_bastion"
 maxLevel = 3
 script = "abilities/twirl.js"
 item = "{id:'minecraft:feather',Count:1b}"
-recipe = [
-  "{id:'minecraft:feather',Count:64b}"
-]
 
 ["dash"]
 displayName = "Dash"
-description = [ "Gives you a little boost" ]
+description = [
+  "Gives you a little boost"
+]
+useLimit = "350 + (tier * 50)"
+advancement = "minecraft:adventure/adventuring_time"
 script = "abilities/dash.js"
 baseCooldown = 00:00:05
 item = "{id:'minecraft:iron_boots',Count:1b}"
-recipe = [
-  "{id:'minecraft:iron_boots',Count:1b}"
-]
 
 ["far_reach"]
 displayName = "Far Reach"
-description = [ "Allows you to hit entities up to 5 blocks away" ]
+description = [
+  "Allows you to hit entities up to 5 blocks away"
+]
+advancement = "minecraft:adventure/sniper_duel"
 script = "abilities/far_reach.js"
 # Each level increases distance
 maxLevel = 2
 item = "{id:'minecraft:iron_sword',Count:1b}"
-recipe = [
-  "{id:'minecraft:iron_sword',Count:1b}"
-]
 
 # Note on potion types: They don't use the ResourceLocation names, eg:
 # 'minecraft:regeneration' for the '--potion-type' values, they use the 'names'
@@ -237,30 +235,31 @@ recipe = [
 # I got tired of over-engineering the potion_effect.js script, so goodluck
 ["potion/regeneration"]
 displayName = "Regeneration"
-description = [ "Gives you regen on Right-Click" ]
-script = "abilities/potion_effect.js"
-inputArgs = "--potion-type=REGENERATION --duration=5s"
-item = "{Count:1b,id:'minecraft:potion',tag:{Potion:'minecraft:regeneration'}}"
-recipe = [
-  "{Count:1b,id:'minecraft:potion',tag:{Potion:'minecraft:regeneration'}}"
+description = [
+  "Gives you regen on Right-Click"
 ]
+advancement = "minecraft:nether/all_effects"
+inputArgs = "--potion-type=REGENERATION --duration=5s"
+script = "abilities/potion_effect.js"
+item = "{Count:1b,id:'minecraft:potion',tag:{Potion:'minecraft:regeneration'}}"
 
 ["potion/strength"]
 displayName = "Strength"
-description = [ "Gives you Strength on Right-Click" ]
-script = "abilities/potion_effect.js"
-inputArgs = "--potion-type=INCREASE_DAMAGE --duration=4s"
-item = "{Count:1b,id:'minecraft:potion',tag:{Potion:'minecraft:strength'}}"
-recipe = [
-  "{Count:1b,id:'minecraft:potion',tag:{Potion:'minecraft:strength'}}"
+description = [
+  "Gives you Strength on Right-Click"
 ]
+advancement = "minecraft:adventure/kill_all_mobs"
+inputArgs = "--potion-type=INCREASE_DAMAGE --duration=4s"
+script = "abilities/potion_effect.js"
+item = "{Count:1b,id:'minecraft:potion',tag:{Potion:'minecraft:strength'}}"
 
 ["potion/weakness"]
 displayName = "Weakness"
-description = [ "Gives an enemy weakness on Left-Click" ]
-script = "abilities/potion_effect.js"
-inputArgs = "--potion-type=WEAKNESS --duration=5s --left-click --give-target"
-item = "{Count:1b,id:'minecraft:potion',tag:{Potion:'minecraft:weakness'}}"
-recipe = [
-  "{Count:1b,id:'minecraft:potion',tag:{Potion:'minecraft:weakness'}}"
+description = [
+  "Gives an enemy weakness on Left-Click"
 ]
+advancement = "minecraft:adventure/kill_mob_near_sculk_catalyst"
+useLimit = "150 + (tier * 50)"
+inputArgs = "--potion-type=WEAKNESS --duration=5s --left-click --give-target"
+script = "abilities/potion_effect.js"
+item = "{Count:1b,id:'minecraft:potion',tag:{Potion:'minecraft:weakness'}}"

@@ -3026,8 +3026,9 @@ public interface Messages {
   /* ---------------------------- CHALLENGES ----------------------------- */
 
   static Component challengeCompleted(Challenge challenge, User user) {
-    return format("Completed challenge &e{0}&r.",
+    return format("Completed {0} challenge &e{1}&r.",
         NamedTextColor.GRAY,
+        challenge.getResetInterval().getDisplayName(),
         challenge.displayName(user)
     );
   }

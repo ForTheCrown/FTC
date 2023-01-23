@@ -7,12 +7,16 @@ import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.DataResult;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
 import lombok.Getter;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnEnable;
@@ -20,23 +24,22 @@ import net.forthecrown.core.module.OnLoad;
 import net.forthecrown.core.registry.Keys;
 import net.forthecrown.core.registry.Registries;
 import net.forthecrown.core.registry.Registry;
-import net.forthecrown.core.script2.Script;
 import net.forthecrown.core.script2.ScriptSource;
 import net.forthecrown.grenadier.types.ArrayArgument;
 import net.forthecrown.grenadier.types.TimeArgument;
-import net.forthecrown.inventory.weapon.ability.WeaponScriptAbility.ScriptAbilityFactory;
-import net.forthecrown.user.User;
 import net.forthecrown.utils.Time;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.io.FtcJar;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.forthecrown.utils.io.PathUtil;
-import net.forthecrown.utils.io.Results;
 import net.forthecrown.utils.io.SerializationHelper;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.logging.log4j.Logger;
+import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.ItemStack;
 
+@Getter
 public class SwordAbilityManager {
 
   private static final Logger LOGGER = Loggers.getLogger();
@@ -44,27 +47,29 @@ public class SwordAbilityManager {
   @Getter
   private static final SwordAbilityManager instance = new SwordAbilityManager();
 
-  @Getter
   private final Registry<WeaponAbilityType> registry = Registries.newRegistry();
 
-  @Getter
+  private final Path directory;
   private final Path loaderFile;
+  private final Path itemListFile;
 
   private final ArrayArgument<Long> timeParser;
 
-  @Getter
   private boolean enabled;
 
   public SwordAbilityManager() {
-    this.loaderFile = PathUtil.pluginPath("weapon_abilities.toml");
-    timeParser = ArrayArgument.of(TimeArgument.time());
+    this.directory = PathUtil.getPluginDirectory("weapon_abilities");
+    this.loaderFile = directory.resolve("loader.toml");
+    this.itemListFile = directory.resolve("items.txt");
+
+    this.timeParser = ArrayArgument.of(TimeArgument.time());
   }
 
   @OnEnable
   void init() throws IOException {
     FtcJar.saveResources(
-        "weapon_abilities.toml",
-        getLoaderFile(),
+        "weapon_abilities",
+        getDirectory(),
         ALLOW_OVERWRITE | OVERWRITE_IF_NEWER
     );
   }
@@ -72,6 +77,14 @@ public class SwordAbilityManager {
   @OnLoad
   public void loadAbilities() {
     registry.clear();
+
+    Map<String, List<ItemStack>> itemLists;
+    try {
+      itemLists = readItemListFile();
+    } catch (IOException exc) {
+      LOGGER.error("Couldn't read item list file", exc);
+      return;
+    }
 
     var path = getLoaderFile();
     SerializationHelper.readTomlAsJson(path, wrapper -> {
@@ -84,6 +97,14 @@ public class SwordAbilityManager {
       int genericMaxLevel = wrapper.getInt("genericMaxLevel", -1);
       wrapper.remove("genericMaxLevel");
 
+      UseLimit genericUseLimit;
+      if (wrapper.has("genericUseLimit")) {
+        genericUseLimit = UseLimit.load(wrapper.get("genericUseLimit"));
+        wrapper.remove("genericUseLimit");
+      } else {
+        genericUseLimit = null;
+      }
+
       for (var e: wrapper.entrySet()) {
         var key = e.getKey();
 
@@ -92,7 +113,14 @@ public class SwordAbilityManager {
           continue;
         }
 
-        deserialize(e.getValue(), genericCooldown, genericMaxLevel)
+        deserialize(
+            e.getKey(),
+            e.getValue(),
+            genericCooldown,
+            genericMaxLevel,
+            genericUseLimit,
+            itemLists
+        )
             .resultOrPartial(s -> {
               LOGGER.error("Couldn't deserialize ability {}: {}", key, s);
             })
@@ -103,9 +131,12 @@ public class SwordAbilityManager {
   }
 
   DataResult<WeaponAbilityType> deserialize(
+      String registryKey,
       JsonElement element,
       long genericBaseCooldown,
-      int genericMaxLevel
+      int genericMaxLevel,
+      UseLimit genericUseLimit,
+      Map<String, List<ItemStack>> itemMap
   ) {
     if (element == null || !element.isJsonObject()) {
       return DataResult.error("Element was not a object/table");
@@ -115,7 +146,6 @@ public class SwordAbilityManager {
 
     // Ensure all required keys are present
     var missing = missingKey(json, "item")
-        .or(() -> missingKey(json, "recipe"))
         .or(() -> missingKey(json, "displayName"))
         .or(() -> missingKey(json, "script"));
 
@@ -135,6 +165,12 @@ public class SwordAbilityManager {
       );
     }
 
+    if (genericUseLimit == null && !json.has("useLimit")) {
+      return DataResult.error(
+          "Generic useLimit is unset and no 'useLimit' value is set"
+      );
+    }
+
     var builder = WeaponAbilityType.builder()
         .maxLevel(json.getInt("maxLevel", genericMaxLevel))
         .displayName(json.getComponent("displayName"))
@@ -143,54 +179,79 @@ public class SwordAbilityManager {
     json.getList("description", JsonUtils::readText)
         .forEach(builder::addDesc);
 
-    var items = json.getList("recipe", JsonUtils::readItem);
-    var it = items.listIterator();
-
-    while (it.hasNext()) {
-      int i = it.nextIndex();
-      var n = it.next();
-
-      if (ItemStacks.isEmpty(n)) {
-        return Results.errorResult("Item at index %s in recipe is empty", i);
-      }
-
-      builder.addItem(n);
-    }
-
     if (ItemStacks.isEmpty(builder.item())) {
       return DataResult.error("Item at 'item' is empty!");
     }
 
-    if (json.has("condition")) {
-      Script script = Script.read(json.get("condition"), true);
-      script.compile();
-
-      Predicate<User> predicate = user -> {
-        script.put("user", user);
-        var result = script.eval();
-        script.getMirror().remove("user");
-
-        return result.asBoolean()
-            .orElse(false);
-      };
-
-      builder.condition(predicate);
+    if (json.has("advancement")) {
+      NamespacedKey key = json.getKey("advancement");
+      builder.advancementKey(key);
     }
 
-    long baseCooldown;
+    if (json.has("useLimit")) {
+      builder.limit(UseLimit.load(json.get("useLimit")));
+    } else {
+      builder.limit(genericUseLimit);
+    }
 
     if (json.has("baseCooldown")) {
-      baseCooldown = readTicks(json.get("baseCooldown"));
+      builder.baseCooldown(readTicks(json.get("baseCooldown")));
     } else {
-      baseCooldown = genericBaseCooldown;
+      builder.baseCooldown(genericBaseCooldown);
     }
 
-    ScriptSource source = ScriptSource.readSource(json.get("script"), false);
-    String[] inputArgs = getArgs(json.get("inputArgs"));
+    var list = itemMap.get(registryKey);
 
-    builder.factory(new ScriptAbilityFactory(baseCooldown, source, inputArgs));
+    if (list == null) {
+      return DataResult.error("No items found");
+    }
+
+    list.forEach(builder::addItem);
+
+    builder
+        .source(ScriptSource.readSource(json.get("script"), false))
+        .args(getArgs(json.get("inputArgs")));
 
     return DataResult.success(builder.build());
+  }
+
+  Map<String, List<ItemStack>> readItemListFile() throws IOException {
+    Map<String, List<ItemStack>> map = new Object2ObjectOpenHashMap<>();
+
+    var reader = Files.newBufferedReader(getItemListFile());
+    String section = null;
+
+    String line;
+    while ((line = reader.readLine()) != null) {
+      line = line.trim();
+
+      if (line.startsWith("#") || line.isBlank()) {
+        continue;
+      }
+
+      if (line.endsWith(":")) {
+        section = line.substring(0, line.length() - 1);
+        map.computeIfAbsent(section, s -> new ArrayList<>());
+        continue;
+      }
+
+      if (section == null) {
+        throw new IOException("Item found outside of section");
+      }
+
+      ItemStack item = ItemStacks.fromNbtString(line);
+
+      if (ItemStacks.isEmpty(item)) {
+        throw new IOException(
+            String.format("Item in section '%s' is empty", section)
+        );
+      }
+
+      map.computeIfAbsent(section, s -> new ArrayList<>()).add(item);
+    }
+
+    reader.close();
+    return map;
   }
 
   String[] getArgs(JsonElement element) {

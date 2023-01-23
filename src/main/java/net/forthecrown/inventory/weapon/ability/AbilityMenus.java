@@ -70,7 +70,7 @@ public class AbilityMenus extends MenuPage {
 
   private static final ItemStack NO_ABILITY_ITEM
       = ItemStacks.builder(Material.RED_STAINED_GLASS_PANE)
-      .setName("&cNo ability")
+      .setName("&cNo upgrade")
       .build();
 
   public static final ContextSet SET = ContextSet.create();
@@ -98,7 +98,7 @@ public class AbilityMenus extends MenuPage {
     Menus.makeUnstackable(NO_ABILITY_ITEM);
 
     var builder = Menus.builder(Menus.sizeFromRows(5))
-        .setTitle("Weapon abilities")
+        .setTitle("Weapon upgrades")
         .addFlag(MenuFlag.PREVENT_ITEM_STACKING)
         .addFlag(MenuFlag.ALLOW_ITEM_MOVING)
         .addFlag(MenuFlag.ALLOW_SHIFT_CLICKING);
@@ -115,8 +115,7 @@ public class AbilityMenus extends MenuPage {
 
   @Override
   protected void createMenu(MenuBuilder builder) {
-    List<Slot> fillSkips = new ArrayList<>();
-    fillSkips.addAll(RESERVED_SLOTS);
+    List<Slot> fillSkips = new ArrayList<>(RESERVED_SLOTS);
     fillSkips.add(RECIPE_LIST_SLOT);
     fillSkips.add(ABILITY_SLOT);
     fillSkips.add(ANIM_TOGGLE_SLOT);
@@ -178,6 +177,10 @@ public class AbilityMenus extends MenuPage {
               // happens
               Tasks.runLater(() -> {
                 var item = click.getNode().createItem(user, context);
+
+                assert item != null
+                    : "Animation skip toggle produced null item";
+
                 Menus.makeUnstackable(item);
 
                 var view = click.getView();
@@ -218,6 +221,8 @@ public class AbilityMenus extends MenuPage {
                   ItemStack item = click.getInventory().getItem(SWORD_SLOT);
                   RoyalSword sword = ExtendedItems.ROYAL_SWORD.get(item);
 
+                  assert sword != null : "Sword is somehow null";
+
                   WeaponAbility existingAbility = sword.getAbility();
 
                   // Warn if overriding existing ability
@@ -229,12 +234,12 @@ public class AbilityMenus extends MenuPage {
 
                     user.sendMessage(
                         Text.format(
-                            "Your sword has the {0} ability, "
-                                + "adding {1} will override the first ability!"
-                                + "\n&eClick again to override ability",
+                            "Your sword has the {0} upgrade, "
+                                + "adding {1} will override the first upgrade!"
+                                + "\n&eClick again to override upgrade",
 
-                            existingAbility.getType().fullDisplayName(),
-                            abilityType.getValue().fullDisplayName()
+                            existingAbility.getType().fullDisplayName(user),
+                            abilityType.getValue().fullDisplayName(user)
                         )
                     );
 
@@ -249,7 +254,7 @@ public class AbilityMenus extends MenuPage {
                     sword.setAbility(abilityType.getValue().create());
 
                     user.sendMessage(
-                        Text.format("Set sword's ability to &e{0}&r.",
+                        Text.format("Set sword's upgrade to &e{0}&r.",
                             NamedTextColor.GOLD,
                             sword.getAbility().displayName()
                         )
@@ -378,7 +383,7 @@ public class AbilityMenus extends MenuPage {
                                         @NotNull Context context
   ) {
     return ItemStacks.builder(Material.BREWING_STAND)
-        .setName("&eAbility crafting menu")
+        .setName("&Upgrade crafting menu")
         .addLore("&7Back to main menu")
         .build();
   }
@@ -444,11 +449,20 @@ public class AbilityMenus extends MenuPage {
         = SwordAbilityManager.getInstance().getRegistry().entries()
         .stream()
         .filter(holder -> {
-          if (!holder.getValue().test(user)) {
-            return false;
+          var val = holder.getValue();
+          var advancement = val.getAdvancement();
+
+          if (advancement != null) {
+            boolean hasAdvancement = user.getPlayer()
+                .getAdvancementProgress(advancement)
+                .isDone();
+
+            if (!hasAdvancement) {
+              return false;
+            }
           }
 
-          ImmutableList<ItemStack> recipe = holder.getValue().getRecipe();
+          ImmutableList<ItemStack> recipe = val.getRecipe();
 
           if (items.size() != recipe.size()) {
             return false;

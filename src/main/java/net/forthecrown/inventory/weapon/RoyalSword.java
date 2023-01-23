@@ -219,9 +219,9 @@ public class RoyalSword extends ExtendedItem {
       writer.line(BORDER);
     }
 
-    if (ability != null) {
+    if (ability != null && hasPlayerOwner()) {
       writer.newLine();
-      ability.write(writer);
+      ability.write(writer, getOwnerUser());
       writer.newLine();
       writer.newLine();
     }

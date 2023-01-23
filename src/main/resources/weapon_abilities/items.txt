@@ -1,0 +1,57 @@
+# Contains a recipe item list for all abilities.
+# Each line ending in ':' is considered a section beginning
+# and each proceeding non-empty non-comment line is considered
+# a part of the list of items in the section
+
+ender_pearl:
+{Count:1b,id:"minecraft:player_head",tag:{SkullOwner:{Id:[I;12782162,-588822498,-1170731033,1974792938],Name:"Endermite",Properties:{textures:[{Value:"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGM2YjY1YzIyYjQ0NjViYTY3OTNiMjE5NWNkNTA4NGNlODNiODhkY2E2ZTU1ZWI5NDg0NTQwYWNkNzM1MmE1MCJ9fX0="}]}}}}
+{Count:1b,id:"minecraft:chorus_flower"}
+{Count:1b,id:"minecraft:ender_eye"}
+{Count:1b,id:"minecraft:dragon_egg"}
+{Count:1b,id:"minecraft:diamond_block"}
+{Count:1b,id:"minecraft:warped_hyphae"}
+
+twirl:
+{Count:1b,id:"minecraft:sculk_sensor"}
+{Count:1b,id:"minecraft:chain"}
+{Count:1b,id:"minecraft:budding_amethyst"}
+{Count:1b,id:"minecraft:compass"}
+
+dash:
+{Count:1b,id:"minecraft:rabbit_foot"}
+{Count:1b,id:"minecraft:enchanted_golden_apple"}
+{Count:1b,id:"minecraft:lingering_potion",tag:{Potion:"minecraft:strong_swiftness"}}
+{Count:1b,id:"minecraft:dragon_head"}
+
+far_reach:
+{Count:1b,id:"minecraft:enchanted_golden_apple"}
+{Count:1b,id:"minecraft:lead"}
+{Count:1b,id:"minecraft:fishing_rod",tag:{Damage:0}}
+
+potion/regeneration:
+{Count:1b,id:"minecraft:nether_star"}
+{Count:1b,id:"minecraft:conduit"}
+
+potion/strength:
+{Count:1b,id:"minecraft:netherite_ingot"}
+{Count:1b,id:"minecraft:echo_shard"}
+{Count:1b,id:"minecraft:player_head",tag:{SkullOwner:{Id:[I;-1179055889,425870002,-1373572226,1177565319],Name:"Piglin Brute",Properties:{textures:[{Value:"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjQ4ODc5OWM4M2VjYjI5NDUyY2ViYTg5YzNjMDA5OTIxOTI3NGNlNWIyYmZiOGFkMGIzZWE0YzY1ZmFjNDYzMCJ9fX0="}]}}}}
+
+potion/weakness:
+{Count:1b,id:"minecraft:fermented_spider_eye"}
+{Count:1b,id:"minecraft:pufferfish"}
+{Count:1b,id:"minecraft:music_disc_11"}
+{Count:1b,id:"minecraft:poisonous_potato"}
+{Count:1b,id:"minecraft:suspicious_stew",tag:{Effects:[{EffectDuration:160,EffectId:15b}]}}
+{Count:1b,id:"minecraft:sweet_berries"}
+
+tnt:
+{Count:1b,id:"minecraft:creeper_head"}
+{Count:1b,id:"minecraft:tnt"}
+{Count:1b,id:"minecraft:firework_rocket",tag:{Fireworks:{Flight:3b}}}
+{Count:1b,id:"minecraft:end_crystal"}
+{Count:1b,id:"minecraft:disc_fragment_5"}
+{Count:1b,id:"minecraft:tnt_minecart"}
+
+powerball:
+{Count:64b,id:"minecraft:dragon_breath"}

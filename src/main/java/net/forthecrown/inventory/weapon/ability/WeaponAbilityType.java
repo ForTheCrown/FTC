@@ -5,43 +5,60 @@ import static net.forthecrown.inventory.weapon.ability.WeaponAbility.START_LEVEL
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import java.util.Objects;
-import java.util.function.Predicate;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import net.forthecrown.core.script2.Script;
+import net.forthecrown.core.script2.ScriptSource;
 import net.forthecrown.user.User;
-import net.forthecrown.utils.inventory.BaseItemBuilder;
 import net.forthecrown.utils.inventory.ItemStacks;
-import net.forthecrown.utils.text.TextJoiner;
+import net.forthecrown.utils.text.writer.TextWriter;
+import net.forthecrown.utils.text.writer.TextWriters;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
 import net.minecraft.nbt.CompoundTag;
 import org.apache.commons.lang3.Validate;
+import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
+import org.bukkit.advancement.Advancement;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
 @Getter
 @RequiredArgsConstructor
-public class WeaponAbilityType implements Predicate<User> {
-  private final Factory factory;
+public class WeaponAbilityType {
   private final ImmutableList<ItemStack> recipe;
   private final ItemStack item;
   private final int maxLevel;
 
-  private final Predicate<User> condition;
-
   private final Component displayName;
   private final ImmutableList<Component> description;
 
+  private final ScriptSource source;
+  private final long baseCooldown;
+  private final String[] args;
+
+  private final NamespacedKey advancementKey;
+
+  private final UseLimit limit;
+
   public WeaponAbilityType(Builder builder) {
-    this.factory = Objects.requireNonNull(builder.factory);
     this.recipe = builder.items.build();
     this.item = builder.item;
     this.maxLevel = builder.maxLevel;
-    this.condition = Objects.requireNonNull(builder.condition);
 
     this.displayName = Objects.requireNonNull(builder.displayName);
     this.description = builder.description.build();
+
+    this.limit = Objects.requireNonNull(builder.limit);
+
+    this.source = Objects.requireNonNull(builder.source);
+    this.args = Objects.requireNonNull(builder.args);
+
+    this.advancementKey = builder.advancementKey;
+    this.baseCooldown = builder.baseCooldown;
 
     // Check arguments
     Preconditions.checkArgument(
@@ -50,8 +67,12 @@ public class WeaponAbilityType implements Predicate<User> {
     );
     Preconditions.checkArgument(
         ItemStacks.notEmpty(item),
-        "Cannot have empty item")
-    ;
+        "Cannot have empty item"
+    );
+    Preconditions.checkArgument(
+        baseCooldown >= 0,
+        "Negative base cooldown"
+    );
   }
 
   public static Builder builder() {
@@ -59,7 +80,14 @@ public class WeaponAbilityType implements Predicate<User> {
   }
 
   public WeaponAbility create() {
-    return factory.newAbility(this);
+    var script = Script.of(source);
+    script.compile(args);
+    script.put("baseCooldown", baseCooldown);
+    script.put("abilityType", this);
+
+    script.eval().throwIfError();
+
+    return new WeaponAbility(this, script);
   }
 
   public WeaponAbility load(CompoundTag tag) {
@@ -72,30 +100,60 @@ public class WeaponAbilityType implements Predicate<User> {
     return item.clone();
   }
 
-  public Component fullDisplayName() {
+  public Component fullDisplayName(User user) {
+    var writer = TextWriters.newWriter();
+    writer.setFieldStyle(Style.style(NamedTextColor.GRAY));
+
+    writeHover(writer, user);
+
     return displayName
         .colorIfAbsent(NamedTextColor.YELLOW)
-        .hoverEvent(
-            TextJoiner.onNewLine()
-                .setColor(NamedTextColor.GRAY)
-                .add(description)
-                .asComponent()
-        );
+        .hoverEvent(writer.asComponent());
   }
 
-  public BaseItemBuilder<?> createDisplayItem() {
+  public ItemStack createDisplayItem(User user) {
     var builder = ItemStacks.toBuilder(getItem());
     builder.setName(getDisplayName().colorIfAbsent(NamedTextColor.YELLOW));
-    description.forEach(component -> {
-      builder.addLore(component.colorIfAbsent(NamedTextColor.GRAY));
-    });
 
-    return builder;
+    var writer = TextWriters.loreWriter();
+    writeHover(writer, user);
+    builder.addLore(writer.getLore());
+
+    builder.addFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
+
+    return builder.build();
   }
 
-  @Override
-  public boolean test(User input) {
-    return condition.test(input);
+  private void writeHover(TextWriter writer, User user) {
+    description.forEach(component -> {
+      writer.line(component.colorIfAbsent(NamedTextColor.GRAY));
+    });
+
+    var adv = getAdvancement();
+
+    if (adv == null) {
+      return;
+    }
+
+    if (!description.isEmpty()) {
+      writer.newLine();
+      writer.newLine();
+    }
+
+    writer.field("Requires",
+        adv.displayName()
+            .color(
+                user.getPlayer().getAdvancementProgress(adv).isDone()
+                    ? NamedTextColor.YELLOW
+                    : NamedTextColor.GRAY
+            )
+    );
+  }
+
+  public Advancement getAdvancement() {
+    return advancementKey == null
+        ? null
+        : Bukkit.getAdvancement(advancementKey);
   }
 
   /* ------------------------- OBJECT OVERRIDES --------------------------- */
@@ -110,14 +168,19 @@ public class WeaponAbilityType implements Predicate<User> {
     }
 
     return getMaxLevel() == that.getMaxLevel()
-        && getFactory().equals(that.getFactory())
         && getRecipe().equals(that.getRecipe())
-        && getItem().equals(that.getItem());
+        && getItem().equals(that.getItem())
+        && Objects.equals(getAdvancementKey(), that.getAdvancementKey());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(getFactory(), getRecipe(), getItem(), getMaxLevel());
+    return Objects.hash(
+        getRecipe(),
+        getItem(),
+        getMaxLevel(),
+        getAdvancementKey()
+    );
   }
 
   /* ------------------------------ BUILDER ------------------------------- */
@@ -132,14 +195,18 @@ public class WeaponAbilityType implements Predicate<User> {
     final ImmutableList.Builder<Component> description
         = ImmutableList.builder();
 
-    Factory factory;
-
     ItemStack item;
     int maxLevel;
 
-    Predicate<User> condition = user -> true;
-
     Component displayName;
+
+    ScriptSource source;
+    long baseCooldown;
+    String[] args;
+
+    NamespacedKey advancementKey;
+
+    UseLimit limit;
 
     public Builder addItem(ItemStack item) {
       Validate.isTrue(ItemStacks.notEmpty(item), "Empty item given");
@@ -156,10 +223,5 @@ public class WeaponAbilityType implements Predicate<User> {
     public WeaponAbilityType build() {
       return new WeaponAbilityType(this);
     }
-  }
-
-  @FunctionalInterface
-  public interface Factory {
-    WeaponAbility newAbility(WeaponAbilityType type);
   }
 }

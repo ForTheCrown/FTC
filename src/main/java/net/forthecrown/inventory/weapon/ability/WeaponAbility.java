@@ -1,11 +1,17 @@
 package net.forthecrown.inventory.weapon.ability;
 
+import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
+import net.forthecrown.core.script2.Script;
+import net.forthecrown.core.script2.ScriptResult;
 import net.forthecrown.inventory.weapon.RoyalSword;
-import net.forthecrown.inventory.weapon.SwordConfig;
+import net.forthecrown.inventory.weapon.SwordRank;
+import net.forthecrown.inventory.weapon.SwordRanks;
+import net.forthecrown.user.User;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.nbt.CompoundTag;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -16,35 +22,80 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.math.GenericMath;
 
 @Getter @Setter
-public abstract class WeaponAbility {
+public class WeaponAbility {
   public static final String TAG_LEVEL = "level";
+  public static final String TAG_USES = "uses";
+
   public static final int START_LEVEL = 1;
 
   protected int level = START_LEVEL;
-  private final WeaponAbilityType type;
+  protected int uses = 0;
 
-  public WeaponAbility(WeaponAbilityType type) {
+  private final WeaponAbilityType type;
+  private final Script script;
+
+  public WeaponAbility(WeaponAbilityType type, Script script) {
     this.type = type;
+    this.script = script;
+
+    assert script.isCompiled() : "Script not compiled when given to ability";
+    setLevel(START_LEVEL);
+    setUses(0);
   }
 
   public Component displayName() {
-    return getType().fullDisplayName();
+    return getType().getDisplayName()
+        .colorIfAbsent(NamedTextColor.GRAY);
   }
 
-  public void write(TextWriter writer) {
+  public void write(TextWriter writer, User user) {
     writer.write(displayName());
 
     if (level > START_LEVEL) {
-      writer.formatted(" {0, number, -roman}", level);
+      writer.formatted(" {0, number, -roman}", NamedTextColor.GRAY, level);
     }
+
+    writer.formatted(" {0, number} / {1, number}",
+        NamedTextColor.GRAY,
+        uses, getType().getLimit().get(user)
+    );
   }
 
-  public abstract long getCooldownTicks();
+  public long getCooldownTicks(SwordRank rank) {
+    return script.invokeIfExists("getCooldown", rank)
+        .flatMap(ScriptResult::result)
+        .flatMap(o -> {
+          if (o instanceof String str) {
+            return Optional.of(
+                SwordAbilityManager.getInstance()
+                    .parseTicks(str)
+            );
+          }
 
-  protected long scaledCooldown(long baseDuration) {
-    float level = getLevel();
-    float mod = SwordConfig.swordAbilityCooldownScalar / level;
-    return GenericMath.floor(baseDuration * mod);
+          if (o instanceof Number number) {
+            return Optional.of(number.longValue());
+          }
+
+          return Optional.empty();
+        })
+
+        .orElseGet(() -> scaledCooldown(type.getBaseCooldown(), rank));
+  }
+
+  protected long scaledCooldown(long baseDuration, SwordRank rank) {
+    float max = SwordRanks.MAX_RANK;
+    float scalar = (max - rank.getIndex()) / max;
+    return GenericMath.floor(scalar * baseDuration);
+  }
+
+  public void setLevel(int level) {
+    this.level = level;
+    script.put("level", level);
+  }
+
+  public void setUses(int uses) {
+    this.uses = uses;
+    script.put("uses", uses);
   }
 
   /* ----------------------------- CALLBACKS ------------------------------ */
@@ -58,10 +109,12 @@ public abstract class WeaponAbility {
    * @param clickedBlock
    * @return True, if the item should be placed on cooldown, false otherwise
    */
-  public abstract boolean onRightClick(Player player,
-                                       @Nullable Entity clicked,
-                                       @Nullable Block clickedBlock
-  );
+  public boolean onRightClick(Player player,
+                              @Nullable Entity clicked,
+                              @Nullable Block clickedBlock
+  ) {
+    return invokeClickCallback("onRightClick", player, clicked, clickedBlock);
+  }
 
   /**
    * Left-click callback, triggered when the player left-clicks a block, entity
@@ -73,25 +126,42 @@ public abstract class WeaponAbility {
    * @param clickedBlock
    * @return True, if the item should be placed on cooldown, false otherwise
    */
-  public abstract boolean onLeftClick(Player player,
-                                      @Nullable Entity clicked,
-                                      @Nullable Block clickedBlock
-  );
+  public boolean onLeftClick(Player player,
+                             @Nullable Entity clicked,
+                             @Nullable Block clickedBlock
+  ) {
+    return invokeClickCallback("onLeftClick", player, clicked, clickedBlock);
+  }
+
+  private boolean invokeClickCallback(String method, Player player,
+                                      @Nullable Entity entity,
+                                      @Nullable Block block
+  ) {
+    Object clickedInput = block == null ? entity : block;
+
+    // Default to true, as that will cause a weapon cooldown, which should
+    // happen, if the method wasn't declared, or failed, or didn't return
+    // a result
+    return script.invokeIfExists(method, player, clickedInput)
+        .flatMap(ScriptResult::asBoolean)
+        .orElse(true);
+  }
 
   /* --------------------------- SERIALIZATION ---------------------------- */
 
   public void load(CompoundTag tag) {
     setLevel(tag.getInt(TAG_LEVEL));
-    loadAdditional(tag);
+    setUses(tag.getInt(TAG_USES));
+
+    script.invokeIfExists("onLoad", tag);
   }
 
   public void save(CompoundTag tag) {
     tag.putInt(TAG_LEVEL, getLevel());
-    saveAdditional(tag);
-  }
+    tag.putInt(TAG_USES, getUses());
 
-  protected abstract void saveAdditional(CompoundTag tag);
-  protected abstract void loadAdditional(CompoundTag tag);
+    script.invokeIfExists("onSave", tag);
+  }
 
   /* -------------------------- UPDATE CALLBACK --------------------------- */
 

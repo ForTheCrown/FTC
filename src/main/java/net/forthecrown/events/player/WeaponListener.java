@@ -5,6 +5,9 @@ import net.forthecrown.inventory.ExtendedItems;
 import net.forthecrown.inventory.weapon.RoyalSword;
 import net.forthecrown.inventory.weapon.ability.SwordAbilityManager;
 import net.forthecrown.inventory.weapon.SwordConfig;
+import net.forthecrown.user.Users;
+import net.forthecrown.utils.text.Text;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -19,6 +22,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public class WeaponListener implements Listener {
+  public static final int USES_WARN_THRESHOLD = 10;
 
   @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
   public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
@@ -76,6 +80,7 @@ public class WeaponListener implements Listener {
       return;
     }
 
+    var user = Users.get(player);
     var item = player.getInventory().getItemInMainHand();
     RoyalSword sword = ExtendedItems.ROYAL_SWORD.get(item);
 
@@ -89,13 +94,43 @@ public class WeaponListener implements Listener {
       return;
     }
 
-    boolean giveCooldown = leftClick
+    boolean usedSuccessfully = leftClick
         ? ability.onLeftClick(player, entity, block)
         : ability.onRightClick(player, entity, block);
 
-    long cooldownTicks = ability.getCooldownTicks();
-    if (cooldownTicks > 0 && giveCooldown) {
-      player.setCooldown(item.getType(), Math.toIntExact(cooldownTicks));
+    if (usedSuccessfully) {
+      long cooldownTicks = ability.getCooldownTicks(sword.getRank());
+      if (cooldownTicks > 0) {
+        player.setCooldown(item.getType(), Math.toIntExact(cooldownTicks));
+      }
+
+      int uses = ability.getUses() + 1;
+      int limit = ability.getType().getLimit().get(user);
+
+      ability.setUses(uses);
+      if (uses >= limit) {
+        sword.setAbility(null);
+
+        user.sendMessage(
+            Text.format("Upgrade {0} used up!",
+                NamedTextColor.GRAY,
+                ability.getType().fullDisplayName(user)
+            )
+        );
+      } else {
+        int remaining = limit - uses;
+
+        if (remaining <= USES_WARN_THRESHOLD) {
+          user.sendMessage(
+              Text.format("Sword upgrade has &e{0, number} &ruses remaining.",
+                  NamedTextColor.GRAY,
+                  remaining
+              )
+          );
+        }
+      }
     }
+
+    sword.update(item);
   }
 }

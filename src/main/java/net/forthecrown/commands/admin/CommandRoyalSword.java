@@ -160,7 +160,7 @@ public class CommandRoyalSword extends FtcCommand {
 
               c.getSource().sendMessage(
                   Text.format("&7Sword's ability: &e{0}",
-                      sword.getAbility().getType().fullDisplayName()
+                      sword.getAbility().getType().fullDisplayName(user)
                   )
               );
               return 0;
@@ -183,7 +183,8 @@ public class CommandRoyalSword extends FtcCommand {
 
   private int setAbility(CommandContext<CommandSource> c, int level)
       throws CommandSyntaxException {
-    var pair = getSword(getUserSender(c));
+    var user = getUserSender(c);
+    var pair = getSword(user);
     var item = pair.first();
     var sword = pair.second();
 
@@ -200,7 +201,7 @@ public class CommandRoyalSword extends FtcCommand {
 
     c.getSource().sendAdmin(
         Text.format("&7Set sword's ability to &e{0}",
-            holder.getValue().fullDisplayName()
+            holder.getValue().fullDisplayName(user)
         )
     );
     return 0;
