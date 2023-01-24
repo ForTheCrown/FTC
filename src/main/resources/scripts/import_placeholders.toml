@@ -1,5 +1,8 @@
 # A list of import statement placeholders that will be replaced by their values
 # in import statements during JavaScript preprocessing
+#
+# Note:
+# These placeholders do not work inside regular 'Java.type()' imports
 # ------------------------------------------------------------------------------
 # Format:
 # ------------------------------------------------------------------------------
@@ -19,3 +22,4 @@ jutil = "java.util"
 jlang = "java.lang"
 worldguard = "com.sk89q.worldguard"
 worldedit = "com.sk89q.worldedit"
+kyori = "net.kyori.adventure"

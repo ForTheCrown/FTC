@@ -53,5 +53,5 @@ tnt:
 {Count:1b,id:"minecraft:disc_fragment_5"}
 {Count:1b,id:"minecraft:tnt_minecart"}
 
-powerball:
+fireball:
 {Count:64b,id:"minecraft:dragon_breath"}

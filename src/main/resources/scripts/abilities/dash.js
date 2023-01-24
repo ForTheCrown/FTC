@@ -1,7 +1,16 @@
 import "@bukkit.Particle";
+import "@kyori.sound.Sound";
+import "@kyori.key.Key";
 
 const MULTIPLIER = 1.10;
 const ROUND_MIN = -0.07841;
+
+const SOUND_KEY = Key.key("entity.item_frame.remove_item");
+
+const SOUND = Sound.sound()
+    .type(SOUND_KEY)
+    .pitch(2)
+    .build();
 
 function onRightClick(player, clicked) {
   if (clicked != null) {
@@ -41,7 +50,7 @@ function onRightClick(player, clicked) {
   player.setVelocity(dir);
 
   spawnEffects(player);
-  // TODO: A sound effect
+  player.playSound(SOUND);
 
   return true;
 }

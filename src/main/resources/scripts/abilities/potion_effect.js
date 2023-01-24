@@ -27,9 +27,7 @@ function parseArgs() {
       .withOptionalArg();
 
   const amplifierArg = parser.accepts("amplifier", "Amplifier given to potion, if -1, uses ability's level")
-      .withOptionalArg()
-      .defaultsTo(0)
-      .ofType(Integer.class);
+      .withOptionalArg();
 
   const giveTargetArg = parser.accepts("give-target", "If set, gives the target the potion effect, instead of the player");
   const leftClickArg = parser.accepts("left-click", "If set, listens to left clicks instead of right clicks");
@@ -105,7 +103,13 @@ function trigger(player, clicked) {
   }
 
   let target = giveTarget ? clicked : player;
-  let amp = amplifier == -1 ? level : amplifier;
+  let amp = 0;
+
+  if (amplifier == "level") {
+    amp = level - 1;
+  } else if (amplifier != -1) {
+    amp = Number(amplifier);
+  }
 
   let effect = new PotionEffect(potionType, duration, amp);
   target.addPotionEffect(effect);

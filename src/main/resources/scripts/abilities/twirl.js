@@ -1,3 +1,6 @@
+import "@ftc.cosmetics.travel.TravelUtil";
+import "@bukkit.Particle";
+
 const RADIUS = 1.5;
 
 function onRightClick(player, clicked) {
@@ -14,7 +17,16 @@ function onRightClick(player, clicked) {
     player.attack(entity);
   });
 
-  // TODO: some effects and sound
-
+  spawnEffects(player.getLocation(), living);
   return true;
+}
+
+function spawnEffects(playerLocation, entityList) {
+  const points = Math.min(entityList.size() * 2, 15);
+
+  if (points <= 1) {
+    return;
+  }
+
+  TravelUtil.spawnInCircle(playerLocation, 0.5, 1, points, Particle.SWEEP_ATTACK, 1);
 }

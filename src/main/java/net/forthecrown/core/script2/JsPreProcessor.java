@@ -6,6 +6,7 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.utils.io.SerializationHelper;
 import org.apache.commons.io.IOUtils;
 
@@ -72,6 +73,13 @@ public class JsPreProcessor {
 
     for (var e: map.entrySet()) {
       result = result.replaceAll("@" + e.getKey(), e.getValue());
+    }
+
+    if (result.indexOf('@') != -1) {
+      Loggers.getLogger().warn(
+          "Import '{}' contains unknown placeholders (result: '{}')",
+          importStatement, result
+      );
     }
 
     return result;

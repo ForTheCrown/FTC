@@ -1,4 +1,13 @@
 import "@bukkit.entity.EnderPearl"
+import "@kyori.key.Key";
+import "@kyori.sound.Sound";
+
+const SOUND_KEY = Key.key("entity.ender_pearl.throw");
+
+const SOUND = Sound.sound()
+    .type(SOUND_KEY)
+    .pitch(0.5)
+    .build();
 
 function onRightClick(player, clicked) {
   if (clicked != null) {
@@ -11,5 +20,11 @@ function onRightClick(player, clicked) {
   let velocity = player.getLocation().getDirection().multiply(level);
 
   let projectile = player.launchProjectile(EnderPearl.class, velocity);
-  return !projectile.isDead();
+
+  if (!projectile.isDead()) {
+    player.playSound(SOUND);
+    return true;
+  }
+
+  return false;
 }

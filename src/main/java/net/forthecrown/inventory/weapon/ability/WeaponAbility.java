@@ -49,13 +49,13 @@ public class WeaponAbility {
   }
 
   public void write(TextWriter writer, User user) {
-    writer.write(displayName());
+    writer.line(displayName());
 
     if (level > START_LEVEL) {
       writer.formatted(" {0, number, -roman}", NamedTextColor.GRAY, level);
     }
 
-    writer.formatted(" {0, number} / {1, number}",
+    writer.formattedLine("{0, number} / {1, number} Uses left",
         NamedTextColor.GRAY,
         uses, getType().getLimit().get(user)
     );
@@ -137,13 +137,17 @@ public class WeaponAbility {
                                       @Nullable Entity entity,
                                       @Nullable Block block
   ) {
+    if (!script.hasMethod(method)) {
+      return false;
+    }
+
     Object clickedInput = block == null ? entity : block;
 
     // Default to true, as that will cause a weapon cooldown, which should
     // happen, if the method wasn't declared, or failed, or didn't return
     // a result
-    return script.invokeIfExists(method, player, clickedInput)
-        .flatMap(ScriptResult::asBoolean)
+    return script.invoke(method, player, clickedInput)
+        .asBoolean()
         .orElse(true);
   }
 

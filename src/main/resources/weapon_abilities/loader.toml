@@ -173,7 +173,7 @@ enabled = false
 
 # Max level that applies for all abilities, unless they override it with their
 # own max level value
-genericMaxLevel = 5
+genericMaxLevel = 3
 
 # Base cooldown value that applies to all abilities, unless they override it
 # with their own value
@@ -192,7 +192,6 @@ description = [
   "Throws an Ender Pearl on Right-Click"
 ]
 advancement = "minecraft:adventure/bullseye"
-maxLevel = 3
 script = "abilities/ender_pearl.js"
 item = "{id:\"minecraft:ender_pearl\",Count:1b}"
 
@@ -203,7 +202,6 @@ description = [
 ]
 useLimit = "150 + (tier * 50)"
 advancement = "minecraft:nether/loot_bastion"
-maxLevel = 3
 script = "abilities/twirl.js"
 item = "{id:'minecraft:feather',Count:1b}"
 
@@ -229,6 +227,27 @@ script = "abilities/far_reach.js"
 maxLevel = 2
 item = "{id:'minecraft:iron_sword',Count:1b}"
 
+["tnt"]
+displayName = "TNT"
+description = [
+  "Drops a primed TNT on Right-Click"
+]
+advancement = "minecraft:adventure/totem_of_undying"
+useLimit = "150 + (tier * 50)"
+script = "abilities/tnt.js"
+item = "{Count:1b,id:'minecraft:tnt'}"
+
+["fireball"]
+displayName = "Fire Ball"
+description = [
+  "Throws a Fire ball on Right-Click"
+]
+maxLevel = 2
+advancement = "minecraft:end/levitate"
+useLimit = "35 + (tier * 5)"
+script = "abilities/fireball.js"
+item = "{Count:1b,id:'minecraft:fire_charge'}"
+
 # Note on potion types: They don't use the ResourceLocation names, eg:
 # 'minecraft:regeneration' for the '--potion-type' values, they use the 'names'
 # which are the names of the potion type constants inside the MC codebase, but
@@ -238,8 +257,9 @@ displayName = "Regeneration"
 description = [
   "Gives you regen on Right-Click"
 ]
+maxLevel = 2
 advancement = "minecraft:nether/all_effects"
-inputArgs = "--potion-type=REGENERATION --duration=5s"
+inputArgs = "--potion-type=REGENERATION --duration=5s --amplifier=level"
 script = "abilities/potion_effect.js"
 item = "{Count:1b,id:'minecraft:potion',tag:{Potion:'minecraft:regeneration'}}"
 
@@ -248,8 +268,9 @@ displayName = "Strength"
 description = [
   "Gives you Strength on Right-Click"
 ]
+maxLevel = 2
 advancement = "minecraft:adventure/kill_all_mobs"
-inputArgs = "--potion-type=INCREASE_DAMAGE --duration=4s"
+inputArgs = "--potion-type=INCREASE_DAMAGE --duration=4s --amplifier=level"
 script = "abilities/potion_effect.js"
 item = "{Count:1b,id:'minecraft:potion',tag:{Potion:'minecraft:strength'}}"
 
@@ -258,6 +279,7 @@ displayName = "Weakness"
 description = [
   "Gives an enemy weakness on Left-Click"
 ]
+maxLevel = 1
 advancement = "minecraft:adventure/kill_mob_near_sculk_catalyst"
 useLimit = "150 + (tier * 50)"
 inputArgs = "--potion-type=WEAKNESS --duration=5s --left-click --give-target"

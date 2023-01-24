@@ -85,6 +85,7 @@ public final class Events {
 
     register(new ResourceWorldListener());
     register(new WeaponListener());
+    register(new SwordFireballListener());
 
     register(new AutoSellListener());
     register(new DurabilityListener());

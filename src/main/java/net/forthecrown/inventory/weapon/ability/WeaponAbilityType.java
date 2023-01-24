@@ -1,7 +1,5 @@
 package net.forthecrown.inventory.weapon.ability;
 
-import static net.forthecrown.inventory.weapon.ability.WeaponAbility.START_LEVEL;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import java.util.Objects;
@@ -12,7 +10,10 @@ import lombok.experimental.Accessors;
 import net.forthecrown.core.script2.Script;
 import net.forthecrown.core.script2.ScriptSource;
 import net.forthecrown.user.User;
+import net.forthecrown.utils.Time;
 import net.forthecrown.utils.inventory.ItemStacks;
+import net.forthecrown.utils.text.Text;
+import net.forthecrown.utils.text.format.PeriodFormat;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.forthecrown.utils.text.writer.TextWriters;
 import net.kyori.adventure.text.Component;
@@ -62,10 +63,6 @@ public class WeaponAbilityType {
 
     // Check arguments
     Preconditions.checkArgument(
-        maxLevel > START_LEVEL,
-        "Max level must be above " + START_LEVEL
-    );
-    Preconditions.checkArgument(
         ItemStacks.notEmpty(item),
         "Cannot have empty item"
     );
@@ -102,7 +99,8 @@ public class WeaponAbilityType {
 
   public Component fullDisplayName(User user) {
     var writer = TextWriters.newWriter();
-    writer.setFieldStyle(Style.style(NamedTextColor.GRAY));
+    writer.setFieldStyle(Style.style(NamedTextColor.DARK_GRAY));
+    writer.setFieldValueStyle(Style.style(NamedTextColor.DARK_GRAY));
 
     writeHover(writer, user);
 
@@ -116,6 +114,9 @@ public class WeaponAbilityType {
     builder.setName(getDisplayName().colorIfAbsent(NamedTextColor.YELLOW));
 
     var writer = TextWriters.loreWriter();
+    writer.setFieldStyle(Style.style(NamedTextColor.DARK_GRAY));
+    writer.setFieldValueStyle(Style.style(NamedTextColor.DARK_GRAY));
+
     writeHover(writer, user);
     builder.addLore(writer.getLore());
 
@@ -129,25 +130,26 @@ public class WeaponAbilityType {
       writer.line(component.colorIfAbsent(NamedTextColor.GRAY));
     });
 
-    var adv = getAdvancement();
-
-    if (adv == null) {
-      return;
-    }
-
     if (!description.isEmpty()) {
       writer.newLine();
       writer.newLine();
     }
 
-    writer.field("Requires",
-        adv.displayName()
-            .color(
-                user.getPlayer().getAdvancementProgress(adv).isDone()
-                    ? NamedTextColor.YELLOW
-                    : NamedTextColor.GRAY
-            )
-    );
+    var adv = getAdvancement();
+    if (adv != null) {
+      writer.field("Requires",
+          adv.displayName()
+              .color(
+                  user.getPlayer().getAdvancementProgress(adv).isDone()
+                      ? NamedTextColor.YELLOW
+                      : NamedTextColor.GRAY
+              )
+      );
+    }
+
+    writer.field("Max Level", Text.format("{0, number, -roman}", maxLevel));
+    writer.field("Uses", Text.formatNumber(limit.get(user)));
+    writer.field("Cooldown", PeriodFormat.of(Time.ticksToMillis(baseCooldown)));
   }
 
   public Advancement getAdvancement() {

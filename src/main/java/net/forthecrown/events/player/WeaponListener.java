@@ -1,6 +1,8 @@
 package net.forthecrown.events.player;
 
+import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import net.forthecrown.core.FTC;
+import net.forthecrown.core.FtcFlags;
 import net.forthecrown.inventory.ExtendedItems;
 import net.forthecrown.inventory.weapon.RoyalSword;
 import net.forthecrown.inventory.weapon.ability.SwordAbilityManager;
@@ -91,6 +93,13 @@ public class WeaponListener implements Listener {
     var ability = sword.getAbility();
 
     if (ability == null || player.hasCooldown(item.getType())) {
+      return;
+    }
+
+    State abilityUsageAllowed
+        = FtcFlags.query(player.getLocation(), FtcFlags.SWORD_UPGRADE_USE);
+
+    if (abilityUsageAllowed == State.DENY) {
       return;
     }
 

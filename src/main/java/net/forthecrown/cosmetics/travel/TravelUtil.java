@@ -7,9 +7,7 @@ import org.bukkit.Particle;
 import org.spongepowered.math.vector.Vector3d;
 
 public final class TravelUtil {
-
-  private TravelUtil() {
-  }
+  private TravelUtil() {}
 
   private static final float[][] HEART_OFFSETS = {
       // Bottom Tips:
@@ -73,8 +71,13 @@ public final class TravelUtil {
    * @param particle                The particle to spawn
    * @param amountParticlesPerPoint Amount of particles to spawn on a point
    */
-  static void spawnInCircle(Location loc, double extraY, double radius, short amountPoints,
-                            Particle particle, int amountParticlesPerPoint
+  public static void spawnInCircle(
+      Location loc,
+      double extraY,
+      double radius,
+      int amountPoints,
+      Particle particle,
+      int amountParticlesPerPoint
   ) {
     for (int i = 0; i < amountPoints; ++i) {
       final double angle = Math.toRadians(((double) i / amountPoints) * 360d);
@@ -82,10 +85,19 @@ public final class TravelUtil {
       double x = Math.cos(angle) * radius;
       double z = Math.sin(angle) * radius;
 
-      Location pointLoc = new Location(loc.getWorld(), loc.getX() + x, loc.getY() + extraY,
-          loc.getZ() + z);
-      pointLoc.getWorld()
-          .spawnParticle(particle, pointLoc, amountParticlesPerPoint, 0, 0, 0, 0, null, true);
+      Location pointLoc = new Location(
+          loc.getWorld(),
+          loc.getX() + x,
+          loc.getY() + extraY,
+          loc.getZ() + z
+      );
+
+      particle.builder()
+          .location(pointLoc)
+          .count(amountParticlesPerPoint)
+          .extra(0D)
+          .force(true)
+          .spawn();
     }
   }
 
@@ -99,11 +111,17 @@ public final class TravelUtil {
    */
   static void spawn4Hearts(Location loc, double extraY, Particle particle) {
     for (float[] xz : HEART_OFFSETS) {
-      loc.getWorld().spawnParticle(particle, new Location(loc.getWorld(),
-          loc.getX() + xz[0],
-          loc.getY() + extraY,
-          loc.getZ() + xz[1]
-      ), 3, 0, 0, 0, 0.002, null, true);
+      particle.builder()
+          .location(
+              loc.getWorld(),
+              loc.getX() + xz[0],
+              loc.getY() + extraY,
+              loc.getZ() + xz[1]
+          )
+          .count(3)
+          .extra(0.002D)
+          .force(true)
+          .spawn();
     }
   }
 }

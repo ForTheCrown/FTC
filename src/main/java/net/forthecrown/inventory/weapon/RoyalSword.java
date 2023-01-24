@@ -220,8 +220,13 @@ public class RoyalSword extends ExtendedItem {
     }
 
     if (ability != null && hasPlayerOwner()) {
-      writer.newLine();
-      ability.write(writer, getOwnerUser());
+      writer.line("Upgrade:", NamedTextColor.GRAY);
+
+      var prefixed = writer.withPrefix(
+          Component.text("• ", NamedTextColor.GRAY)
+      );
+
+      ability.write(prefixed, getOwnerUser());
       writer.newLine();
       writer.newLine();
     }
