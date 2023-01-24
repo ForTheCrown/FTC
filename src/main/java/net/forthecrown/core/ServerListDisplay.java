@@ -37,6 +37,7 @@ import net.kyori.adventure.text.Component;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.util.CachedServerIcon;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Dynamically/randomly changes the server icon
@@ -46,7 +47,10 @@ public class ServerListDisplay {
   private static final Logger LOGGER = Loggers.getLogger();
 
   public static final Comparator<Holder<Entry>> ENTRY_COMPARATOR
-      = makeComparator(); // I dislike Java sometimes
+      = Holder.comparingByValue();
+
+  public static final Pair<CachedServerIcon, Component> NULL_PAIR
+      = Pair.of(null, null);
 
   @Getter
   private static final ServerListDisplay instance = new ServerListDisplay();
@@ -71,13 +75,6 @@ public class ServerListDisplay {
     this.loaderFile = PathUtil.pluginPath("serverlist.toml");
 
     saveDefaults();
-  }
-
-  private static Comparator<Holder<Entry>> makeComparator() {
-    Comparator<Holder<Entry>> comparator
-        = Comparator.comparingInt(value -> value.getValue().getPriority());
-
-    return comparator.reversed();
   }
 
   void saveDefaults() {
@@ -128,7 +125,7 @@ public class ServerListDisplay {
 
   public Pair<CachedServerIcon, Component> getCurrent() {
     if (registry.isEmpty()) {
-      return Pair.of(null, null);
+      return NULL_PAIR;
     }
 
     var rand = Util.RANDOM;
@@ -153,17 +150,24 @@ public class ServerListDisplay {
         motdPart = val.getMotdPart();
       }
 
+      // Both icon and MOTD have been found, stop here
       if (icon != null && motdPart != null) {
         return Pair.of(icon, motdPart);
       }
     }
 
+    // Either MOTD, icon or both are missing, get the default entry
+    // and fill any missing data with it
     Optional<Holder<Entry>> def = registry.getHolder(DEFAULT);
+
     if (def.isEmpty()) {
       return Pair.of(icon, motdPart);
     } else {
       var defaultValue = def.get().getValue();
-      return Pair.of(defaultValue.get(rand), defaultValue.motdPart);
+      return Pair.of(
+          icon == null ? defaultValue.get(rand) : icon,
+          motdPart == null ? defaultValue.motdPart : motdPart
+      );
     }
   }
 
@@ -278,7 +282,7 @@ public class ServerListDisplay {
 
   @Getter
   @RequiredArgsConstructor
-  static class Entry {
+  static class Entry implements Comparable<Entry> {
 
     private final MonthDayPeriod period;
     private final List<CachedServerIcon> icons;
@@ -321,6 +325,11 @@ public class ServerListDisplay {
           getIcons().size(),
           getPriority()
       );
+    }
+
+    @Override
+    public int compareTo(@NotNull ServerListDisplay.Entry o) {
+      return Integer.compare(o.getPriority(), getPriority());
     }
   }
 }

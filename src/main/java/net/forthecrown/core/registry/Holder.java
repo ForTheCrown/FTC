@@ -1,5 +1,6 @@
 package net.forthecrown.core.registry;
 
+import java.util.Comparator;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode.Exclude;
@@ -47,4 +48,26 @@ public final class Holder<V> {
   @ToString.Exclude
   @Setter(AccessLevel.PACKAGE)
   Registry<V> registry;
+
+  /* ---------------------------- COMPARATORS ----------------------------- */
+
+  public static <T> Comparator<Holder<T>> comparingByKey() {
+    return Comparator.comparing(Holder::getKey);
+  }
+
+  public static <T> Comparator<Holder<T>> comparingById() {
+    return Comparator.comparing(Holder::getId);
+  }
+
+  public static <T> Comparator<Holder<T>> comparingByValue(
+      Comparator<T> comparator
+  ) {
+    return (o1, o2) -> {
+      return comparator.compare(o1.getValue(), o2.getValue());
+    };
+  }
+
+  public static <T extends Comparable<T>> Comparator<Holder<T>> comparingByValue() {
+    return Comparator.comparing(Holder::getValue);
+  }
 }
