@@ -17,6 +17,7 @@ import net.kyori.adventure.text.Component;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,6 +37,9 @@ public class ActionCommand extends UsageAction {
 
     return FtcSuggestions.COMMAND_SUGGESTIONS.getSuggestions(context, builder);
   };
+
+  private static final CommandSender SILENT_SENDER
+      = Bukkit.createCommandSender(component -> {});
 
   // --- TYPE ---
   public static final UsageType<ActionCommand> TYPE_PLAYER = UsageType.of(ActionCommand.class)
@@ -59,7 +63,7 @@ public class ActionCommand extends UsageAction {
     String command = replaceSelectors(player.getName(), this.command);
 
     Bukkit.dispatchCommand(
-        server ? Bukkit.getConsoleSender() : player,
+        server ? SILENT_SENDER : player,
         command
     );
   }

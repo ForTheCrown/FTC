@@ -540,6 +540,10 @@ public class ComponentFormat implements ComponentLike {
           format = format.retainBiggest();
         }
 
+        if (style.contains("-short")) {
+          format = format.withShortNames();
+        }
+
         return format.asComponent();
       }
     },

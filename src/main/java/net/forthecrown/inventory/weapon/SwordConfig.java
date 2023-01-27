@@ -9,8 +9,6 @@ public class SwordConfig {
 
   public static Vector3i swordPostAnimDump = Vector3i.from(273, 99, 178);
 
-  public static float swordAbilityCooldownScalar = 1.5F;
-
   public static double swordAnim_initialDistance = 2.5D;
 
   public static String swordAnim_claimScript = "weapon_ability/sword_claim.js";

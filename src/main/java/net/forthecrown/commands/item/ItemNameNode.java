@@ -3,11 +3,15 @@ package net.forthecrown.commands.item;
 import static net.forthecrown.commands.CommandNickname.CLEAR;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import java.util.Locale;
 import net.forthecrown.commands.arguments.Arguments;
+import net.forthecrown.commands.arguments.chat.MessageSuggestions;
 import net.forthecrown.core.Messages;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.translation.GlobalTranslator;
 
 public class ItemNameNode extends ItemModifierNode {
 
@@ -23,7 +27,7 @@ public class ItemNameNode extends ItemModifierNode {
   @Override
   public void populateUsages(UsageFactory factory) {
     namingNote(
-        factory.usage("<name>")
+        factory.usage("<text>")
             .addInfo("Sets the name of the item you're holding")
     );
 
@@ -33,7 +37,7 @@ public class ItemNameNode extends ItemModifierNode {
 
   static void namingNote(Usage usage) {
     usage.addInfo("Note:")
-        .addInfo("If the <name> is a JSON component (eg: {\"text\":\"Item Name\"})")
+        .addInfo("If the <text> is a JSON component (eg: {\"text\":\"Item Name\"})")
         .addInfo("The name won't automatically become non-italic")
         .addInfo("and white, you'll be required to manually set them to")
         .addInfo("that configuration");
@@ -44,14 +48,20 @@ public class ItemNameNode extends ItemModifierNode {
     command
         .then(argument("name", Arguments.CHAT)
             .suggests((context, builder) -> {
-              var token = builder.getRemainingLowerCase();
+              return MessageSuggestions.get(context, builder, true, (builder1, source) -> {
+                CompletionProvider.suggestMatching(builder1, CLEAR);
 
-              if (token.isBlank() || CLEAR.startsWith(token)) {
-                builder.suggest(CLEAR);
-                return builder.buildFuture();
-              }
+                // Suggest existing item name
+                getItemSuggestions(source, itemStack -> {
+                  var name = Text.itemDisplayName(itemStack);
 
-              return Arguments.CHAT.listSuggestions(context, builder);
+                  String legacy = Text.LEGACY.serialize(
+                      GlobalTranslator.render(name, Locale.ENGLISH)
+                  );
+
+                  CompletionProvider.suggestMatching(builder1, legacy);
+                });
+              });
             })
 
             .executes(c -> {

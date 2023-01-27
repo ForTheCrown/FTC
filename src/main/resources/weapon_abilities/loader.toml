@@ -63,11 +63,9 @@
 # - useLimit = 14
 # - useLimit = "200 + (tier * 15)"
 # ------------------------------------------------------------------------------
-# baseCooldown (required, if 'genericBaseCooldown' is not set):
-#  The base cooldown, in ticks, the ability has. This base is scaled with the
-#  level, the scaling formula is thus:
-#  cooldown = base * ( SwordAbility.cooldownScalar / abilityLevel )
-#  This decreases cooldown as level increases
+# cooldown (required, if 'genericCooldown' is not set):
+#  The cooldown, in ticks, can either be a fixed value or a range of 2 values,
+#  which will then be scaled between depending on the sword of the rank.
 #
 #  The input for this value can be an integer, which is used as ticks, or a
 #  string in the same style as the time argument in commands, eg: '10m' for
@@ -76,21 +74,20 @@
 #  Lastly, a 'localTime' string is also accepted, see examples, for how to
 #  use it.
 #
+# time input examples:
+# - 60: 3 Seconds, counted as ticks
+# - 00:00:03: 3 Seconds, localTime syntax
+# - "300t": 300 ticks
+# - "10s":  10 seconds
+# - "10.45s":  10.45 seconds, aka 209 ticks
+# - "10m, 10s": 10 minutes and 10 seconds
+#
 # examples:
-# - baseCooldown = 60
-#   ^ 3 Seconds, counted as ticks
+# - cooldown = [ "8s", "1.4s" ]
+#   ^ Will scale with sword's level
 #
-# - baseCooldown = "300t"
-#   ^ 300 ticks
-#
-# - baseCooldown = "10s"
-#   ^ 10 seconds
-#
-# - baseCooldown = "10m, 10s"
-#   ^ 10 minutes and 10 seconds
-#
-# - baseCooldown = 00:00:03
-#   ^ 3 Seconds, localTime syntax
+# - cooldown = "3s
+#   ^ Fixed constant, will not scale with sword's level
 # ------------------------------------------------------------------------------
 # 'inputArgs' (optional):
 #  Optional args to be given to the 'script' value
@@ -138,9 +135,9 @@
 #
 # getCooldown(swordRank): (optional)
 #  Called to get a cooldown, optional function
-#  If this function isn't declared, uses the baseCooldown and scales it
+#  If this function isn't declared, uses the cooldown and scales it
 #  to get a cooldown.
-#  This method is allowed to return the same types as the 'baseCooldown' value
+#  This method is allowed to return the same types as the 'cooldown' value
 #  in this file.
 #  swordRank is the SwordRank object of the sword that holds the ability
 #
@@ -156,7 +153,7 @@
 # displayName = "Weapon Ability"
 # description = [ "Does a thing" ]
 # maxLevel = 3
-# baseCooldown = 00:00:05
+# cooldown = 00:00:05
 # useLimit = "250 + (tier * 10)"
 # item = "{id:'minecraft:stick',Count:32b}"
 # script = "abilities/ability_script.js"
@@ -169,7 +166,7 @@
 # Determines if abilities are enabled at all, if not set at all, assumes true
 # If false, then will only be enabled if the plugin is on 'debug mode'
 # If true, abilities are still loaded, their click callbacks are never called
-enabled = false
+enabled = true
 
 # Max level that applies for all abilities, unless they override it with their
 # own max level value
@@ -177,7 +174,7 @@ genericMaxLevel = 3
 
 # Base cooldown value that applies to all abilities, unless they override it
 # with their own value
-genericBaseCooldown = "3s"
+genericCooldown = [ "5s", "24t" ]
 
 genericUseLimit = "250 + (tier * 50)"
 # ------------------------------------------------------------------------------
@@ -213,7 +210,7 @@ description = [
 useLimit = "350 + (tier * 50)"
 advancement = "minecraft:adventure/adventuring_time"
 script = "abilities/dash.js"
-baseCooldown = 00:00:05
+cooldown = [ "8s", "26t" ]
 item = "{id:'minecraft:iron_boots',Count:1b}"
 
 ["far_reach"]

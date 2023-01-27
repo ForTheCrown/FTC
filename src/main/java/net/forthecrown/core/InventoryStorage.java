@@ -4,7 +4,9 @@ import com.google.common.base.Preconditions;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectSets;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -167,6 +169,40 @@ public class InventoryStorage {
     return true;
   }
 
+  /**
+   * Gives the items to the player without removing them from the storage.
+   * <p>
+   * Different from {@link #returnItems(Player, String, boolean)} because it
+   * doesn't remove the items from storage before returning them to the user.
+   *
+   * @param player   The player to return the items to
+   * @param category The category to get the items from
+   *
+   * @return True, if the player had items to give, false if the player had no
+   *         storage entry, or if the player had no items saved in the category
+   */
+  public boolean giveItems(Player player, String category) {
+    Objects.requireNonNull(player);
+    Objects.requireNonNull(category);
+
+    if (!hasStoredInventory(player, category)) {
+      return false;
+    }
+
+    InventoryMap map = inventories.get(player.getUniqueId());
+
+    Int2ObjectMap<ItemStack> items = map.get(category);
+
+    var inventory = player.getInventory();
+    inventory.clear();
+
+    items.forEach((slot, item) -> {
+      inventory.setItem(slot, item.clone());
+    });
+
+    return true;
+  }
+
   public Int2ObjectMap<ItemStack> removeItems(Player player,
                                               String category
   ) {
@@ -197,6 +233,16 @@ public class InventoryStorage {
       inventory.setItem(slot, item.clone());
     });
     map.clear();
+  }
+
+  public Collection<String> getExistingCategories(Player player) {
+    InventoryMap map = inventories.get(player.getUniqueId());
+
+    if (map == null || map.isEmpty()) {
+      return ObjectSets.emptySet();
+    }
+
+    return map.keySet();
   }
 
 

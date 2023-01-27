@@ -11,7 +11,10 @@ import java.util.concurrent.TimeUnit;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import net.forthecrown.utils.Time;
+import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.forthecrown.utils.text.writer.TextWriters;
 import net.kyori.adventure.text.Component;
@@ -37,7 +40,9 @@ public class PeriodFormat implements ComponentLike {
   /**
    * Constant for the amount of milliseconds in a second
    */
-  public final static long SECOND_IN_MILLIS = TimeUnit.SECONDS.toMillis(1);
+  public final static long MILLIS_IN_SECOND = TimeUnit.SECONDS.toMillis(1);
+
+  public static final long MILLIS_IN_MINUTE = TimeUnit.MINUTES.toMillis(1);
 
   /* ----------------------------- INSTANCE FIELDS ------------------------------ */
 
@@ -48,6 +53,9 @@ public class PeriodFormat implements ComponentLike {
 
   @Getter
   private final Style numberStyle, textStyle;
+
+  @Getter
+  private final boolean shortNames;
 
   /* ----------------------------- STATIC CONSTRUCTORS ------------------------------ */
 
@@ -112,7 +120,7 @@ public class PeriodFormat implements ComponentLike {
 
     // If less than a second of time between the start and ends,
     // then just create a format with only the millis unit
-    if (time < SECOND_IN_MILLIS) {
+    if (time < MILLIS_IN_MINUTE) {
       builder.add(ChronoUnit.MILLIS, time);
     } else {
       // Otherwise loop through as many units as
@@ -135,7 +143,8 @@ public class PeriodFormat implements ComponentLike {
         builder.add(unit, amount);
 
         // Less than a second of time left, end
-        if (time < SECOND_IN_MILLIS) {
+        if (time < MILLIS_IN_MINUTE) {
+          builder.add(ChronoUnit.MILLIS, time);
           break;
         }
       }
@@ -156,16 +165,39 @@ public class PeriodFormat implements ComponentLike {
 
     while (it.hasNext()) {
       var entry = it.next();
+      ChronoUnit unit = entry.unit;
+      double amount = entry.amount;
 
-      writer.write(Component.text(entry.amount, numberStyle));
-      writer.space();
-      writer.write(Component.text(entry.displayName(), textStyle));
+      if (entry.unit == ChronoUnit.MILLIS) {
+        double millis = entry.amount;
+        amount = millis / MILLIS_IN_SECOND;
+        unit = ChronoUnit.SECONDS;
+      }
+
+      writer.write(Text.formatNumber(amount).style(numberStyle));
+
+      if (!shortNames) {
+        writer.space();
+        writer.write(Component.text(
+            ChronoEntry.displayName(unit, entry.amount),
+            textStyle
+        ));
+      } else {
+        writer.write(
+            ChronoEntry.shortDisplayName(unit, entry.amount),
+            textStyle
+        );
+      }
 
       if (it.hasNext()) {
         writer.write(
             // If next entry is final, use 'and', else use ','
             // propah english grammar that is
-            Component.text(it.isNextFinal() ? " and " : ", ",
+            Component.text(
+                (it.isNextFinal() && !shortNames)
+                    ? " and "
+                    : ", ",
+
                 textStyle
             )
         );
@@ -213,7 +245,9 @@ public class PeriodFormat implements ComponentLike {
 
       return new PeriodFormat(
           ArrayUtils.subarray(entries, 0, i),
-          numberStyle, textStyle
+          numberStyle,
+          textStyle,
+          shortNames
       );
     }
 
@@ -233,7 +267,12 @@ public class PeriodFormat implements ComponentLike {
       return this;
     }
 
-    return new PeriodFormat(ArrayUtils.remove(entries, index), numberStyle, textStyle);
+    return new PeriodFormat(
+        ArrayUtils.remove(entries, index),
+        numberStyle,
+        textStyle,
+        shortNames
+    );
   }
 
   /**
@@ -253,7 +292,7 @@ public class PeriodFormat implements ComponentLike {
       entries = ArrayUtils.removeElement(entries, e);
     }
 
-    return new PeriodFormat(entries, numberStyle, textStyle);
+    return new PeriodFormat(entries, numberStyle, textStyle, shortNames);
   }
 
   /**
@@ -266,7 +305,12 @@ public class PeriodFormat implements ComponentLike {
       return this;
     }
 
-    return new PeriodFormat(ArrayUtils.subarray(entries, 0, 1), numberStyle, textStyle);
+    return new PeriodFormat(
+        ArrayUtils.subarray(entries, 0, 1),
+        numberStyle,
+        textStyle,
+        shortNames
+    );
   }
 
   private int indexOf(ChronoUnit unit) {
@@ -277,6 +321,14 @@ public class PeriodFormat implements ComponentLike {
     }
 
     return -1;
+  }
+
+  public PeriodFormat withShortNames() {
+    return new PeriodFormat(entries, numberStyle, textStyle, true);
+  }
+
+  public PeriodFormat withLongNames() {
+    return new PeriodFormat(entries, numberStyle, textStyle, false);
   }
 
   /* ----------------------------- SUB CLASSES ------------------------------ */
@@ -312,9 +364,27 @@ public class PeriodFormat implements ComponentLike {
 
   private record ChronoEntry(ChronoUnit unit, long amount) implements Comparable<ChronoEntry> {
 
-    String displayName() {
+    public static String displayName(ChronoUnit unit, double amount) {
       String name = unit.toString();
       return amount == 1 ? name.replaceAll("(s$)", "") : name;
+    }
+
+    public static String shortDisplayName(ChronoUnit unit, double amount) {
+      if (unit == ChronoUnit.MILLIS) {
+        return "millis";
+      }
+
+      return displayName(unit, amount)
+          .toLowerCase()
+          .substring(0, 1);
+    }
+
+    String displayName() {
+      return displayName(unit, amount);
+    }
+
+    String shortDisplayName() {
+      return shortDisplayName(unit, amount);
     }
 
     @Override
@@ -323,21 +393,16 @@ public class PeriodFormat implements ComponentLike {
     }
   }
 
+  @Setter
+  @Accessors(chain = true)
   public static class Builder {
 
     private Style numberStyle = Style.empty();
     private Style textStyle = Style.empty();
-    private final EnumMap<ChronoUnit, Long> entries = new EnumMap<>(ChronoUnit.class);
+    private final EnumMap<ChronoUnit, Long> entries
+        = new EnumMap<>(ChronoUnit.class);
 
-    public Builder setNumberStyle(Style numberStyle) {
-      this.numberStyle = numberStyle;
-      return this;
-    }
-
-    public Builder setTextStyle(Style textStyle) {
-      this.textStyle = textStyle;
-      return this;
-    }
+    private boolean shortNames;
 
     public Builder add(ChronoUnit unit, long amount) {
       Validate.isTrue(SUPPORTED_UNITS.contains(unit), "Not a supported unit");
@@ -357,7 +422,9 @@ public class PeriodFormat implements ComponentLike {
 
       return new PeriodFormat(
           entries,
-          numberStyle, textStyle
+          numberStyle,
+          textStyle,
+          shortNames
       );
     }
   }

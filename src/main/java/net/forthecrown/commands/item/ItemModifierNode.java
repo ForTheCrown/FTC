@@ -4,11 +4,13 @@ import com.google.common.base.Strings;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.function.Consumer;
 import net.forthecrown.commands.manager.Commands;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.ItemStack;
@@ -29,6 +31,23 @@ public abstract class ItemModifierNode extends FtcCommand {
   @Override
   protected void createCommand(BrigadierCommand command) {
     create(command);
+  }
+
+  protected void getItemSuggestions(CommandSource source,
+                                    Consumer<ItemStack> consumer
+  ) {
+    if (!source.isPlayer()) {
+      return;
+    }
+
+    var player = source.asPlayerOrNull();
+    var held = player.getInventory().getItemInMainHand();
+
+    if (ItemStacks.isEmpty(held)) {
+      return;
+    }
+
+    consumer.accept(held);
   }
 
   public abstract void create(LiteralArgumentBuilder<CommandSource> command);

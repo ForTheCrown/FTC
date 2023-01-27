@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import lombok.Getter;
 import net.forthecrown.events.Events;
@@ -13,6 +14,7 @@ import net.forthecrown.utils.math.Bounds3i;
 import net.forthecrown.utils.math.Vectors;
 import net.minecraft.nbt.CompoundTag;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.spongepowered.math.vector.Vector3d;
 
@@ -116,22 +118,56 @@ public class TriggerManager {
   public void run(Player player, Location source, Location destination) {
     Bounds3i sourceBounds = makePlayerBounds(source);
     Bounds3i destBounds = makePlayerBounds(destination);
-    Bounds3i totalArea = sourceBounds.combine(destBounds);
 
-    var w = player.getWorld();
+    World sourceWorld = source.getWorld();
+    World destWorld = destination.getWorld();
 
-    Set<UsableTrigger> triggers = this.worldMap.getOverlapping(
-        w, totalArea
-    );
+    if (Objects.equals(sourceWorld, destWorld)) {
+      Bounds3i totalArea = sourceBounds.combine(destBounds);
 
-    if (triggers.isEmpty()) {
+      var triggers = this.worldMap.getOverlapping(sourceWorld, totalArea);
+
+      if (triggers.isEmpty()) {
+        return;
+      }
+
+      triggers.forEach(trigger -> {
+        var type = trigger.getType();
+
+        if (!type.shouldRun(trigger.getBounds(), sourceBounds, destBounds)) {
+          return;
+        }
+
+        trigger.interact(player);
+      });
+
       return;
     }
 
-    for (var t : triggers) {
-      if (t.getType().shouldRun(t.getBounds(), sourceBounds, destBounds)) {
-        t.interact(player);
-      }
+    Set<UsableTrigger> sourceTriggers
+        = this.worldMap.getOverlapping(sourceWorld, sourceBounds);
+
+    Set<UsableTrigger> destTriggers
+        = this.worldMap.getOverlapping(destWorld, destBounds);
+
+    if (!sourceTriggers.isEmpty()) {
+      sourceTriggers.forEach(trigger -> {
+        if (trigger.getType() == TriggerType.ENTER) {
+          return;
+        }
+
+        trigger.interact(player);
+      });
+    }
+
+    if (!destTriggers.isEmpty()) {
+      destTriggers.forEach(trigger -> {
+        if (trigger.getType() == TriggerType.EXIT) {
+          return;
+        }
+
+        trigger.interact(player);
+      });
     }
   }
 

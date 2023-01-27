@@ -4,19 +4,15 @@ import static net.forthecrown.utils.io.FtcJar.ALLOW_OVERWRITE;
 import static net.forthecrown.utils.io.FtcJar.OVERWRITE_IF_NEWER;
 
 import com.google.gson.JsonElement;
-import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.DataResult;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnEnable;
@@ -25,9 +21,6 @@ import net.forthecrown.core.registry.Keys;
 import net.forthecrown.core.registry.Registries;
 import net.forthecrown.core.registry.Registry;
 import net.forthecrown.core.script2.ScriptSource;
-import net.forthecrown.grenadier.types.ArrayArgument;
-import net.forthecrown.grenadier.types.TimeArgument;
-import net.forthecrown.utils.Time;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.io.FtcJar;
 import net.forthecrown.utils.io.JsonUtils;
@@ -53,16 +46,12 @@ public class SwordAbilityManager {
   private final Path loaderFile;
   private final Path itemListFile;
 
-  private final ArrayArgument<Long> timeParser;
-
   private boolean enabled;
 
   public SwordAbilityManager() {
     this.directory = PathUtil.getPluginDirectory("weapon_abilities");
     this.loaderFile = directory.resolve("loader.toml");
     this.itemListFile = directory.resolve("items.txt");
-
-    this.timeParser = ArrayArgument.of(TimeArgument.time());
   }
 
   @OnEnable
@@ -91,8 +80,10 @@ public class SwordAbilityManager {
       enabled = wrapper.getBool("enabled", true);
       wrapper.remove("enabled");
 
-      long genericCooldown = readTicks(wrapper.get("genericBaseCooldown"));
-      wrapper.remove("genericBaseCooldown");
+      UpgradeCooldown genericCooldown
+          = UpgradeCooldown.read(wrapper.get("genericCooldown"));
+
+      wrapper.remove("genericCooldown");
 
       int genericMaxLevel = wrapper.getInt("genericMaxLevel", -1);
       wrapper.remove("genericMaxLevel");
@@ -133,7 +124,7 @@ public class SwordAbilityManager {
   DataResult<WeaponAbilityType> deserialize(
       String registryKey,
       JsonElement element,
-      long genericBaseCooldown,
+      UpgradeCooldown genericCooldown,
       int genericMaxLevel,
       UseLimit genericUseLimit,
       Map<String, List<ItemStack>> itemMap
@@ -153,7 +144,7 @@ public class SwordAbilityManager {
       return DataResult.error(missing.get());
     }
 
-    if (genericBaseCooldown == -1 && !json.has("baseCooldown")) {
+    if (genericCooldown == null && !json.has("cooldown")) {
       return DataResult.error(
           "Generic cooldown is unset, and no 'baseCooldown' value is set"
       );
@@ -194,10 +185,10 @@ public class SwordAbilityManager {
       builder.limit(genericUseLimit);
     }
 
-    if (json.has("baseCooldown")) {
-      builder.baseCooldown(readTicks(json.get("baseCooldown")));
+    if (json.has("cooldown")) {
+      builder.cooldown(UpgradeCooldown.read(json.get("cooldown")));
     } else {
-      builder.baseCooldown(genericBaseCooldown);
+      builder.cooldown(genericCooldown);
     }
 
     var list = itemMap.get(registryKey);
@@ -280,37 +271,5 @@ public class SwordAbilityManager {
     }
 
     return Optional.of(String.format("Missing value for: '%s'", k));
-  }
-
-  private long readTicks(JsonElement element) {
-    if (element == null || !element.isJsonPrimitive()) {
-      return -1;
-    }
-
-    var prim = element.getAsJsonPrimitive();
-    if (prim.isString()) {
-      return parseTicks(prim.getAsString());
-    }
-
-    return prim.getAsLong();
-  }
-
-  public long parseTicks(String input) {
-    if (input.contains(":")) {
-      LocalTime localTime = LocalTime.parse(input);
-      long nano = localTime.toNanoOfDay();
-      return Time.millisToTicks(TimeUnit.NANOSECONDS.toMillis(nano));
-    }
-
-    try {
-      long time = timeParser.parse(new StringReader(input))
-          .stream()
-          .mapToLong(value -> value)
-          .sum();
-
-      return Time.millisToTicks(time);
-    } catch (CommandSyntaxException exc) {
-      throw new IllegalStateException(exc);
-    }
   }
 }

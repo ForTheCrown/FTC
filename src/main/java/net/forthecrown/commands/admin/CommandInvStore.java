@@ -1,14 +1,17 @@
 package net.forthecrown.commands.admin;
 
+import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.InventoryStorage;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.text.Text;
@@ -40,7 +43,8 @@ public class CommandInvStore extends FtcCommand {
 
         "Returns all items a <player> has stored in a <category>",
         "If the '-doNotClear' flag is not set, the player's inventory",
-        "is cleared before any items are returned"
+        "is cleared before any items are returned",
+        "This command will also remove the items from storage"
     );
 
     factory.usage(
@@ -52,6 +56,34 @@ public class CommandInvStore extends FtcCommand {
         "In either case, the player's current items are saved in",
         "the <category>"
     );
+
+    factory.usage(
+        "give <player> <category: quoted string> [-doNotClear]",
+
+        "Works like the 'return' argument, except, it doesn't",
+        "remove the items from storage"
+    );
+  }
+
+  private static final SuggestionProvider<CommandSource> SUGGEST_CATEGORIES
+      = (context, builder) -> {
+          var user = Arguments.getUser(context, "user");
+          var categories = InventoryStorage.getStorage()
+              .getExistingCategories(user.getPlayer())
+              .stream()
+              .map(CommandInvStore::wrapIfNeeded);
+
+          return CompletionProvider.suggestMatching(builder, categories);
+        };
+
+  private static String wrapIfNeeded(String s) {
+    for (var c: s.toCharArray()) {
+      if (!StringReader.isAllowedInUnquotedString(c)) {
+        return "'" + s + "'";
+      }
+    }
+
+    return s;
   }
 
   @Override
@@ -60,6 +92,8 @@ public class CommandInvStore extends FtcCommand {
         .then(literal("save")
             .then(argument("user", Arguments.ONLINE_USER)
                 .then(argument("category", StringArgumentType.string())
+                    .suggests(SUGGEST_CATEGORIES)
+
                     .executes(c -> storeInventory(c, true))
 
                     .then(literal("-doNotClear")
@@ -72,6 +106,8 @@ public class CommandInvStore extends FtcCommand {
         .then(literal("return")
             .then(argument("user", Arguments.ONLINE_USER)
                 .then(argument("category", StringArgumentType.string())
+                    .suggests(SUGGEST_CATEGORIES)
+
                     .executes(c -> returnItems(c, true))
 
                     .then(literal("-doNotClear")
@@ -81,11 +117,19 @@ public class CommandInvStore extends FtcCommand {
             )
         )
 
-        .then(literal("swap")
+        .then(literal("give")
             .then(argument("user", Arguments.ONLINE_USER)
-                .then(argument("category", StringArgumentType.greedyString())
-                    .executes(this::storeAndReturn)
+                .then(argument("category", StringArgumentType.string())
+                    .suggests(SUGGEST_CATEGORIES)
+                    .executes(c -> giveItems(c))
                 )
+            )
+        )
+
+        .then(literal("swap")
+            .then(argument("category", StringArgumentType.greedyString())
+                .suggests(SUGGEST_CATEGORIES)
+                .executes(c -> storeAndReturn(c))
             )
         );
   }
@@ -158,6 +202,30 @@ public class CommandInvStore extends FtcCommand {
                 + "inventory in category &e{1}&r.",
             NamedTextColor.GRAY,
 
+            user, category
+        )
+    );
+    return 0;
+  }
+
+  private int giveItems(CommandContext<CommandSource> c)
+      throws CommandSyntaxException {
+    InventoryStorage store = InventoryStorage.getStorage();
+
+    User user = getUser(c);
+    String category = c.getArgument("category", String.class);
+
+    if (!store.giveItems(user.getPlayer(), category)) {
+      throw Exceptions.format(
+          "Player {0, user} has NO stored inventory in category {1}",
+          user, category
+      );
+    }
+
+    c.getSource().sendAdmin(
+        Text.format(
+            "Gave &e{0, user}&r their items back from category &e{1}&r.",
+            NamedTextColor.GRAY,
             user, category
         )
     );

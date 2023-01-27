@@ -1,5 +1,6 @@
 import "@bukkit.entity.Fireball";
 import "@bukkit.entity.Enemy";
+import "@bukkit.entity.Player";
 import "@bukkit.block.Block";
 
 import "@kyori.sound.Sound";
@@ -44,9 +45,5 @@ function shouldLaunch(clicked) {
     return true;
   }
 
-  if (clicked instanceof Block) {
-    return false;
-  }
-
-  return clicked instanceof Enemy;
+  return clicked instanceof Enemy || clicked instanceof Player;
 }

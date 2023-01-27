@@ -7,11 +7,12 @@ import net.forthecrown.core.script2.Script;
 import net.forthecrown.core.script2.ScriptResult;
 import net.forthecrown.inventory.weapon.RoyalSword;
 import net.forthecrown.inventory.weapon.SwordRank;
-import net.forthecrown.inventory.weapon.SwordRanks;
 import net.forthecrown.user.User;
+import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.minecraft.nbt.CompoundTag;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -19,7 +20,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.math.GenericMath;
 
 @Getter @Setter
 public class WeaponAbility {
@@ -55,9 +55,21 @@ public class WeaponAbility {
       writer.formatted(" {0, number, -roman}", NamedTextColor.GRAY, level);
     }
 
-    writer.formattedLine("{0, number} / {1, number} Uses left",
+    float useLimit = getType().getLimit().get(user);
+    float uses = this.uses;
+
+    final float progress = uses / useLimit;
+    TextColor color = TextColor.lerp(
+        progress,
+        NamedTextColor.GREEN,
+        NamedTextColor.RED
+    );
+
+    writer.formattedLine("Uses left: {0, number}",
         NamedTextColor.GRAY,
-        uses, getType().getLimit().get(user)
+
+        Text.formatNumber(useLimit - uses)
+            .color(color)
     );
   }
 
@@ -66,10 +78,7 @@ public class WeaponAbility {
         .flatMap(ScriptResult::result)
         .flatMap(o -> {
           if (o instanceof String str) {
-            return Optional.of(
-                SwordAbilityManager.getInstance()
-                    .parseTicks(str)
-            );
+            return Optional.of(UpgradeCooldown.parseTicks(str));
           }
 
           if (o instanceof Number number) {
@@ -79,23 +88,17 @@ public class WeaponAbility {
           return Optional.empty();
         })
 
-        .orElseGet(() -> scaledCooldown(type.getBaseCooldown(), rank));
-  }
-
-  protected long scaledCooldown(long baseDuration, SwordRank rank) {
-    float max = SwordRanks.MAX_RANK;
-    float scalar = (max - rank.getIndex()) / max;
-    return GenericMath.floor(scalar * baseDuration);
+        .orElseGet(() -> type.getCooldown().get(rank));
   }
 
   public void setLevel(int level) {
-    this.level = level;
-    script.put("level", level);
+    this.level = Math.max(START_LEVEL, level);
+    script.put("level", this.level);
   }
 
   public void setUses(int uses) {
-    this.uses = uses;
-    script.put("uses", uses);
+    this.uses = Math.max(0, uses);
+    script.put("uses", this.uses);
   }
 
   /* ----------------------------- CALLBACKS ------------------------------ */

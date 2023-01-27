@@ -13,10 +13,6 @@ const SOUND = Sound.sound()
     .build();
 
 function onRightClick(player, clicked) {
-  if (clicked != null) {
-    return false;
-  }
-
   // Note: velocity == 0, if player is just walking or sprinting
   // Apperantly that's a bug that hasn't been fixed since 2017 lmao
   let velocity = player.getVelocity();

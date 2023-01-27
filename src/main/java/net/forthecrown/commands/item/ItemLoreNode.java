@@ -33,7 +33,7 @@ public class ItemLoreNode extends ItemModifierNode {
 
     ItemNameNode.namingNote(
         factory.usage("add <text>")
-            .addInfo("Adds the <text> to your held item's lore")
+            .addInfo("Adds <text> to your held item's lore")
     );
 
     factory.usage("remove <index>")

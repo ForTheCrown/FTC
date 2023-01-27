@@ -38,7 +38,7 @@ public class WeaponAbilityType {
   private final ImmutableList<Component> description;
 
   private final ScriptSource source;
-  private final long baseCooldown;
+  private final UpgradeCooldown cooldown;
   private final String[] args;
 
   private final NamespacedKey advancementKey;
@@ -54,21 +54,17 @@ public class WeaponAbilityType {
     this.description = builder.description.build();
 
     this.limit = Objects.requireNonNull(builder.limit);
+    this.cooldown = Objects.requireNonNull(builder.cooldown);
 
     this.source = Objects.requireNonNull(builder.source);
     this.args = Objects.requireNonNull(builder.args);
 
     this.advancementKey = builder.advancementKey;
-    this.baseCooldown = builder.baseCooldown;
 
     // Check arguments
     Preconditions.checkArgument(
         ItemStacks.notEmpty(item),
         "Cannot have empty item"
-    );
-    Preconditions.checkArgument(
-        baseCooldown >= 0,
-        "Negative base cooldown"
     );
   }
 
@@ -79,7 +75,7 @@ public class WeaponAbilityType {
   public WeaponAbility create() {
     var script = Script.of(source);
     script.compile(args);
-    script.put("baseCooldown", baseCooldown);
+    script.put("cooldown", cooldown);
     script.put("abilityType", this);
 
     script.eval().throwIfError();
@@ -114,8 +110,8 @@ public class WeaponAbilityType {
     builder.setName(getDisplayName().colorIfAbsent(NamedTextColor.YELLOW));
 
     var writer = TextWriters.loreWriter();
-    writer.setFieldStyle(Style.style(NamedTextColor.DARK_GRAY));
-    writer.setFieldValueStyle(Style.style(NamedTextColor.DARK_GRAY));
+    writer.setFieldStyle(Style.style(NamedTextColor.GRAY));
+    writer.setFieldValueStyle(Style.style(NamedTextColor.GRAY));
 
     writeHover(writer, user);
     builder.addLore(writer.getLore());
@@ -149,7 +145,21 @@ public class WeaponAbilityType {
 
     writer.field("Max Level", Text.format("{0, number, -roman}", maxLevel));
     writer.field("Uses", Text.formatNumber(limit.get(user)));
-    writer.field("Cooldown", PeriodFormat.of(Time.ticksToMillis(baseCooldown)));
+
+    writer.field("Cooldown", cooldown);
+
+    long change = cooldown.getCooldownChange();
+    if (change > 0) {
+      writer.field("Cooldown decrease",
+          PeriodFormat.of(Time.ticksToMillis(change))
+              .withShortNames()
+      );
+
+      writer.line(
+          "^ Cooldown decrease per sword level",
+          NamedTextColor.DARK_GRAY
+      );
+    }
   }
 
   public Advancement getAdvancement() {
@@ -203,7 +213,7 @@ public class WeaponAbilityType {
     Component displayName;
 
     ScriptSource source;
-    long baseCooldown;
+    UpgradeCooldown cooldown;
     String[] args;
 
     NamespacedKey advancementKey;

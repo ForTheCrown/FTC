@@ -41,7 +41,12 @@ public class MessageSuggestions {
       return;
     }
 
-    suggest(reader.getCursor(), this::suggestEmotes, this::suggestPlayers, customSuggestions);
+    suggest(
+        reader.getCursor(),
+        this::suggestEmotes,
+        this::suggestPlayers,
+        customSuggestions
+    );
 
     while (reader.canRead()) {
       if (peekMatches('<', Permissions.CHAT_GRADIENTS)) {
@@ -60,8 +65,12 @@ public class MessageSuggestions {
       }
 
       if (reader.peek() == ' ') {
-        suggest(reader.getCursor() + 1, this::suggestPlayers, this::suggestEmotes,
-            customSuggestions);
+        suggest(
+            reader.getCursor() + 1,
+            this::suggestPlayers,
+            this::suggestEmotes,
+            customSuggestions
+        );
       }
 
       reader.skip();
@@ -159,7 +168,13 @@ public class MessageSuggestions {
     reader.skipWhitespace();
 
     if (!reader.canRead()) {
-      suggest(reader.getCursor(), this::suggestPlayers, (builder, source) -> builder.suggest(">"));
+      suggest(
+          reader.getCursor(),
+          this::suggestPlayers,
+          (builder, source) -> builder.suggest(">"),
+          customSuggestions
+      );
+
       return;
     }
 
@@ -174,8 +189,12 @@ public class MessageSuggestions {
         continue;
       }
 
-      suggest(reader.getCursor() + 1, this::suggestPlayers,
-          (builder, source) -> builder.suggest(">"), customSuggestions);
+      suggest(
+          reader.getCursor() + 1,
+          this::suggestPlayers,
+          (builder, source) -> builder.suggest(">"),
+          customSuggestions
+      );
       reader.skip();
     }
   }
@@ -244,7 +263,9 @@ public class MessageSuggestions {
 
   private void suggest(int cursor, SuggestionFunction... suggestions) {
     this.suggests = (context, builder) -> {
-      builder = builder.createOffset(cursor);
+      if (cursor != builder.getStart()) {
+        builder = builder.createOffset(cursor);
+      }
 
       for (var s : suggestions) {
         if (s == null) {

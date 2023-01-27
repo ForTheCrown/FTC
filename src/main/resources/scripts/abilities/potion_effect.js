@@ -2,7 +2,7 @@ import "joptsimple.OptionParser";
 import "@bukkit.potion.PotionEffectType";
 import "@bukkit.potion.PotionEffect";
 import "@bukkit.entity.LivingEntity";
-import "@ftc.inventory.weapon.ability.SwordAbilityManager";
+import "@ftc.inventory.weapon.ability.UpgradeCooldown";
 
 import "@jlang.Integer";
 import "@jlang.System";
@@ -66,7 +66,7 @@ function parseArgs() {
 
   if (set.hasArgument(durationArg)) {
     let durValue = set.valueOf(durationArg);
-    duration = SwordAbilityManager.getInstance().parseTicks(durValue);
+    duration = UpgradeCooldown.parseTicks(durValue);
   }
 
   let potionTypeString = set.valueOf(type);
@@ -113,4 +113,8 @@ function trigger(player, clicked) {
 
   let effect = new PotionEffect(potionType, duration, amp);
   target.addPotionEffect(effect);
+}
+
+function getCooldown(rank) {
+  return duration + 60;
 }
