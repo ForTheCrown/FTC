@@ -40,6 +40,8 @@ abstract class InteractableNode<H extends Usable> extends FtcCommand {
         .then(createEditArguments());
   }
 
+  protected abstract UsableSaveCallback<H> saveCallback();
+
   protected RequiredArgumentBuilder<CommandSource, ?> createEditArguments() {
     var argument = argument("holder_value", getArgumentType());
     UsageHolderProvider<H> provider = context -> get("holder_value", context);
@@ -76,8 +78,14 @@ abstract class InteractableNode<H extends Usable> extends FtcCommand {
 
         .then(removeLiteral)
 
-        .then(UsableCommands.CHECK_NODE.createArguments(provider))
-        .then(UsableCommands.ACTION_NODE.createArguments(provider));
+        .then(
+            UsableCommands.CHECK_NODE
+                .createArguments(provider, saveCallback())
+        )
+        .then(
+            UsableCommands.ACTION_NODE
+                .createArguments(provider, saveCallback())
+        );
   }
 
   protected abstract void createNewUsableArguments(LiteralArgumentBuilder<CommandSource> command);

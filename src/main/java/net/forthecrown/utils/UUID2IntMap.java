@@ -173,7 +173,7 @@ public class UUID2IntMap extends SerializableObject.Json
    * @param uuid The UUID to remove
    */
   public void remove(UUID uuid) {
-    var entry = entries.get(uuid);
+    var entry = entries.remove(uuid);
 
     if (entry != null) {
       sortedList.remove(entry);

@@ -2,8 +2,6 @@ package net.forthecrown.core;
 
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.ModuleServices;
-import net.forthecrown.core.module.OnDisable;
-import net.forthecrown.core.module.OnSave;
 import net.forthecrown.dungeons.enchantments.FtcEnchants;
 import net.kyori.adventure.key.Namespaced;
 import org.apache.logging.log4j.Logger;
@@ -28,7 +26,6 @@ public final class Main extends JavaPlugin implements Namespaced {
 
     // Register dynmap hook connection thing
     DynmapUtil.registerListener();
-
     BootStrap.init();
 
     getLog4JLogger().info("FTC started");
@@ -45,8 +42,8 @@ public final class Main extends JavaPlugin implements Namespaced {
     Bukkit.getScheduler()
         .cancelTasks(this);
 
-    ModuleServices.run(OnSave.class);
-    ModuleServices.run(OnDisable.class);
+    ModuleServices.SAVE.run();
+    ModuleServices.ON_DISABLE.run();
   }
 
   private void setDebugMode() {

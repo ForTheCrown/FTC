@@ -2,6 +2,7 @@ package net.forthecrown.useables;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import net.forthecrown.utils.io.TagUtil;
 import net.minecraft.nbt.CompoundTag;
 import org.bukkit.NamespacedKey;
@@ -20,6 +21,7 @@ public abstract class BukkitSavedUsable extends AbstractUsable {
    */
   @Getter
   @Setter
+  @Accessors(fluent = true)
   protected boolean cancelVanilla;
 
   public abstract PersistentDataContainer getDataContainer();
@@ -65,7 +67,7 @@ public abstract class BukkitSavedUsable extends AbstractUsable {
 
   @Override
   public void load(CompoundTag tag) {
-    setCancelVanilla(tag.getBoolean("cancelVanilla"));
+    cancelVanilla(tag.getBoolean("cancelVanilla"));
     super.load(tag);
   }
 }

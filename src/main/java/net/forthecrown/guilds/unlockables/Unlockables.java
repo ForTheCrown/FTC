@@ -26,8 +26,8 @@ public @UtilityClass class Unlockables {
 
     // Role color doesn't have to be registered
     // because it's not serialized
-    registerAll(UnlockableDiscordRole.ROLE);
-    registerAll(UnlockableTextChannel.CHANNEL);
+    registerAll(DiscordUnlocks.ROLE);
+    registerAll(DiscordUnlocks.CHANNEL);
   }
 
   private static void registerAll(Unlockable... unlockables) {

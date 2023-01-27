@@ -43,6 +43,7 @@ import net.forthecrown.commands.admin.CommandGetPos;
 import net.forthecrown.commands.admin.CommandGift;
 import net.forthecrown.commands.admin.CommandHologram;
 import net.forthecrown.commands.admin.CommandIllegalWorlds;
+import net.forthecrown.commands.admin.CommandInvStore;
 import net.forthecrown.commands.admin.CommandJoinInfo;
 import net.forthecrown.commands.admin.CommandLaunch;
 import net.forthecrown.commands.admin.CommandMakeAward;
@@ -185,6 +186,7 @@ public final class Commands {
     new CommandGetOffset();
     new CommandStructFunction();
     new CommandScripts();
+    new CommandInvStore();
 
     InteractableCommands.createCommands();
     CommandSpecificGameMode.createCommands();

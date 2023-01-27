@@ -325,7 +325,7 @@ public class AbilityAnimation {
         );
 
         UsableEntity entity = Usables.getInstance().createEntity(holder);
-        entity.setCancelVanilla(true);
+        entity.cancelVanilla(true);
         entity.setSilent(false);
 
         var action = new ActionScript(SwordConfig.swordAnim_claimScript);

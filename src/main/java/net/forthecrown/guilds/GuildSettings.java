@@ -14,7 +14,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.forthecrown.core.DynmapUtil;
 import net.forthecrown.core.logging.Loggers;
-import net.forthecrown.guilds.unlockables.UnlockableRoleColor;
+import net.forthecrown.guilds.unlockables.DiscordUnlocks;
 import net.forthecrown.utils.ArrayIterator;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
@@ -200,7 +200,7 @@ public class GuildSettings {
 
     if (boost == BoostTier.NONE
         || boost == BoostTier.TIER_1
-        || !UnlockableRoleColor.COLOR.isUnlocked(guild) // Check if donator
+        || !DiscordUnlocks.COLOR.isUnlocked(guild) // Check if donator
     ) {
       return;
     }

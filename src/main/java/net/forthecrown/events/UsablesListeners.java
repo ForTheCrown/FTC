@@ -1,17 +1,18 @@
 package net.forthecrown.events;
 
-import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
-import io.papermc.paper.event.entity.EntityMoveEvent;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.useables.UsableBlock;
 import net.forthecrown.useables.UsableEntity;
 import net.forthecrown.useables.Usables;
 import net.forthecrown.utils.Cooldown;
-import net.forthecrown.utils.EntityIdentifier;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
@@ -21,83 +22,51 @@ import org.bukkit.inventory.EquipmentSlot;
 
 public class UsablesListeners implements Listener {
 
+  private static final Logger LOGGER = Loggers.getLogger();
+
   private static final String COOLDOWN_CATEGORY = "Core_Interactables";
 
-  @EventHandler(ignoreCancelled = true)
-  public void onEntityRemoveFromWorld(EntityRemoveFromWorldEvent event) {
-    if (!Usables.getInstance().isUsableEntity(event.getEntity())) {
-      return;
-    }
-
-    var manager = Usables.getInstance();
-    var entity = event.getEntity();
-    var usable = manager.getLoadedEntity(entity);
-
-    if (usable == null) {
-      usable = new UsableEntity(entity.getUniqueId());
-      usable.load(entity.getPersistentDataContainer());
-    } else {
-      manager.entityUnload(usable);
-    }
-
-    usable.setIdentifier(EntityIdentifier.of(entity));
-    usable.save(entity.getPersistentDataContainer());
-  }
-
-  @EventHandler(ignoreCancelled = true)
-  public void onEntityMove(EntityMoveEvent event) {
-    if (!Usables.getInstance().isUsableEntity(event.getEntity())) {
-      return;
-    }
-
-    var manager = Usables.getInstance();
-    var entity = event.getEntity();
-    var usable = manager.getEntity(entity);
-
-    var fChunk = event.getFrom().getChunk();
-    var tChunk = event.getTo().getChunk();
-
-    if (fChunk.getX() != tChunk.getX() || fChunk.getZ() != tChunk.getZ()) {
-      usable.setIdentifier(
-          EntityIdentifier.of(entity)
-      );
-
-      usable.save(entity.getPersistentDataContainer());
-    }
-  }
-
-  @EventHandler
+  @EventHandler(priority = EventPriority.MONITOR)
   public void onPlayerInteract(PlayerInteractEvent event) {
     if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
       return;
     }
 
-    boolean b = check(event.getClickedBlock(), event.getPlayer());
+    boolean cancelVanilla = interactBlock(
+        event.getClickedBlock(),
+        event.getPlayer()
+    );
 
-    if (b && !event.isCancelled()) {
+    if (cancelVanilla) {
       event.setCancelled(true);
     }
   }
 
-  @EventHandler
+  @EventHandler(priority = EventPriority.MONITOR)
   public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
-    boolean b = check(event.getRightClicked(), event.getPlayer(), event.getHand());
+    boolean cancelVanilla = interactEntity(
+        event.getRightClicked(),
+        event.getPlayer(),
+        event.getHand()
+    );
 
-    if (b && !event.isCancelled()) {
+    if (cancelVanilla) {
       event.setCancelled(true);
     }
   }
 
-  @EventHandler
+  @EventHandler(priority = EventPriority.MONITOR)
   public void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event) {
-    boolean b = check(event.getRightClicked(), event.getPlayer(), event.getHand());
-
-    if (b && !event.isCancelled()) {
-      event.setCancelled(true);
+    if (!(event.getRightClicked() instanceof ArmorStand)) {
+      return;
     }
+
+    // Same logic as this listener, but different handler list, so gotta
+    // have this method
+    onPlayerInteractEntity(event);
   }
 
-  public boolean check(Entity entity, Player player, EquipmentSlot slot) {
+  public boolean interactEntity(Entity entity, Player player, EquipmentSlot slot) {
     if (slot != EquipmentSlot.HAND) {
       return false;
     }
@@ -105,24 +74,28 @@ public class UsablesListeners implements Listener {
     var manager = Usables.getInstance();
 
     try {
-      if (manager.isUsableEntity(entity)) {
-        if (check0(player)) {
-          return false;
-        }
-
-        UsableEntity usable = manager.getEntity(entity);
-        usable.interact(player);
-        usable.save(entity.getPersistentDataContainer());
-
-        return usable.isCancelVanilla();
+      if (!manager.isUsableEntity(entity)
+          || shouldSkipInteraction(player)
+      ) {
+        return false;
       }
-    } catch (NullPointerException ignored) {
+
+      UsableEntity usable = manager.getEntity(entity);
+      usable.interact(player);
+      usable.save(entity.getPersistentDataContainer());
+
+      return usable.cancelVanilla();
+    } catch (NullPointerException e) {
+      LOGGER.error(
+          "Error running entity interaction between player {} and {}",
+          player, entity, e
+      );
     }
 
     return false;
   }
 
-  private boolean check0(Player player) {
+  private boolean shouldSkipInteraction(Player player) {
     if (player.getGameMode() == GameMode.SPECTATOR) {
       return true;
     }
@@ -131,22 +104,25 @@ public class UsablesListeners implements Listener {
   }
 
   // Returns whether the event should be cancelled
-  public boolean check(Block block, Player player) {
+  public boolean interactBlock(Block block, Player player) {
     var manager = Usables.getInstance();
 
     try {
-      if (manager.isUsableBlock(block)) {
-        if (check0(player)) {
-          return false;
-        }
-
-        UsableBlock usable = manager.getBlock(block);
-        usable.interact(player);
-        usable.save();
-
-        return usable.isCancelVanilla();
+      if (!manager.isUsableBlock(block)
+          || shouldSkipInteraction(player)
+      ) {
+        return false;
       }
-    } catch (NullPointerException ignored) {
+
+      UsableBlock usable = manager.getBlock(block);
+      usable.interact(player);
+      usable.save();
+
+      return usable.cancelVanilla();
+    } catch (NullPointerException e) {
+      LOGGER.error("Error running block interaction at {}, player: {}",
+          block, player, e
+      );
     }
 
     return false;

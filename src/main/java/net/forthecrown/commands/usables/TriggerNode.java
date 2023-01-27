@@ -31,6 +31,11 @@ class TriggerNode extends InteractableNode<UsableTrigger> {
   }
 
   @Override
+  protected UsableSaveCallback<UsableTrigger> saveCallback() {
+    return UsableSaveCallback.empty();
+  }
+
+  @Override
   protected void createNewUsableArguments(LiteralArgumentBuilder<CommandSource> command) {
     command
         .then(argument("name", Arguments.FTC_KEY)

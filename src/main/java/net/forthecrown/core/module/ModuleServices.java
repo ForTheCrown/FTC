@@ -1,6 +1,5 @@
 package net.forthecrown.core.module;
 
-import java.lang.annotation.Annotation;
 import net.forthecrown.core.registry.Registries;
 import net.forthecrown.core.registry.Registry;
 
@@ -26,15 +25,5 @@ public class ModuleServices {
     SERVICES.register("on_enable", ON_ENABLE);
     SERVICES.register("on_disable", ON_DISABLE);
     SERVICES.register("day_change", DAY_CHANGE);
-  }
-
-  public static void run(Class<? extends Annotation> type) {
-    for (var s : SERVICES) {
-      if (s.getAnnotationType() != type) {
-        continue;
-      }
-
-      s.run();
-    }
   }
 }

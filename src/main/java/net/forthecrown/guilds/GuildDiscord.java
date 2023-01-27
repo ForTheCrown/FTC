@@ -36,7 +36,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.forthecrown.core.logging.Loggers;
-import net.forthecrown.guilds.unlockables.UnlockableRoleColor;
+import net.forthecrown.guilds.unlockables.DiscordUnlocks;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.io.FtcJar;
@@ -170,6 +170,16 @@ public class GuildDiscord {
     });
   }
 
+  public void sendAnnouncement(Message message) {
+    if (!forwardAnnouncements()) {
+      return;
+    }
+
+    channelIfNotArchived().ifPresent(channel -> {
+      webHookMessage(channel, message);
+    });
+  }
+
   public void forwardGuildChat(User sender, Component message) {
     // Only forward to non archived channels
     channelIfNotArchived().ifPresent(channel -> {
@@ -251,7 +261,9 @@ public class GuildDiscord {
     try {
       var input = Files.newInputStream(path);
 
-      var extension =  FilenameUtils.getExtension(path.getFileName().toString());
+      var extension = FilenameUtils.getExtension(
+          path.getFileName().toString()
+      );
       icon = Icon.from(input, IconType.fromExtension(extension));
     } catch (IOException exc) {
       LOGGER.error("Couldn't read icon from path {}",
@@ -326,7 +338,7 @@ public class GuildDiscord {
 
     if (boost == BoostTier.NONE
         || boost == BoostTier.TIER_1
-        || UnlockableRoleColor.COLOR.isUnlocked(guild) // Check if donator
+        || DiscordUnlocks.COLOR.isUnlocked(guild) // Check if donator
     ) {
       icon = null;
     }

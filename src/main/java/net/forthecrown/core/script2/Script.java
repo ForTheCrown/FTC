@@ -338,7 +338,8 @@ public class Script implements Closeable {
    * however they deem fit. Script bindings can be accessed with
    * {@link #getMirror()}
    *
-   * @param args Optional arguments to supply to the engine
+   * @param args Optional arguments to supply to the script, will be placed into
+   *             a 'args' binding
    * @return This
    * @throws ScriptLoadException If the script couldn't be loaded
    */

@@ -1,6 +1,5 @@
 package net.forthecrown.guilds.unlockables;
 
-import static net.forthecrown.commands.guild.GuildCommandNode.testPermission;
 import static net.forthecrown.guilds.GuildDiscord.isArchived;
 import static net.forthecrown.guilds.GuildSettings.GUILD_CHANNEL;
 import static net.forthecrown.guilds.menu.GuildMenus.GUILD;
@@ -25,10 +24,8 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemFlag;
 
 public class UnlockableTextChannel implements Unlockable {
-  public static final UnlockableTextChannel CHANNEL
-      = new UnlockableTextChannel();
 
-  private UnlockableTextChannel() {
+  UnlockableTextChannel() {
   }
 
   @Override
@@ -73,6 +70,15 @@ public class UnlockableTextChannel implements Unlockable {
               .addLore("&7Creates a private Discord channel for the guild!")
               .addLore("");
 
+          if (!DiscordUnlocks.ROLE.isUnlocked(guild)) {
+            builder.addLore(
+                Text.format("Requires {0}",
+                    NamedTextColor.RED,
+                    DiscordUnlocks.ROLE.getName()
+                )
+            );
+          }
+
           if (isUnlocked(guild)) {
             guild.getDiscord().getChannel().ifPresentOrElse(channel -> {
               if (isArchived(channel)) {
@@ -107,8 +113,14 @@ public class UnlockableTextChannel implements Unlockable {
 
         .setRunnable((user, context, click) -> {
           var guild = context.getOrThrow(GUILD);
+          ensureHasPermission(guild, user);
 
-          testPermission(user, guild, getPerm(), Exceptions.NO_PERMISSION);
+          if (!DiscordUnlocks.ROLE.isUnlocked(guild)) {
+            throw Exceptions.format(
+                "Requires {0}",
+                DiscordUnlocks.ROLE.getName()
+            );
+          }
 
           if (!isUnlocked(guild)) {
             throw Exceptions.format(
@@ -132,7 +144,9 @@ public class UnlockableTextChannel implements Unlockable {
               .orElse(false);
 
           var disc = guild.getDiscord();
-          var page = GuildMenus.MAIN_MENU.getUpgradesMenu().getDiscordMenu();
+          var page = GuildMenus.MAIN_MENU
+              .getUpgradesMenu()
+              .getDiscordMenu();
 
           // Note:
           // Since any method involving Discord can fail, every method call

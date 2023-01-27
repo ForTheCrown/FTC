@@ -170,8 +170,7 @@ public class Guild
     }
 
     // Forward message to discord
-    getDiscord()
-        .forwardGuildChat(user, message);
+    getDiscord().forwardGuildChat(user, message);
 
     Mute finalMute = mute;
     getMembers()

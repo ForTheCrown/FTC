@@ -22,7 +22,6 @@ import net.kyori.adventure.text.format.TextDecoration;
 @AllArgsConstructor
 public class GuildNameFormat {
 
-  // todo serialize/deserialize
   public static final String
       BRACKETS_KEY = "brackets",
       COLORS_KEY = "colors",
@@ -34,9 +33,11 @@ public class GuildNameFormat {
       CLOSING_BRACKET = 2;
 
   private Bracket bracket;
+
   @Getter
   @Setter
   private Color color;
+
   @Getter
   @Setter
   private Stylee style;

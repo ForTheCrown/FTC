@@ -22,11 +22,10 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemFlag;
 
 public class UnlockableDiscordRole implements Unlockable {
-  public static final UnlockableDiscordRole ROLE = new UnlockableDiscordRole();
 
   private MenuNode node;
 
-  private UnlockableDiscordRole() {
+  UnlockableDiscordRole() {
   }
 
   @Override
@@ -108,6 +107,9 @@ public class UnlockableDiscordRole implements Unlockable {
             }
 
             var roleOpt = guild.getDiscord().getRole();
+            var page = GuildMenus.MAIN_MENU
+                .getUpgradesMenu()
+                .getDiscordMenu();
 
             if (roleOpt.isEmpty()) {
               guild.getDiscord().createRole().whenComplete((role, throwable) -> {
@@ -126,11 +128,7 @@ public class UnlockableDiscordRole implements Unlockable {
                     user
                 ));
 
-                GuildMenus.open(
-                    GuildMenus.MAIN_MENU.getUpgradesMenu().getDiscordMenu(),
-                    user,
-                    guild
-                );
+                GuildMenus.open(page, user, guild);
               });
               return;
             }
@@ -158,11 +156,7 @@ public class UnlockableDiscordRole implements Unlockable {
                   )
               );
 
-              GuildMenus.open(
-                  GuildMenus.MAIN_MENU.getUpgradesMenu().getDiscordMenu(),
-                  user,
-                  guild
-              );
+              GuildMenus.open(page, user, guild);
             });
           });
         })

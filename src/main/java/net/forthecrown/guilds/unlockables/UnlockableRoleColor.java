@@ -1,6 +1,5 @@
 package net.forthecrown.guilds.unlockables;
 
-import static net.forthecrown.commands.guild.GuildCommandNode.testPermission;
 import static net.forthecrown.guilds.GuildSettings.ROLE_COLOR;
 import static net.forthecrown.guilds.menu.GuildMenus.GUILD;
 
@@ -11,12 +10,13 @@ import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.inventory.menu.MenuNode;
 import net.forthecrown.utils.inventory.menu.Slot;
+import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 public class UnlockableRoleColor implements Unlockable {
-  public static final UnlockableRoleColor COLOR = new UnlockableRoleColor();
 
-  private UnlockableRoleColor() {
+  UnlockableRoleColor() {
   }
 
   @Override
@@ -47,7 +47,7 @@ public class UnlockableRoleColor implements Unlockable {
   @Override
   public boolean isUnlocked(Guild guild) {
     return guild.getSettings().hasFlags(ROLE_COLOR)
-        && UnlockableDiscordRole.ROLE.isUnlocked(guild);
+        && DiscordUnlocks.ROLE.isUnlocked(guild);
   }
 
   @Override
@@ -63,6 +63,15 @@ public class UnlockableRoleColor implements Unlockable {
           builder.setName("&eRole color")
               .addLore("&7Set Discord role color to guild's primary color")
               .addLoreRaw(Component.empty());
+
+          if (!DiscordUnlocks.ROLE.isUnlocked(guild)) {
+            builder.addLore(
+                Text.format("Requires {0}",
+                    NamedTextColor.RED,
+                    DiscordUnlocks.ROLE.getName()
+                )
+            );
+          }
 
           if (isUnlocked(guild)) {
             builder
@@ -86,7 +95,14 @@ public class UnlockableRoleColor implements Unlockable {
           }
 
           var guild = context.getOrThrow(GUILD);
-          testPermission(user, guild, getPerm(), Exceptions.NO_PERMISSION);
+          ensureHasPermission(guild, user);
+
+          if (!DiscordUnlocks.ROLE.isUnlocked(guild)) {
+            throw Exceptions.format(
+                "Requires {0}",
+                DiscordUnlocks.ROLE.getName()
+            );
+          }
 
           if (!isUnlocked(guild)) {
             throw Exceptions.format("Not yet unlocked");

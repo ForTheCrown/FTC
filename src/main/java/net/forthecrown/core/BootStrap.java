@@ -57,6 +57,8 @@ final class BootStrap {
 
     long freeMem = Runtime.getRuntime().freeMemory();
 
+    init(InventoryStorage::getStorage);
+
     // Guilds
     init(Unlockables.class);
     init(GuildManager::get);
@@ -152,7 +154,7 @@ final class BootStrap {
 
     long freeMemAfter = Runtime.getRuntime().freeMemory();
     long lostMemory = freeMemAfter - freeMem;
-    LOGGER.info("Plugin initialization took {}MB or {} bytes",
+    LOGGER.debug("Plugin initialization took {}MB or {} bytes",
         lostMemory / 1024 / 1024,
         lostMemory
     );

@@ -1,6 +1,7 @@
 package net.forthecrown.events.player;
 
 import io.papermc.paper.adventure.ChatDecorationProcessor;
+import java.lang.reflect.Method;
 import java.util.Objects;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.user.packet.PacketCall;
@@ -55,6 +56,8 @@ public class ChatPacketListener implements PacketListener {
                 .withResult(Objects.requireNonNull(result)),
             true
         );
+
+        detectRateSpam(call.getPacketListener(), packet.message());
       } catch (Throwable t) {
         LOGGER.error("Couldn't process chat!", t);
       }
@@ -74,8 +77,8 @@ public class ChatPacketListener implements PacketListener {
       // Prepend this onto it, or it won't find the command lol
       String command = "/" + packet.command();
 
-      call.getPacketListener()
-          .handleCommand(command);
+      call.getPacketListener().handleCommand(command);
+      detectRateSpam(call.getPacketListener(), command);
     });
   }
 
@@ -97,5 +100,20 @@ public class ChatPacketListener implements PacketListener {
     }
 
     return false;
+  }
+
+  private void detectRateSpam(ServerGamePacketListenerImpl listener, String msg) {
+    try {
+      Method m = listener.getClass()
+          // For some reason, this method doesn't get obfuscated
+          .getDeclaredMethod("detectRateSpam", String.class);
+
+      m.setAccessible(true);
+      m.invoke(listener, msg);
+    } catch (ReflectiveOperationException exc) {
+      LOGGER.error("Couldn't call detectRateSpam in {}",
+          listener.getClass(), exc
+      );
+    }
   }
 }

@@ -163,7 +163,11 @@ public abstract class UseCmdCommand<T extends CommandUsable> extends FtcCommand 
             .then(literal("edit")
                 .requires(source -> source.hasPermission(Permissions.ADMIN))
 
-                .then(UsableCommands.CHECK_NODE.createArguments(this::get))
+                .then(
+                    UsableCommands.CHECK_NODE
+                        .createArguments(this::get, UsableSaveCallback.empty())
+                )
+
                 .then(editArgument())
             )
         );

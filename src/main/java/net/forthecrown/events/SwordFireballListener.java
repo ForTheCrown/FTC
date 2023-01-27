@@ -15,7 +15,7 @@ public class SwordFireballListener implements Listener {
   public void onEntityMove(EntityMoveEvent event) {
     var entity = event.getEntity();
 
-    if (entity.getScoreboardTags().contains(FIREBALL_TAG)) {
+    if (!entity.getScoreboardTags().contains(FIREBALL_TAG)) {
       return;
     }
 

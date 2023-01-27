@@ -122,12 +122,12 @@ public class ModuleService implements Runnable {
       }
     }
 
+    timing.stopTiming();
     LOGGER.info(
         "Ran {} on {} modules",
         annotationType.getSimpleName(),
         ran
     );
-    timing.stopTiming();
   }
 
   public void invoke(@Nullable Object instance,

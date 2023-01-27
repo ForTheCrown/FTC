@@ -22,7 +22,7 @@ import net.forthecrown.guilds.Guild;
 import net.forthecrown.guilds.GuildManager;
 import net.forthecrown.guilds.GuildPermission;
 import net.forthecrown.guilds.Guilds;
-import net.forthecrown.guilds.unlockables.UnlockableTextChannel;
+import net.forthecrown.guilds.unlockables.DiscordUnlocks;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.utils.text.Text;
@@ -56,7 +56,7 @@ class GuildSetNode extends GuildCommandNode {
       return false;
     }
 
-    return UnlockableTextChannel.CHANNEL.isUnlocked(guild);
+    return DiscordUnlocks.CHANNEL.isUnlocked(guild);
   };
 
   @Override

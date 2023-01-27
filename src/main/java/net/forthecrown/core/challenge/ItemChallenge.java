@@ -132,7 +132,7 @@ public class ItemChallenge implements Challenge {
         if (ItemStacks.notEmpty(item)) {
           container.getUsed().add(item);
           container.setActive(item);
-          setTargetItem(item);
+          setTargetItem(item.clone());
         } else {
           container.setActive(null);
           setTargetItem(null);

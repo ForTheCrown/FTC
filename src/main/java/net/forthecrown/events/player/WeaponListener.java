@@ -82,6 +82,11 @@ public class WeaponListener implements Listener {
       return;
     }
 
+    // Player has shield raised
+    if (player.isBlocking()) {
+      return;
+    }
+
     var user = Users.get(player);
     var item = player.getInventory().getItemInMainHand();
     RoyalSword sword = ExtendedItems.ROYAL_SWORD.get(item);

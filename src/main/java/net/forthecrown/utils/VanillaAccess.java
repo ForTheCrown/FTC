@@ -22,7 +22,6 @@ import org.bukkit.craftbukkit.v1_19_R2.block.CraftBlockEntityState;
 import org.bukkit.craftbukkit.v1_19_R2.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_19_R2.entity.CraftEntity;
 import org.bukkit.entity.Player;
-import org.spongepowered.math.vector.Vector3d;
 
 /**
  * Utility class for accessing vanilla code
@@ -82,6 +81,7 @@ public final class VanillaAccess {
    * @param state The bukkit tile entity
    * @return The vanilla equivalent
    */
+  @SuppressWarnings("rawtypes")
   public static BlockEntity getBlockEntity(TileState state) {
     return ((CraftBlockEntityState) state).getTileEntity();
   }
@@ -120,17 +120,12 @@ public final class VanillaAccess {
     return state.createCraftBlockData();
   }
 
-  public static void setPosRaw(org.bukkit.entity.Entity entity, Vector3d dest) {
-    var vanilla = getEntity(entity);
-    vanilla.setPosRaw(dest.x(), dest.y(), dest.z());
-  }
-
   /**
    * Unfreezes the given registry
    *
    * @param registry The registry to unfreeze
    */
-  public static void unfreeze(MappedRegistry registry) {
+  public static void unfreeze(MappedRegistry<?> registry) {
     try {
       // The only liability here is the frozen variable
       // It may change with each release, but I also don't
@@ -149,7 +144,7 @@ public final class VanillaAccess {
 
   private static final String FROZEN_FIELD = "ca";
 
-  private static Field findFrozenField(Class c) throws NoSuchFieldException {
+  private static Field findFrozenField(Class<?> c) throws NoSuchFieldException {
     for (var f : c.getDeclaredFields()) {
       if (f.getType() == Boolean.TYPE
           || f.getType() == Boolean.class

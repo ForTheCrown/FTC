@@ -1,15 +1,9 @@
 package net.forthecrown.guilds.menu;
 
-import static net.forthecrown.guilds.menu.GuildMenus.GUILD;
-
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.guilds.unlockables.UnlockableDiscordRole;
-import net.forthecrown.guilds.unlockables.UnlockableRoleColor;
-import net.forthecrown.guilds.unlockables.UnlockableTextChannel;
+import net.forthecrown.guilds.unlockables.DiscordUnlocks;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.inventory.ItemStacks;
-import net.forthecrown.utils.inventory.menu.ClickContext;
 import net.forthecrown.utils.inventory.menu.MenuBuilder;
 import net.forthecrown.utils.inventory.menu.MenuNode;
 import net.forthecrown.utils.inventory.menu.Menus;
@@ -32,39 +26,16 @@ public class GuildDiscordMenu extends MenuPage {
   @Override
   protected void createMenu(MenuBuilder builder) {
     UpgradesMenu.addAll(builder,
-        UnlockableDiscordRole.ROLE,
-        UnlockableRoleColor.COLOR,
-        UnlockableTextChannel.CHANNEL
+        DiscordUnlocks.ROLE,
+        DiscordUnlocks.COLOR,
+        DiscordUnlocks.CHANNEL
     );
-  }
-
-  @Override
-  public void onClick(User user, Context context, ClickContext click)
-      throws CommandSyntaxException
-  {
-    var guild = context.getOrThrow(GUILD);
-
-    if (!UnlockableDiscordRole.ROLE.isUnlocked(guild)) {
-      UnlockableDiscordRole.ROLE.toInvOption()
-          .onClick(user, context, click);
-
-      return;
-    }
-
-    super.onClick(user, context, click);
   }
 
   @Override
   public @Nullable ItemStack createItem(@NotNull User user,
                                         @NotNull Context context
   ) {
-    var guild = context.getOrThrow(GUILD);
-
-    if (!UnlockableDiscordRole.ROLE.isUnlocked(guild)) {
-      return UnlockableDiscordRole.ROLE.toInvOption()
-          .createItem(user, context);
-    }
-
     return ItemStacks.builder(Material.DRAGON_HEAD)
         .setName("&eDiscord Menu")
         .addLore("&7Click to view Discord settings")
