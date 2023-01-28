@@ -11,12 +11,10 @@ import net.forthecrown.events.Events;
 import net.forthecrown.events.TriggerListener;
 import net.forthecrown.utils.WorldChunkMap;
 import net.forthecrown.utils.math.Bounds3i;
-import net.forthecrown.utils.math.Vectors;
 import net.minecraft.nbt.CompoundTag;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.spongepowered.math.vector.Vector3d;
 
 /**
  * A class which manages {@link UsableTrigger} instances.
@@ -171,14 +169,15 @@ public class TriggerManager {
     }
   }
 
-  public static Bounds3i makePlayerBounds(Location location) {
-    return makeBounds(Vectors.doubleFrom(location));
-  }
-
-  private static Bounds3i makeBounds(Vector3d pos) {
+  public static Bounds3i makePlayerBounds(Location l) {
     return Bounds3i.of(
-        pos.x() - PLAYER_HALF_WIDTH, pos.y(), pos.z() - PLAYER_HALF_WIDTH,
-        pos.x() + PLAYER_HALF_WIDTH, pos.y() + PLAYER_HEIGHT, pos.z() + PLAYER_HALF_WIDTH
+        l.getX() - PLAYER_HALF_WIDTH,
+        l.getY(),
+        l.getZ() - PLAYER_HALF_WIDTH,
+
+        l.getX() + PLAYER_HALF_WIDTH,
+        l.getY() + PLAYER_HEIGHT,
+        l.getZ() + PLAYER_HALF_WIDTH
     );
   }
 

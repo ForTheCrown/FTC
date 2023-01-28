@@ -5,6 +5,7 @@ import net.forthecrown.useables.TriggerManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 @RequiredArgsConstructor
 public class TriggerListener implements Listener {
@@ -19,6 +20,11 @@ public class TriggerListener implements Listener {
       return;
     }
 
+    manager.run(event.getPlayer(), event.getFrom(), event.getTo());
+  }
+
+  @EventHandler(ignoreCancelled = true)
+  public void onPlayerTeleport(PlayerTeleportEvent event) {
     manager.run(event.getPlayer(), event.getFrom(), event.getTo());
   }
 }
