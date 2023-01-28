@@ -174,5 +174,6 @@ public class WeaponAbility {
   /* -------------------------- UPDATE CALLBACK --------------------------- */
 
   public void onUpdate(ItemStack item, ItemMeta meta, RoyalSword royalSword) {
+    script.close();
   }
 }
