@@ -89,6 +89,10 @@ public class ActionTeleport extends UsageAction {
     var loc = source.getLocation();
     args.get(POS_ARG).apply(loc);
 
+    if (args.has(CommandTeleportExact.WORLD)) {
+      loc.setWorld(args.get(CommandTeleportExact.WORLD));
+    }
+
     loc.setYaw(args.getOrDefault(CommandTeleportExact.YAW, loc.getYaw()));
     loc.setPitch(args.getOrDefault(CommandTeleportExact.PITCH, loc.getPitch()));
 
