@@ -14,14 +14,17 @@ import net.forthecrown.utils.inventory.menu.Slot;
 import net.forthecrown.utils.inventory.menu.page.ListPage;
 import net.forthecrown.utils.inventory.menu.page.MenuPage;
 import net.forthecrown.utils.text.Text;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class RecipeListPage extends ListPage<ItemStack> {
   public static final Slot ADVANCEMENT_SLOT = Slot.of(4, 2);
+  public static final Slot TRIAL_SLOT = Slot.of(0, 2);
 
   public RecipeListPage(MenuPage parent) {
     super(parent, RECIPE_PAGE);
@@ -32,6 +35,36 @@ public class RecipeListPage extends ListPage<ItemStack> {
   @Override
   protected void createMenu(MenuBuilder builder) {
     super.createMenu(builder);
+
+    builder.add(
+        TRIAL_SLOT,
+
+        MenuNode.builder()
+            .setItem((user, context) -> {
+              var type = context.getOrThrow(CURRENT_TYPE);
+
+              if (type.getTrialArea() == null) {
+                return null;
+              }
+
+              return ItemStacks.builder(Material.IRON_AXE)
+                  .setName("&eTry it out!")
+                  .addLore("&7Try out the upgrade in a trial area")
+
+                  .addLoreRaw(Component.empty())
+                  .addLore("&7You'll be teleported to a trial area,")
+                  .addLore("&7your items will be saved in a separate inventory")
+                  .addLore("&7and returned to you, once you leave")
+                  .build();
+            })
+
+            .setRunnable((user, context, click) -> {
+              var type = context.getOrThrow(CURRENT_TYPE);
+              type.enterTrialArea(user);
+            })
+
+            .build()
+    );
 
     builder.add(
         ADVANCEMENT_SLOT,

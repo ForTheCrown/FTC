@@ -125,7 +125,7 @@ public class ChatParser {
    * @see #replaceGradients(Component)
    */
   private static final Pattern GRADIENT_PATTERN
-      = Pattern.compile("<gradient=([a-zA-Z0-9_# ])+,([a-zA-Z0-9_# ])+:(.)+?>");
+      = Pattern.compile("<gradient=([a-zA-Z0-9_# ,])+:((.)+)?>");
 
   /**
    * A renderer which renders input with the {@link #ALL_FLAGS} flags
@@ -428,30 +428,48 @@ public class ChatParser {
         .substring("<gradient=".length(), result.group().length() - 1)
         .trim();
 
-    int separator = group.indexOf(',');
     int paramsEnd = group.indexOf(':');
 
     // I don't think this could happen because a
     // regex pattern is being used, but still
-    if (separator == -1 || paramsEnd == -1) {
+    if (paramsEnd == -1) {
       return Component.text(result.group());
     }
 
-    String firstColorName = group.substring(0, separator).trim();
-    String secondColorName = group.substring(separator + 1, paramsEnd).trim();
+    TextColor[] colors = parseColors(group.substring(0, paramsEnd));
 
-    TextColor startColor = getColor(firstColorName);
-    TextColor endColor = getColor(secondColorName);
-
-    // Invalid color names, return input
-    if (startColor == null || endColor == null) {
+    if (colors == null) {
       return Component.text(result.group());
     }
 
     return Text.gradient(
-        group.substring(paramsEnd + 1).trim(),
-        startColor, endColor
+        group.substring(paramsEnd + 1),
+        colors
     );
+  }
+
+  private static TextColor[] parseColors(String input) {
+    String[] split = input.split("( ?)+,( ?)+");
+    TextColor[] colors = new TextColor[split.length];
+
+    for (int i = 0; i < split.length; i++) {
+      String name = split[i];
+
+      // Blank color name, fail
+      if (name == null || name.isBlank()) {
+        return null;
+      }
+
+      TextColor color = getColor(name);
+
+      if (color == null) {
+        return null;
+      }
+
+      colors[i] = color;
+    }
+
+    return colors;
   }
 
   private static TextColor getColor(String s) {

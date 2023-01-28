@@ -10,6 +10,8 @@ import lombok.experimental.Accessors;
 import net.forthecrown.core.script2.Script;
 import net.forthecrown.core.script2.ScriptSource;
 import net.forthecrown.user.User;
+import net.forthecrown.user.UserTeleport.Type;
+import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.Time;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.text.Text;
@@ -17,11 +19,13 @@ import net.forthecrown.utils.text.format.PeriodFormat;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.forthecrown.utils.text.writer.TextWriters;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.minecraft.nbt.CompoundTag;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.inventory.ItemFlag;
@@ -45,6 +49,8 @@ public class WeaponAbilityType {
 
   private final UseLimit limit;
 
+  private final AbilityTrialArea trialArea;
+
   public WeaponAbilityType(Builder builder) {
     this.recipe = builder.items.build();
     this.item = builder.item;
@@ -61,6 +67,8 @@ public class WeaponAbilityType {
 
     this.advancementKey = builder.advancementKey;
 
+    this.trialArea = builder.trialArea;
+
     // Check arguments
     Preconditions.checkArgument(
         ItemStacks.notEmpty(item),
@@ -70,6 +78,19 @@ public class WeaponAbilityType {
 
   public static Builder builder() {
     return new Builder();
+  }
+
+  public void enterTrialArea(User user) {
+    if (trialArea == null) {
+      return;
+    }
+
+    var config = TextReplacementConfig.builder()
+        .matchLiteral("%ability")
+        .replacement(fullDisplayName(user))
+        .build();
+
+    trialArea.enter(user, config);
   }
 
   public WeaponAbility create() {
@@ -198,6 +219,46 @@ public class WeaponAbilityType {
   /* ------------------------------ BUILDER ------------------------------- */
 
   @Getter
+  @RequiredArgsConstructor
+  public static class AbilityTrialArea {
+    private final Location location;
+    private final TrialInfoNode info;
+
+    public void enter(User user, TextReplacementConfig config) {
+      user.createTeleport(() -> location, Type.TELEPORT).start();
+
+      if (info != null) {
+        info.start(user, config);
+      }
+    }
+
+  }
+
+  @Setter
+  @Getter
+  @RequiredArgsConstructor
+  public static class TrialInfoNode {
+    private final Component text;
+    private final long delay;
+
+    private TrialInfoNode next;
+
+    public void start(User user, TextReplacementConfig config) {
+      Tasks.runLater(() -> {
+        if (!user.isOnline()) {
+          return;
+        }
+
+        user.sendMessage(text.replaceText(config));
+
+        if (next != null) {
+          next.start(user, config);
+        }
+      }, delay);
+    }
+  }
+
+  @Getter
   @Setter
   @Accessors(chain = true, fluent = true)
   @RequiredArgsConstructor
@@ -219,6 +280,8 @@ public class WeaponAbilityType {
     NamespacedKey advancementKey;
 
     UseLimit limit;
+
+    AbilityTrialArea trialArea;
 
     public Builder addItem(ItemStack item) {
       Validate.isTrue(ItemStacks.notEmpty(item), "Empty item given");

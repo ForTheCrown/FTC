@@ -83,6 +83,17 @@ public final class SerializationHelper {
     return readFileObject(path, JSON_READER);
   }
 
+  public static DataResult<JsonObject> readTomlAsJson(Path path) {
+    return readFileObject(path, Toml::parse).flatMap(t -> {
+      if (!t.errors().isEmpty()) {
+        t.errors().forEach(LOGGER::error);
+        return DataResult.error("TOML read errors");
+      }
+
+      return DataResult.success(TomlUtil.toJson(t));
+    });
+  }
+
   public static boolean readTagFile(Path file, Consumer<CompoundTag> loadCallback) {
     return readFile(file, TAG_READER, loadCallback);
   }

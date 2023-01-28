@@ -9,6 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.StringJoiner;
 import lombok.Getter;
 import lombok.Setter;
@@ -154,7 +155,8 @@ public class UsageType<T extends UsageInstance> {
     }
   }
 
-  private static boolean validate(UsableConstructor loader, Executable executable,
+  private static boolean validate(UsableConstructor loader,
+                                  Executable executable,
                                   UsageType usageType
   ) {
     var type = loader.value();
@@ -226,7 +228,34 @@ public class UsageType<T extends UsageInstance> {
     return joiner.toString();
   }
 
-  /* ----------------------------- SUB CLASSES ------------------------------ */
+  /* -------------------------- OBJECT OVERRIDES -------------------------- */
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof UsageType<?> usageType)) {
+      return false;
+    }
+
+    return getTypeClass().equals(usageType.getTypeClass())
+        && Objects.equals(getTagLoader(), usageType.getTagLoader())
+        && Objects.equals(getParser(), usageType.getParser())
+        && Objects.equals(getEmptyConstructor(), usageType.getEmptyConstructor());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        getTypeClass(),
+        getTagLoader(),
+        getParser(),
+        getEmptyConstructor()
+    );
+  }
+
+  /* ---------------------------- SUB CLASSES ----------------------------- */
 
   interface ReflectionExecutable<T extends UsageInstance> {
 

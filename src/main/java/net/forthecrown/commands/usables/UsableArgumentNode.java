@@ -213,18 +213,26 @@ public class UsableArgumentNode<T extends UsageInstance, H extends UsageTypeHold
     var holder = provider.get(c);
     var list = accessor.getList(holder);
 
-    var parsed = getParsedType(c);
+    Holder<UsageType<T>> parseHolder = c.getArgument("add_type", Holder.class);
+    var parsed = parseHolder.getValue();
+    boolean canRead = reader.canRead();
 
-    if (parsed.requiresInput() && !reader.canRead()) {
-      var r = new StringReader(c.getInput());
-      r.setCursor(c.getInput().length());
+    T instance;
 
-      throw CommandSyntaxException.BUILT_IN_EXCEPTIONS
-          .dispatcherExpectedArgumentSeparator()
-          .createWithContext(r);
+    if (canRead) {
+      if (parsed.getParser() == null) {
+        throw Exceptions.format("Type {0} does not take input",
+            parseHolder.getKey()
+        );
+      }
+
+      instance = parsed.parse(reader, c.getSource());
+    } else if (parsed.getEmptyConstructor() == null) {
+      throw Exceptions.format("Type {0} requires input", parseHolder.getKey());
+    } else {
+      instance = parsed.create();
     }
 
-    var instance = parsed.parse(reader, c.getSource());
     Readers.ensureCannotRead(reader);
 
     if (first) {
@@ -239,7 +247,7 @@ public class UsableArgumentNode<T extends UsageInstance, H extends UsageTypeHold
         Text.format(
             "Added {0}: {1}: {2}",
             accessor.getName(),
-            list.getRegistry().getKey(parsed).orElse("UNKNOWN"),
+            parseHolder.getKey(),
             instance.displayInfo()
         )
     );

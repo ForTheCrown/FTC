@@ -191,8 +191,6 @@ public class TriggerManager {
 
   /**
    * Saves all the triggers in this manager into a single list
-   *
-   * @return The NBT representation of all triggers in this manager
    */
   public void save(CompoundTag tag) {
     for (var v : triggers.values()) {

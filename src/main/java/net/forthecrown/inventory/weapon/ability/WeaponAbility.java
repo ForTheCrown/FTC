@@ -59,9 +59,10 @@ public class WeaponAbility {
     float uses = this.uses;
 
     final float progress = uses / useLimit;
-    TextColor color = TextColor.lerp(
+    TextColor color = Text.lerp(
         progress,
         NamedTextColor.GREEN,
+        NamedTextColor.GOLD,
         NamedTextColor.RED
     );
 

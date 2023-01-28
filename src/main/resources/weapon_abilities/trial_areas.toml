@@ -1,0 +1,37 @@
+# Sets info about the trial areas of the various weapon upgrades
+# ------------------------------------------------------------------------------
+# Format:
+# ------------------------------------------------------------------------------
+# 'position':
+#  The position the player will be teleported to when they enter the trial
+# 
+# examples:
+# - position = { x = -452.5, y = 12, z = -247.5 }
+# ------------------------------------------------------------------------------
+# 'rotation':
+#  The rotation the player will have after being teleported
+#
+# examples:
+# - rotation = { yaw = 90, pitch = 0 }
+# ------------------------------------------------------------------------------
+# 'text':
+#  Sets the text that's shown to players, and the delay the text is shown after
+#
+# examples:
+# text = [
+#   { info = "Foo bar", delay = 0 },
+#   { info = "More info", delay = "3s" }
+# ]
+# ------------------------------------------------------------------------------
+
+# The world the trial areas are located in
+trial_world = "world_void"
+
+[dash]
+position = { x = -452.5, y = 12, z = -247.5 }
+rotation = { yaw = 90, pitch = 0 }
+info = [
+  { info = "&7The &e%ability&7 lets you jolt forward a bit", delay = 0 },
+  { info = "&eTry it out by crossing the pit", delay = "3s" }
+]
+
