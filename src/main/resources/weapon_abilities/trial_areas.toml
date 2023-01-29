@@ -27,6 +27,11 @@
 # The world the trial areas are located in
 trial_world = "world_void"
 
+# Sets the name of the inventory storage category that players' inventories
+# Are placed into after teleporting into the trial area.
+# If unset, doesn't separate inventories
+inventory_store = "weapon_ability/pre_trial_inventory"
+
 [dash]
 position = { x = -452.5, y = 12, z = -247.5 }
 rotation = { yaw = 90, pitch = 0 }

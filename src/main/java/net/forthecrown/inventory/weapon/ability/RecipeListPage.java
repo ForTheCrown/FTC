@@ -4,6 +4,7 @@ import static net.forthecrown.inventory.weapon.ability.AbilityMenus.CURRENT_TYPE
 import static net.forthecrown.inventory.weapon.ability.AbilityMenus.RECIPE_PAGE;
 
 import java.util.List;
+import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.inventory.ItemStacks;
@@ -60,7 +61,11 @@ public class RecipeListPage extends ListPage<ItemStack> {
 
             .setRunnable((user, context, click) -> {
               var type = context.getOrThrow(CURRENT_TYPE);
-              type.enterTrialArea(user);
+              var opt = type.enterTrialArea(user);
+
+              if (opt.isPresent()) {
+                throw Exceptions.format(opt.get());
+              }
             })
 
             .build()

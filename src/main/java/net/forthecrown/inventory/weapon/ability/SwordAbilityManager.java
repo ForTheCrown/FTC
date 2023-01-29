@@ -59,6 +59,8 @@ public class SwordAbilityManager {
 
   private boolean enabled;
 
+  private String trialInventoryStore;
+
   public SwordAbilityManager() {
     this.directory = PathUtil.getPluginDirectory("weapon_abilities");
     this.loaderFile = directory.resolve("loader.toml");
@@ -291,6 +293,12 @@ public class SwordAbilityManager {
 
       if (world == null) {
         return Results.errorResult("Unknown world '%s'", worldName);
+      }
+
+      if (!object.has("inventory_store")) {
+        trialInventoryStore = null;
+      } else {
+        trialInventoryStore = object.remove("inventory_store").getAsString();
       }
 
       Map<String, AbilityTrialArea> trialData = new Object2ObjectOpenHashMap<>();

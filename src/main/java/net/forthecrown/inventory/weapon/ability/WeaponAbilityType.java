@@ -1,12 +1,16 @@
 package net.forthecrown.inventory.weapon.ability;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import net.forthecrown.core.InventoryStorage;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.script2.Script;
 import net.forthecrown.core.script2.ScriptSource;
 import net.forthecrown.inventory.ExtendedItems;
@@ -82,12 +86,33 @@ public class WeaponAbilityType {
     return new Builder();
   }
 
-  public void enterTrialArea(User user) {
+  public Optional<String> enterTrialArea(User user) {
     if (trialArea == null) {
-      return;
+      return Optional.empty();
+    }
+
+    String inventoryStore = SwordAbilityManager.getInstance()
+        .getTrialInventoryStore();
+
+    if (!Strings.isNullOrEmpty(inventoryStore)) {
+      var store = InventoryStorage.getStorage();
+
+      if (store.hasStoredInventory(user.getPlayer(), inventoryStore)) {
+        Loggers.getLogger().error(
+            "{} already has inventory saved in {}, cannot enter trial area",
+            user, inventoryStore
+        );
+
+        return Optional.of(
+            "Internal error with inventory separation, tell a staff member"
+        );
+      }
+
+      store.storeInventory(user.getPlayer(), inventoryStore, true);
     }
 
     trialArea.enter(user, this);
+    return Optional.empty();
   }
 
   public WeaponAbility create() {
