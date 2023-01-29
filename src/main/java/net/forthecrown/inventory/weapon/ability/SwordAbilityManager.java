@@ -333,7 +333,8 @@ public class SwordAbilityManager {
               .orElse(null);
         }
 
-        trialData.put(key, new AbilityTrialArea(l, node));
+        boolean giveSword = json.getBool("give_sword");
+        trialData.put(key, new AbilityTrialArea(l, node, giveSword));
       }
 
       return DataResult.success(trialData);

@@ -190,14 +190,11 @@ public class CommandRoyalSword extends FtcCommand {
 
     @SuppressWarnings("unchecked")
     Holder<WeaponAbilityType> holder = c.getArgument("type", Holder.class);
-    WeaponAbility ability = holder.getValue().create();
+    WeaponAbility ability = holder.getValue().create(user);
 
     if (level > START_LEVEL) {
       ability.setLevel(level);
     }
-
-    int startUses = holder.getValue().getLimit().get(user);
-    ability.setRemainingUses(startUses);
 
     sword.setAbility(ability);
     sword.update(item);

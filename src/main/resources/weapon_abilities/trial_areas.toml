@@ -30,8 +30,9 @@ trial_world = "world_void"
 [dash]
 position = { x = -452.5, y = 12, z = -247.5 }
 rotation = { yaw = 90, pitch = 0 }
+give_sword = true
 info = [
-  { info = "&7The &e%ability&7 lets you jolt forward a bit", delay = 0 },
-  { info = "&eTry it out by crossing the pit", delay = "3s" }
+  { info = "&7The &e%ability&7 lets you jolt forward a bit", delay = 0    },
+  { info = "&eTry it out by crossing the pit",               delay = "3s" },
+  { info = "&eComplete the trial and you'll get a reward",   delay = "3s" }
 ]
-

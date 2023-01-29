@@ -251,10 +251,7 @@ public class AbilityMenus extends MenuPage {
                   if (existingAbility == null
                       || !existingAbility.getType().equals(abilityType.getValue())
                   ) {
-                    sword.setAbility(abilityType.getValue().create());
-                    sword.getAbility().setRemainingUses(
-                        abilityType.getValue().getLimit().get(user)
-                    );
+                    sword.setAbility(abilityType.getValue().create(user));
 
                     user.sendMessage(
                         Text.format("Set sword's upgrade to &e{0}&r.",

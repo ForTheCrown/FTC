@@ -9,6 +9,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.forthecrown.core.script2.Script;
 import net.forthecrown.core.script2.ScriptSource;
+import net.forthecrown.inventory.ExtendedItems;
+import net.forthecrown.inventory.weapon.RoyalSword;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserTeleport.Type;
 import net.forthecrown.utils.Tasks;
@@ -85,12 +87,7 @@ public class WeaponAbilityType {
       return;
     }
 
-    var config = TextReplacementConfig.builder()
-        .matchLiteral("%ability")
-        .replacement(fullDisplayName(user))
-        .build();
-
-    trialArea.enter(user, config);
+    trialArea.enter(user, this);
   }
 
   public WeaponAbility create() {
@@ -102,6 +99,14 @@ public class WeaponAbilityType {
     script.eval().throwIfError();
 
     return new WeaponAbility(this, script);
+  }
+
+  public WeaponAbility create(User user) {
+    int limit = getLimit().get(user);
+    var ability = create();
+    ability.setRemainingUses(limit);
+
+    return ability;
   }
 
   public WeaponAbility load(CompoundTag tag) {
@@ -223,11 +228,35 @@ public class WeaponAbilityType {
   public static class AbilityTrialArea {
     private final Location location;
     private final TrialInfoNode info;
+    private final boolean giveSword;
 
-    public void enter(User user, TextReplacementConfig config) {
-      user.createTeleport(() -> location, Type.TELEPORT).start();
+    public void enter(User user, WeaponAbilityType type) {
+      user.createTeleport(() -> location, Type.TELEPORT)
+          .setDelayed(false)
+          .setSilent(true)
+          .setAsync(false)
+          .start();
+
+      if (giveSword) {
+        ItemStack item
+            = ExtendedItems.ROYAL_SWORD.createItem(user.getUniqueId());
+
+        RoyalSword sword = ExtendedItems.ROYAL_SWORD.get(item);
+        assert sword != null;
+
+        var ability = type.create(user);
+        sword.setAbility(ability);
+        sword.update(item);
+
+        user.getInventory().addItem(item);
+      }
 
       if (info != null) {
+        var config = TextReplacementConfig.builder()
+            .matchLiteral("%ability")
+            .replacement(type.fullDisplayName(user))
+            .build();
+
         info.start(user, config);
       }
     }
