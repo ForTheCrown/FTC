@@ -163,6 +163,14 @@ public final class TagUtil {
     return new Location(world, x, y, z, yaw, pitch);
   }
 
+  public static <V> ListTag writeArray(V[] arr, Function<V, Tag> serializer) {
+    ListTag tag = new ListTag();
+    for (V v : arr) {
+      tag.add(serializer.apply(v));
+    }
+    return tag;
+  }
+
   public static <V> ListTag writeCollection(Collection<V> c, Function<V, Tag> serializer) {
     ListTag listTag = new ListTag();
 

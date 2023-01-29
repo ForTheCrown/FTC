@@ -1,10 +1,14 @@
 package net.forthecrown.commands.admin;
 
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
 import net.forthecrown.commands.arguments.Arguments;
+import net.forthecrown.commands.economy.CommandShopHistory;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
@@ -15,12 +19,33 @@ import net.forthecrown.core.script2.ScriptManager;
 import net.forthecrown.core.script2.ScriptResult;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.types.ArrayArgument;
+import net.forthecrown.grenadier.types.args.ArgsArgument;
+import net.forthecrown.grenadier.types.args.Argument;
+import net.forthecrown.grenadier.types.args.ParsedArgs;
 import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.writer.TextWriters;
-import org.jetbrains.annotations.Nullable;
 
 public class CommandScripts extends FtcCommand {
+
+  public static final Argument<List<String>> ARGS_ARRAY
+      = Argument.builder("args", ArrayArgument.of(StringArgumentType.string()))
+      .build();
+
+  public static final Argument<String> METHOD_NAME
+      = Argument.builder("method", StringArgumentType.string()).build();
+
+  public static final Argument<Boolean> CLOSE_AFTER
+      = Argument.builder("close_after", BoolArgumentType.bool())
+      .setDefaultValue(true)
+      .build();
+
+  public static final ArgsArgument ARGS = ArgsArgument.builder()
+      .addOptional(ARGS_ARRAY)
+      .addOptional(METHOD_NAME)
+      .addOptional(CLOSE_AFTER)
+      .build();
 
   public CommandScripts() {
     super("Scripts");
@@ -50,16 +75,16 @@ public class CommandScripts extends FtcCommand {
     factory.usage("eval <java script code>")
         .addInfo("Runs the given JavaScript code");
 
-    factory.usage("run <script file> [-doNotClose]")
+    factory.usage("run <script file> [args=<args array>] [close_after=<true | false>] [method=<name>]")
         .addInfo("Runs the given script file's global function")
-        .addInfo("If -doNotClose flag is set, the script won't")
-        .addInfo("be shutdown after execution");
+        .addInfo("If the <args> argument is present, the set string array")
+        .addInfo("is added into the script.")
 
-    factory.usage("run <script file> <method name> [-doNotClose]")
-        .addInfo("Runs the given script file's global function, then")
-        .addInfo("runs the given method.")
-        .addInfo("If -doNotClose flag is set, the script won't")
-        .addInfo("be shutdown after execution");
+        .addInfo("If <close_after> is set to 'true' or not set at all, the")
+        .addInfo("script is closed after execution, else, it stays loaded")
+
+        .addInfo("<method> specifies the name of the method to run after")
+        .addInfo("the global scope has been executed");
 
     factory.usage("delete <script file>")
         .addInfo("Deletes a <script file>");
@@ -78,32 +103,10 @@ public class CommandScripts extends FtcCommand {
         // /script run <script> [method]
         .then(literal("run")
             .then(argument("script", Arguments.SCRIPT)
-                .executes(c -> run(c, null, true))
+                .executes(c -> run(c, CommandShopHistory.EMPTY))
 
-                .then(literal("-doNotClose")
-                    .executes(c -> run(c, null, false))
-                )
-
-                .then(argument("func", StringArgumentType.string())
-                    .executes(c -> {
-                      String func = c.getArgument(
-                          "func",
-                          String.class
-                      );
-
-                      return run(c, func, true);
-                    })
-
-                    .then(literal("-doNotClose")
-                        .executes(c -> {
-                          String func = c.getArgument(
-                              "func",
-                              String.class
-                          );
-
-                          return run(c, null, false);
-                        })
-                    )
+                .then(argument("args", ARGS)
+                    .executes(c -> run(c, c.getArgument("args", ParsedArgs.class)))
                 )
             )
         )
@@ -164,26 +167,33 @@ public class CommandScripts extends FtcCommand {
     return runScript(c.getSource(), script, true, null);
   }
 
-  private int run(CommandContext<CommandSource> c,
-                  @Nullable String method,
-                  boolean closeAfter
+  private int run(CommandContext<CommandSource> c, ParsedArgs args
   ) throws CommandSyntaxException {
     String scriptName = c.getArgument("script", String.class);
     Script script = Script.of(scriptName);
 
-    return runScript(c.getSource(), script, closeAfter, method);
+    List<String> stringArgsList
+        = args.getOrDefault(ARGS_ARRAY, Collections.emptyList());
+
+    String[] stringArgs = stringArgsList.toArray(String[]::new);
+
+    boolean closeAfter = args.get(CLOSE_AFTER);
+    String method = args.get(METHOD_NAME);
+
+    return runScript(c.getSource(), script, closeAfter, method, stringArgs);
   }
 
   private int runScript(CommandSource source,
                         Script script,
                         boolean closeAfter,
-                        String method
+                        String method,
+                        String... args
   ) throws CommandSyntaxException {
     var scriptName = script.getSource().getName();
     ScriptResult result;
 
     try {
-      result = script.compile().eval();
+      result = script.compile(args).eval();
     } catch (ScriptLoadException exc) {
       exc.printStackTrace();
 

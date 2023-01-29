@@ -1,5 +1,7 @@
 package net.forthecrown.useables.actions;
 
+import static net.minecraft.nbt.Tag.TAG_STRING;
+
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.arguments.Arguments;
@@ -14,9 +16,12 @@ import net.forthecrown.useables.UsageAction;
 import net.forthecrown.useables.UsageType;
 import net.forthecrown.useables.UsageTypeHolder;
 import net.forthecrown.user.Users;
+import net.forthecrown.utils.io.TagUtil;
 import net.kyori.adventure.text.Component;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
+import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,21 +31,26 @@ public class ActionScript extends UsageAction {
       .setSuggests(Arguments.SCRIPT::listSuggestions);
 
   private final String script;
+  private final String[] args;
 
-  public ActionScript(String script) {
+  public ActionScript(String script, String... args) {
     super(TYPE);
     this.script = script;
+    this.args = args;
   }
 
   @Override
   public void onUse(Player player, ActionHolder holder) {
-    try (var _script = getScript(script, holder)) {
+    try (var _script = getScript(script, holder, args)) {
       _script.invoke("onUse", Users.get(player));
     }
   }
 
-  public static Script getScript(String name, UsageTypeHolder holder) {
-    Script _script = Script.of(name).compile();
+  public static Script getScript(String name,
+                                 UsageTypeHolder holder,
+                                 String... args
+  ) {
+    Script _script = Script.of(name).compile(args);
 
     _script.put("_holder", holder);
 
@@ -68,17 +78,41 @@ public class ActionScript extends UsageAction {
 
   @Override
   public @Nullable Tag save() {
-    return StringTag.valueOf(script);
+    CompoundTag tag = new CompoundTag();
+    tag.putString("script", script);
+    tag.put("args", TagUtil.writeArray(args, StringTag::valueOf));
+    return tag;
   }
 
   @UsableConstructor(ConstructType.PARSE)
   public static ActionScript parse(StringReader reader, CommandSource source)
       throws CommandSyntaxException {
-    return new ActionScript(Arguments.SCRIPT.parse(reader));
+    String script = Arguments.SCRIPT.parse(reader);
+    String[] args = ArrayUtils.EMPTY_STRING_ARRAY;
+
+    if (reader.canRead()) {
+      String remaining = reader.getRemaining();
+      reader.setCursor(reader.getTotalLength());
+      args = remaining.split("\s");
+    }
+
+    return new ActionScript(script, args);
   }
 
   @UsableConstructor(ConstructType.TAG)
   public static ActionScript readTag(Tag tag) {
-    return new ActionScript(tag.getAsString());
+    if (tag.getId() == TAG_STRING) {
+      return new ActionScript(tag.getAsString());
+    }
+
+    CompoundTag compound = (CompoundTag) tag;
+    String script = compound.getString("script");
+
+    String[] args = compound.getList("args", TAG_STRING)
+        .stream()
+        .map(Tag::getAsString)
+        .toArray(String[]::new);
+
+    return new ActionScript(script, args);
   }
 }

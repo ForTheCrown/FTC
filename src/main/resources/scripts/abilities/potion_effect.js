@@ -81,6 +81,8 @@ function parseArgs() {
   logger.debug("Set potion type={}", potionType);
 }
 
+// Callbacks
+
 function onRightClick(player, clicked) {
   if (!triggeredByRight) {
     return false;

@@ -1,12 +1,16 @@
 package net.forthecrown.events.player;
 
+import static net.forthecrown.inventory.weapon.ability.WeaponAbility.UNLIMITED_USES;
+
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import net.forthecrown.core.FTC;
 import net.forthecrown.core.FtcFlags;
 import net.forthecrown.inventory.ExtendedItems;
 import net.forthecrown.inventory.weapon.RoyalSword;
-import net.forthecrown.inventory.weapon.ability.SwordAbilityManager;
 import net.forthecrown.inventory.weapon.SwordConfig;
+import net.forthecrown.inventory.weapon.ability.SwordAbilityManager;
+import net.forthecrown.inventory.weapon.ability.WeaponAbility;
+import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -118,33 +122,38 @@ public class WeaponListener implements Listener {
         player.setCooldown(item.getType(), Math.toIntExact(cooldownTicks));
       }
 
-      int uses = ability.getUses() + 1;
-      int limit = ability.getType().getLimit().get(user);
-
-      ability.setUses(uses);
-      if (uses >= limit) {
-        sword.setAbility(null);
-
-        user.sendMessage(
-            Text.format("Upgrade {0} used up!",
-                NamedTextColor.GRAY,
-                ability.getType().fullDisplayName(user)
-            )
-        );
-      } else {
-        int remaining = limit - uses;
-
-        if (remaining <= USES_WARN_THRESHOLD) {
-          user.sendMessage(
-              Text.format("Sword upgrade has &e{0, number} &ruses remaining.",
-                  NamedTextColor.GRAY,
-                  remaining
-              )
-          );
-        }
-      }
+      updateUses(ability, user, sword);
     }
 
     sword.update(item);
+  }
+
+  private void updateUses(WeaponAbility ability, User user, RoyalSword sword) {
+    int remaining = ability.getRemainingUses();
+
+    if (remaining == UNLIMITED_USES) {
+      return;
+    }
+
+    int newRemaining = remaining - 1;
+
+    ability.setRemainingUses(newRemaining);
+    if (newRemaining <= 0) {
+      sword.setAbility(null);
+
+      user.sendMessage(
+          Text.format("Upgrade {0} used up!",
+              NamedTextColor.GRAY,
+              ability.getType().fullDisplayName(user)
+          )
+      );
+    } else if (remaining <= USES_WARN_THRESHOLD) {
+      user.sendMessage(
+          Text.format("Sword upgrade has &e{0, number} &ruses remaining.",
+              NamedTextColor.GRAY,
+              remaining
+          )
+      );
+    }
   }
 }

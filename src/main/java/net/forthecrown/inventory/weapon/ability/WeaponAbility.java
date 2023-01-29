@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import net.forthecrown.core.script2.Script;
 import net.forthecrown.core.script2.ScriptResult;
-import net.forthecrown.inventory.weapon.RoyalSword;
 import net.forthecrown.inventory.weapon.SwordRank;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.text.Text;
@@ -17,8 +16,6 @@ import net.minecraft.nbt.CompoundTag;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 
 @Getter @Setter
@@ -27,9 +24,10 @@ public class WeaponAbility {
   public static final String TAG_USES = "uses";
 
   public static final int START_LEVEL = 1;
+  public static final int UNLIMITED_USES = -1;
 
   protected int level = START_LEVEL;
-  protected int uses = 0;
+  protected int remainingUses = 0;
 
   private final WeaponAbilityType type;
   private final Script script;
@@ -40,7 +38,7 @@ public class WeaponAbility {
 
     assert script.isCompiled() : "Script not compiled when given to ability";
     setLevel(START_LEVEL);
-    setUses(0);
+    setRemainingUses(0);
   }
 
   public Component displayName() {
@@ -55,22 +53,28 @@ public class WeaponAbility {
       writer.formatted(" {0, number, -roman}", NamedTextColor.GRAY, level);
     }
 
-    float useLimit = getType().getLimit().get(user);
-    float uses = this.uses;
+    Component usesLeftText;
 
-    final float progress = uses / useLimit;
-    TextColor color = Text.lerp(
-        progress,
-        NamedTextColor.GREEN,
-        NamedTextColor.GOLD,
-        NamedTextColor.RED
-    );
+    if (remainingUses == UNLIMITED_USES) {
+      usesLeftText = Component.text("Infinite", NamedTextColor.GREEN);
+    } else {
+      float useLimit = getType().getLimit().get(user);
+      float remaining = this.remainingUses;
+
+      final float progress = (useLimit-remaining) / useLimit;
+      TextColor color = Text.lerp(
+          progress,
+          NamedTextColor.GREEN,
+          NamedTextColor.GOLD,
+          NamedTextColor.RED
+      );
+
+      usesLeftText = Text.formatNumber(remaining).color(color);
+    }
 
     writer.formattedLine("Uses left: {0, number}",
         NamedTextColor.GRAY,
-
-        Text.formatNumber(useLimit - uses)
-            .color(color)
+        usesLeftText
     );
   }
 
@@ -97,9 +101,9 @@ public class WeaponAbility {
     script.put("level", this.level);
   }
 
-  public void setUses(int uses) {
-    this.uses = Math.max(0, uses);
-    script.put("uses", this.uses);
+  public void setRemainingUses(int remainingUses) {
+    this.remainingUses = Math.max(UNLIMITED_USES, remainingUses);
+    script.put("remainingUses", this.remainingUses);
   }
 
   /* ----------------------------- CALLBACKS ------------------------------ */
@@ -110,7 +114,8 @@ public class WeaponAbility {
    *
    * @param player       The player that right-clicked
    * @param clicked      The right-clicked entity,
-   * @param clickedBlock
+   * @param clickedBlock The block that was clicked, exclusive with clicked,
+   *                     If this is not null, clicked is
    * @return True, if the item should be placed on cooldown, false otherwise
    */
   public boolean onRightClick(Player player,
@@ -127,7 +132,8 @@ public class WeaponAbility {
    * @param player       The player that left-clicked
    * @param clicked      The clicked entity, null, if a block or air was
    *                     clicked
-   * @param clickedBlock
+   * @param clickedBlock The block that was clicked, exclusive with clicked,
+   *                     If this is not null, clicked is
    * @return True, if the item should be placed on cooldown, false otherwise
    */
   public boolean onLeftClick(Player player,
@@ -159,21 +165,21 @@ public class WeaponAbility {
 
   public void load(CompoundTag tag) {
     setLevel(tag.getInt(TAG_LEVEL));
-    setUses(tag.getInt(TAG_USES));
+    setRemainingUses(tag.getInt(TAG_USES));
 
     script.invokeIfExists("onLoad", tag);
   }
 
   public void save(CompoundTag tag) {
     tag.putInt(TAG_LEVEL, getLevel());
-    tag.putInt(TAG_USES, getUses());
+    tag.putInt(TAG_USES, getRemainingUses());
 
     script.invokeIfExists("onSave", tag);
   }
 
   /* -------------------------- UPDATE CALLBACK --------------------------- */
 
-  public void onUpdate(ItemStack item, ItemMeta meta, RoyalSword royalSword) {
+  public void onUpdate() {
     script.close();
   }
 }

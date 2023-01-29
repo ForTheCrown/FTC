@@ -196,6 +196,9 @@ public class CommandRoyalSword extends FtcCommand {
       ability.setLevel(level);
     }
 
+    int startUses = holder.getValue().getLimit().get(user);
+    ability.setRemainingUses(startUses);
+
     sword.setAbility(ability);
     sword.update(item);
 

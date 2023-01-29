@@ -77,7 +77,7 @@ public class RoyalSword extends ExtendedItem {
     }
 
     if (ability != null) {
-      ability.onUpdate(item, meta, this);
+      ability.onUpdate();
     }
   }
 

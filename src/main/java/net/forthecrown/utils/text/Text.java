@@ -277,10 +277,6 @@ public final class Text {
       return colors[0];
     }
 
-    return _lerp(progress, colors);
-  }
-
-  private static TextColor _lerp(float progress, TextColor... colors) {
     if (progress <= 0) {
       return colors[0];
     }
@@ -289,6 +285,10 @@ public final class Text {
       return colors[colors.length - 1];
     }
 
+    return _lerp(progress, colors);
+  }
+
+  private static TextColor _lerp(float progress, TextColor... colors) {
     if (colors.length == 2) {
       return TextColor.lerp(progress, colors[0], colors[1]);
     }

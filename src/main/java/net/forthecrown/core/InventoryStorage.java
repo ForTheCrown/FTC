@@ -4,11 +4,11 @@ import com.google.common.base.Preconditions;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectSets;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import lombok.Getter;
 import net.forthecrown.core.logging.Loggers;
@@ -30,6 +30,8 @@ import org.bukkit.inventory.ItemStack;
 public class InventoryStorage {
 
   private static final Logger LOGGER = Loggers.getLogger();
+
+  public static final String CATEGORY_SURVIVAL = "survival";
 
   @Getter
   private static final InventoryStorage storage = new InventoryStorage();
@@ -239,7 +241,7 @@ public class InventoryStorage {
     InventoryMap map = inventories.get(player.getUniqueId());
 
     if (map == null || map.isEmpty()) {
-      return ObjectSets.emptySet();
+      return Set.of(CATEGORY_SURVIVAL);
     }
 
     return map.keySet();
