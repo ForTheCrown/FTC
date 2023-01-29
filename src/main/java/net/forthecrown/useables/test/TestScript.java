@@ -105,8 +105,10 @@ public class TestScript extends UsageTest {
     String script = Arguments.SCRIPT.parse(reader);
     String[] args = ArrayUtils.EMPTY_STRING_ARRAY;
 
+    reader.skipWhitespace();
+
     if (reader.canRead()) {
-      String remaining = reader.getRemaining();
+      String remaining = reader.getRemaining().trim();
       reader.setCursor(reader.getTotalLength());
       args = remaining.split("\s");
     }
