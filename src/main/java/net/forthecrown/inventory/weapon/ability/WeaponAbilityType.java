@@ -1,5 +1,7 @@
 package net.forthecrown.inventory.weapon.ability;
 
+import static net.forthecrown.inventory.weapon.ability.WeaponAbility.UNLIMITED_USES;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
@@ -248,12 +250,23 @@ public class WeaponAbilityType {
 
   /* ------------------------------ BUILDER ------------------------------- */
 
-  @Getter
-  @RequiredArgsConstructor
-  public static class AbilityTrialArea {
-    private final Location location;
-    private final TrialInfoNode info;
-    private final boolean giveSword;
+  public record AbilityTrialArea(Location location,
+                                 TrialInfoNode info,
+                                 boolean giveSword,
+                                 Script script
+  ) {
+
+    public void start() {
+      if (script != null) {
+        script.compile().eval();
+      }
+    }
+
+    public void close() {
+      if (script != null) {
+        script.close();
+      }
+    }
 
     public void enter(User user, WeaponAbilityType type) {
       user.createTeleport(() -> location, Type.TELEPORT)
@@ -269,7 +282,12 @@ public class WeaponAbilityType {
         RoyalSword sword = ExtendedItems.ROYAL_SWORD.get(item);
         assert sword != null;
 
+        // Create ability, give it unlimited uses and a
+        // constant 2-second cooldown
         var ability = type.create(user);
+        ability.setRemainingUses(UNLIMITED_USES);
+        ability.setCooldownOverride(2 * 20);
+
         sword.setAbility(ability);
         sword.update(item);
 
@@ -285,7 +303,6 @@ public class WeaponAbilityType {
         info.start(user, config);
       }
     }
-
   }
 
   @Setter

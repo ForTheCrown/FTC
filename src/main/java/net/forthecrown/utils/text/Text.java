@@ -40,6 +40,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.translation.Translatable;
+import net.kyori.adventure.util.HSVLike;
 import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.TextComponentTagVisitor;
 import org.apache.commons.lang.WordUtils;
@@ -290,7 +291,7 @@ public final class Text {
 
   private static TextColor _lerp(float progress, TextColor... colors) {
     if (colors.length == 2) {
-      return TextColor.lerp(progress, colors[0], colors[1]);
+      return hsvLerp(progress, colors[0], colors[1]);
     }
 
     final int maxIndex = colors.length - 1;
@@ -306,7 +307,27 @@ public final class Text {
     TextColor c1 = colors[firstIndex];
     TextColor c2 = colors[firstIndex + 1];
 
-    return TextColor.lerp(localStep, c1, c2);
+    return hsvLerp(localStep, c1, c2);
+  }
+
+  private static TextColor hsvLerp(float p, TextColor c1, TextColor c2) {
+    boolean useHsvInterpolation = Boolean.getBoolean("ftc.hsv");
+
+    if (!useHsvInterpolation) {
+      return TextColor.lerp(p, c1, c2);
+    }
+
+    HSVLike hsv1 = c1.asHSV();
+    HSVLike hsv2 = c2.asHSV();
+
+    HSVLike result = HSVLike.hsvLike(
+        // min + (step * (max - min))
+        hsv1.h() + p * (hsv2.h() - hsv1.h()),
+        hsv1.s() + p * (hsv2.s() - hsv1.s()),
+        hsv1.v() + p * (hsv2.v() - hsv1.v())
+    );
+
+    return TextColor.color(result);
   }
 
   /**

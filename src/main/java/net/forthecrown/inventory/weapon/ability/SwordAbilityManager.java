@@ -18,9 +18,12 @@ import lombok.Getter;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnEnable;
 import net.forthecrown.core.module.OnLoad;
+import net.forthecrown.core.registry.Holder;
 import net.forthecrown.core.registry.Keys;
 import net.forthecrown.core.registry.Registries;
 import net.forthecrown.core.registry.Registry;
+import net.forthecrown.core.registry.RegistryListener;
+import net.forthecrown.core.script2.Script;
 import net.forthecrown.core.script2.ScriptSource;
 import net.forthecrown.inventory.weapon.ability.WeaponAbilityType.AbilityTrialArea;
 import net.forthecrown.inventory.weapon.ability.WeaponAbilityType.TrialInfoNode;
@@ -66,6 +69,26 @@ public class SwordAbilityManager {
     this.loaderFile = directory.resolve("loader.toml");
     this.itemListFile = directory.resolve("items.txt");
     this.trialData = directory.resolve("trial_areas.toml");
+
+    registry.setListener(new RegistryListener<>() {
+      @Override
+      public void onRegister(Holder<WeaponAbilityType> value) {
+        var trialArea = value.getValue().getTrialArea();
+
+        if (trialArea != null) {
+          trialArea.start();
+        }
+      }
+
+      @Override
+      public void onUnregister(Holder<WeaponAbilityType> value) {
+        var trialArea = value.getValue().getTrialArea();
+
+        if (trialArea != null) {
+          trialArea.close();
+        }
+      }
+    });
   }
 
   @OnEnable
@@ -342,7 +365,15 @@ public class SwordAbilityManager {
         }
 
         boolean giveSword = json.getBool("give_sword");
-        trialData.put(key, new AbilityTrialArea(l, node, giveSword));
+        Script script;
+
+        if (json.has("script")) {
+          script = Script.read(json.get("script"), false);
+        } else {
+          script = null;
+        }
+
+        trialData.put(key, new AbilityTrialArea(l, node, giveSword, script));
       }
 
       return DataResult.success(trialData);

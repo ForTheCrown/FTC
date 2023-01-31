@@ -169,10 +169,19 @@ public class UserTimeTracker extends UserComponent {
       // Deserialize value, if it's a string, it's a date object, if it's a long
       // it's a serialized time stamp, serialize accordingly
       var jsonVal = e.getValue().getAsJsonPrimitive();
-      var val = jsonVal.isString() ? JsonUtils.readDate(jsonVal).getTime() : jsonVal.getAsLong();
+      TimeField timeField = field.get();
 
-      // Set field's value
-      set(field.get(), val);
+      try {
+        var val = JsonUtils.readTimestamp(jsonVal, UNSET);
+
+        // Set field's value
+        set(timeField, val);
+      } catch (NumberFormatException | IllegalStateException exc) {
+        Loggers.getLogger()
+            .error("Error reading timestamp '{}'", jsonVal, exc);
+
+        remove(timeField);
+      }
     }
   }
 }

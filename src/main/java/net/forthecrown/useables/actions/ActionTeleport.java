@@ -25,7 +25,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
-public class ActionTeleport extends UsageAction {
+public class  ActionTeleport extends UsageAction {
 
   private static final Argument<Position> POS_ARG = Argument.builder("pos",
           PositionArgument.position())
@@ -41,7 +41,8 @@ public class ActionTeleport extends UsageAction {
 
   // --- TYPE ---
   public static final UsageType<ActionTeleport> TYPE = UsageType.of(ActionTeleport.class)
-      .setSuggests(ARGS::listSuggestions);
+      .setSuggests(ARGS::listSuggestions)
+      .requiresInput(false);
 
   private final Location location;
 

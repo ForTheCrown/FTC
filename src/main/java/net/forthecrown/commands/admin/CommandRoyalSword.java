@@ -1,11 +1,18 @@
 package net.forthecrown.commands.admin;
 
+import static net.forthecrown.commands.DataCommands.HELD_ITEM_ACCESSOR;
+import static net.forthecrown.inventory.ExtendedItems.TAG_CONTAINER;
+import static net.forthecrown.inventory.ExtendedItems.TAG_DATA;
+import static net.forthecrown.inventory.weapon.ability.WeaponAbility.NO_OVERRIDE;
 import static net.forthecrown.inventory.weapon.ability.WeaponAbility.START_LEVEL;
+import static net.forthecrown.inventory.weapon.ability.WeaponAbility.UNLIMITED_USES;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.Pair;
+import net.forthecrown.commands.DataCommands;
+import net.forthecrown.commands.DataCommands.DataAccessor;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.arguments.RegistryArguments;
 import net.forthecrown.commands.manager.Exceptions;
@@ -14,6 +21,7 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.types.TimeArgument;
 import net.forthecrown.inventory.ExtendedItems;
 import net.forthecrown.inventory.weapon.RoyalSword;
 import net.forthecrown.inventory.weapon.ability.SwordAbilityManager;
@@ -24,10 +32,14 @@ import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.nbt.CompoundTag;
 import org.bukkit.inventory.ItemStack;
 
 public class CommandRoyalSword extends FtcCommand {
+  public static final DataAccessor SWORD_DATA_ACCESS
+      = DataCommands.offsetAccessor(
+          HELD_ITEM_ACCESSOR,
+          "tag." + TAG_CONTAINER + "." + TAG_DATA
+      );
 
   private static final RegistryArguments<WeaponAbilityType> ABILITY_ARGUMENT
       = new RegistryArguments<>(
@@ -63,10 +75,10 @@ public class CommandRoyalSword extends FtcCommand {
         "Forces your held sword to update",
         "the lore and sword data, this is",
         "normally done after killing any mob",
-        "with the sword"
+        "with the sword, or after using a sword's",
+        "ability"
     );
 
-    factory.usage("data", "Views the data of the sword you're holding");
     factory.usage("upgrade", "Upgrades your held sword by 1 level");
 
     var ability = factory.withPrefix("ability");
@@ -75,6 +87,25 @@ public class CommandRoyalSword extends FtcCommand {
     ability.usage("<ability> [<level: number(1..)>]")
         .addInfo("Sets the active ability of your held sword")
         .addInfo("If <level> is not set, defaults to %s", START_LEVEL);
+
+    ability.usage("cooldown <ticks>")
+        .addInfo("Adds a cooldown override to the ability of the sword")
+        .addInfo("you're holding");
+
+    ability.usage("cooldown remove_override")
+        .addInfo("Removes the cooldown override of the sword you're holding");
+
+    ability.usage("remaining_uses <uses: number(0..)>")
+        .addInfo("Sets the remaining uses of the ability of the")
+        .addInfo("sword you're holding");
+
+    ability.usage("remaining_uses infinite")
+        .addInfo("Sets the remaining uses to 'infinite' for the")
+        .addInfo("ability of the sword you're holding.")
+        .addInfo("This means the ability will never run out of uses");
+
+    var data = factory.withPrefix("data");
+    DataCommands.addUsages(data, "Sword", null);
   }
 
   @Override
@@ -113,18 +144,8 @@ public class CommandRoyalSword extends FtcCommand {
             })
         )
 
-        .then(literal("data")
-            .executes(c -> {
-              User user = getUserSender(c);
-              var swordPair = getSword(user);
-              var sword = swordPair.second();
-
-              CompoundTag tag = new CompoundTag();
-              sword.save(tag);
-
-              user.sendMessage(Text.displayTag(tag, true));
-              return 0;
-            })
+        .then(
+            DataCommands.dataAccess("Sword", SWORD_DATA_ACCESS)
         )
 
         .then(literal("upgrade")
@@ -178,7 +199,103 @@ public class CommandRoyalSword extends FtcCommand {
                     })
                 )
             )
+
+            .then(literal("cooldown")
+                .then(argument("ticks", TimeArgument.time())
+                    .executes(c -> abilityCooldown(c, false))
+                )
+
+                .then(literal("remove")
+                    .executes(c -> abilityCooldown(c, true))
+                )
+            )
+
+            .then(literal("remaining_use")
+                .then(argument("uses", IntegerArgumentType.integer(0))
+                    .executes(c -> abilityUses(c, false))
+                )
+
+                .then(literal("infinite")
+                    .executes(c -> abilityUses(c, true))
+                )
+            )
         );
+  }
+
+  private int abilityUses(CommandContext<CommandSource> c, boolean infinite)
+      throws CommandSyntaxException {
+    var user = getUserSender(c);
+    var pair = getSword(user);
+    var item = pair.first();
+    var sword = pair.second();
+
+    validateAbility(sword);
+
+    int uses = infinite ? UNLIMITED_USES : c.getArgument("uses", Integer.class);
+    sword.getAbility().setRemainingUses(uses);
+
+    sword.update(item);
+
+    if (uses == UNLIMITED_USES) {
+      c.getSource().sendAdmin(
+          Component.text(
+              "Set ability's remaining uses to infinite",
+              NamedTextColor.GRAY
+          )
+      );
+
+    } else {
+      c.getSource().sendAdmin(
+          Text.format("Set sword ability's remaining uses to &e{0, number}&r.",
+              NamedTextColor.GRAY,
+              uses
+          )
+      );
+    }
+
+    return 0;
+  }
+
+  private int abilityCooldown(CommandContext<CommandSource> c, boolean remove)
+      throws CommandSyntaxException {
+    var user = getUserSender(c);
+    var pair = getSword(user);
+    var item = pair.first();
+    var sword = pair.second();
+
+    validateAbility(sword);
+
+    long ticks = remove ? NO_OVERRIDE : TimeArgument.getTicks(c, "ticks");
+    sword.getAbility().setCooldownOverride(ticks);
+
+    sword.update(item);
+
+    if (ticks == NO_OVERRIDE) {
+      c.getSource().sendAdmin(
+          Component.text(
+              "Removed ability cooldown override",
+              NamedTextColor.GRAY
+          )
+      );
+
+    } else {
+      c.getSource().sendAdmin(
+          Text.format(
+              "Set cooldown override to &e{0, number}&r ticks "
+                  + "or &e{0, time, -ticks}&r.",
+              NamedTextColor.GRAY,
+              ticks
+          )
+      );
+    }
+
+    return 0;
+  }
+
+  private void validateAbility(RoyalSword sword) throws CommandSyntaxException {
+    if (sword.getAbility() == null) {
+      throw Exceptions.format("Held sword has no applied ability");
+    }
   }
 
   private int setAbility(CommandContext<CommandSource> c, int level)

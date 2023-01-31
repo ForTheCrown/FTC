@@ -308,7 +308,7 @@ public class RoyalSword extends ExtendedItem {
 
   /* --------------------------- SERIALIZATION ---------------------------- */
 
-  private void load(CompoundTag tag) {
+  public void load(CompoundTag tag) {
     if (tag.contains(TAG_LAST_FLAVOR)) {
       int lastFlavor = tag.getInt(TAG_LAST_FLAVOR);
       setLastFlavorChange(SwordRanks.RANKS[lastFlavor]);

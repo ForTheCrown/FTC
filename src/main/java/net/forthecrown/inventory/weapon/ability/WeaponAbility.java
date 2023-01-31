@@ -22,12 +22,16 @@ import org.jetbrains.annotations.Nullable;
 public class WeaponAbility {
   public static final String TAG_LEVEL = "level";
   public static final String TAG_USES = "uses";
+  public static final String TAG_COOLDOWN_OVERRIDE = "cooldownOverride";
 
   public static final int START_LEVEL = 1;
   public static final int UNLIMITED_USES = -1;
+  public static final int NO_OVERRIDE = -1;
 
-  protected int level = START_LEVEL;
-  protected int remainingUses = 0;
+  private int level = START_LEVEL;
+  private int remainingUses = 0;
+
+  private long cooldownOverride = NO_OVERRIDE;
 
   private final WeaponAbilityType type;
   private final Script script;
@@ -37,8 +41,10 @@ public class WeaponAbility {
     this.script = script;
 
     assert script.isCompiled() : "Script not compiled when given to ability";
+
     setLevel(START_LEVEL);
     setRemainingUses(0);
+    setCooldownOverride(NO_OVERRIDE);
   }
 
   public Component displayName() {
@@ -79,6 +85,10 @@ public class WeaponAbility {
   }
 
   public long getCooldownTicks(SwordRank rank) {
+    if (cooldownOverride != NO_OVERRIDE) {
+      return cooldownOverride;
+    }
+
     return script.invokeIfExists("getCooldown", rank)
         .flatMap(ScriptResult::result)
         .flatMap(o -> {
@@ -167,12 +177,22 @@ public class WeaponAbility {
     setLevel(tag.getInt(TAG_LEVEL));
     setRemainingUses(tag.getInt(TAG_USES));
 
+    if (tag.contains(TAG_COOLDOWN_OVERRIDE)) {
+      setCooldownOverride(tag.getLong(TAG_COOLDOWN_OVERRIDE));
+    } else {
+      setCooldownOverride(NO_OVERRIDE);
+    }
+
     script.invokeIfExists("onLoad", tag);
   }
 
   public void save(CompoundTag tag) {
     tag.putInt(TAG_LEVEL, getLevel());
     tag.putInt(TAG_USES, getRemainingUses());
+
+    if (cooldownOverride != NO_OVERRIDE) {
+      tag.putLong(TAG_COOLDOWN_OVERRIDE, getCooldownOverride());
+    }
 
     script.invokeIfExists("onSave", tag);
   }

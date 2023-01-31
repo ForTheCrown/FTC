@@ -217,22 +217,11 @@ public class UsableArgumentNode<T extends UsageInstance, H extends UsageTypeHold
     var parsed = parseHolder.getValue();
     boolean canRead = reader.canRead();
 
-    T instance;
-
-    if (canRead) {
-      if (parsed.getParser() == null) {
-        throw Exceptions.format("Type {0} does not take input",
-            parseHolder.getKey()
-        );
-      }
-
-      instance = parsed.parse(reader, c.getSource());
-    } else if (parsed.getEmptyConstructor() == null) {
+    if (!canRead && parsed.requiresInput()) {
       throw Exceptions.format("Type {0} requires input", parseHolder.getKey());
-    } else {
-      instance = parsed.create();
     }
 
+    T instance = parsed.parse(reader, c.getSource());
     Readers.ensureCannotRead(reader);
 
     if (first) {

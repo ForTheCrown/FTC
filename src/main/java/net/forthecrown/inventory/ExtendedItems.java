@@ -18,12 +18,14 @@ public final class ExtendedItems {
   /**
    * Item type which represents royal swords
    */
-  public static final ExtendedItemType<RoyalSword> ROYAL_SWORD = register(new RoyalSwordType());
+  public static final ExtendedItemType<RoyalSword> ROYAL_SWORD
+      = register(new RoyalSwordType());
 
   /**
    * Item type which represents crowns
    */
-  public static final ExtendedItemType<RoyalCrown> CROWN = register(new CrownType());
+  public static final ExtendedItemType<RoyalCrown> CROWN
+      = register(new CrownType());
 
   @OnEnable
   public static void init() {

@@ -40,8 +40,10 @@ public class UserJsonSerializer implements UserSerializer {
     user.setTimeToNow(TimeField.LAST_LOADED);
 
     try {
-      SerializationHelper.writeJsonFile(getUserFile(user.getUniqueId()),
-          json -> _serialize(user, json));
+      SerializationHelper.writeJsonFile(
+          getUserFile(user.getUniqueId()),
+          json -> _serialize(user, json)
+      );
     } catch (Throwable t) {
       LOGGER.error("Error serializing user: " + user.getUniqueId() + " or " + user.getName(), t);
     }
@@ -52,8 +54,10 @@ public class UserJsonSerializer implements UserSerializer {
     user.setTimeToNow(TimeField.LAST_LOADED);
 
     try {
-      SerializationHelper.readJsonFile(getUserFile(user.getUniqueId()),
-          json -> _deserialize(user, json));
+      SerializationHelper.readJsonFile(
+          getUserFile(user.getUniqueId()),
+          json -> _deserialize(user, json)
+      );
     } catch (Throwable t) {
       LOGGER.error("Error deserializing user: " + user.getUniqueId() + " or " + user.getName(), t);
     }
@@ -151,15 +155,20 @@ public class UserJsonSerializer implements UserSerializer {
 
       var component = user.getComponent(type);
       var componentJson = json.get(type.getSerialId());
-      component.deserialize(componentJson);
+
+      try {
+        component.deserialize(componentJson);
+      } catch (Throwable throwable) {
+        LOGGER.error("Couldn't deserialize component {} for {}",
+            component, user, throwable
+        );
+      }
     }
   }
 
   @Override
   public void delete(UUID id) {
     UserManager.get().remove(id);
-    UserManager.get().getOnline()
-        .remove(id);
 
     try {
       Files.delete(getUserFile(id));

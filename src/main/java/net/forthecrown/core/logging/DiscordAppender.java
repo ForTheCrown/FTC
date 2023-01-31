@@ -73,7 +73,9 @@ public class DiscordAppender extends AbstractAppender {
         builder.append(BLOCK_PREFIX);
         MessageWriter writer = new MessageWriter(builder);
         PrintWriter print = new MessagePrint(writer);
-        thrown.printStackTrace(print);
+
+        // Print in a different format to conserve characters
+        printStackTrace(thrown, print);
 
         builder.append(BLOCK_SUFFIX);
       } else if ((THROWABLE_TOO_LONG.length() + builder.length()) < MAX_CONTENT_LENGTH) {
@@ -86,6 +88,23 @@ public class DiscordAppender extends AbstractAppender {
         .ifPresent(channel -> {
           DiscordUtil.queueMessage(channel, builder.toString());
         });
+  }
+
+  private static void printStackTrace(Throwable t, PrintWriter out) {
+    out.println(t);
+
+    StackTraceElement[] stackTrace = t.getStackTrace();
+    for (var trace: stackTrace) {
+      String className = trace.getClassName();
+      String methodName = trace.getMethodName();
+      int lineno = trace.getLineNumber();
+
+      out.println(className + "#" + methodName + ":" + lineno);
+    }
+
+    if (t.getCause() != null) {
+      printStackTrace(t.getCause(), out);
+    }
   }
 
   private static Optional<TextChannel> findChannel(String name) {
@@ -102,6 +121,11 @@ public class DiscordAppender extends AbstractAppender {
     }
 
     @Override
+    public void println(String x) {
+      this.println((Object) x);
+    }
+
+    @Override
     public void println(Object x) {
       String s = String.valueOf(x);
 
@@ -110,6 +134,13 @@ public class DiscordAppender extends AbstractAppender {
         s = s.substring(index + 2);
       } else if (s.startsWith("\tat ")) {
         s = s.substring("\tat ".length());
+      }
+
+      if (s.startsWith("net.")
+          || s.startsWith("com.")
+          || s.startsWith("org.")
+      ) {
+        s = s.substring(4);
       }
 
       super.println(s);

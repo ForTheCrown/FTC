@@ -5,12 +5,13 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.commands.DataCommands;
+import net.forthecrown.commands.DataCommands.DataAccessor;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.useables.Usable;
-import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.writer.TextWriters;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.NotNull;
@@ -40,6 +41,31 @@ abstract class InteractableNode<H extends Usable> extends FtcCommand {
         .then(createEditArguments());
   }
 
+  protected DataAccessor createAccessor(UsageHolderProvider<H> provider,
+                                        UsableSaveCallback<H> saveCallback
+  ) {
+    return new DataAccessor() {
+      @Override
+      public CompoundTag getTag(CommandContext<CommandSource> context)
+          throws CommandSyntaxException {
+        var holder = provider.get(context);
+
+        CompoundTag tag = new CompoundTag();
+        holder.save(tag);
+        return tag;
+      }
+
+      @Override
+      public void setTag(CommandContext<CommandSource> context, CompoundTag tag)
+          throws CommandSyntaxException {
+        var holder = provider.get(context);
+        holder.load(tag);
+
+        saveCallback.save(holder);
+      }
+    };
+  }
+
   protected abstract UsableSaveCallback<H> saveCallback();
 
   protected RequiredArgumentBuilder<CommandSource, ?> createEditArguments() {
@@ -49,6 +75,8 @@ abstract class InteractableNode<H extends Usable> extends FtcCommand {
     var removeLiteral = literal("remove");
     createRemoveArguments(removeLiteral, provider);
     addEditArguments(argument, provider);
+
+    var saveCallback = saveCallback();
 
     return argument
         .then(literal("info")
@@ -63,28 +91,22 @@ abstract class InteractableNode<H extends Usable> extends FtcCommand {
             })
         )
 
-        .then(literal("data")
-            .executes(c -> {
-              var holder = provider.get(c);
-              CompoundTag tag = new CompoundTag();
-              holder.save(tag);
-
-              c.getSource().sendMessage(
-                  Text.displayTag(tag, true)
-              );
-              return 0;
-            })
+        .then(
+            DataCommands.dataAccess(
+                "Usable",
+                createAccessor(provider, saveCallback)
+            )
         )
 
         .then(removeLiteral)
 
         .then(
             UsableCommands.CHECK_NODE
-                .createArguments(provider, saveCallback())
+                .createArguments(provider, saveCallback)
         )
         .then(
             UsableCommands.ACTION_NODE
-                .createArguments(provider, saveCallback())
+                .createArguments(provider, saveCallback)
         );
   }
 

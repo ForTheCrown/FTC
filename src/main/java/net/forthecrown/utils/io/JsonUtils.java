@@ -185,11 +185,7 @@ public final class JsonUtils {
     try {
       return DATE_FORMAT.parse(element.getAsString());
     } catch (ParseException e) {
-      try {
-        return LEGACY_FORMAT.parse(element.getAsString());
-      } catch (ParseException e1) {
-        return new Date();
-      }
+      throw new IllegalStateException(e);
     }
   }
 
