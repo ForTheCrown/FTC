@@ -10,7 +10,7 @@ import net.forthecrown.grenadier.types.args.Argument;
 import net.forthecrown.grenadier.types.args.ParsedArgs;
 import net.forthecrown.grenadier.types.pos.Position;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
-import net.forthecrown.useables.ActionHolder;
+import net.forthecrown.useables.Usable;
 import net.forthecrown.useables.ConstructType;
 import net.forthecrown.useables.UsableConstructor;
 import net.forthecrown.useables.UsageAction;
@@ -52,7 +52,7 @@ public class  ActionTeleport extends UsageAction {
   }
 
   @Override
-  public void onUse(Player player, ActionHolder holder) {
+  public void onUse(Player player, Usable holder) {
     var user = Users.get(player);
 
     if (!user.canTeleport()) {

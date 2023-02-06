@@ -1,10 +1,13 @@
 package net.forthecrown.commands.admin;
 
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.UUID;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.arguments.chat.MessageSuggestions;
@@ -14,6 +17,7 @@ import net.forthecrown.core.Messages;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.types.MapArgument;
 import net.forthecrown.grenadier.types.pos.Position;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.user.User;
@@ -21,7 +25,9 @@ import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Sign;
+import org.bukkit.block.data.type.WallSign;
 
 public class CommandSign extends FtcCommand {
 
@@ -36,6 +42,34 @@ public class CommandSign extends FtcCommand {
 
   private final Map<UUID, SignLines> copies = new Object2ObjectOpenHashMap<>();
 
+  private final Map<String, SignType> types = Map.ofEntries(
+      entry("oak"),
+      entry("spruce"),
+      entry("birch"),
+      entry("jungle"),
+      entry("acacia"),
+      entry("dark_oak"),
+      entry("mangrove"),
+      entry("crimson"),
+      entry("warped")
+  );
+
+  private static Entry<String, SignType> entry(String name) {
+    Material wallSign = Material.matchMaterial(name + "_wall_sign");
+    Material sign = Material.matchMaterial(name + "_sign");
+    Objects.requireNonNull(wallSign);
+    Objects.requireNonNull(sign);
+
+    return entry(name, wallSign, sign);
+  }
+
+  private static Entry<String, SignType> entry(String name,
+                                               Material wall,
+                                               Material normal
+  ) {
+    return Map.entry(name, new SignType(normal, wall));
+  }
+
   @Override
   public void populateUsages(UsageFactory factory) {
     var prefixed = factory.withPrefix("<pos: x,y,z>");
@@ -45,6 +79,8 @@ public class CommandSign extends FtcCommand {
     prefixed.usage("paste", "Pastes your copied sign contents onto a sign");
     prefixed.usage("<line: number(1..4)> <text>", "Sets a sign's <line> to <text>");
     prefixed.usage("<line: number(1..4)> -clear", "Clears <line>");
+    prefixed.usage("type <type>", "Sets the sign's type");
+    prefixed.usage("glow <true | false>", "Makes a sign glow/not glow");
   }
 
   @Override
@@ -61,6 +97,41 @@ public class CommandSign extends FtcCommand {
                   c.getSource().sendAdmin("Cleared sign");
                   return 0;
                 })
+            )
+
+            .then(literal("glow")
+                .then(argument("glow_state", BoolArgumentType.bool())
+                    .executes(c -> {
+                      Sign sign = get(c);
+
+                      boolean glowing
+                          = c.getArgument("glow_state", Boolean.class);
+
+                      sign.setGlowingText(glowing);
+                      sign.update();
+
+                      c.getSource().sendAdmin(
+                          Text.format("Set sign glowing: {0}", glowing)
+                      );
+                      return 0;
+                    })
+                )
+            )
+
+            .then(literal("type")
+                .then(argument("type", MapArgument.of(types))
+                    .executes(c -> {
+                      Sign sign = get(c);
+                      SignType type = c.getArgument("type", SignType.class);
+
+                      type.apply(sign);
+
+                      c.getSource().sendAdmin(
+                          "Set sign's type to: " + type.name()
+                      );
+                      return 0;
+                    })
+                )
             )
 
             .then(literal("copy")
@@ -209,6 +280,37 @@ public class CommandSign extends FtcCommand {
 
     private static Component emptyIfNull(Component component) {
       return component == null ? Component.empty() : component;
+    }
+  }
+
+  record SignType(Material sign, Material wallSign) {
+
+    public String name() {
+      return sign.name()
+          .toLowerCase()
+          .replaceAll("_sign", "");
+    }
+
+    public void apply(Sign sign) {
+      var data = sign.getBlockData();
+
+      if (data instanceof WallSign wallData) {
+        WallSign newData = (WallSign) wallSign.createBlockData();
+        newData.setFacing(wallData.getFacing());
+        newData.setWaterlogged(wallData.isWaterlogged());
+
+        sign.setBlockData(newData);
+      } else if (data instanceof org.bukkit.block.data.type.Sign signData) {
+        org.bukkit.block.data.type.Sign newData
+            = (org.bukkit.block.data.type.Sign) sign().createBlockData();
+
+        newData.setWaterlogged(signData.isWaterlogged());
+        newData.setRotation(signData.getRotation());
+
+        sign.setBlockData(newData);
+      }
+
+      sign.update(true, false);
     }
   }
 }

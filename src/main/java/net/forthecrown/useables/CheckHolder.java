@@ -1,40 +1,29 @@
 package net.forthecrown.useables;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import lombok.Getter;
+import lombok.Setter;
 import net.forthecrown.core.logging.Loggers;
 import net.minecraft.nbt.CompoundTag;
 import org.bukkit.entity.Player;
 
 /**
- * A {@link UsageTypeHolder} which holds a list of usage checks
+ * Provides a simple base for implementing the {@link CheckHolder} interface
  */
-public interface CheckHolder extends UsageTypeHolder {
+@Getter
+@Setter
+public abstract class CheckHolder implements UsageTypeHolder {
 
   /**
    * The NBT tag this holder uses
    */
-  String CHECKS_TAG = "checks";
+  public static final String CHECKS_TAG = "checks";
 
-  /**
-   * Gets the list of checks this holder has
-   *
-   * @return The check list
-   */
-  UsageTypeList<UsageTest> getChecks();
+  protected final UsageTypeList<UsageTest> checks
+      = UsageTypeList.newTestList();
 
-  /**
-   * Checks if this check holder should send failure message when checks fail for players
-   *
-   * @return True, if this check holder should NOT send messages
-   */
-  boolean isSilent();
-
-  /**
-   * Sets if this check holder should tell players why they failed checks
-   *
-   * @param silent
-   */
-  void setSilent(boolean silent);
+  /** Determines if fail messages will be sent to players or not */
+  protected boolean silent = false;
 
   /**
    * Gets the first {@link UsageTest} that fails for the given player
@@ -42,7 +31,7 @@ public interface CheckHolder extends UsageTypeHolder {
    * @param player The player to check
    * @return The failed check instance, null, if all passed
    */
-  default UsageTest getFail(Player player) {
+  public UsageTest getFail(Player player) {
     for (var v : getChecks()) {
       // Test if we fail this instance's check
       // If we do, return it
@@ -54,11 +43,11 @@ public interface CheckHolder extends UsageTypeHolder {
     return null;
   }
 
-  default boolean test(Player player) {
+  public boolean test(Player player) {
     return getFail(player) == null;
   }
 
-  default boolean testInteraction(Player player) {
+  public boolean testInteraction(Player player) {
     // Get the test they failed on
     UsageTest failed;
 
@@ -99,7 +88,7 @@ public interface CheckHolder extends UsageTypeHolder {
    *
    * @param tag The tag to save to
    */
-  default void saveChecks(CompoundTag tag) {
+  public void saveChecks(CompoundTag tag) {
     tag.putBoolean("silent", isSilent());
 
     // If the checks are empty, don't save
@@ -118,7 +107,7 @@ public interface CheckHolder extends UsageTypeHolder {
    * @param tag The tag to load from
    * @throws CommandSyntaxException idk lol
    */
-  default void loadChecks(CompoundTag tag) throws CommandSyntaxException {
+  public void loadChecks(CompoundTag tag) throws CommandSyntaxException {
     setSilent(tag.getBoolean("silent"));
 
     // Clear checks list, because we're re-reading

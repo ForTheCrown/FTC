@@ -29,12 +29,13 @@ import net.forthecrown.core.Messages;
 import net.forthecrown.core.config.ConfigManager;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnDayChange;
-import net.forthecrown.core.module.OnEnable;
 import net.forthecrown.core.module.OnLoad;
 import net.forthecrown.core.module.OnSave;
+import net.forthecrown.guilds.multiplier.ExpModifiers;
 import net.forthecrown.guilds.unlockables.UnlockableColor;
 import net.forthecrown.guilds.unlockables.Upgradable;
 import net.forthecrown.user.User;
+import net.forthecrown.user.Users;
 import net.forthecrown.utils.UUID2IntMap;
 import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.waypoint.Waypoints;
@@ -87,6 +88,8 @@ public class GuildManager {
           : null;
     });
 
+    ConfigManager.get().registerConfig(GuildConfig.class);
+
     try {
       this.renderer = new BannerRenderer();
     } catch (IOException exc) {
@@ -98,11 +101,6 @@ public class GuildManager {
     return inst;
   }
 
-  @OnEnable
-  private void onEnable() {
-    ConfigManager.get().registerConfig(GuildConfig.class);
-  }
-
   @OnDayChange
   void onDayChange(ZonedDateTime time) {
     resetDailyExpEarnedAmounts();
@@ -111,9 +109,11 @@ public class GuildManager {
 
     // If start of weekend or end of weekend, announce multiplier state change
     if (time.getDayOfWeek() == DayOfWeek.SATURDAY) {
-      announcer.announce(
-          Messages.weekendMultiplierActive(expModifier.getModifier())
-      );
+      Users.getOnline()
+          .forEach(user -> {
+            float mod = expModifier.getModifier(user.getUniqueId());
+            user.sendMessage(Messages.weekendMultiplierActive(mod));
+          });
     } else if (time.getDayOfWeek() == DayOfWeek.MONDAY) {
       announcer.announce(Messages.WEEKEND_MULTIPLIER_INACTIVE);
     }

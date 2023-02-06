@@ -41,6 +41,8 @@ public final class Permissions {
       CHAT_EMOTES             = register("ftc.chat.emotes"),
       CHAT_COLORS             = register("ftc.chat.color"),
       CHAT_LINKS              = register("ftc.chat.links"),
+      CHAT_PLAYER_TAGGING     = register("ftc.chat.tagging"),
+      CHAT_TIMESTAMPS         = register("ftc.chat.timestamps"),
       CHAT_CLEAN_LINKS        = registerPrefixed(CHAT_LINKS, "clean"),
       CHAT_GRADIENTS          = register("ftc.chat.gradients"),
 

@@ -32,7 +32,9 @@ public final class TextInfo {
 
   public static @NotNull String getFiller(@Nonnegative int pixels) {
     if (pixels < 2) {
-      return "";
+      // I spent a good 30 minutes looking for a 1px wide character in
+      // minecraft's texture sheets, god bless unicode
+      return "꣎";
     }
 
     if (pixels == 2) {

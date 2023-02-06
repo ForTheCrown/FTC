@@ -11,6 +11,7 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.longs.LongList;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.time.chrono.ChronoZonedDateTime;
 import java.util.Date;
 import java.util.List;
@@ -530,13 +531,15 @@ public class ComponentFormat implements ComponentLike {
     TIME {
       @Override
       public Component resolveArgument(Object arg, String style) {
-        // Not a number, we can't format so return default value
-        if (!(arg instanceof Number number)) {
+        long time;
+
+        if (arg instanceof Duration duration) {
+          time = duration.toMillis();
+        } else if (arg instanceof Number number) {
+          time = number.longValue();
+        } else {
           return Text.valueOf(arg);
         }
-
-        // Format given time
-        long time = number.longValue();
 
         if (style.contains("-ticks")) {
           time = Time.ticksToMillis(time);

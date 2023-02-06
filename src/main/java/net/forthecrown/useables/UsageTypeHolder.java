@@ -4,7 +4,7 @@ import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * A generic super class for both {@link CheckHolder} and {@link ActionHolder}
+ * A generic super class for both {@link CheckHolder} and {@link Usable}
  */
 public interface UsageTypeHolder {
 

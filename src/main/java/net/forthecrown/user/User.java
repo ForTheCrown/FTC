@@ -489,7 +489,7 @@ public class User implements ForwardingAudience.Single,
     // Inform of guild Exp Multiplier
     var modifier = GuildManager.get()
         .getExpModifier()
-        .getModifier();
+        .getModifier(getUniqueId());
 
     if (getGuild() != null && modifier > 1) {
       Tasks.runLaterAsync(() -> sendMessage(Messages.guildMultiplierActive(modifier)), 60);

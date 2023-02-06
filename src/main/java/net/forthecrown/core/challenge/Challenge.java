@@ -64,7 +64,11 @@ public interface Challenge {
       writer.setFieldStyle(Style.style(NamedTextColor.GRAY));
       writer.setFieldValueStyle(Style.style(NamedTextColor.GRAY));
 
-      reward.write(writer, streak);
+      reward.write(
+          writer,
+          streak,
+          viewer == null ? null : viewer.getUniqueId()
+      );
     }
 
     var displayName = getName()

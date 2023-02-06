@@ -2,7 +2,6 @@ package net.forthecrown.useables.command;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.Getter;
-import net.forthecrown.useables.AbstractCheckable;
 import net.forthecrown.useables.CheckHolder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEventSource;
@@ -10,8 +9,10 @@ import net.minecraft.nbt.CompoundTag;
 import org.bukkit.entity.Player;
 
 @Getter
-public abstract class CommandUsable extends AbstractCheckable implements CheckHolder,
-    HoverEventSource<Component> {
+public abstract class CommandUsable
+    extends CheckHolder
+    implements HoverEventSource<Component>
+{
 
   private final String name;
 

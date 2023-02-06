@@ -3012,9 +3012,17 @@ public interface Messages {
     );
   }
 
+  static Component multiplierDecremented(float mod) {
+    return format(
+        "Guild Exp multiplier decreased to &e{0, number}x&r.",
+        NamedTextColor.GRAY,
+        mod
+    );
+  }
+
   static Component weekendMultiplierActive(float mod) {
     return format(
-        "Weekend Guild Exp multiplier is now active! &6({0, number}x)",
+        "Weekend Guild Exp multiplier is now active! &6(now {0, number}x)",
         NamedTextColor.YELLOW,
         mod
     );

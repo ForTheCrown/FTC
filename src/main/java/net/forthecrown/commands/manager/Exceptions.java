@@ -8,6 +8,7 @@ import static net.forthecrown.waypoint.Waypoints.PLAYER_COLUMN;
 import com.mojang.brigadier.ImmutableStringReader;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.time.Duration;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.PunishEntry;
@@ -256,9 +257,11 @@ public interface Exceptions {
     return format("You've already sent a request to {0, user}.", target);
   }
 
-  static CommandSyntaxException nonActiveChallenge(Challenge challenge) {
+  static CommandSyntaxException nonActiveChallenge(Challenge challenge,
+                                                   User viewer
+  ) {
     return format("Challenge {0} is not active!",
-        challenge.displayName(null)
+        challenge.displayName(viewer)
     );
   }
 

@@ -35,7 +35,6 @@ import net.forthecrown.user.UserManager;
 import net.forthecrown.user.data.UserRanks;
 import net.forthecrown.user.packet.PacketListeners;
 import net.forthecrown.user.property.Properties;
-import net.forthecrown.utils.text.ChatEmotes;
 import net.forthecrown.utils.world.WorldLoader;
 import net.forthecrown.waypoint.WaypointManager;
 import net.forthecrown.waypoint.WaypointProperties;
@@ -57,7 +56,9 @@ final class BootStrap {
 
     long freeMem = Runtime.getRuntime().freeMemory();
 
+    // Tools
     init(InventoryStorage::getStorage);
+    init(Cooldowns::getCooldowns);
 
     // Guilds
     init(Unlockables.class);
@@ -97,7 +98,6 @@ final class BootStrap {
     init(ExtendedItems.class);
 
     // Bunch of miscellaneous modules
-    init(ChatEmotes.class);
     init(AbilityAnimation::getInstance);
     init(Cosmetics.class);
     init(Usables::getInstance);
@@ -164,6 +164,9 @@ final class BootStrap {
     init(supplier.get());
   }
 
+  // There is no way Object#getClass() returns anything other than
+  // its own class, ie, T#getClass() MUST return a Class<T>
+  @SuppressWarnings("unchecked")
   static <T> void init(T instance) {
     _init(instance, (Class<T>) instance.getClass());
   }

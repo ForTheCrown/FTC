@@ -246,7 +246,7 @@ public class ItemChallenge implements Challenge {
                 Style.style(NamedTextColor.GRAY)
             );
 
-            getReward().write(writer, streak);
+            getReward().write(writer, streak, user.getUniqueId());
             builder.addLore(writer.getLore());
           }
 

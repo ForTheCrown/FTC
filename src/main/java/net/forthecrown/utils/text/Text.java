@@ -37,6 +37,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.format.TextDecoration.State;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.translation.Translatable;
@@ -153,11 +154,18 @@ public final class Text {
    * @return The wrapped text
    */
   public static Component wrapForItems(Component text) {
-    return Component.text()
-        .decoration(TextDecoration.ITALIC, false)
-        .color(NamedTextColor.WHITE)
-        .append(text)
-        .build();
+    var color = text.color();
+    var italicState = text.decoration(TextDecoration.ITALIC);
+
+    if (color == null) {
+      text = text.color(NamedTextColor.WHITE);
+    }
+
+    if (italicState == State.NOT_SET) {
+      text = text.decoration(TextDecoration.ITALIC, false);
+    }
+
+    return text;
   }
 
   /**
@@ -214,6 +222,10 @@ public final class Text {
     return Messages.DASH_CLEAR.equals(text);
   }
 
+  public static TextComponent gradient(String input, TextColor... colors) {
+    return gradient(input, false, colors);
+  }
+
   /**
    * Creates a text with a gradient color
    * <p>
@@ -227,7 +239,7 @@ public final class Text {
    * @param colors The colors to create the gradient with
    * @return The text colored as a gradient
    */
-  public static TextComponent gradient(String input, TextColor... colors) {
+  public static TextComponent gradient(String input, boolean hsv, TextColor... colors) {
     if (input == null) {
       return null;
     }
@@ -253,12 +265,20 @@ public final class Text {
     for (int i = 0; i < length; i++) {
       char c = chars[i];
       float progress = (float) i / length;
-      TextColor color = _lerp(progress, colors);
+      TextColor color = _lerp(hsv, progress, colors);
 
       builder.append(text(c, color));
     }
 
     return builder.build();
+  }
+
+  public static TextColor rgbLerp(float progress, TextColor... colors) {
+    return lerp(false, progress, colors);
+  }
+
+  public static TextColor hsvLerp(float progress, TextColor... colors) {
+    return lerp(true, progress, colors);
   }
 
   /**
@@ -271,7 +291,7 @@ public final class Text {
    * @param colors   The colors to interpolate
    * @return The interpolated color
    */
-  public static TextColor lerp(float progress, TextColor... colors) {
+  public static TextColor lerp(boolean hsv, float progress, TextColor... colors) {
     if (colors.length == 0) {
       return null;
     } else if (colors.length == 1) {
@@ -286,12 +306,12 @@ public final class Text {
       return colors[colors.length - 1];
     }
 
-    return _lerp(progress, colors);
+    return _lerp(hsv, progress, colors);
   }
 
-  private static TextColor _lerp(float progress, TextColor... colors) {
+  private static TextColor _lerp(boolean hsv, float progress, TextColor... colors) {
     if (colors.length == 2) {
-      return hsvLerp(progress, colors[0], colors[1]);
+      return hsvLerp(hsv, progress, colors[0], colors[1]);
     }
 
     final int maxIndex = colors.length - 1;
@@ -307,13 +327,11 @@ public final class Text {
     TextColor c1 = colors[firstIndex];
     TextColor c2 = colors[firstIndex + 1];
 
-    return hsvLerp(localStep, c1, c2);
+    return hsvLerp(hsv, localStep, c1, c2);
   }
 
-  private static TextColor hsvLerp(float p, TextColor c1, TextColor c2) {
-    boolean useHsvInterpolation = Boolean.getBoolean("ftc.hsv");
-
-    if (!useHsvInterpolation) {
+  private static TextColor hsvLerp(boolean hsv, float p, TextColor c1, TextColor c2) {
+    if (!hsv) {
       return TextColor.lerp(p, c1, c2);
     }
 
@@ -350,8 +368,7 @@ public final class Text {
     Component hoverName = PaperAdventure.asAdventure(nms.getHoverName());
 
     if (nms.hasCustomHoverName()
-        && hoverName.decoration(TextDecoration.ITALIC)
-        == TextDecoration.State.NOT_SET
+        && hoverName.decoration(TextDecoration.ITALIC) == TextDecoration.State.NOT_SET
     ) {
       hoverName = hoverName.decorate(TextDecoration.ITALIC);
     }

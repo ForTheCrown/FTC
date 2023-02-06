@@ -7,7 +7,7 @@ import lombok.Getter;
 import net.forthecrown.commands.manager.FtcSuggestions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Suggester;
-import net.forthecrown.useables.ActionHolder;
+import net.forthecrown.useables.Usable;
 import net.forthecrown.useables.ConstructType;
 import net.forthecrown.useables.UsableConstructor;
 import net.forthecrown.useables.UsageAction;
@@ -59,11 +59,14 @@ public class ActionCommand extends UsageAction {
   }
 
   @Override
-  public void onUse(Player player, ActionHolder holder) {
+  public void onUse(Player player, Usable holder) {
     String command = replaceSelectors(player.getName(), this.command);
 
     Bukkit.dispatchCommand(
-        server ? SILENT_SENDER : player,
+        server
+            ? (holder.isSilent() ? SILENT_SENDER : Bukkit.getConsoleSender())
+            : player,
+
         command
     );
   }

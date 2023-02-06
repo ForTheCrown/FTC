@@ -89,8 +89,10 @@ public final class Events {
 
     register(new AutoSellListener());
     register(new DurabilityListener());
+
     register(new PlayerMoveGuildChunkListener());
     register(new PotionEffectListener());
+    register(new WhitelistListener());
 
     // Listen for voting plugin votes
     if (Util.isPluginEnabled("VotingPlugin")) {

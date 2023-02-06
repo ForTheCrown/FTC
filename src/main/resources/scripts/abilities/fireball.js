@@ -14,7 +14,9 @@ const SOUND = Sound.sound()
     .type(SOUND_KEY)
     .build();
 
-const YIELD_MOD = 1.15
+const YIELD_MOD = 1.15;
+
+const SCOREBOARD_TAG = "swordUpgrade_fireball";
 
 function onRightClick(player, clicked) {
   if (!shouldLaunch(clicked)) {
@@ -29,6 +31,7 @@ function onRightClick(player, clicked) {
     // Required so that SwordFireballListener can despawn it after 40 blocks
     ball.addScoreboardTag(SwordFireballListener.FIREBALL_TAG);
     ball.setYield(YIELD_MOD * level);
+    ball.addScoreboardTag(SCOREBOARD_TAG);
   });
 
   // Removed in EntitySpawnEvent or something similar

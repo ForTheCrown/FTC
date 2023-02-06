@@ -142,8 +142,6 @@ public @UtilityClass class WorldLoader {
 
   /**
    * Shuts down the loader.
-   * <p></p>
-   * ONLY TO BE USED BY onDisable IN MAIN
    */
   @OnDisable
   public void shutdown() {

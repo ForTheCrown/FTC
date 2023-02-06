@@ -13,7 +13,7 @@ import net.minecraft.nbt.CompoundTag;
  * A trigger which holds actions and triggers that is activated when a user enters its area of
  * effect
  */
-public class UsableTrigger extends AbstractUsable implements BoundsHolder {
+public class UsableTrigger extends Usable implements BoundsHolder {
 
   private static final String
       TAG_AREA = "area",

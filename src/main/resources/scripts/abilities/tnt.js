@@ -1,6 +1,8 @@
 import "@bukkit.entity.TNTPrimed";
 import "@bukkit.block.Block";
 
+const SCOREBOARD_TAG = "swordUpgrade_tnt";
+
 function onRightClick(player, clicked) {
   if (clicked != null) {
     return false;
@@ -9,7 +11,9 @@ function onRightClick(player, clicked) {
   let loc = player.getLocation();
   let w = loc.getWorld();
 
-  let spawned = w.spawn(loc, TNTPrimed.class);
+  let spawned = w.spawn(loc, TNTPrimed.class, tnt => {
+    tnt.addScoreboardTag(SCOREBOARD_TAG);
+  });
 
   // Could be removed by event
   if (spawned.isDead()) {

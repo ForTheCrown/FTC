@@ -30,7 +30,6 @@ public final class UsageActions {
 
     register(KEY_SCRIPT, ActionScript.TYPE);
 
-    ActionScore.Action.registerAll();
     ActionUserMap.Type.registerAll();
 
     Registries.USAGE_ACTIONS.freeze();

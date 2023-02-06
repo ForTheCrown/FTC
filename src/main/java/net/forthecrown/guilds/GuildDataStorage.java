@@ -18,6 +18,7 @@ import javax.imageio.ImageIO;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.core.logging.Loggers;
+import net.forthecrown.guilds.multiplier.ExpModifiers;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.forthecrown.utils.io.PathUtil;

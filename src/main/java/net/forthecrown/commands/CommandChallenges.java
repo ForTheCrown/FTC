@@ -366,7 +366,7 @@ public class CommandChallenges extends FtcCommand {
     Holder<Challenge> holder = c.getArgument("challenge", Holder.class);
 
     if (!Challenges.isActive(holder.getValue())) {
-      throw Exceptions.nonActiveChallenge(holder.getValue());
+      throw Exceptions.nonActiveChallenge(holder.getValue(), user);
     }
 
     holder.getValue()
@@ -388,7 +388,7 @@ public class CommandChallenges extends FtcCommand {
     Holder<Challenge> holder = c.getArgument("challenge", Holder.class);
 
     if (!Challenges.isActive(holder.getValue())) {
-      throw Exceptions.nonActiveChallenge(holder.getValue());
+      throw Exceptions.nonActiveChallenge(holder.getValue(), user);
     }
 
     ChallengeManager.getInstance()

@@ -34,6 +34,7 @@ import net.forthecrown.commands.ToolBlockCommands;
 import net.forthecrown.commands.UserMapCommand;
 import net.forthecrown.commands.UserMapTopCommand;
 import net.forthecrown.commands.admin.CommandBroadcast;
+import net.forthecrown.commands.admin.CommandCooldown;
 import net.forthecrown.commands.admin.CommandDungeons;
 import net.forthecrown.commands.admin.CommandEndOpener;
 import net.forthecrown.commands.admin.CommandFtcStruct;
@@ -187,6 +188,7 @@ public final class Commands {
     new CommandStructFunction();
     new CommandScripts();
     new CommandInvStore();
+    new CommandCooldown();
 
     InteractableCommands.createCommands();
     CommandSpecificGameMode.createCommands();

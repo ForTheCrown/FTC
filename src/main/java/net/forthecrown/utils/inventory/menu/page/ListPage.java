@@ -81,6 +81,12 @@ public abstract class ListPage<T> extends MenuPage {
                 // If the current entry's index is an
                 // invalid index, don't place item
                 if (index >= list.size()) {
+                  int middleIndex = (builder.getSize() - 1) / 2;
+
+                  if (slot.getIndex() == middleIndex && list.isEmpty()) {
+                    return createEmptyItem(user, context);
+                  }
+
                   return null;
                 }
 
@@ -113,6 +119,10 @@ public abstract class ListPage<T> extends MenuPage {
       throws CommandSyntaxException
   {
 
+  }
+
+  protected ItemStack createEmptyItem(User user, Context context) {
+    return null;
   }
 
   protected int getPage(Context context) {

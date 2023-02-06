@@ -53,9 +53,10 @@ public interface FtcSuggestions {
    * @param acceptOffline True, if offline names may be suggested, false otherwise
    * @return The built suggestions
    */
-  static CompletableFuture<Suggestions> suggestPlayerNames(CommandSource c,
-                                                           SuggestionsBuilder builder,
-                                                           boolean acceptOffline
+  static CompletableFuture<Suggestions> suggestPlayerNames(
+      CommandSource c,
+      SuggestionsBuilder builder,
+      boolean acceptOffline
   ) {
     String token = builder.getRemainingLowerCase();
 

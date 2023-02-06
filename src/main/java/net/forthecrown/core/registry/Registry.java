@@ -225,7 +225,7 @@ public class Registry<V> implements Iterable<V> {
                                      @NonNegative int id
   ) throws IllegalArgumentException,
       NullPointerException {
-    return register(new Holder<>(removeNamespace(key), id, value));
+    return register(new Holder<>(removeNamespace(key).intern(), id, value));
   }
 
   /**
@@ -543,7 +543,7 @@ public class Registry<V> implements Iterable<V> {
   public @NotNull Optional<Holder<V>> getHolder(@Pattern(VALID_KEY_REGEX) String key)
       throws IllegalArgumentException {
     return Optional.ofNullable(byKey.get(
-        Keys.ensureValid(removeNamespace(key))
+        Keys.ensureValid(removeNamespace(key)).intern()
     ));
   }
 

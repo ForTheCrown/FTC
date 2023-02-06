@@ -1,7 +1,5 @@
 package net.forthecrown.useables.test;
 
-import static net.minecraft.nbt.Tag.TAG_STRING;
-
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.arguments.Arguments;
@@ -11,7 +9,7 @@ import net.forthecrown.useables.ConstructType;
 import net.forthecrown.useables.UsableConstructor;
 import net.forthecrown.useables.UsageTest;
 import net.forthecrown.useables.UsageType;
-import net.forthecrown.useables.actions.ActionScript;
+import net.forthecrown.useables.util.UsablesScripts;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.text.Text;
@@ -19,7 +17,6 @@ import net.kyori.adventure.text.Component;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
-import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,7 +51,7 @@ public class TestScript extends UsageTest {
 
   @Override
   public boolean test(Player player, CheckHolder holder) {
-    var script = ActionScript.getScript(this.script, holder, args);
+    var script = UsablesScripts.getScript(this.script, holder, args);
 
     if (!script.hasMethod("test")) {
       script.close();
@@ -71,7 +68,7 @@ public class TestScript extends UsageTest {
 
   @Override
   public @Nullable Component getFailMessage(Player player, CheckHolder holder) {
-    var script = ActionScript.getScript(this.script, holder, args);
+    var script = UsablesScripts.getScript(this.script, holder, args);
 
     if (!script.hasMethod("getFailMessage")) {
       script.close();
@@ -93,43 +90,19 @@ public class TestScript extends UsageTest {
 
   @Override
   public void postTests(Player player, CheckHolder holder) {
-    try (var script = ActionScript.getScript(this.script, holder, args)) {
+    try (var script = UsablesScripts.getScript(this.script, holder, args)) {
       script.invokeIfExists("onTestsPassed", Users.get(player));
     }
   }
 
   @UsableConstructor(ConstructType.PARSE)
   public static TestScript parse(StringReader reader, CommandSource source)
-      throws CommandSyntaxException
-  {
-    String script = Arguments.SCRIPT.parse(reader);
-    String[] args = ArrayUtils.EMPTY_STRING_ARRAY;
-
-    reader.skipWhitespace();
-
-    if (reader.canRead()) {
-      String remaining = reader.getRemaining().trim();
-      reader.setCursor(reader.getTotalLength());
-      args = remaining.split("\s");
-    }
-
-    return new TestScript(script, args);
+      throws CommandSyntaxException {
+    return UsablesScripts.parseScript(reader, TestScript::new);
   }
 
   @UsableConstructor(ConstructType.TAG)
   public static TestScript readTag(Tag tag) {
-    if (tag.getId() == TAG_STRING) {
-      return new TestScript(tag.getAsString());
-    }
-
-    CompoundTag compound = (CompoundTag) tag;
-    String script = compound.getString("script");
-
-    String[] args = compound.getList("args", TAG_STRING)
-        .stream()
-        .map(Tag::getAsString)
-        .toArray(String[]::new);
-
-    return new TestScript(script, args);
+    return UsablesScripts.loadScript(tag, TestScript::new);
   }
 }

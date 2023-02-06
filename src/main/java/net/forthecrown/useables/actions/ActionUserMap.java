@@ -7,7 +7,7 @@ import java.util.EnumMap;
 import java.util.UUID;
 import net.forthecrown.core.registry.Registries;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.useables.ActionHolder;
+import net.forthecrown.useables.Usable;
 import net.forthecrown.useables.ConstructType;
 import net.forthecrown.useables.UsableConstructor;
 import net.forthecrown.useables.UsageAction;
@@ -39,7 +39,7 @@ public class ActionUserMap extends UsageAction {
   }
 
   @Override
-  public void onUse(Player player, ActionHolder holder) {
+  public void onUse(Player player, Usable holder) {
     action.apply(map, player.getUniqueId(), amount);
   }
 

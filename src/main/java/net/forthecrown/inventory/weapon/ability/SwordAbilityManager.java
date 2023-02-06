@@ -1,5 +1,6 @@
 package net.forthecrown.inventory.weapon.ability;
 
+import static net.forthecrown.inventory.weapon.ability.WeaponAbility.START_LEVEL;
 import static net.forthecrown.utils.io.FtcJar.ALLOW_OVERWRITE;
 import static net.forthecrown.utils.io.FtcJar.OVERWRITE_IF_NEWER;
 
@@ -324,7 +325,8 @@ public class SwordAbilityManager {
         trialInventoryStore = object.remove("inventory_store").getAsString();
       }
 
-      Map<String, AbilityTrialArea> trialData = new Object2ObjectOpenHashMap<>();
+      Map<String, AbilityTrialArea> trialData
+          = new Object2ObjectOpenHashMap<>();
 
       for (var e: object.entrySet()) {
         String key = e.getKey();
@@ -365,6 +367,7 @@ public class SwordAbilityManager {
         }
 
         boolean giveSword = json.getBool("give_sword");
+        int level = json.getInt("ability_level", START_LEVEL);
         Script script;
 
         if (json.has("script")) {
@@ -373,7 +376,10 @@ public class SwordAbilityManager {
           script = null;
         }
 
-        trialData.put(key, new AbilityTrialArea(l, node, giveSword, script));
+        trialData.put(
+            key,
+            new AbilityTrialArea(l, node, giveSword, script, level)
+        );
       }
 
       return DataResult.success(trialData);

@@ -253,7 +253,8 @@ public class WeaponAbilityType {
   public record AbilityTrialArea(Location location,
                                  TrialInfoNode info,
                                  boolean giveSword,
-                                 Script script
+                                 Script script,
+                                 int level
   ) {
 
     public void start() {
@@ -287,6 +288,7 @@ public class WeaponAbilityType {
         var ability = type.create(user);
         ability.setRemainingUses(UNLIMITED_USES);
         ability.setCooldownOverride(2 * 20);
+        ability.setLevel(level);
 
         sword.setAbility(ability);
         sword.update(item);

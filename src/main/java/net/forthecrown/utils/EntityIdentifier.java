@@ -6,8 +6,10 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.UUID;
 import lombok.Data;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.grenadier.types.UUIDArgument;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.ChunkPos;
 import org.bukkit.Bukkit;
@@ -76,6 +78,10 @@ public class EntityIdentifier {
   }
 
   public static EntityIdentifier load(Tag t) {
+    if (t.getId() == Tag.TAG_STRING) {
+      return parse(t.getAsString());
+    }
+
     CompoundTag tag = (CompoundTag) t;
 
     return of(
@@ -102,6 +108,12 @@ public class EntityIdentifier {
     reader.expect(FIELD_SEPARATOR);
 
     int chunkZ = reader.readInt();
+    reader.expect(FIELD_SEPARATOR);
+
+    Loggers.getLogger().debug("remaining={} input={}",
+        reader.getRemaining(),
+        reader.getString()
+    );
 
     UUID id = UUIDArgument.uuid().parse(reader);
 
@@ -110,17 +122,13 @@ public class EntityIdentifier {
 
   @Override
   public String toString() {
-    return worldName + FIELD_SEPARATOR + chunk.x + FIELD_SEPARATOR + chunk.z + FIELD_SEPARATOR
-        + uniqueId;
+    return worldName
+        + FIELD_SEPARATOR + chunk.x
+        + FIELD_SEPARATOR + chunk.z
+        + FIELD_SEPARATOR + uniqueId;
   }
 
   public Tag save() {
-    CompoundTag tag = new CompoundTag();
-
-    tag.putUUID("uuid", uniqueId);
-    tag.putString("world_name", worldName);
-    tag.putLong("chunk", chunk.longKey);
-
-    return tag;
+    return StringTag.valueOf(toString());
   }
 }

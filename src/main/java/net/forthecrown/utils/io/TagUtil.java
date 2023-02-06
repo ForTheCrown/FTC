@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 import net.forthecrown.core.Worlds;
 import net.forthecrown.core.registry.Keys;
 import net.forthecrown.utils.VanillaAccess;
@@ -128,17 +129,12 @@ public final class TagUtil {
     pos.add(DoubleTag.valueOf(location.getZ()));
 
     ListTag rot = new ListTag();
-    if (location.getYaw() != 0F) {
-      rot.add(FloatTag.valueOf(location.getYaw()));
-    }
-    if (location.getPitch() != 0F) {
-      rot.add(FloatTag.valueOf(location.getPitch()));
-    }
+    rot.add(FloatTag.valueOf(location.getYaw()));
+    rot.add(FloatTag.valueOf(location.getPitch()));
 
     tag.put("pos", pos);
-    if (!rot.isEmpty()) {
-      tag.put("rot", rot);
-    }
+    tag.put("rot", rot);
+
     if (location.getWorld() != null) {
       tag.putString("world", location.getWorld().getName());
     }
@@ -161,6 +157,20 @@ public final class TagUtil {
     World world = worldName.isBlank() ? null : Bukkit.getWorld(worldName);
 
     return new Location(world, x, y, z, yaw, pitch);
+  }
+
+  public static <V> V[] readArray(Tag tag,
+                                  Function<Tag, V> deserializer,
+                                  IntFunction<V[]> factory
+  ) {
+    ListTag list = (ListTag) tag;
+    V[] arr = factory.apply(list.size());
+
+    for (int i = 0; i < list.size(); i++) {
+      arr[i] = deserializer.apply(list.get(i));
+    }
+
+    return arr;
   }
 
   public static <V> ListTag writeArray(V[] arr, Function<V, Tag> serializer) {

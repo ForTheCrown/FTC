@@ -2,6 +2,7 @@ package net.forthecrown.core.challenge;
 
 
 import com.google.gson.JsonElement;
+import java.util.UUID;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
@@ -113,8 +114,8 @@ public class Reward {
       var member = guild.getMember(user.getUniqueId());
 
       var modifier = GuildManager.get().getExpModifier();
-      float mod = modifier.getModifier();
-      int modified = modifier.applyAsInt(guildReward);
+      float mod = modifier.getModifier(user.getUniqueId());
+      int modified = modifier.apply(guildReward, user.getUniqueId());
 
       member.addExpEarned(modified);
 
@@ -138,7 +139,7 @@ public class Reward {
   /**
    * Writes info about this reward to the given writer, using the given streak as context
    */
-  public void write(TextWriter writer, int streak) {
+  public void write(TextWriter writer, int streak, UUID uuid) {
     if (isEmpty()) {
       return;
     }
@@ -157,15 +158,15 @@ public class Reward {
       writer.field("Gems", Text.formatNumber(gems));
     }
 
-    if (guildExp > 0) {
+    if (guildExp > 0 && uuid != null) {
       var modifier = GuildManager.get().getExpModifier();
-      float mod = modifier.getModifier();
+      float mod = modifier.getModifier(uuid);
 
       if (mod > 1) {
         writer.field("Guild Exp",
             Text.format(
                 "{0, number} ({1, number}x multiplier, {2, number} originally)",
-                modifier.applyAsInt(guildExp),
+                modifier.apply(guildExp, uuid),
                 mod,
                 guildExp
             )

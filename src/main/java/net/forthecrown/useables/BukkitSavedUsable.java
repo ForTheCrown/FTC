@@ -13,7 +13,7 @@ import org.bukkit.persistence.PersistentDataType;
  * A usable which is saved into a {@link PersistentDataContainer} and typically exists within the MC
  * world itself.
  */
-public abstract class BukkitSavedUsable extends AbstractUsable {
+public abstract class BukkitSavedUsable extends Usable {
 
   /**
    * Determines if the vanilla interaction that occurs when you interact with the underlying MC

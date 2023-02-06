@@ -81,8 +81,7 @@ public class MobHealthBar implements Listener {
     }
 
     // Calculate hearts to show:
-    int maxHealth = (int) Math.ceil(
-        damaged.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue() / 2);
+    int maxHealth = (int) Math.ceil(damaged.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue() / 2);
     int remainingHRTS = (int) Math.ceil((damaged.getHealth() - finalDamage) / 2);
 
     if (remainingHRTS < 0) {

@@ -5,8 +5,8 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.forthecrown.commands.manager.FtcCommand.UsageFactory;
 import net.forthecrown.grenadier.CmdUtil;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.useables.ActionHolder;
 import net.forthecrown.useables.CheckHolder;
+import net.forthecrown.useables.Usable;
 import net.forthecrown.useables.UsageAction;
 import net.forthecrown.useables.UsageTest;
 import net.forthecrown.utils.text.Text;
@@ -64,6 +64,6 @@ public class UsableCommands extends CmdUtil {
     }
   };
 
-  public static final UsableArgumentNode<UsageAction, ActionHolder> ACTION_NODE
+  public static final UsableArgumentNode<UsageAction, Usable> ACTION_NODE
       = new UsableArgumentNode<>(UsageTypeAccessor.ACTIONS);
 }
