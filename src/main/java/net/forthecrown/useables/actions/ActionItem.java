@@ -82,8 +82,7 @@ public class ActionItem extends UsageAction {
   @UsableConstructor(ConstructType.PARSE)
   public static ActionItem parse(UsageType<ActionItem> type, StringReader reader,
                                  CommandSource source
-  )
-      throws CommandSyntaxException {
+  ) throws CommandSyntaxException {
     return new ActionItem(
         type,
         UsageUtil.parseItems(reader, source)

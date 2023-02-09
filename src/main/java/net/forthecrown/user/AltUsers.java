@@ -47,6 +47,18 @@ public class AltUsers extends SerializableObject.Json {
     return alt2Main.containsKey(id);
   }
 
+  public Collection<UUID> getOtherAccounts(UUID uuid) {
+    var alts = getAlts(uuid);
+    var main = getMain(uuid);
+
+    if (main != null) {
+      alts.addAll(getAlts(main));
+      alts.add(main);
+    }
+
+    return alts;
+  }
+
   public boolean isAltForAny(UUID id, Collection<Player> players) {
     UUID main = getMain(id);
 

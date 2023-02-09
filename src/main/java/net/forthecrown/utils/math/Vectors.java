@@ -220,9 +220,9 @@ public class Vectors {
     // ^ Short way of saying I do not understand this at all lol
     // All I know is it packs coordinates, so it uses less space
     // and works for what I need
-    return (((long) v.x() & 67108863L) << 38)
-        | (((long) v.y() & 4095L))
-        | (((long) v.z() & 67108863L) << 12);
+    return (((long) v.x() & 0x3FFFFFF) << 38)
+         | (((long) v.y() & 0xFFF))
+         | (((long) v.z() & 0x3FFFFFF) << 12);
   }
 
   public Vector3i fromLong(long l) {

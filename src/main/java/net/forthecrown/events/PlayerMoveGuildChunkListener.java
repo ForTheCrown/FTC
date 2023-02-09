@@ -39,8 +39,8 @@ public class PlayerMoveGuildChunkListener implements Listener {
     // ? -> Guild
     if (guildTo != null) {
       // No message when moving between chunks of same guild
-      if (Objects.equals(MAP.get(playerId),
-          guildTo.getId())) { // Jules: use Objects.equals(o, o1) to minimize MAP lookups
+      // Jules: use Objects.equals(o, o1) to minimize MAP lookups
+      if (Objects.equals(MAP.get(playerId), guildTo.getId())) {
         return;
       }
 

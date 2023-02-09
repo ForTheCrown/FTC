@@ -2,6 +2,8 @@ package net.forthecrown.useables.test;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import lombok.Getter;
+import lombok.Setter;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.useables.CheckHolder;
@@ -10,48 +12,49 @@ import net.forthecrown.useables.UsableConstructor;
 import net.forthecrown.useables.UsageTest;
 import net.forthecrown.useables.UsageType;
 import net.forthecrown.useables.util.UsablesScripts;
+import net.forthecrown.useables.UsableScriptHolder;
 import net.forthecrown.user.Users;
-import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
-public class TestScript extends UsageTest {
+public class TestScript extends UsageTest implements UsableScriptHolder {
 
   public static final UsageType<TestScript> TYPE = UsageType.of(TestScript.class)
       .setSuggests(Arguments.SCRIPT::listSuggestions);
 
-  private final String script;
+  @Getter
+  private final String scriptName;
+
+  @Getter
   private final String[] args;
+
+  @Getter @Setter
+  private String dataString;
 
   public TestScript(String script, String... args) {
     super(TYPE);
-    this.script = script;
+    this.scriptName = script;
     this.args = args;
   }
 
   @Override
   public @Nullable Component displayInfo() {
     return Component.text(
-        String.format("'%s'", script)
+        String.format("'%s'", scriptName)
     );
   }
 
   @Override
   public @Nullable Tag save() {
-    CompoundTag tag = new CompoundTag();
-    tag.putString("script", script);
-    tag.put("args", TagUtil.writeArray(args, StringTag::valueOf));
-    return tag;
+    return UsablesScripts.saveScript(this);
   }
 
   @Override
   public boolean test(Player player, CheckHolder holder) {
-    var script = UsablesScripts.getScript(this.script, holder, args);
+    var script = UsablesScripts.getScript(holder, this);
 
     if (!script.hasMethod("test")) {
       script.close();
@@ -68,7 +71,7 @@ public class TestScript extends UsageTest {
 
   @Override
   public @Nullable Component getFailMessage(Player player, CheckHolder holder) {
-    var script = UsablesScripts.getScript(this.script, holder, args);
+    var script = UsablesScripts.getScript(holder, this);
 
     if (!script.hasMethod("getFailMessage")) {
       script.close();
@@ -90,7 +93,7 @@ public class TestScript extends UsageTest {
 
   @Override
   public void postTests(Player player, CheckHolder holder) {
-    try (var script = UsablesScripts.getScript(this.script, holder, args)) {
+    try (var script = UsablesScripts.getScript(holder, this)) {
       script.invokeIfExists("onTestsPassed", Users.get(player));
     }
   }

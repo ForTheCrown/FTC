@@ -60,6 +60,9 @@ public @UtilityClass class GeneralConfig {
        */
       chunkLoaderRunsInSeries     = true,
 
+      /** Enforce the rule of 'only 1 online account per player' */
+      enforceAltRule              = false,
+
       debugLoggerEnabled          = FTC.inDebugMode();
 
   public static int
