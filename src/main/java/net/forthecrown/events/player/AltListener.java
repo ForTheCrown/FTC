@@ -32,7 +32,7 @@ public class AltListener implements Listener {
     event.disallow(
         Result.KICK_OTHER,
         Text.format(
-            "Your other account ({1, user}) is already online",
+            "Your other account ({0, user}) is already online",
             alreadyOnlineOpt.get()
         )
     );
