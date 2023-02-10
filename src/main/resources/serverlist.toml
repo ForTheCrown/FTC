@@ -107,7 +107,7 @@ icons = "a_joke_of_an_icon.png"
 motd = "&cYou're amazing :heart:"
 
 ["seasonal/valentines"]
-period = [ "13.02", "15.2" ]
+period = [ "10.02", "17.02" ]
 
 # This icon makes me cringe, ngl lmao
 icons = "seasonal/valentines.png"

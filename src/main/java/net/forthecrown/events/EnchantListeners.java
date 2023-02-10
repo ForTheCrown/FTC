@@ -44,6 +44,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class EnchantListeners implements Listener {
 
@@ -78,7 +79,11 @@ public class EnchantListeners implements Listener {
     event.setResult(result);
   }
 
-  private void addEnchants(ItemMeta resMeta, ItemStack first, ItemStack second, Mutable<Boolean> pointer) {
+  private void addEnchants(ItemMeta resultMeta,
+                           ItemStack first,
+                           ItemStack second,
+                           Mutable<Boolean> shouldCancel
+  ) {
     Map<Enchantment, Integer> enchants;
     var meta = second.getItemMeta();
 
@@ -99,7 +104,7 @@ public class EnchantListeners implements Listener {
       if (combiningEnchants) {
         if (!book && !enchant.canEnchantItem(first)) {
           if (enchants.size() == 1) {
-            pointer.setValue(true);
+            shouldCancel.setValue(true);
             return;
           }
 
@@ -107,7 +112,7 @@ public class EnchantListeners implements Listener {
         }
       } else if (!enchant.canEnchantItem(first)) {
         if (enchants.size() == 1) {
-          pointer.setValue(true);
+          shouldCancel.setValue(true);
           return;
         }
 
@@ -115,10 +120,11 @@ public class EnchantListeners implements Listener {
       }
 
       int level = e.getValue();
-      FtcEnchants.addEnchant(resMeta, enchant, level);
+      FtcEnchants.addEnchant(resultMeta, enchant, level);
     }
   }
 
+  @SuppressWarnings("deprecation") // The non-deprecated event didn't function
   @EventHandler(ignoreCancelled = true)
   public void onPrepareGrindstone(PrepareGrindstoneEvent event) {
     if (ItemStacks.isEmpty(event.getResult())) {
@@ -180,6 +186,9 @@ public class EnchantListeners implements Listener {
     }
   }
 
+  // How else do I detect if the player is on the ground? I'm not doing
+  // it manually, f you
+  @SuppressWarnings("deprecation")
   @EventHandler(ignoreCancelled = true)
   public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
     if (!(event.getDamager() instanceof Player player)
@@ -188,10 +197,10 @@ public class EnchantListeners implements Listener {
       return;
     }
 
-    if (!player.getInventory()
-        .getItemInMainHand()
-        .containsEnchantment(FtcEnchants.POISON_CRIT)
-    ) {
+    if (!hasEnchant(
+        player.getInventory().getItemInMainHand(),
+        FtcEnchants.POISON_CRIT
+    )) {
       return;
     }
 
@@ -246,8 +255,8 @@ public class EnchantListeners implements Listener {
     }
 
     var inv = player.getInventory();
-    if (!(inv.getItemInOffHand().containsEnchantment(FtcEnchants.HEALING_BLOCK)
-        || inv.getItemInMainHand().containsEnchantment(FtcEnchants.HEALING_BLOCK))
+    if (!(hasEnchant(inv.getItemInOffHand(), FtcEnchants.HEALING_BLOCK)
+        || hasEnchant(inv.getItemInMainHand(), FtcEnchants.HEALING_BLOCK))
     ) {
       return;
     }
@@ -256,10 +265,22 @@ public class EnchantListeners implements Listener {
       return;
     }
 
-    double maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+    var maxHealthAttr = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+    assert maxHealthAttr != null;
+
+    double maxHealth = maxHealthAttr.getValue();
 
     player.setHealth(Math.min(player.getHealth() + 2, maxHealth));
     player.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 0.6f, 1f);
+  }
+
+  static boolean hasEnchant(@Nullable ItemStack item, FtcEnchant enchant) {
+    if (ItemStacks.isEmpty(item)) {
+      return false;
+    }
+
+    var map = item.getEnchantments();
+    return map.containsKey(enchant);
   }
 
   @EventHandler
@@ -309,7 +330,7 @@ public class EnchantListeners implements Listener {
 
   @EventHandler(ignoreCancelled = true)
   public void onEntityShootBow(EntityShootBowEvent event) {
-    if (!event.getBow().containsEnchantment(FtcEnchants.STRONG_AIM)) {
+    if (!hasEnchant(event.getBow(), FtcEnchants.STRONG_AIM)) {
       return;
     }
 
