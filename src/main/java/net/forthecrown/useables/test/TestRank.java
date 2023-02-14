@@ -20,7 +20,8 @@ import org.bukkit.entity.Player;
 
 public class TestRank extends UsageTest {
 
-  public static final UsageType<TestRank> TYPE = UsageType.of(TestRank.class);
+  public static final UsageType<TestRank> TYPE = UsageType.of(TestRank.class)
+      .setSuggests(RegistryArguments.RANKS::listSuggestions);
 
   private final UserRank title;
 
@@ -54,8 +55,7 @@ public class TestRank extends UsageTest {
 
   @UsableConstructor
   public static TestRank parse(StringReader reader, CommandSource source)
-      throws CommandSyntaxException
-  {
+      throws CommandSyntaxException {
     return new TestRank(RegistryArguments.RANKS.parse(reader).getValue());
   }
 

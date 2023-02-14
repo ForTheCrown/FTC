@@ -307,7 +307,7 @@ public class CommandRoyalSword extends FtcCommand {
 
     @SuppressWarnings("unchecked")
     Holder<WeaponAbilityType> holder = c.getArgument("type", Holder.class);
-    WeaponAbility ability = holder.getValue().create(user);
+    WeaponAbility ability = holder.getValue().create(user, 0);
 
     if (level > START_LEVEL) {
       ability.setLevel(level);

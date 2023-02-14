@@ -23,11 +23,13 @@ import net.forthecrown.utils.text.writer.TextWriters;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.profile.PlayerTextures;
 
 @RequiredArgsConstructor
 public class ItemChallenge implements Challenge {
@@ -250,6 +252,13 @@ public class ItemChallenge implements Challenge {
             builder.addLore(writer.getLore());
           }
 
+          if (baseItem.getType() == Material.AXOLOTL_BUCKET
+              || baseItem.getType() == Material.TROPICAL_FISH_BUCKET
+          ) {
+            builder.addLoreRaw(Component.empty())
+                .addLore("&7Any variant");
+          }
+
           return builder.build();
         })
 
@@ -320,20 +329,13 @@ public class ItemChallenge implements Challenge {
           // due to material being able to represent different
           // variants of the mob
           if (typeName.contains("BUCKET")
-              && !typeName.contains("AXOLOTL")
-              && !typeName.contains("TROPICAL")
+              && (typeName.contains("AXOLOTL") || typeName.contains("TROPICAL"))
           ) {
             return true;
           }
 
           var sMeta = target.getItemMeta();
           var iMeta = item.getItemMeta();
-
-          // I doubt this could happen, but
-          // better safe than sorry lol
-          if (sMeta.getClass() != iMeta.getClass()) {
-            return false;
-          }
 
           // Skull items just need to the same texture,
           // nothing else matters
@@ -352,7 +354,7 @@ public class ItemChallenge implements Challenge {
             var itemTextures = itemProfile.getTextures();
             var targetTextures = targetProfile.getTextures();
 
-            return Objects.equals(targetTextures, itemTextures);
+            return texturesMatch(targetTextures, itemTextures);
           }
 
           // isSimilar check happens above, so we can return false here
@@ -360,6 +362,12 @@ public class ItemChallenge implements Challenge {
         })
 
         .orElse(false);
+  }
+
+  private static boolean texturesMatch(PlayerTextures t1, PlayerTextures t2) {
+    var url1 = t1.getSkin();
+    var url2 = t2.getSkin();
+    return Objects.equals(url1, url2);
   }
 
   /* -------------------------- OBJECT OVERRIDES -------------------------- */

@@ -22,7 +22,15 @@ function onRightClick(player, clicked) {
 
   const shouldThrow = !player.isSneaking();
   if (shouldThrow) {
-    let velocity = loc.getDirection().multiply(level);
+    let mod = 1;
+
+    if (level == 2) {
+        mod = 0.6;
+    } else if (level > 2) {
+        mod = 0.5;
+    }
+
+    let velocity = loc.getDirection().multiply(level * mod);
     spawned.setVelocity(velocity);
   }
 

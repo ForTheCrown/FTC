@@ -1,13 +1,13 @@
 package net.forthecrown.dungeons.level;
 
-import net.forthecrown.dungeons.level.gate.DungeonGate;
-import net.forthecrown.dungeons.level.room.DungeonRoom;
+import net.forthecrown.dungeons.level.gate.GatePiece;
+import net.forthecrown.dungeons.level.room.RoomPiece;
 
 public interface PieceVisitor {
 
-  Result onGate(DungeonGate gate);
+  Result onGate(GatePiece gate);
 
-  Result onRoom(DungeonRoom room);
+  Result onRoom(RoomPiece room);
 
   default void onChildrenStart(DungeonPiece piece) {
 

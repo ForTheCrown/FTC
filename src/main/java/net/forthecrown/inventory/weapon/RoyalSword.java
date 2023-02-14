@@ -8,9 +8,11 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 import net.forthecrown.core.logging.Loggers;
+import net.forthecrown.core.registry.Holder;
 import net.forthecrown.inventory.ExtendedItem;
 import net.forthecrown.inventory.weapon.ability.SwordAbilityManager;
 import net.forthecrown.inventory.weapon.ability.WeaponAbility;
+import net.forthecrown.inventory.weapon.ability.WeaponAbilityType;
 import net.forthecrown.inventory.weapon.goals.WeaponGoal;
 import net.forthecrown.user.data.RankTier;
 import net.forthecrown.utils.Tasks;
@@ -44,7 +46,8 @@ public class RoyalSword extends ExtendedItem {
       TAG_EXTRA_DATA = "extraData",
       TAG_GOALS = "goals",
       TAG_ABILITY = "ability",
-      TAG_ABILITY_TYPE = "abilityType";
+      TAG_ABILITY_TYPE = "abilityType",
+      TAG_ABILITY_USES = "abilityUses";
 
   public static final Component BORDER = Component.text(
       "------------------------------",
@@ -59,7 +62,11 @@ public class RoyalSword extends ExtendedItem {
   @Setter
   private WeaponAbility ability;
 
-  private final Object2IntMap<String> progress = new Object2IntOpenHashMap<>();
+  private final Object2IntMap<String> progress
+      = new Object2IntOpenHashMap<>();
+
+  private final Object2IntMap<String> abilityUses
+      = new Object2IntOpenHashMap<>();
 
   public RoyalSword(RoyalSwordType type, CompoundTag tag) {
     super(type, tag);
@@ -79,6 +86,12 @@ public class RoyalSword extends ExtendedItem {
     if (ability != null) {
       ability.onUpdate();
     }
+  }
+
+  public void onAbilityUse(Holder<WeaponAbilityType> holder) {
+    int currentUses = this.abilityUses.getOrDefault(holder.getKey(), 0);
+    currentUses++;
+    abilityUses.put(holder.getKey(), currentUses);
   }
 
   public void damage(Player killer, EntityDamageByEntityEvent event, ItemStack item) {
@@ -204,6 +217,10 @@ public class RoyalSword extends ExtendedItem {
     return true;
   }
 
+  public int getTotalUses(Holder<WeaponAbilityType> holder) {
+    return abilityUses.getOrDefault(holder.getKey(), 0);
+  }
+
   /* ------------------------------- LORE --------------------------------- */
 
   @Override
@@ -220,13 +237,48 @@ public class RoyalSword extends ExtendedItem {
     }
 
     if (ability != null && hasPlayerOwner()) {
-      writer.line("Upgrade:", NamedTextColor.GRAY);
+      writer.line("Ability Upgrade: (", NamedTextColor.GRAY);
+      writer.write(ability.displayName());
+
+      writer.formatted(" {0, number, -roman}",
+          NamedTextColor.GRAY,
+          ability.getLevel()
+      );
+
+      writer.write(")", NamedTextColor.GRAY);
 
       var prefixed = writer.withPrefix(
           Component.text("• ", NamedTextColor.GRAY)
       );
 
-      ability.write(prefixed, getOwnerUser());
+      ability.write(prefixed, getRank());
+
+      SwordAbilityManager.getInstance().getRegistry()
+          .getHolderByValue(ability.getType())
+
+          .ifPresent(holder -> {
+            var type = holder.getValue();
+            int maxLevel = type.getMaxLevel();
+
+            if (ability.getLevel() >= maxLevel) {
+              return;
+            }
+
+            int totalUses = getTotalUses(holder);
+            int levelUpUses = type.getUpgradeUses(ability.getLevel());
+
+            if (levelUpUses == -1) {
+              return;
+            }
+
+            int remainingUses = levelUpUses - totalUses;
+            prefixed.formattedLine(
+                "Level up after {0, number} more uses",
+                NamedTextColor.GRAY,
+                remainingUses
+            );
+          });
+
       writer.newLine();
       writer.newLine();
     }
@@ -329,6 +381,14 @@ public class RoyalSword extends ExtendedItem {
           });
     }
 
+    if (tag.contains(TAG_ABILITY_USES)) {
+      CompoundTag usesTag = tag.getCompound(TAG_ABILITY_USES);
+      abilityUses.clear();
+      usesTag.getAllKeys().forEach(s -> {
+        abilityUses.put(s, usesTag.getInt(s));
+      });
+    }
+
     if (!tag.contains(TAG_RANK)) {
       return;
     }
@@ -377,6 +437,12 @@ public class RoyalSword extends ExtendedItem {
 
     if (lastFlavorChange != null) {
       tag.putInt(TAG_LAST_FLAVOR, lastFlavorChange.getIndex());
+    }
+
+    if (!abilityUses.isEmpty()) {
+      CompoundTag usesTag = new CompoundTag();
+      abilityUses.forEach(usesTag::putInt);
+      tag.put(TAG_ABILITY_USES, usesTag);
     }
 
     if (ability != null) {

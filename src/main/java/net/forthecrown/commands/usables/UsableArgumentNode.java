@@ -31,9 +31,16 @@ public class UsableArgumentNode<T extends UsageInstance, H extends UsageTypeHold
 
   private final UsageTypeAccessor<T, H> accessor;
 
-  public void populateUsages(UsageFactory factory, String holderName) {
+  protected void addExtraUsages(UsageFactory factory, String holderName) {
+
+  }
+
+  public final void populateUsages(UsageFactory factory, String holderName) {
     String name = accessor.getName().toLowerCase();
     String plural = name + "s";
+
+    factory = factory.withPrefix(plural);
+    addExtraUsages(factory, holderName);
 
     factory.usage("")
         .addInfo("Lists all %s a %s has", plural, holderName);
@@ -138,6 +145,8 @@ public class UsableArgumentNode<T extends UsageInstance, H extends UsageTypeHold
             .then(literal("-with_type")
                 .then(argument("remove_type", accessor.getArgumentType())
                     .executes(context -> remove(context, provider, saveCallback, (list, c) -> {
+
+                      @SuppressWarnings("unchecked")
                       Holder<UsageType<T>> holder = c.getArgument("remove_type", Holder.class);
                       UsageType<T> type = holder.getValue();
 
@@ -199,6 +208,7 @@ public class UsableArgumentNode<T extends UsageInstance, H extends UsageTypeHold
   }
 
   private UsageType<T> getParsedType(CommandContext<CommandSource> c) {
+    @SuppressWarnings("unchecked")
     Holder<UsageType<T>> holder = c.getArgument("add_type", Holder.class);
     return holder.getValue();
   }
@@ -213,6 +223,7 @@ public class UsableArgumentNode<T extends UsageInstance, H extends UsageTypeHold
     var holder = provider.get(c);
     var list = accessor.getList(holder);
 
+    @SuppressWarnings("unchecked")
     Holder<UsageType<T>> parseHolder = c.getArgument("add_type", Holder.class);
     var parsed = parseHolder.getValue();
     boolean canRead = reader.canRead();

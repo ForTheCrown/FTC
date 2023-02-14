@@ -18,8 +18,10 @@ import net.minecraft.nbt.CompoundTag;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class CmdUsables<T extends CommandUsable> extends SerializableObject.NbtDat implements
-    Iterable<T> {
+public class CmdUsables<T extends CommandUsable>
+    extends SerializableObject.NbtDat
+    implements Iterable<T>
+{
 
   /**
    * Entry factory to deserialize entries

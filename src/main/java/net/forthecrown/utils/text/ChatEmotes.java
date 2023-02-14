@@ -39,6 +39,7 @@ public final class ChatEmotes {
     register("fedup", "(¬_¬)");
     register("reallysad", "(◉︵◉ )");
     register("heart", HEART);
+    register("skull", "☠");
   }
 
   private static void register(String key, String emote) {

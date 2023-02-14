@@ -17,7 +17,8 @@ import org.bukkit.entity.Player;
 
 public class ActionShowText extends UsageAction {
 
-  public static final UsageType<ActionShowText> TYPE = UsageType.of(ActionShowText.class)
+  public static final UsageType<ActionShowText> TYPE
+      = UsageType.of(ActionShowText.class)
       .setSuggests(Arguments.CHAT::listSuggestions);
 
   private final Component text;

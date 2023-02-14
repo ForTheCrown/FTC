@@ -292,16 +292,19 @@ public class JarAttributeSync {
             fs = FileSystems.newFileSystem(uri, Collections.singletonMap("create", "true"));
         }
 
+        println("beginning walk");
         var walker = new AttributeWalker(resourceDirectory, fs);
         Files.walkFileTree(resourceDirectory, walker)
-        fs.close()
 
-        Files.copy(
+        /*Files.copy(
                 jarFile,
                 jarFile.getParent().resolve("attributes_updated.jar"),
                 StandardCopyOption.REPLACE_EXISTING,
                 StandardCopyOption.COPY_ATTRIBUTES
-        )
+        )*/
+
+        println("fs closed");
+        fs.close();
     }
 
     private static class AttributeWalker extends SimpleFileVisitor<Path> {

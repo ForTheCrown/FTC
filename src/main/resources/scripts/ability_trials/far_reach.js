@@ -4,6 +4,7 @@ import "@bukkit.attribute.Attribute";
 import "@bukkit.loot.LootTables";
 
 import "@ftc.user.UserTeleport.Type";
+import "@ftc.useables.Usables";
 
 import "@jutil.LinkedList";
 
@@ -21,11 +22,12 @@ const RANDOM = Util.RANDOM;
 const CAGE_RADIUS = 1;
 
 const cagePositions = [
-  { x: -461, y: 24, z: -307 },
-  { x: -462, y: 22, z: -298 },
-  { x: -458, y: 18, z: -299 }
+  { x: -461, y: 24, z: -308 },
+  { x: -457, y: 18, z: -299 },
+  { x: -462, y: 22, z: -297 },
 ];
 let brokenIndex = -1;
+let nextIndex = 0;
 
 const respawnStack = new LinkedList();
 
@@ -104,18 +106,42 @@ function onUpdate(task) {
     });
   }
 
-  brokenIndex = RANDOM.nextInt(cagePositions.length);
+  let bounds = getBounds();
+  if (bounds != null) {
+    let players = bounds.getPlayers();
+
+    if (players.isEmpty()) {
+      return;
+    }
+  }
+
+  brokenIndex = nextIndex;
+  nextIndex = (nextIndex + 1) % cagePositions.length;
 
   forEachBlock(cagePositions[brokenIndex], block => {
     block.setType(Material.AIR, true);
   });
 }
 
+function getBounds() {
+  let triggers = Usables.getInstance().getTriggers();
+  let trigger = triggers.getNamed("abilities_trial/far_reach/enter");
+
+  if (trigger == null) {
+    return null;
+  }
+
+  return trigger.getBounds();
+}
+
 function spawnEntity(location) {
   let world = location.getWorld();
 
   world.spawn(location, Stray.class, stray => {
+    stray.setRemoveWhenFarAway(false);
     stray.setShouldBurnInDay(false);
+    stray.addScoreboardTag(SCOREBOARD_TAG);
+    stray.setLootTable(LootTables.EMPTY.getLootTable());
 
     let attr = stray.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
     attr.setBaseValue(0);
@@ -123,14 +149,13 @@ function spawnEntity(location) {
     let knockbackResistance = stray.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
     knockbackResistance.setBaseValue(1000);
 
-    stray.addScoreboardTag(SCOREBOARD_TAG);
-    stray.setLootTable(LootTables.EMPTY.getLootTable());
-
     let eq = stray.getEquipment();
     eq.setHelmet(null);
     eq.setChestplate(null);
     eq.setLeggings(null);
     eq.setBoots(null);
+    eq.setItemInMainHandDropChance(0);
+    eq.setItemInOffHandDropChance(0);
   });
 }
 

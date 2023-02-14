@@ -91,11 +91,19 @@ public class ActionCommand extends UsageAction {
   // --- TYPE CONSTRUCTORS ---
 
   @UsableConstructor(ConstructType.PARSE)
-  public static ActionCommand parse(UsageType<ActionCommand> type, StringReader reader,
+  public static ActionCommand parse(UsageType<ActionCommand> type,
+                                    StringReader reader,
                                     CommandSource source
   ) throws CommandSyntaxException {
     String result = reader.getRemaining();
     reader.setCursor(reader.getTotalLength());
+
+    if (result.startsWith("/")) {
+      source.sendMessage(
+          "Command starts with '/', this isn't required for most commands"
+              + "\n(Is this intentional?)"
+      );
+    }
 
     return new ActionCommand(type, result);
   }

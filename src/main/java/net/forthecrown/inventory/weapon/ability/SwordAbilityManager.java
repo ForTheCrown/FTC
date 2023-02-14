@@ -131,9 +131,6 @@ public class SwordAbilityManager {
 
       wrapper.remove("genericCooldown");
 
-      int genericMaxLevel = wrapper.getInt("genericMaxLevel", -1);
-      wrapper.remove("genericMaxLevel");
-
       UseLimit genericUseLimit;
       if (wrapper.has("genericUseLimit")) {
         genericUseLimit = UseLimit.load(wrapper.get("genericUseLimit"));
@@ -144,7 +141,6 @@ public class SwordAbilityManager {
 
       AbilityReadContext context = new AbilityReadContext(
           genericCooldown,
-          genericMaxLevel,
           genericUseLimit,
           itemLists,
           trialData
@@ -173,7 +169,6 @@ public class SwordAbilityManager {
   }
 
   record AbilityReadContext(UpgradeCooldown cooldown,
-                            int maxLevel,
                             UseLimit useLimit,
                             Map<String, List<ItemStack>> itemMap,
                             Map<String, AbilityTrialArea> trials
@@ -207,12 +202,6 @@ public class SwordAbilityManager {
       );
     }
 
-    if (context.maxLevel == -1 && !json.has("maxLevel")) {
-      return DataResult.error(
-          "Generic maxLevel is unset, and no 'maxLevel' value is set"
-      );
-    }
-
     if (context.useLimit == null && !json.has("useLimit")) {
       return DataResult.error(
           "Generic useLimit is unset and no 'useLimit' value is set"
@@ -220,7 +209,6 @@ public class SwordAbilityManager {
     }
 
     var builder = WeaponAbilityType.builder()
-        .maxLevel(json.getInt("maxLevel", context.maxLevel))
         .displayName(json.getComponent("displayName"))
         .item(json.getItem("item"));
 
@@ -238,6 +226,14 @@ public class SwordAbilityManager {
       return DataResult.error("Item at 'item' is empty!");
     }
 
+    if (!json.has("levelUses")) {
+      return DataResult.error("No 'levelUses' set");
+    }
+
+    JsonUtils.stream(json.getArray("levelUses"))
+        .mapToInt(JsonElement::getAsInt)
+        .forEach(builder.levelRequirements()::add);
+
     if (json.has("advancement")) {
       NamespacedKey key = json.getKey("advancement");
       builder.advancementKey(key);
@@ -253,6 +249,11 @@ public class SwordAbilityManager {
       builder.cooldown(UpgradeCooldown.read(json.get("cooldown")));
     } else {
       builder.cooldown(context.cooldown);
+    }
+
+    var cd = builder.cooldown();
+    if (cd.getMin() <= 0 || cd.getMax() <= 0) {
+      return DataResult.error("Cooldown min or max was below 0");
     }
 
     AbilityTrialArea trialInfo = context.trials.get(registryKey);
@@ -376,9 +377,16 @@ public class SwordAbilityManager {
           script = null;
         }
 
+        long cooldown;
+        if (json.has("cooldown_override")) {
+          cooldown = UpgradeCooldown.readTicks(json.get("cooldown_override"));
+        } else {
+          cooldown = 2 * 20;
+        }
+
         trialData.put(
             key,
-            new AbilityTrialArea(l, node, giveSword, script, level)
+            new AbilityTrialArea(l, node, giveSword, script, level, cooldown)
         );
       }
 

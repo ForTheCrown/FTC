@@ -273,7 +273,7 @@ public class SignShop implements InventoryHolder {
    * Lastly, it returns true if the shop's inventory contains enough of the example item to complete
    * a successful transaction
    *
-   * @return
+   * @return True, if the shop is in stock, false otherwise
    */
   public boolean inStock() {
     if (ItemStacks.isEmpty(exampleItem)) {
@@ -428,7 +428,7 @@ public class SignShop implements InventoryHolder {
     // Update the ingame tile entity by
     // calling bukkit's update method here.
     // what did I just say???
-    s.update(true);
+    s.update();
   }
 
   /* ----------------------------- SERIALIZATION ------------------------------ */

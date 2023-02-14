@@ -32,6 +32,11 @@ public abstract class GuildCommandNode extends FtcCommand {
   }
 
   @Override
+  public String getHelpListName() {
+    return "g " + argumentName[0];
+  }
+
+  @Override
   protected void createCommand(BrigadierCommand command) {
     create(command);
   }

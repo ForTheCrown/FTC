@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.forthecrown.dungeons.level.room.DungeonRoom;
+import net.forthecrown.dungeons.level.room.RoomPiece;
 
 @Getter
 @Setter
@@ -12,6 +12,6 @@ import net.forthecrown.dungeons.level.room.DungeonRoom;
 @RequiredArgsConstructor
 public class PathData {
 
-  private final DungeonRoom connectorRoot;
+  private final RoomPiece connectorRoot;
   private int connectorDepth;
 }

@@ -1,6 +1,8 @@
 package net.forthecrown.guilds.multiplier;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import it.unimi.dsi.fastutil.objects.ReferenceList;
@@ -13,10 +15,12 @@ import java.util.Objects;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import net.forthecrown.core.Messages;
 import net.forthecrown.guilds.GuildConfig;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.io.JsonUtils;
+import net.forthecrown.utils.io.JsonWrapper;
 import net.kyori.adventure.util.Ticks;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
@@ -38,6 +42,9 @@ public class ExpModifiers {
 
   private final ReferenceList<DonatorMultiplier> ticked
       = new ReferenceArrayList<>();
+
+  @Setter
+  private float manual;
 
   private BukkitTask tickingTask;
 
@@ -175,7 +182,7 @@ public class ExpModifiers {
   }
 
   public float getModifier(UUID uuid) {
-    float result = 0F;
+    float result = getManual();
 
     if (isWeekend()) {
       result += GuildConfig.weekendModifier;
@@ -194,16 +201,33 @@ public class ExpModifiers {
     updateTickingState();
   }
 
-  public JsonArray serialize() {
-    return JsonUtils.ofStream(
-        multiplierList.stream()
-            .map(DonatorMultiplier::serialize)
+  public JsonObject serialize() {
+    JsonWrapper json = JsonWrapper.create();
+    json.add("manual", getManual());
+    json.add("donator_multipliers",
+        JsonUtils.ofStream(
+            multiplierList.stream()
+                .map(DonatorMultiplier::serialize)
+        )
     );
+
+    return json.getSource();
   }
 
-  public void deserialize(JsonArray arr) {
+  public void deserialize(JsonElement element) {
     clear();
 
+    if (element.isJsonArray()) {
+      loadDonators(element.getAsJsonArray());
+      return;
+    }
+
+    JsonWrapper json = JsonWrapper.wrap(element.getAsJsonObject());
+    setManual(json.getFloat("manual", 0.0F));
+    loadDonators(json.getArray("donator_multipliers"));
+  }
+
+  private void loadDonators(JsonArray arr) {
     JsonUtils.stream(arr)
         .map(DonatorMultiplier::deserialize)
         .forEach(multiplier -> {
@@ -216,5 +240,4 @@ public class ExpModifiers {
           addMultiplier(multiplier);
         });
   }
-
 }

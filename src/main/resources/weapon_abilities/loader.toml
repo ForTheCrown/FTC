@@ -168,10 +168,6 @@
 # If true, abilities are still loaded, their click callbacks are never called
 enabled = true
 
-# Max level that applies for all abilities, unless they override it with their
-# own max level value
-genericMaxLevel = 3
-
 # Base cooldown value that applies to all abilities, unless they override it
 # with their own value
 genericCooldown = [ "5s", "24t" ]
@@ -188,41 +184,46 @@ displayName = "Ender Pearl"
 description = [
   "Throws an Ender Pearl on Right-Click"
 ]
+cooldown = [ "8s", "1.3s" ]
 advancement = "minecraft:adventure/bullseye"
 script = "abilities/ender_pearl.js"
 item = "{id:\"minecraft:ender_pearl\",Count:1b}"
+levelUses = [ 750, 1500 ]
 
 ["twirl"]
 displayName = "Twirl"
 description = [
   "Damages all entities around you in a swirl"
 ]
+cooldown = [ "6s", "4s" ]
 useLimit = "150 + (tier * 50)"
 advancement = "minecraft:nether/loot_bastion"
 script = "abilities/twirl.js"
 item = "{id:'minecraft:feather',Count:1b}"
+levelUses = [ 600, 1200 ]
 
 ["dash"]
 displayName = "Dash"
 description = [
   "Gives you a little boost"
 ]
+cooldown = [ "8s", "1.3s" ]
 useLimit = "350 + (tier * 50)"
 advancement = "minecraft:adventure/adventuring_time"
 script = "abilities/dash.js"
-cooldown = [ "8s", "26t" ]
 item = "{id:'minecraft:iron_boots',Count:1b}"
+levelUses = [ 1750, 3500 ]
 
 ["far_reach"]
 displayName = "Far Reach"
 description = [
   "Allows you to hit entities up to 5 blocks away"
 ]
+cooldown = [ "6s", "3s" ]
 advancement = "minecraft:adventure/sniper_duel"
 script = "abilities/far_reach.js"
-# Each level increases distance
-maxLevel = 2
 item = "{id:'minecraft:iron_sword',Count:1b}"
+levelUses = [ 1000, 2000 ]
 
 ["tnt"]
 displayName = "TNT"
@@ -230,20 +231,23 @@ description = [
   "Drops a primed TNT on Right-Click"
 ]
 advancement = "minecraft:adventure/totem_of_undying"
-useLimit = "150 + (tier * 50)"
+useLimit = "35 + (tier * 5)"
+cooldown = [ "20s", "5s" ]
 script = "abilities/tnt.js"
 item = "{Count:1b,id:'minecraft:tnt'}"
+levelUses = [ 175, 350 ]
 
 ["fireball"]
 displayName = "Fire Ball"
 description = [
   "Throws a Fire ball on Right-Click"
 ]
-maxLevel = 2
+cooldown = [ "8s", "3s" ]
 advancement = "minecraft:end/levitate"
 useLimit = "35 + (tier * 5)"
 script = "abilities/fireball.js"
 item = "{Count:1b,id:'minecraft:fire_charge'}"
+levelUses = [ 350 ]
 
 # Note on potion types: They don't use the ResourceLocation names, eg:
 # 'minecraft:regeneration' for the '--potion-type' values, they use the 'names'
@@ -254,31 +258,37 @@ displayName = "Regeneration"
 description = [
   "Gives you regen on Right-Click"
 ]
-maxLevel = 2
+cooldown = [ "30s", "15s" ]
+useLimit = "125 + (tier * 25)"
 advancement = "minecraft:nether/all_effects"
-inputArgs = "--potion-type=REGENERATION --duration=5s --amplifier=level"
+inputArgs = "--potion-type=REGENERATION --duration=13.5s --amplifier=level"
 script = "abilities/potion_effect.js"
 item = "{Count:1b,id:'minecraft:potion',tag:{Potion:'minecraft:regeneration'}}"
+levelUses = [ 1000 ]
 
 ["potion/strength"]
 displayName = "Strength"
 description = [
   "Gives you Strength on Right-Click"
 ]
-maxLevel = 2
+cooldown = [ "20s", "10s" ]
+useLimit = "125 + (tier * 25)"
 advancement = "minecraft:adventure/kill_all_mobs"
-inputArgs = "--potion-type=INCREASE_DAMAGE --duration=4s --amplifier=level"
+inputArgs = "--potion-type=INCREASE_DAMAGE --duration=6s --amplifier=level"
 script = "abilities/potion_effect.js"
 item = "{Count:1b,id:'minecraft:potion',tag:{Potion:'minecraft:strength'}}"
+levelUses = [ 1000 ]
 
 ["potion/weakness"]
 displayName = "Weakness"
 description = [
   "Gives an enemy weakness on Left-Click"
 ]
-maxLevel = 1
+cooldown = [ "20s", "10s" ]
+useLimit = "125 + (tier * 25)"
 advancement = "minecraft:adventure/kill_mob_near_sculk_catalyst"
 useLimit = "150 + (tier * 50)"
-inputArgs = "--potion-type=WEAKNESS --duration=5s --left-click --give-target"
+inputArgs = "--potion-type=WEAKNESS --duration=6s --left-click --give-target"
 script = "abilities/potion_effect.js"
 item = "{Count:1b,id:'minecraft:potion',tag:{Potion:'minecraft:weakness'}}"
+levelUses = [ 1000 ]

@@ -16,26 +16,21 @@ public class UsableCommands extends CmdUtil {
   public static final UsableArgumentNode<UsageTest, CheckHolder> CHECK_NODE
       = new UsableArgumentNode<>(UsageTypeAccessor.CHECKS) {
     @Override
-    public void populateUsages(UsageFactory factory, String holderName) {
+    protected void addExtraUsages(UsageFactory factory, String holderName) {
       factory.usage("silent")
-          .addInfo(
-              "Shows if the Usage checks of %s will show fail messages",
+          .addInfo("Shows if the Usage checks of %s will show fail messages",
               holderName
           );
 
       factory.usage("silent <true | false>")
-          .addInfo(
-              "Sets if %s will show fail messages or not",
-              holderName
-          );
-
-      super.populateUsages(factory, holderName);
+          .addInfo("Sets if %s will show fail messages or not", holderName);
     }
 
     @Override
-    protected void addExtraArguments(LiteralArgumentBuilder<CommandSource> command,
-                                     UsageHolderProvider<? extends CheckHolder> provider,
-                                     UsableSaveCallback<? extends CheckHolder> saveCallback
+    protected void addExtraArguments(
+        LiteralArgumentBuilder<CommandSource> command,
+        UsageHolderProvider<? extends CheckHolder> provider,
+        UsableSaveCallback<? extends CheckHolder> saveCallback
     ) {
       command
           .then(literal("silent")

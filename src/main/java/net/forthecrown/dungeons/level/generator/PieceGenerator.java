@@ -11,12 +11,12 @@ import java.util.Objects;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.dungeons.level.DungeonPiece;
-import net.forthecrown.dungeons.level.room.DungeonRoom;
 import net.forthecrown.dungeons.level.Gates;
 import net.forthecrown.dungeons.level.Pieces;
-import net.forthecrown.dungeons.level.room.RoomType;
-import net.forthecrown.dungeons.level.gate.DungeonGate;
 import net.forthecrown.dungeons.level.gate.GateData;
+import net.forthecrown.dungeons.level.gate.GatePiece;
+import net.forthecrown.dungeons.level.room.RoomPiece;
+import net.forthecrown.dungeons.level.room.RoomType;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.WeightedList;
 import org.apache.commons.lang3.Range;
@@ -40,7 +40,7 @@ public class PieceGenerator {
   private final SectionType type;
   private final SectionData data;
 
-  private final DungeonGate origin;
+  private final GatePiece origin;
   private final @Nullable PieceGenerator parent;
 
   private final List<RoomType> failedTypes = new ObjectArrayList<>();
@@ -48,7 +48,7 @@ public class PieceGenerator {
 
   public PieceGenerator(SectionType type,
                         TreeGenerator gen,
-                        DungeonGate origin,
+                        GatePiece origin,
                         @Nullable PieceGenerator parent
   ) {
     this.type = type;
@@ -106,12 +106,23 @@ public class PieceGenerator {
         .forEach(pair -> potentials.add(pair.firstInt(), pair.second()));
   }
 
+  private StepResult sectionDepthFailure() {
+    return StepResult.failure(MAX_SECTION_DEPTH);
+  }
+
   public StepResult generate() {
-    if (sectionDepth > data.depthRange.getMaximum()
-        || (sectionDepth > data.getOptimalDepth() && config.getRandom().nextInt(4) == 0)
-        || (data.roomCount + 1) > data.maxRooms
+    if (sectionDepth > data.depthRange.getMaximum()) {
+      return sectionDepthFailure();
+    }
+
+    if (sectionDepth > data.getOptimalDepth()
+        && config.getRandom().nextInt(4) == 0
     ) {
-      return StepResult.failure(MAX_SECTION_DEPTH);
+      return sectionDepthFailure();
+    }
+
+    if ((data.roomCount + 1) > data.maxRooms) {
+      return sectionDepthFailure();
     }
 
     if (depth > config.getMaxDepth()) {
@@ -145,7 +156,7 @@ public class PieceGenerator {
         // a gate that can be used as the entrance
         while (gIt.hasNext()) {
           GateData entrance = gIt.next();
-          DungeonRoom room = next.create();
+          RoomPiece room = next.create();
 
           // Stair gates cannot connect to each other
           if (entrance.stairs() && origin.getParentExit().stairs()) {
@@ -163,7 +174,7 @@ public class PieceGenerator {
           // Remove gate, as it's now the entrance
           gIt.remove();
 
-          List<DungeonGate> exits = Gates.createGates(
+          List<GatePiece> exits = Gates.createGates(
               room, gates, config.getRandom()
           );
 
@@ -201,7 +212,7 @@ public class PieceGenerator {
           }
 
           List<PieceGenerator> childSections = exits.stream()
-              .filter(DungeonGate::isOpen)
+              .filter(GatePiece::isOpen)
               .map(this::newGeneratorForGate)
               .collect(ObjectArrayList.toList());
 
@@ -213,7 +224,7 @@ public class PieceGenerator {
     return StepResult.failure(FAILED);
   }
 
-  private PieceGenerator newGeneratorForGate(DungeonGate gate) {
+  private PieceGenerator newGeneratorForGate(GatePiece gate) {
     return new PieceGenerator(type, gen, gate, this);
   }
 
@@ -228,16 +239,14 @@ public class PieceGenerator {
   public @Nullable PieceGenerator sectionRoot() {
     PieceGenerator root = sectionParent();
 
-    while (root != null
-        && root.sectionParent() != null
-    ) {
+    while (root != null && root.sectionParent() != null) {
       root = root.sectionParent();
     }
 
     return root;
   }
 
-  public void onSuccess(DungeonRoom success) {
+  public void onSuccess(RoomPiece success) {
     data.roomCount++;
     data.successful.add(success.getType());
     origin.addChild(success);

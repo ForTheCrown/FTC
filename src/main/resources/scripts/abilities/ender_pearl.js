@@ -12,7 +12,17 @@ const SOUND = Sound.sound()
 function onRightClick(player, clicked) {
   // Launch EnderPearl with the ability's
   // level as the velocity multiplier
-  let velocity = player.getLocation().getDirection().multiply(level);
+  let world = player.getWorld();
+
+  let mod = 1;
+
+  if (level == 2) {
+    mod = 0.66;
+  } else if (level > 2) {
+    mod = 0.66;
+  }
+
+  let velocity = player.getLocation().getDirection().multiply(level * mod);
   let projectile = player.launchProjectile(EnderPearl.class, velocity);
 
   if (!projectile.isDead()) {

@@ -35,6 +35,7 @@ import net.forthecrown.user.UserManager;
 import net.forthecrown.user.data.UserRanks;
 import net.forthecrown.user.packet.PacketListeners;
 import net.forthecrown.user.property.Properties;
+import net.forthecrown.utils.dialogue.DialogueManager;
 import net.forthecrown.utils.world.WorldLoader;
 import net.forthecrown.waypoint.WaypointManager;
 import net.forthecrown.waypoint.WaypointProperties;
@@ -59,6 +60,7 @@ final class BootStrap {
     // Tools
     init(InventoryStorage::getStorage);
     init(Cooldowns::getCooldowns);
+    init(DialogueManager::getDialogues);
 
     // Guilds
     init(Unlockables.class);
@@ -90,7 +92,7 @@ final class BootStrap {
 
     // Only load dungeons for testing purposes
     if (FTC.inDebugMode()) {
-      init(DungeonManager::getInstance);
+      init(DungeonManager::getDungeons);
     }
 
     // Item stuff, like crown and royal sword

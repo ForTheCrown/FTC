@@ -74,15 +74,16 @@ public class UsablesListeners implements Listener {
     var manager = Usables.getInstance();
 
     try {
-      if (!manager.isUsableEntity(entity)
-          || shouldSkipInteraction(player)
-      ) {
+      if (!manager.isUsableEntity(entity)) {
         return false;
       }
 
       UsableEntity usable = manager.getEntity(entity);
-      usable.interact(player);
-      usable.save(entity.getPersistentDataContainer());
+
+      if (shouldRunInteraction(player)) {
+        usable.interact(player);
+        usable.save(entity.getPersistentDataContainer());
+      }
 
       return usable.cancelVanilla();
     } catch (NullPointerException e) {
@@ -95,12 +96,12 @@ public class UsablesListeners implements Listener {
     return false;
   }
 
-  private boolean shouldSkipInteraction(Player player) {
+  private boolean shouldRunInteraction(Player player) {
     if (player.getGameMode() == GameMode.SPECTATOR) {
-      return true;
+      return false;
     }
 
-    return Cooldown.containsOrAdd(player, COOLDOWN_CATEGORY, 10);
+    return !Cooldown.containsOrAdd(player, COOLDOWN_CATEGORY, 10);
   }
 
   // Returns whether the event should be cancelled
@@ -108,15 +109,16 @@ public class UsablesListeners implements Listener {
     var manager = Usables.getInstance();
 
     try {
-      if (!manager.isUsableBlock(block)
-          || shouldSkipInteraction(player)
-      ) {
+      if (!manager.isUsableBlock(block)) {
         return false;
       }
 
       UsableBlock usable = manager.getBlock(block);
-      usable.interact(player);
-      usable.save();
+
+      if (shouldRunInteraction(player)) {
+        usable.interact(player);
+        usable.save();
+      }
 
       return usable.cancelVanilla();
     } catch (NullPointerException e) {

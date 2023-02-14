@@ -53,6 +53,7 @@ trial_world = "world_void"
 position = { x = -452.5, y = 12, z = -247.5 }
 rotation = { yaw = 90, pitch = 0 }
 give_sword = true
+ability_level = 2
 info = [
   { info = "&7The &e%ability&7 lets you jolt forward a bit", delay = 0    },
   { info = "&eTry it out by crossing the pit",               delay = "3s" },
@@ -65,8 +66,32 @@ rotation = { yaw = 180, pitch = 0 }
 give_sword = true
 script = "ability_trials/far_reach.js"
 ability_level = 7
+cooldown_override = "1.3s"
 info = [
   { info = "&7The &e%ability&7 lets you hit enemies further away", delay = 0    },
   { info = "&eTry it out on these skeletons",                      delay = "3s" }
-  #{ info = "&7Kill &e3&7 of them to finish!",                      delay = "3s" }
+ #{ info = "&7Kill &e3&7 of them to finish!",                      delay = "3s" }
+]
+
+[twirl]
+position = { x = -525.5, y = 5, z = -298.5 }
+rotation = { yaw = 0, pitch = 0 }
+give_sword = true
+ability_level = 1
+info = [
+  { info = "&e%ability&7 lets you deal damage to all enemies around", delay = 0    },
+  { info = "&7Position yourself in the middle of the mummies and",    delay = "3s" },
+  { info = "&7then right-click to attack all of them at once!",       delay = 0    }
+]
+
+[fireball]
+position = { x = -524.5, y = 5, z = -265.5 }
+rotation = { yaw = 0, pitch = 90 }
+give_sword = true
+ability_level = 1
+info = [
+  { info = "&e%ability &7lets you live out your cosplay dreams", delay = 0    },
+  { info = "&7and become a ghast",                               delay = 0    },
+  { info = "&eRight-Click&7 to throw a fireball",                delay = "3s" },
+  { info = "&eThrow a fireball at the target to get across",     delay = "3s" }
 ]

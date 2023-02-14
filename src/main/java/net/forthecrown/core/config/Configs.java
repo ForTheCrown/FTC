@@ -116,15 +116,9 @@ public final class Configs {
             }
         )
 
-        .registerTypeAdapter(
-            Vector3i.class,
-            JsonUtils.createAdapter(Vectors::writeJson, Vectors::read3i)
-        )
+        .registerTypeAdapter(Vector3i.class, Vectors.V3I_ADAPTER)
+        .registerTypeAdapter(Vector3d.class, Vectors.V3D_ADAPTER)
 
-        .registerTypeAdapter(
-            Vector3d.class,
-            JsonUtils.createAdapter(Vectors::writeJson, Vectors::read3d)
-        )
         .registerTypeAdapter(
             Vector2i.class,
             JsonUtils.createAdapter(Vectors::writeJson, Vectors::read2i)

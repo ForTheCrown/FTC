@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 public class EmoteFunction extends TextFunction {
 
   public EmoteFunction() {
-    super(FLAG_EMOTES, ":[^:]+:");
+    super(FLAG_EMOTES, ":[^: ]+:");
   }
 
   @Override

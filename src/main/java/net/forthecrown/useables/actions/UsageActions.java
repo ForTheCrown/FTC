@@ -16,7 +16,8 @@ public final class UsageActions {
       KEY_CMD_CONSOLE = "console_command",
       KEY_CMD_PLAYER = "player_command",
       KEY_TELEPORT = "teleport",
-      KEY_SCRIPT = "run_script";
+      KEY_SCRIPT = "run_script",
+      KEY_DIALOGUE = "dialogue";
 
   public static void init() {
     register(KEY_SHOW_TEXT, ActionShowText.TYPE);
@@ -29,6 +30,7 @@ public final class UsageActions {
     register(KEY_CMD_PLAYER, ActionCommand.TYPE_PLAYER);
 
     register(KEY_SCRIPT, ActionScript.TYPE);
+    register(KEY_DIALOGUE, ActionDialogue.TYPE);
 
     ActionUserMap.Type.registerAll();
 

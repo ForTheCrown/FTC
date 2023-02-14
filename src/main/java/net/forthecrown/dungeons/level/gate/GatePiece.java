@@ -4,12 +4,12 @@ import lombok.Getter;
 import lombok.Setter;
 import net.forthecrown.dungeons.level.DungeonPiece;
 import net.forthecrown.dungeons.level.PieceVisitor;
-import net.forthecrown.dungeons.level.room.DungeonRoom;
+import net.forthecrown.dungeons.level.room.RoomPiece;
 import net.minecraft.nbt.CompoundTag;
 
 @Getter
 @Setter
-public class DungeonGate extends DungeonPiece {
+public class GatePiece extends DungeonPiece {
 
   private static final String
       TAG_ORIGIN = "origin_gate",
@@ -23,11 +23,11 @@ public class DungeonGate extends DungeonPiece {
   private AbsoluteGateData originGate;
   private AbsoluteGateData targetGate;
 
-  public DungeonGate(GateType type) {
+  public GatePiece(GateType type) {
     super(type);
   }
 
-  public DungeonGate(GateType type, CompoundTag tag) {
+  public GatePiece(GateType type, CompoundTag tag) {
     super(type, tag);
 
     if (tag.contains(TAG_OPEN) && type.isOpenable()) {
@@ -88,7 +88,7 @@ public class DungeonGate extends DungeonPiece {
 
   @Override
   protected boolean canBeChild(DungeonPiece o) {
-    return o instanceof DungeonRoom
+    return o instanceof RoomPiece
         && this.isOpen()
         && !hasChildren();
   }

@@ -292,7 +292,7 @@ public class GuildDataStorage {
 
     SerializationHelper.readFile(
         this.modifiers,
-        file -> JsonUtils.readFile(file).getAsJsonArray(),
+        JsonUtils::readFile,
         modifiers::deserialize
     );
   }

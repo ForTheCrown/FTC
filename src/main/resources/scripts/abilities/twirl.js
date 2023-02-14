@@ -1,10 +1,17 @@
 import "@ftc.cosmetics.travel.TravelUtil";
 import "@bukkit.Particle";
 
-const RADIUS = 1.5;
+import "@kyori.sound.Sound";
+import "@kyori.key.Key";
+
+const RADIUS = 2;
+const SOUND_KEY = Key.key("entity.player.attack.sweep");
+const SOUND = Sound.sound()
+    .type(SOUND_KEY)
+    .build();
 
 function onRightClick(player, clicked) {
-  let living = player.getLocation().getNearbyLivingEntities(RADIUS);
+  let living = player.getEyeLocation().getNearbyLivingEntities(RADIUS + level / 2);
   living.removeIf(entity => {
     return entity.equals(player);
   });
@@ -13,12 +20,25 @@ function onRightClick(player, clicked) {
     return false;
   }
 
-  living.forEach(entity => {
-    player.attack(entity);
+  let dmg = getDamage();
+
+  living.forEach(e => {
+    e.damage(dmg, player);
   });
 
   spawnEffects(player.getLocation(), living);
+  player.playSound(SOUND);
+
   return true;
+}
+
+function getDamage() {
+  let swordLevel = getSwordLevel();
+  return (swordLevel / 2) + (level * 3.3) + 2;
+}
+
+function getSwordLevel() {
+  return royalSword.getRank().getViewerRank();
 }
 
 function spawnEffects(playerLocation, entityList) {

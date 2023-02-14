@@ -28,6 +28,33 @@ abstract class InteractableNode<H extends Usable> extends FtcCommand {
   }
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    addCreateUsage(factory.withPrefix("-create"));
+
+    factory = prefixWithType(factory);
+    addUsages(factory);
+  }
+
+  protected void addCreateUsage(UsageFactory factory) {
+    prefixWithType(factory)
+        .usage("")
+        .addInfo("Creates a new usable");
+  }
+
+  protected void addUsages(UsageFactory factory) {
+    factory.usage("remove")
+        .addInfo("Removes the %s", argumentName);
+
+    factory.usage("info")
+        .addInfo("Displays admin information about the %s", argumentName);
+
+    DataCommands.addUsages(factory.withPrefix("data"), argumentName, null);
+
+    UsableCommands.ACTION_NODE.populateUsages(factory, argumentName);
+    UsableCommands.CHECK_NODE.populateUsages(factory, argumentName);
+  }
+
+  @Override
   protected void createCommand(BrigadierCommand command) {
     create(command);
   }
@@ -40,6 +67,8 @@ abstract class InteractableNode<H extends Usable> extends FtcCommand {
         .then(createLiteral)
         .then(createEditArguments());
   }
+
+  protected abstract UsageFactory prefixWithType(UsageFactory factory);
 
   protected DataAccessor createAccessor(UsageHolderProvider<H> provider,
                                         UsableSaveCallback<H> saveCallback

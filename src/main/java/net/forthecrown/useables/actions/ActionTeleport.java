@@ -27,8 +27,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class  ActionTeleport extends UsageAction {
 
-  private static final Argument<Position> POS_ARG = Argument.builder("pos",
-          PositionArgument.position())
+  private static final Argument<Position> POS_ARG
+      = Argument.builder("pos", PositionArgument.position())
       .setDefaultValue(Position.SELF)
       .build();
 

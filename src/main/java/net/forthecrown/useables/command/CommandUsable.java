@@ -43,12 +43,12 @@ public abstract class CommandUsable
     return tag;
   }
 
-  public boolean interact(Player player) {
+  public boolean interact(Player player, boolean adminInteraction) {
     if (!testInteraction(player)) {
       return false;
     }
 
-    return onInteract(player, false);
+    return onInteract(player, adminInteraction);
   }
 
   public abstract boolean onInteract(Player player, boolean adminInteraction);

@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.dungeons.level.room.DungeonRoom;
+import net.forthecrown.dungeons.level.room.RoomPiece;
 
 @Getter
 @RequiredArgsConstructor
@@ -41,7 +41,7 @@ public class StepResult {
   /**
    * The generated room
    */
-  final DungeonRoom room;
+  final RoomPiece room;
 
   /**
    * numerical result value because I was too lazy to create another enum... and because a single
@@ -65,7 +65,7 @@ public class StepResult {
    * @return The created result
    */
   public static StepResult success(List<PieceGenerator> sections,
-                                   DungeonRoom room
+                                   RoomPiece room
   ) {
     return new StepResult(sections, room, SUCCESS);
   }

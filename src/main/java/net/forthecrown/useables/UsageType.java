@@ -100,6 +100,11 @@ public class UsageType<T extends UsageInstance> {
     try {
       return executable.invoke(type, params);
     } catch (InvocationTargetException exc) {
+      var cause = exc.getCause();
+
+      if (cause instanceof CommandSyntaxException syntaxException) {
+        throw syntaxException;
+      }
 
       // Invocation target exception means the constructor or
       // method screwed up, and it's not our fault, so we throw
@@ -113,6 +118,7 @@ public class UsageType<T extends UsageInstance> {
     }
   }
 
+  @SuppressWarnings("unchecked")
   private static <T extends UsageInstance> void findConstructors(UsageType<T> type) {
     var c = type.getTypeClass();
 
@@ -155,6 +161,7 @@ public class UsageType<T extends UsageInstance> {
     }
   }
 
+  @SuppressWarnings("rawtypes")
   private static boolean validate(UsableConstructor loader,
                                   Executable executable,
                                   UsageType usageType
@@ -217,7 +224,7 @@ public class UsageType<T extends UsageInstance> {
     return typeFirst;
   }
 
-  private static String joinClassArray(Class[] arr) {
+  private static String joinClassArray(Class<?>[] arr) {
     StringJoiner joiner = new StringJoiner(", ");
 
     var it = ArrayIterator.unmodifiable(arr);

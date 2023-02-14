@@ -6,6 +6,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.With;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.Readers;
 import net.forthecrown.core.logging.Loggers;
@@ -28,6 +29,7 @@ import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
 
 @Getter
+@With
 @RequiredArgsConstructor
 public class FunctionInfo {
 

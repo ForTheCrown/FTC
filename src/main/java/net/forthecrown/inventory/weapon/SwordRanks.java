@@ -22,10 +22,6 @@ public class SwordRanks {
 
   static final SwordRank[] RANKS = createRanks();
 
-  // Called reflectively in BootStrap to force class loading
-  static void init() {
-  }
-
   private static SwordRank[] createRanks() {
     SwordRank.Builder[] ranks = new SwordRank.Builder[MAX_RANK];
 

@@ -16,8 +16,9 @@ import lombok.Setter;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.dungeons.DungeonWorld;
 import net.forthecrown.dungeons.LevelManager.LevelCell;
-import net.forthecrown.dungeons.level.gate.DungeonGate;
-import net.forthecrown.dungeons.level.room.DungeonRoom;
+import net.forthecrown.dungeons.level.placement.PostProcessorManager;
+import net.forthecrown.dungeons.level.placement.RoomPlacingVisitor;
+import net.forthecrown.dungeons.level.room.RoomPiece;
 import net.forthecrown.utils.ChunkedMap;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.io.TagUtil;
@@ -51,20 +52,20 @@ public class DungeonLevel implements Iterable<DungeonPiece> {
   private final ChunkedMap<DungeonPiece> chunkMap = new ChunkedMap<>();
 
   @Getter
-  private final Set<DungeonRoom> activePieces = new ObjectOpenHashSet<>();
+  private final Set<RoomPiece> activePieces = new ObjectOpenHashSet<>();
 
   @Getter
-  private final Set<DungeonRoom> inactivePieces = new ObjectOpenHashSet<>();
+  private final Set<RoomPiece> inactivePieces = new ObjectOpenHashSet<>();
 
   /**
    * The root room from which all other rooms have sprung
    */
   @Getter
-  private DungeonRoom root;
+  private RoomPiece root;
 
   @Getter
   @Setter
-  private DungeonRoom bossRoom;
+  private RoomPiece bossRoom;
 
   private BukkitTask tickTask;
 
@@ -88,7 +89,7 @@ public class DungeonLevel implements Iterable<DungeonPiece> {
    */
   public void addPiece(DungeonPiece piece) {
     if (this.root == null
-        && piece instanceof DungeonRoom room
+        && piece instanceof RoomPiece room
         && room.getType().hasFlags(Pieces.FLAG_ROOT)
     ) {
       this.root = room;
@@ -97,7 +98,7 @@ public class DungeonLevel implements Iterable<DungeonPiece> {
     pieceLookup.put(piece.getId(), piece);
     piece.level = this;
 
-    if (piece instanceof DungeonRoom) {
+    if (piece instanceof RoomPiece) {
       chunkMap.add(piece);
     }
 
@@ -141,8 +142,8 @@ public class DungeonLevel implements Iterable<DungeonPiece> {
     inactivePieces.addAll(
         pieceLookup.values()
             .stream()
-            .filter(dungeonPiece -> dungeonPiece instanceof DungeonRoom)
-            .map(dungeonPiece -> (DungeonRoom) dungeonPiece)
+            .filter(dungeonPiece -> dungeonPiece instanceof RoomPiece)
+            .map(dungeonPiece -> (RoomPiece) dungeonPiece)
             .toList()
     );
   }
@@ -155,21 +156,15 @@ public class DungeonLevel implements Iterable<DungeonPiece> {
   /* ----------------------------- PLACEMENT ------------------------------ */
 
   public void place() {
-    PieceVisitor placementVisitor = new PieceVisitor() {
-      @Override
-      public Result onGate(DungeonGate gate) {
-        gate.place(DungeonWorld.get());
-        return Result.CONTINUE;
-      }
+    var manager = PostProcessorManager.create(DungeonWorld.get());
+    RoomPlacingVisitor visitor = new RoomPlacingVisitor();
+    visitor.setCollector(manager);
 
-      @Override
-      public Result onRoom(DungeonRoom room) {
-        room.place(DungeonWorld.get());
-        return Result.CONTINUE;
-      }
-    };
+    getRoot().visit(visitor);
 
-    getRoot().visit(placementVisitor);
+    LOGGER.debug("Placed {} rooms for level", visitor.getPlacementCounter());
+
+    manager.runPostProcessors();
   }
 
   /* --------------------------- SERIALIZATION ---------------------------- */
@@ -192,7 +187,7 @@ public class DungeonLevel implements Iterable<DungeonPiece> {
     loadPieces(tag.getList(TAG_PIECES, Tag.TAG_COMPOUND), tag.getUUID(TAG_ROOT));
 
     if (tag.contains(TAG_BOSS_ROOM)) {
-      setBossRoom((DungeonRoom) pieceLookup.get(tag.getUUID(TAG_BOSS_ROOM)));
+      setBossRoom((RoomPiece) pieceLookup.get(tag.getUUID(TAG_BOSS_ROOM)));
     }
   }
 
@@ -244,6 +239,8 @@ public class DungeonLevel implements Iterable<DungeonPiece> {
 
     for (var e : tag) {
       CompoundTag pTag = (CompoundTag) e;
+
+      @SuppressWarnings("rawtypes")
       PieceType type = Pieces.load(pTag.get(TAG_TYPE));
 
       DungeonPiece piece = type.load(pTag);
@@ -284,7 +281,7 @@ public class DungeonLevel implements Iterable<DungeonPiece> {
       }
     }
 
-    DungeonRoom rootPiece = (DungeonRoom) linkMap.get(rootId);
+    RoomPiece rootPiece = (RoomPiece) linkMap.get(rootId);
 
     if (rootPiece == null) {
       LOGGER.warn(

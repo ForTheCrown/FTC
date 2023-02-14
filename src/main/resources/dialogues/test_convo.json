@@ -1,0 +1,13 @@
+{
+  "node_1": {
+    "condition": { "js": "logger.debug('Test called!'); true" },
+    "on_view": { "js": "logger.debug('I\\'ve been viewed!')" },
+    "text": [
+      "Hello world!",
+      "Node button => ${button: node=node_1 text='Node'}",
+      "Conv button => ${button: dialog=test_convo;node_1 text='Dialog'}",
+      "run_command => ${button: run_command='/broadcast test_test' text='Sup yall'}",
+      "run_command => \\${button: run_command='/broadcast test_test' text='Sup yall'}"
+    ]
+  }
+}

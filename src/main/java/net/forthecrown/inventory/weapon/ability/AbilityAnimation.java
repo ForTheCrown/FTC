@@ -24,7 +24,6 @@ import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.chat.Keybinds;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -127,7 +126,7 @@ public class AbilityAnimation {
   @Getter
   @Setter
   @RequiredArgsConstructor
-  public class Animation implements Runnable {
+  public static class Animation implements Runnable {
     private final ItemStack sword;
     private final UUID owner;
 
@@ -320,7 +319,7 @@ public class AbilityAnimation {
         holder.customName(
             Text.format("{0} to take sword",
                 NamedTextColor.YELLOW,
-                Component.keybind(Keybinds.USE)
+                Component.keybind("key.use")
             )
         );
 
@@ -333,6 +332,8 @@ public class AbilityAnimation {
 
         var check = new TestScript(SwordConfig.swordAnim_claimTest);
         entity.getChecks().add(check);
+
+        entity.save(holder.getPersistentDataContainer());
 
         animation.stop();
         animation.itemTaken = false;

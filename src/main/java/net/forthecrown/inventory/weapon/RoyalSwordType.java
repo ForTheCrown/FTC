@@ -30,7 +30,9 @@ public class RoyalSwordType implements ExtendedItemType<RoyalSword> {
       RANK_5_NAME = makeName("Royal", NamedTextColor.YELLOW, NamedTextColor.GOLD, true),
       RANK_FINAL_NAME = makeName("Dragon's", NamedTextColor.RED, NamedTextColor.DARK_RED, true);
 
-  private static Component makeName(String name, TextColor nameColor, TextColor borderColor,
+  private static Component makeName(String name,
+                                    TextColor nameColor,
+                                    TextColor borderColor,
                                     boolean bold
   ) {
     return Component.text()
@@ -42,7 +44,6 @@ public class RoyalSwordType implements ExtendedItemType<RoyalSword> {
   }
 
   public RoyalSwordType() {
-    SwordRanks.init();
     ConfigManager.get().registerConfig(SwordConfig.class);
   }
 

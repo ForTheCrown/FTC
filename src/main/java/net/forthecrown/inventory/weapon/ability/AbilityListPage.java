@@ -63,7 +63,7 @@ public class AbilityListPage extends ListPage<WeaponAbilityType> {
   public @Nullable ItemStack createItem(@NotNull User user,
                                         @NotNull Context context
   ) {
-    return ItemStacks.builder(Material.BOOK)
+    return ItemStacks.builder(Material.KNOWLEDGE_BOOK)
         .setName("&eKnown abilities")
         .addLore("&7Click to see all known abilities")
         .addLore("&7and their recipes")

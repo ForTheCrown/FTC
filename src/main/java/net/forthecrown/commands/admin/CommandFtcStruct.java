@@ -6,6 +6,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
@@ -18,6 +19,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
+import net.forthecrown.commands.DataCommands;
+import net.forthecrown.commands.DataCommands.DataAccessor;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.arguments.RegistryArguments;
 import net.forthecrown.commands.manager.Exceptions;
@@ -47,8 +50,6 @@ import net.forthecrown.utils.math.Transform;
 import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.utils.math.WorldBounds3i;
 import net.forthecrown.utils.text.Text;
-import net.minecraft.commands.arguments.CompoundTagArgument;
-import net.minecraft.commands.arguments.NbtPathArgument;
 import net.minecraft.nbt.CompoundTag;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -63,20 +64,18 @@ import org.spongepowered.math.vector.Vector3i;
 public class CommandFtcStruct extends FtcCommand {
   /* ----------------------------- CREATION ARGUMENTS ------------------------------ */
 
-  private static final Argument<List<EntityType>>
-      IGNORE_ENT_ARG = Argument.builder("ignore_entities",
-          ArrayArgument.of(EnumArgument.of(EntityType.class)))
+  private static final Argument<List<EntityType>> IGNORE_ENT_ARG
+      = Argument.builder("ignore_entities", ArrayArgument.of(EnumArgument.of(EntityType.class)))
       .setDefaultValue(Collections.emptyList())
       .build();
 
-  private static final Argument<List<BlockPredicateArgument.Result>>
-      BLOCK_FILTER = Argument.builder("ignore_blocks",
-          ArrayArgument.of(BlockPredicateArgument.blockPredicate()))
+  private static final Argument<List<BlockPredicateArgument.Result>> BLOCK_FILTER
+      = Argument.builder("ignore_blocks", ArrayArgument.of(BlockPredicateArgument.blockPredicate()))
       .setDefaultValue(Collections.emptyList())
       .build();
 
-  private static final Argument<Boolean>
-      INCLUDE_FUNCTIONS = Argument.builder("include_functions", BoolArgumentType.bool())
+  private static final Argument<Boolean> INCLUDE_FUNCTIONS
+      = Argument.builder("include_functions", BoolArgumentType.bool())
       .setDefaultValue(false)
       .build();
 
@@ -88,38 +87,39 @@ public class CommandFtcStruct extends FtcCommand {
 
   /* ----------------------------- PLACEMENT ARGUMENTS ------------------------------ */
 
-  static final Argument<Rotation> ROT_ARG = Argument.builder("rotation",
-          EnumArgument.of(Rotation.class))
+  static final Argument<Rotation> ROT_ARG
+      = Argument.builder("rotation", EnumArgument.of(Rotation.class))
       .setAliases("rot", "rotated")
       .setDefaultValue(Rotation.NONE)
       .build();
 
-  private static final Argument<Vector3d> OFFSET_ARG = Argument.builder("offset",
-          new VectorParser())
+  private static final Argument<Vector3d> OFFSET_ARG
+      = Argument.builder("offset", new VectorParser())
       .setDefaultValue(Vector3d.ZERO)
       .build();
 
-  private static final Argument<Vector3d> PIVOT_ARG = Argument.builder("pivot", new VectorParser())
+  private static final Argument<Vector3d> PIVOT_ARG
+      = Argument.builder("pivot", new VectorParser())
       .setDefaultValue(Vector3d.ZERO)
       .build();
 
-  private static final Argument<Position> POS_ARG = Argument.builder("pos",
-          PositionArgument.blockPos())
+  private static final Argument<Position> POS_ARG
+      = Argument.builder("pos", PositionArgument.blockPos())
       .setDefaultValue(Position.SELF)
       .build();
 
-  private static final Argument<Boolean> PLACE_ENTITIES = Argument.builder("place_entities",
-          BoolArgumentType.bool())
+  private static final Argument<Boolean> PLACE_ENTITIES
+      = Argument.builder("place_entities", BoolArgumentType.bool())
       .setDefaultValue(true)
       .build();
 
-  private static final Argument<Boolean> IGNORE_AIR = Argument.builder("ignore_air",
-          BoolArgumentType.bool())
+  private static final Argument<Boolean> IGNORE_AIR
+      = Argument.builder("ignore_air", BoolArgumentType.bool())
       .setDefaultValue(false)
       .build();
 
-  private static final Argument<String> PALETTE_ARG = Argument.builder("palette",
-          new PaletteParser())
+  private static final Argument<String> PALETTE_ARG
+      = Argument.builder("palette", new PaletteParser())
       .setDefaultValue(BlockStructure.DEFAULT_PALETTE_NAME)
       .build();
 
@@ -132,6 +132,26 @@ public class CommandFtcStruct extends FtcCommand {
       .addOptional(PALETTE_ARG)
       .addOptional(IGNORE_AIR)
       .build();
+
+  private static final DataAccessor HEADER_ACCESSOR = new DataAccessor() {
+    @Override
+    public CompoundTag getTag(CommandContext<CommandSource> context) {
+      Holder<BlockStructure> holder
+          = context.getArgument("structure", Holder.class);
+
+      return holder.getValue().getHeader().copy();
+    }
+
+    @Override
+    public void setTag(CommandContext<CommandSource> context, CompoundTag tag) {
+      Holder<BlockStructure> holder
+          = context.getArgument("structure", Holder.class);
+
+      var header = holder.getValue().getHeader();
+      header.tags.clear();
+      header.merge(tag);
+    }
+  };
 
   /* ----------------------------- CONSTRUCTOR ------------------------------ */
 
@@ -195,16 +215,7 @@ public class CommandFtcStruct extends FtcCommand {
         .addInfo("-palette: the name of structure palette to place");
 
     var header = prefixed.withPrefix("header");
-    header.usage("view")
-        .addInfo("Shows the structure's header data");
-
-    header.usage("put <compound tag>")
-        .addInfo("Places the <compound tag> into a <structure>'s")
-        .addInfo("header data");
-
-    header.usage("remove <nbt path>")
-        .addInfo("Removes the element at the specified <nbt path>")
-        .addInfo("in a <structure>'s header data");
+    DataCommands.addUsages(header, "Structure", null);
   }
 
   private void addCreationArg(UsageFactory factory, String name) {
@@ -224,6 +235,12 @@ public class CommandFtcStruct extends FtcCommand {
         .addInfo("  included in the %s", name)
         .addInfo("-include_functions: Whether to include structure functions")
         .addInfo("  in the %s or not", name);
+  }
+
+  private LiteralArgumentBuilder<CommandSource> headerArgument() {
+    var literal = literal("header");
+    DataCommands.addArguments(literal, "Structure", HEADER_ACCESSOR);
+    return literal;
   }
 
   @Override
@@ -297,8 +314,6 @@ public class CommandFtcStruct extends FtcCommand {
                     throw Exceptions.REMOVED_NO_DATA;
                   }
 
-                  structures.delete(holder);
-
                   c.getSource().sendAdmin(
                       Text.format("Removed structure: '{0}'", holder.getKey())
                   );
@@ -306,60 +321,7 @@ public class CommandFtcStruct extends FtcCommand {
                 })
             )
 
-            .then(literal("header")
-                .then(literal("view")
-                    .executes(c -> {
-                      Holder<BlockStructure> holder = c.getArgument("structure", Holder.class);
-                      BlockStructure structure = holder.getValue();
-
-                      c.getSource().sendMessage(
-                          Text.format("{0}'s header data: {1}",
-                              holder.getKey(),
-                              Text.displayTag(structure.getHeader(), true)
-                          )
-                      );
-                      return 0;
-                    })
-                )
-
-                .then(literal("put")
-                    .then(argument("nbt", CompoundTagArgument.compoundTag())
-                        .executes(c -> {
-                          CompoundTag tag = c.getArgument("nbt", CompoundTag.class);
-                          Holder<BlockStructure> holder = c.getArgument("structure", Holder.class);
-                          BlockStructure structure = holder.getValue();
-
-                          structure.getHeader().merge(tag);
-
-                          c.getSource().sendMessage(
-                              Text.format("Put {0} into {1}'s header",
-                                  Text.displayTag(tag, false),
-                                  holder.getKey()
-                              )
-                          );
-                          return 0;
-                        })
-                    )
-                )
-
-                .then(literal("remove")
-                    .then(argument("path", NbtPathArgument.nbtPath())
-                        .executes(c -> {
-                          NbtPathArgument.NbtPath path = c.getArgument("path",
-                              NbtPathArgument.NbtPath.class);
-                          Holder<BlockStructure> holder = c.getArgument("structure", Holder.class);
-                          BlockStructure structure = holder.getValue();
-
-                          if (path.remove(structure.getHeader()) < 1) {
-                            throw Exceptions.REMOVED_NO_DATA;
-                          }
-
-                          c.getSource().sendAdmin("Removed tags from structure header");
-                          return 0;
-                        })
-                    )
-                )
-            )
+            .then(headerArgument())
         );
   }
 

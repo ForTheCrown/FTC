@@ -8,6 +8,7 @@ import static net.forthecrown.user.data.UserTimeTracker.UNSET;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
@@ -483,7 +484,7 @@ public class MarketShop {
     mergedName = shop == null ? null : shop.getName();
   }
 
-  /* ----------------------------- MEMBERSHIPS ------------------------------ */
+  /* ---------------------------- MEMBERSHIPS ----------------------------- */
 
   /**
    * Adds the given player's UUID to this shop's members list
@@ -511,7 +512,7 @@ public class MarketShop {
     syncWorldGuard();
   }
 
-  /* ----------------------------- CONNECTIONS ------------------------------ */
+  /* ---------------------------- CONNECTIONS ----------------------------- */
 
   /**
    * Connects this shop to the given shop
@@ -745,8 +746,8 @@ public class MarketShop {
       }
     }
 
-    Component reason = failedAmount < failedStock ?
-        Messages.MARKET_EVICT_STOCK
+    Component reason = failedAmount < failedStock
+        ? Messages.MARKET_EVICT_STOCK
         : Messages.tooLittleShops();
 
     beginEviction(
@@ -761,26 +762,16 @@ public class MarketShop {
    * shop's merged shop as well.
    */
   public void syncWorldGuard() {
-    var members = worldGuard.getMembers();
-    members.clear();
-
-    if (!hasOwner()) {
-      return;
-    }
+    DefaultDomain domain = new DefaultDomain();
+    forEachMember(domain::addPlayer);
 
     var merged = getMerged();
-
-    forEachMember(uuid -> {
-      members.addPlayer(uuid);
-
-      if (merged != null) {
-        merged.getWorldGuard().getMembers().addPlayer(uuid);
-      }
-    });
-
     if (merged != null) {
-      merged.forEachMember(members::addPlayer);
+      merged.forEachMember(domain::addPlayer);
+      merged.getWorldGuard().setMembers(domain);
     }
+
+    getWorldGuard().setMembers(domain);
   }
 
   /**

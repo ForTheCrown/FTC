@@ -1,26 +1,24 @@
 package net.forthecrown.commands.help;
 
 import com.google.common.base.Strings;
+import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import lombok.Getter;
 import net.forthecrown.commands.manager.Commands;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcCommand.Usage;
 import net.forthecrown.commands.manager.FtcCommand.UsageFactory;
-import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.utils.context.Context;
@@ -39,10 +37,8 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import org.apache.commons.text.similarity.LevenshteinDistance;
-import org.apache.logging.log4j.Logger;
 
 public class FtcHelpMap {
-  private static final Logger LOGGER = Loggers.getLogger();
 
   @Getter
   private static final FtcHelpMap instance = new FtcHelpMap();
@@ -68,6 +64,7 @@ public class FtcHelpMap {
   private final PageFormat<Component> singleEntryPaginator
       = PageFormat.create();
 
+  @SuppressWarnings({"unchecked", "rawtypes"})
   private FtcHelpMap() {
     // Initialize the page format used to display help entries
 
@@ -120,13 +117,29 @@ public class FtcHelpMap {
   public CompletableFuture<Suggestions> suggest(CommandSource source,
                                                 SuggestionsBuilder builder
   ) {
-    Set<String> result = new ObjectOpenHashSet<>();
+    var input = builder.getRemainingLowerCase();
+    boolean beginsWithQuote
+        = input.length() > 0
+        && StringReader.isQuotedStringStart(input.charAt(0));
+
+    char quote;
+
+    if (beginsWithQuote) {
+      quote = input.charAt(0);
+    } else {
+      quote = '"';
+    }
+
+    String unquoted = input.replaceAll(quote + "", "");
 
     getAll().stream()
         .filter(entry -> entry.test(source))
-        .forEach(entry -> result.addAll(entry.getKeywords()));
+        .flatMap(entry -> entry.getKeywords().stream())
+        .filter(s -> CompletionProvider.startsWith(unquoted, s))
+        .map(s -> Commands.optionallyQuote(quote + "", s))
+        .forEach(builder::suggest);
 
-    return CompletionProvider.suggestMatching(builder, result);
+    return builder.buildFuture();
   }
 
   /**

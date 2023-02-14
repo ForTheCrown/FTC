@@ -18,19 +18,19 @@ public final class UsageTests {
       KEY_HAS_ITEMS = "has_items",
       KEY_NOT_HAVE_ITEMS = "does_not_have_items",
 
-  KEY_HAS_BAL = "rhines",
+      KEY_HAS_BAL = "rhines",
       KEY_HAS_GEMS = "gems",
       KEY_HAS_VOTES = "votes",
 
-  KEY_NEVER_USED = "never_used",
+      KEY_NEVER_USED = "never_used",
 
-  KEY_ONE_USE = "one_use",
+      KEY_ONE_USE = "one_use",
       KEY_COOLDOWN = "cooldown",
       KEY_WORLD = "in_world",
 
-  KEY_RANK = "rank",
+      KEY_RANK = "rank",
 
-  KEY_SCRIPT = "test_script";
+      KEY_SCRIPT = "test_script";
 
   public static void init() {
     register(KEY_PERMISSION, TestPermission.TYPE);

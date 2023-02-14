@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class RecipeListPage extends ListPage<ItemStack> {
   public static final Slot ADVANCEMENT_SLOT = Slot.of(4, 2);
-  public static final Slot TRIAL_SLOT = Slot.of(0, 2);
+  public static final Slot TRIAL_SLOT = Slot.of(8, 0);
 
   public RecipeListPage(MenuPage parent) {
     super(parent, RECIPE_PAGE);

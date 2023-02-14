@@ -138,10 +138,6 @@ public class ChallengeEntry {
       potentiallyAddStreak(challenge.getStreakCategory());
     }
 
-    LOGGER.debug("Set progress of {} to {} for {}",
-        holder.getKey(), newVal, user
-    );
-
     progress.put(holder, newVal);
   }
 

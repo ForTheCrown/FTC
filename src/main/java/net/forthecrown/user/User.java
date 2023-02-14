@@ -58,6 +58,7 @@ import net.forthecrown.user.data.UserTitles;
 import net.forthecrown.user.property.BoolProperty;
 import net.forthecrown.user.property.Properties;
 import net.forthecrown.user.property.PropertyMap;
+import net.forthecrown.user.property.UserPreference;
 import net.forthecrown.user.property.UserProperty;
 import net.forthecrown.utils.ArrayIterator;
 import net.forthecrown.utils.Tasks;
@@ -492,7 +493,10 @@ public class User implements ForwardingAudience.Single,
         .getModifier(getUniqueId());
 
     if (getGuild() != null && modifier > 1) {
-      Tasks.runLaterAsync(() -> sendMessage(Messages.guildMultiplierActive(modifier)), 60);
+      Tasks.runLaterAsync(
+          () -> sendMessage(Messages.guildMultiplierActive(modifier)),
+          60
+      );
     }
 
     // Tell admin if this user has notes
@@ -567,12 +571,16 @@ public class User implements ForwardingAudience.Single,
     }
 
     // Log play time
-    logTime().resultOrPartial(Loggers.getLogger()::warn)
-        .ifPresent(integer -> {
-          UserManager.get()
-              .getPlayTime()
-              .add(getUniqueId(), integer);
-        });
+    logTime().resultOrPartial(Loggers.getLogger()::warn).ifPresent(integer -> {
+      Loggers.getLogger().info("Adding {} seconds or {} hours to {}'s playtime",
+          integer,
+          TimeUnit.SECONDS.toHours(integer),
+          this
+      );
+
+      UserManager.get().getPlayTime()
+          .add(getUniqueId(), integer);
+    });
 
     lastOnlineName = getName();
 
@@ -1379,11 +1387,29 @@ public class User implements ForwardingAudience.Single,
     return getPlayer().getGameMode();
   }
 
-  public void setGameMode(GameMode gameMode) throws UserOfflineException {
+  public void setGameMode(GameMode newGameMode) throws UserOfflineException {
     ensureOnline();
 
-    getPlayer().setGameMode(gameMode);
+    var currentGameMode = getGameMode();
+
+    if (currentGameMode == GameMode.SPECTATOR
+        && newGameMode != GameMode.SPECTATOR
+    ) {
+      boolean hide = get(Properties.DYNMAP_HIDE);
+      UserPreference.DYNMAP_HIDE.setState(this, hide);
+    }
+
+    getPlayer().setGameMode(newGameMode);
     updateFlying();
+
+    if (newGameMode == GameMode.SPECTATOR
+        && currentGameMode != GameMode.SPECTATOR
+    ) {
+      boolean hide = UserPreference.DYNMAP_HIDE.getState(this);
+      set(Properties.DYNMAP_HIDE, hide);
+
+      UserPreference.DYNMAP_HIDE.setState(this, false);
+    }
   }
 
   private static boolean canFly(GameMode mode) {

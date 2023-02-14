@@ -42,7 +42,18 @@ function onRightClick(player, clicked) {
   // if that's a good idea or not
   let length = velocity.length();
   let dir = player.getLocation().getDirection();
+
   dir.multiply(length * MULTIPLIER);
+
+  let multiplier = 0.6;
+
+  if (level == 2) {
+    multiplier = 0.400;
+  } else if (level > 2) {
+    multiplier = 0.322;
+  }
+
+  dir.multiply(level * multiplier);
   player.setVelocity(dir);
 
   spawnEffects(player);

@@ -1,10 +1,14 @@
 package net.forthecrown.useables.command;
 
+import static net.kyori.adventure.text.Component.newline;
+import static net.kyori.adventure.text.Component.text;
+
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.function.UnaryOperator;
 import net.forthecrown.user.UserTeleport;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.io.TagUtil;
+import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.minecraft.nbt.CompoundTag;
@@ -42,24 +46,29 @@ public class Warp extends CommandUsable {
     }
 
     user.createTeleport(this::getDestination, UserTeleport.Type.WARP)
+        .setDelayed(!adminInteraction)
         .start();
+
     return true;
   }
 
   @Override
   public @NotNull HoverEvent<Component> asHoverEvent(@NotNull UnaryOperator<Component> op) {
-    return Component.text("Destination: ")
-        .append(Component.newline())
-        .append(Component.text("world: " + getDestination().getWorld().getName()))
+    return text("Destination: ")
+        .append(newline())
+        .append(text("world: "))
+        .append(text(Text.formatWorldName(getDestination().getWorld())))
 
-        .append(Component.newline())
-        .append(Component.text("x: " + getDestination().getBlockX()))
+        .append(newline())
+        .append(text("x: " + getDestination().getBlockX()))
 
-        .append(Component.newline())
-        .append(Component.text("y: " + getDestination().getBlockY()))
+        .append(newline())
+        .append(text("y: " + getDestination().getBlockY()))
 
-        .append(Component.newline())
-        .append(Component.text("z: " + getDestination().getBlockZ())).asHoverEvent();
+        .append(newline())
+        .append(text("z: " + getDestination().getBlockZ()))
+
+        .asHoverEvent();
   }
 
   public Location getDestination() {

@@ -10,6 +10,7 @@ import net.forthecrown.core.module.OnSave;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.core.registry.Registries;
 import net.forthecrown.core.registry.Registry;
+import net.forthecrown.core.registry.RegistryListener;
 import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.utils.io.SerializationHelper;
 import org.apache.logging.log4j.Logger;
@@ -28,6 +29,8 @@ public final class Structures {
 
   public Structures() {
     this.directory = PathUtil.getPluginDirectory("structures");
+
+    registry.setListener(RegistryListener.removalListener(this::delete));
   }
 
   public static Structures get() {
@@ -51,7 +54,7 @@ public final class Structures {
     }
 
     PathUtil.findAllFiles(directory, false)
-        .resultOrPartial(Loggers.getLogger()::error)
+        .resultOrPartial(LOGGER::error)
 
         .ifPresent(strings -> {
           strings.forEach(s -> {

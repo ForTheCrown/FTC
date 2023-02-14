@@ -56,10 +56,10 @@ public class ActionUserMap extends UsageAction {
   // --- TYPE CONSTRUCTORS ---
 
   @UsableConstructor(ConstructType.PARSE)
-  public static ActionUserMap parse(UsageType<ActionUserMap> type, StringReader reader,
+  public static ActionUserMap parse(UsageType<ActionUserMap> type,
+                                    StringReader reader,
                                     CommandSource source
-  )
-      throws CommandSyntaxException {
+  ) throws CommandSyntaxException {
     return new ActionUserMap(type, reader.readInt());
   }
 
@@ -94,8 +94,8 @@ public class ActionUserMap extends UsageAction {
 
     abstract UUID2IntMap getMap();
 
-    EnumMap<Action, UsageType<ActionUserMap>> typesByAction = Util.make(new EnumMap<>(Action.class),
-        map -> {
+    final EnumMap<Action, UsageType<ActionUserMap>> typesByAction
+        = Util.make(new EnumMap<>(Action.class), map -> {
           for (var t : Action.values()) {
             map.put(t, UsageType.of(ActionUserMap.class));
           }
@@ -106,7 +106,7 @@ public class ActionUserMap extends UsageAction {
 
       for (var t : values()) {
         for (var e : t.typesByAction.entrySet()) {
-          UsageType type = e.getValue();
+          UsageType<ActionUserMap> type = e.getValue();
           Action action = e.getKey();
 
           String key = action.name().toLowerCase() + "_" + t.name().toLowerCase();

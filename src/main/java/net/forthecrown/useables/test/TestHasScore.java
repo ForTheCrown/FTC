@@ -28,13 +28,11 @@ public class TestHasScore extends UsageTest {
 
   // --- PARSING ---
 
-  static final Argument<Objective> OBJ_ARG = Argument.builder("objective",
-          ObjectiveArgument.objective())
-      .build();
+  static final Argument<Objective> OBJ_ARG
+      = Argument.builder("objective", ObjectiveArgument.objective()).build();
 
-  static final Argument<MinMaxBounds.Ints> BOUNDS_ARG = Argument.builder("bounds",
-          RangeArgument.intRange())
-      .build();
+  static final Argument<MinMaxBounds.Ints> BOUNDS_ARG
+      = Argument.builder("bounds", RangeArgument.intRange()).build();
 
   static final ArgsArgument PARSER = ArgsArgument.builder()
       .addRequired(OBJ_ARG)

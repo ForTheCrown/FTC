@@ -26,9 +26,7 @@ import org.bukkit.persistence.PersistentDataType;
  * Sign shop constants and utility methods
  */
 public final class SignShops {
-
-  private SignShops() {
-  }
+  private SignShops() {}
 
   /* ----------------------------- CONSTANTS ------------------------------ */
 

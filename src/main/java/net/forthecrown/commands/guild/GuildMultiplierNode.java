@@ -58,6 +58,11 @@ public class GuildMultiplierNode extends GuildCommandNode {
         "Adds a multiplier"
     );
 
+    factory.usage("manual", "Shows the current manual modifier");
+
+    factory.usage("manual <value: number(0..)>")
+        .addInfo("Sets the current manual modifier to a <value>");
+
     var prefixed = factory.withPrefix("<player> <type: global | guild>");
     prefixed.usage("")
         .addInfo("Lists all <type> multipliers a <player> has");
@@ -186,6 +191,42 @@ public class GuildMultiplierNode extends GuildCommandNode {
                       return 0;
                     })
                 )
+            )
+        )
+
+        .then(literal("manual")
+            .requires(source -> source.hasPermission(Permissions.GUILD_ADMIN))
+
+            .executes(c -> {
+              float val = GuildManager.get().getExpModifier().getManual();
+
+              c.getSource().sendMessage(
+                  Text.format("Current manual modifier: &e{0, number}x&r.",
+                      NamedTextColor.GRAY,
+                      val
+                  )
+              );
+              return 0;
+            })
+
+            .then(argument("value", FloatArgumentType.floatArg())
+                .requires(source -> source.hasPermission(Permissions.GUILD_ADMIN))
+
+                .executes(c -> {
+                  var multipliers = GuildManager.get().getExpModifier();
+                  float val = c.getArgument("value", Float.class);
+
+                  multipliers.setManual(val);
+
+                  c.getSource().sendAdmin(
+                      Text.format(
+                          "Set manual Guild Exp modifier to &e{0, number}x&r.",
+                          NamedTextColor.GRAY,
+                          val
+                      )
+                  );
+                  return 0;
+                })
             )
         )
 

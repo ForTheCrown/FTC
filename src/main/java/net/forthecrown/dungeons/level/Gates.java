@@ -11,11 +11,11 @@ import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.dungeons.DungeonManager;
 import net.forthecrown.dungeons.level.gate.AbsoluteGateData;
-import net.forthecrown.dungeons.level.gate.DungeonGate;
+import net.forthecrown.dungeons.level.gate.GatePiece;
 import net.forthecrown.dungeons.level.gate.GateData;
 import net.forthecrown.dungeons.level.gate.GateType;
 import net.forthecrown.dungeons.level.generator.NodeAlign;
-import net.forthecrown.dungeons.level.room.DungeonRoom;
+import net.forthecrown.dungeons.level.room.RoomPiece;
 import org.apache.logging.log4j.Logger;
 
 public final class Gates {
@@ -23,9 +23,9 @@ public final class Gates {
 
   private static final Logger LOGGER = Loggers.getLogger();
 
-  public static List<DungeonGate> createGates(DungeonRoom room,
-                                              List<GateData> dataList,
-                                              Random random
+  public static List<GatePiece> createGates(RoomPiece room,
+                                            List<GateData> dataList,
+                                            Random random
   ) {
     return dataList.stream()
         .map(gateData -> gateData.toAbsolute(room))
@@ -33,9 +33,9 @@ public final class Gates {
         .collect(Collectors.toList());
   }
 
-  private static DungeonGate genGate(AbsoluteGateData data,
-                                     Random random,
-                                     DungeonRoom parent
+  private static GatePiece genGate(AbsoluteGateData data,
+                                   Random random,
+                                   RoomPiece parent
   ) {
     List<GateMatch> matches = matchOpening(data.opening(), false);
 
@@ -47,11 +47,10 @@ public final class Gates {
       Holder<GateType> def = Pieces.getDefaultGate();
       List<GateData> gates = def.getValue().getGates();
 
-      if (gates.isEmpty()) {
-        throw new IllegalStateException("Default gate has no gates!");
-      }
+      assert !gates.isEmpty()
+          : "Default gate has no exits/entrances! (Forgot to mark them?)";
 
-      IntList indices = ofIndices(gates.size());
+      IntList indices = createIndexList(gates.size());
 
       matches = ObjectLists.singleton(
           new GateMatch(def, gates, indices)
@@ -63,7 +62,7 @@ public final class Gates {
     int chosenGate = match.matchingIndices
         .getInt(random.nextInt(match.matchingIndices.size()));
 
-    DungeonGate gate = match.type().getValue().create();
+    GatePiece gate = match.type().getValue().create();
     NodeAlign.align(gate, data, gates.get(chosenGate));
     parent.addChild(gate);
 
@@ -72,9 +71,8 @@ public final class Gates {
     } else {
       int exit = -1;
 
-      while ((++exit) != chosenGate
-          && exit < gates.size()
-      ) {
+      // Find exit gate by incrementing exit index from -1
+      while ((++exit) != chosenGate && exit < gates.size()) {
 
       }
 
@@ -88,7 +86,7 @@ public final class Gates {
                                              boolean open
   ) {
     final int requiredGates = open ? 2 : 1;
-    var registry = DungeonManager.getInstance()
+    var registry = DungeonManager.getDungeons()
         .getGateTypes();
 
     List<GateMatch> results = new ObjectArrayList<>();
@@ -125,7 +123,7 @@ public final class Gates {
     return results;
   }
 
-  private static IntList ofIndices(int size) {
+  private static IntList createIndexList(int size) {
     IntList list = new IntArrayList();
 
     for (int i = 0; i < size; i++) {

@@ -7,18 +7,15 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.Getter;
-import net.forthecrown.dungeons.level.gate.DungeonGate;
+import net.forthecrown.dungeons.level.gate.GatePiece;
 import net.forthecrown.dungeons.level.generator.NodeAlign;
-import net.forthecrown.structure.BlockProcessors;
 import net.forthecrown.structure.BlockStructure;
 import net.forthecrown.structure.Rotation;
-import net.forthecrown.structure.StructurePlaceConfig;
 import net.forthecrown.utils.BoundsHolder;
 import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.math.Bounds3i;
 import net.forthecrown.utils.math.Transform;
 import net.minecraft.nbt.CompoundTag;
-import org.bukkit.World;
 import org.spongepowered.math.vector.Vector3i;
 
 public abstract class DungeonPiece implements BoundsHolder {
@@ -30,8 +27,7 @@ public abstract class DungeonPiece implements BoundsHolder {
       TAG_ROTATION = "rotation",
       TAG_BOUNDS = "bounds",
       TAG_CHILDREN = "children",
-      TAG_DEPTH = "depth",
-      TAG_PALETTE = "palette";
+      TAG_DEPTH = "depth";
 
   public static final int STARTING_DEPTH = 1;
 
@@ -71,12 +67,12 @@ public abstract class DungeonPiece implements BoundsHolder {
 
   /* ----------------------------- CONSTRUCTORS ------------------------------ */
 
-  public DungeonPiece(PieceType type) {
+  public DungeonPiece(PieceType<? extends DungeonPiece> type) {
     this.type = type;
     this.id = UUID.randomUUID();
   }
 
-  public DungeonPiece(PieceType type, CompoundTag tag) {
+  public DungeonPiece(PieceType<? extends DungeonPiece> type, CompoundTag tag) {
     this.type = type;
     this.id = tag.getUUID(TAG_ID);
 
@@ -95,16 +91,7 @@ public abstract class DungeonPiece implements BoundsHolder {
 
   /* ----------------------------- METHODS ------------------------------ */
 
-  public void place(World world) {
-    var struct = getStructure();
-
-    if (struct == null) {
-      return;
-    }
-
-    StructurePlaceConfig config = createPlaceConfig(world).build();
-    struct.place(config);
-  }
+  public abstract String getPaletteName();
 
   public BlockStructure getStructure() {
     return getType().getStructure().orElse(null);
@@ -113,20 +100,6 @@ public abstract class DungeonPiece implements BoundsHolder {
   public Vector3i getStructureSize() {
     return getStructure().getDefaultSize();
   }
-
-  protected StructurePlaceConfig.Builder createPlaceConfig(World world) {
-    return StructurePlaceConfig.builder()
-        .addRotationProcessor()
-        .addNonNullProcessor()
-        .addProcessor(BlockProcessors.IGNORE_AIR)
-        .pos(getPivotPosition())
-        .paletteName(getPaletteName())
-        .transform(Transform.rotation(getRotation()))
-        .world(world)
-        .placeEntities(true);
-  }
-
-  public abstract String getPaletteName();
 
   public Bounds3i getBounds() {
     return this.bounds == null ? bounds = getLocalizedBounds() : bounds;
@@ -182,7 +155,7 @@ public abstract class DungeonPiece implements BoundsHolder {
     piece.parent = this;
 
     // Exits keep the depth of their parent
-    if (piece instanceof DungeonGate) {
+    if (piece instanceof GatePiece) {
       piece.setDepth(getDepth());
     } else {
       piece.setDepth(getDepth() + 1);
@@ -232,7 +205,7 @@ public abstract class DungeonPiece implements BoundsHolder {
       for (var c : children.values()) {
 
         // Gates keep the depth of their parents
-        if (c instanceof DungeonGate) {
+        if (c instanceof GatePiece) {
           c.setDepth(depth);
         } else {
           c.setDepth(depth + 1);
@@ -242,7 +215,7 @@ public abstract class DungeonPiece implements BoundsHolder {
   }
 
   protected boolean canBeChild(DungeonPiece o) {
-    return o instanceof DungeonGate;
+    return o instanceof GatePiece;
   }
 
   /* ----------------------------- ITERATION ------------------------------ */
@@ -294,7 +267,6 @@ public abstract class DungeonPiece implements BoundsHolder {
     tag.put(TAG_ROTATION, TagUtil.writeEnum(getRotation()));
     tag.put(TAG_BOUNDS, getBounds().save());
     tag.putInt(TAG_DEPTH, getDepth());
-    tag.putString(TAG_PALETTE, getPaletteName());
 
     saveAdditional(tag);
   }
@@ -317,5 +289,16 @@ public abstract class DungeonPiece implements BoundsHolder {
   @Override
   public int hashCode() {
     return getId().hashCode();
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "id=" + id +
+        ", type=" + type +
+        ", bounds=" + bounds +
+        ", depth=" + depth +
+        ", rotation=" + rotation +
+        '}';
   }
 }

@@ -20,6 +20,7 @@ import net.forthecrown.log.LogManager;
 import net.forthecrown.structure.Structures;
 import net.forthecrown.useables.Usables;
 import net.forthecrown.user.UserManager;
+import net.forthecrown.utils.dialogue.DialogueManager;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.waypoint.WaypointManager;
 import net.kyori.adventure.text.Component;
@@ -223,6 +224,11 @@ public class SaveReloadCommands extends FtcCommand {
     SWORD_ABILITIES(
         null,
         SwordAbilityManager.getInstance()::loadAbilities
+    ),
+
+    DIALOGUES(
+        null,
+        DialogueManager.getDialogues()::load
     ),
 
     CONFIG(

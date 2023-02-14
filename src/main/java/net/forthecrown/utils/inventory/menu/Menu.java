@@ -112,15 +112,18 @@ public class Menu implements InventoryHolder, MenuCloseConsumer {
 
   public void open(User user, Context context) {
     getOpenTiming().startTiming();
-    var inventory = createInventory(user, context);
 
-    if (openCallback != null) {
-      openCallback.onOpen(user, context, inventory);
+    try {
+      var inventory = createInventory(user, context);
+
+      if (openCallback != null) {
+        openCallback.onOpen(user, context, inventory);
+      }
+
+      user.getPlayer().openInventory(inventory);
+    } finally {
+      getOpenTiming().stopTiming();
     }
-
-    getOpenTiming().stopTiming();
-
-    user.getPlayer().openInventory(inventory);
   }
 
   public MenuInventory createInventory(User user, Context context) {

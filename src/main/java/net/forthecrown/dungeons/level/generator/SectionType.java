@@ -21,7 +21,7 @@ public enum SectionType {
 
     @Override
     public Stream<IntObjectPair<RoomType>> fillPotentials(PieceGenerator gen) {
-      return DungeonManager.getInstance().getRoomTypes()
+      return DungeonManager.getDungeons().getRoomTypes()
           .stream()
 
           .filter(holder -> holder.getValue().hasFlags(Pieces.FLAG_CONNECTOR))
@@ -55,7 +55,7 @@ public enum SectionType {
 
     @Override
     public Stream<IntObjectPair<RoomType>> fillPotentials(PieceGenerator gen) {
-      return DungeonManager.getInstance().getRoomTypes()
+      return DungeonManager.getDungeons().getRoomTypes()
           .stream()
 
           .filter(holder -> !holder.getValue().hasFlags(Pieces.FLAG_CONNECTOR))

@@ -24,7 +24,8 @@ import org.jetbrains.annotations.Nullable;
 public class TestWorld extends UsageTest {
 
   // --- TYPE ---
-  public static final UsageType<TestWorld> TYPE = UsageType.of(TestWorld.class);
+  public static final UsageType<TestWorld> TYPE = UsageType.of(TestWorld.class)
+      .setSuggests(WorldArgument.world()::listSuggestions);
 
   private final NamespacedKey world;
 

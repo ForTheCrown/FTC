@@ -25,6 +25,7 @@ public class GuildCommands {
       new GuildChunkNode(),
 
       new GuildChatNode(),
+      new GuildInventoryNode(),
 
       new GuildCreateNode(),
       new GuildDeleteNode(),

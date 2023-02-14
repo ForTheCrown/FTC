@@ -1,4 +1,4 @@
-package net.forthecrown.dungeons.level.decoration;
+package net.forthecrown.dungeons.level.room;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

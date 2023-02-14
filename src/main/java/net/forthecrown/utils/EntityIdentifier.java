@@ -6,7 +6,6 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.UUID;
 import lombok.Data;
-import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.grenadier.types.UUIDArgument;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.StringTag;
@@ -109,11 +108,6 @@ public class EntityIdentifier {
 
     int chunkZ = reader.readInt();
     reader.expect(FIELD_SEPARATOR);
-
-    Loggers.getLogger().debug("remaining={} input={}",
-        reader.getRemaining(),
-        reader.getString()
-    );
 
     UUID id = UUIDArgument.uuid().parse(reader);
 

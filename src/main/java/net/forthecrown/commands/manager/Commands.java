@@ -19,6 +19,7 @@ import net.forthecrown.commands.CommandMail;
 import net.forthecrown.commands.CommandMe;
 import net.forthecrown.commands.CommandNear;
 import net.forthecrown.commands.CommandNickname;
+import net.forthecrown.commands.CommandNpcDialogue;
 import net.forthecrown.commands.CommandProfile;
 import net.forthecrown.commands.CommandRank;
 import net.forthecrown.commands.CommandReply;
@@ -224,6 +225,7 @@ public final class Commands {
     new CommandHat();
     new CommandSay();
     new CommandChallenges();
+    new CommandNpcDialogue();
 
     CommandDumbThing.createCommands();
     ToolBlockCommands.createCommands();
@@ -347,5 +349,15 @@ public final class Commands {
     }
 
     return null;
+  }
+
+  public static String optionallyQuote(String quote, String s) {
+    for (var c: s.toCharArray()) {
+      if (!StringReader.isAllowedInUnquotedString(c)) {
+        return quote + s + quote;
+      }
+    }
+
+    return s;
   }
 }

@@ -5,8 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import net.forthecrown.core.script2.Script;
 import net.forthecrown.core.script2.ScriptResult;
+import net.forthecrown.inventory.weapon.RoyalSword;
 import net.forthecrown.inventory.weapon.SwordRank;
-import net.forthecrown.user.User;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.kyori.adventure.text.Component;
@@ -23,6 +23,7 @@ public class WeaponAbility {
   public static final String TAG_LEVEL = "level";
   public static final String TAG_USES = "uses";
   public static final String TAG_COOLDOWN_OVERRIDE = "cooldownOverride";
+  public static final String TAG_MAX_USES = "maxUses";
 
   public static final int START_LEVEL = 1;
   public static final int UNLIMITED_USES = -1;
@@ -30,6 +31,7 @@ public class WeaponAbility {
 
   private int level = START_LEVEL;
   private int remainingUses = 0;
+  private int maxUses = 0;
 
   private long cooldownOverride = NO_OVERRIDE;
 
@@ -52,19 +54,13 @@ public class WeaponAbility {
         .colorIfAbsent(NamedTextColor.GRAY);
   }
 
-  public void write(TextWriter writer, User user) {
-    writer.line(displayName());
-
-    if (level > START_LEVEL) {
-      writer.formatted(" {0, number, -roman}", NamedTextColor.GRAY, level);
-    }
-
+  public void write(TextWriter writer, SwordRank rank) {
     Component usesLeftText;
 
     if (remainingUses == UNLIMITED_USES) {
       usesLeftText = Component.text("Infinite", NamedTextColor.GREEN);
     } else {
-      float useLimit = getType().getLimit().get(user);
+      float useLimit = getMaxUses();
       float remaining = this.remainingUses;
 
       final float progress = (useLimit-remaining) / useLimit;
@@ -81,6 +77,15 @@ public class WeaponAbility {
         NamedTextColor.GRAY,
         usesLeftText
     );
+
+    var cooldownTicks = getCooldownTicks(rank);
+    if (cooldownTicks > 0) {
+      writer.formattedLine(
+          "Cooldown: {0, time, -ticks -short}",
+          NamedTextColor.GRAY,
+          cooldownTicks
+      );
+    }
   }
 
   public long getCooldownTicks(SwordRank rank) {
@@ -115,6 +120,11 @@ public class WeaponAbility {
     script.put("remainingUses", this.remainingUses);
   }
 
+  public void setMaxUses(int maxUses) {
+    this.maxUses = maxUses;
+    script.put("maxUses", maxUses);
+  }
+
   /* ----------------------------- CALLBACKS ------------------------------ */
 
   /**
@@ -128,10 +138,11 @@ public class WeaponAbility {
    * @return True, if the item should be placed on cooldown, false otherwise
    */
   public boolean onRightClick(Player player,
+                              RoyalSword sword,
                               @Nullable Entity clicked,
                               @Nullable Block clickedBlock
   ) {
-    return invokeClickCallback("onRightClick", player, clicked, clickedBlock);
+    return invokeClickCallback("onRightClick", player, sword, clicked, clickedBlock);
   }
 
   /**
@@ -146,13 +157,16 @@ public class WeaponAbility {
    * @return True, if the item should be placed on cooldown, false otherwise
    */
   public boolean onLeftClick(Player player,
+                             RoyalSword sword,
                              @Nullable Entity clicked,
                              @Nullable Block clickedBlock
   ) {
-    return invokeClickCallback("onLeftClick", player, clicked, clickedBlock);
+    return invokeClickCallback("onLeftClick", player, sword, clicked, clickedBlock);
   }
 
-  private boolean invokeClickCallback(String method, Player player,
+  private boolean invokeClickCallback(String method,
+                                      Player player,
+                                      RoyalSword sword,
                                       @Nullable Entity entity,
                                       @Nullable Block block
   ) {
@@ -161,13 +175,17 @@ public class WeaponAbility {
     }
 
     Object clickedInput = block == null ? entity : block;
+    script.put("royalSword", sword);
 
     // Default to true, as that will cause a weapon cooldown, which should
     // happen, if the method wasn't declared, or failed, or didn't return
     // a result
-    return script.invoke(method, player, clickedInput)
+    var result = script.invoke(method, player, clickedInput)
         .asBoolean()
         .orElse(true);
+
+    script.getMirror().remove("royalSword");
+    return result;
   }
 
   /* --------------------------- SERIALIZATION ---------------------------- */
@@ -175,6 +193,12 @@ public class WeaponAbility {
   public void load(CompoundTag tag) {
     setLevel(tag.getInt(TAG_LEVEL));
     setRemainingUses(tag.getInt(TAG_USES));
+
+    if (tag.contains(TAG_MAX_USES)) {
+      setMaxUses(tag.getInt(TAG_MAX_USES));
+    } else {
+      setMaxUses(getRemainingUses());
+    }
 
     if (tag.contains(TAG_COOLDOWN_OVERRIDE)) {
       setCooldownOverride(tag.getLong(TAG_COOLDOWN_OVERRIDE));
@@ -188,6 +212,7 @@ public class WeaponAbility {
   public void save(CompoundTag tag) {
     tag.putInt(TAG_LEVEL, getLevel());
     tag.putInt(TAG_USES, getRemainingUses());
+    tag.putInt(TAG_MAX_USES, getMaxUses());
 
     if (cooldownOverride != NO_OVERRIDE) {
       tag.putLong(TAG_COOLDOWN_OVERRIDE, getCooldownOverride());

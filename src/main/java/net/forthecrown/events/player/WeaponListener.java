@@ -113,8 +113,8 @@ public class WeaponListener implements Listener {
     }
 
     boolean usedSuccessfully = leftClick
-        ? ability.onLeftClick(player, entity, block)
-        : ability.onRightClick(player, entity, block);
+        ? ability.onLeftClick(player, sword, entity, block)
+        : ability.onRightClick(player, sword, entity, block);
 
     if (usedSuccessfully) {
       long cooldownTicks = ability.getCooldownTicks(sword.getRank());
@@ -129,6 +129,30 @@ public class WeaponListener implements Listener {
   }
 
   private void updateUses(WeaponAbility ability, User user, RoyalSword sword) {
+    SwordAbilityManager.getInstance()
+        .getRegistry()
+        .getHolderByValue(ability.getType())
+
+        .ifPresent(holder -> {
+          sword.onAbilityUse(holder);
+          int totalUses = sword.getTotalUses(holder);
+          int newLevel = holder.getValue().getLevel(totalUses);
+
+          if (ability.getLevel() >= newLevel) {
+            return;
+          }
+
+          ability.setLevel(newLevel);
+
+          user.sendMessage(Text.format(
+              "Sword upgrade &e{0}&r upgraded to &eLevel {1, number, -roman}&r.",
+              NamedTextColor.GRAY,
+              holder.getValue().fullDisplayName(user),
+              newLevel
+          ));
+        });
+
+
     int remaining = ability.getRemainingUses();
 
     if (remaining == UNLIMITED_USES) {

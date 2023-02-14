@@ -4,10 +4,9 @@ import static net.kyori.adventure.text.Component.text;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.datafixers.util.Either;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -23,7 +22,10 @@ import net.forthecrown.utils.Util;
 import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.context.ContextOption;
 import net.forthecrown.utils.context.ContextSet;
+import net.forthecrown.utils.inventory.ItemArrayList;
+import net.forthecrown.utils.inventory.ItemList;
 import net.forthecrown.utils.inventory.ItemStacks;
+import net.forthecrown.utils.inventory.menu.ClickContext;
 import net.forthecrown.utils.inventory.menu.MenuBuilder;
 import net.forthecrown.utils.inventory.menu.MenuFlag;
 import net.forthecrown.utils.inventory.menu.MenuInventory;
@@ -44,7 +46,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class AbilityMenus extends MenuPage {
-
   public static final Set<Slot> SLOTS = Set.of(
       Slot.of(5, 1),
       Slot.of(5, 3),
@@ -91,6 +92,9 @@ public class AbilityMenus extends MenuPage {
   private static final AbilityMenus instance = new AbilityMenus();
 
   private final AbilityListPage abilityList;
+
+  @Getter
+  private boolean opened;
 
   public AbilityMenus() {
     abilityList = new AbilityListPage(this);
@@ -208,115 +212,7 @@ public class AbilityMenus extends MenuPage {
         // item or upgrades the existing one
         .add(ABILITY_SLOT,
             MenuNode.builder()
-                .setRunnable((user, context, click) -> {
-                  click.cancelEvent(true);
-                  var matching = matchingAbility(click.getInventory(), user);
-
-                  if (matching.left().isEmpty()) {
-                    // Left empty == right present, no need for isPresent check
-                    throw Exceptions.format(matching.right().get());
-                  }
-
-                  Holder<WeaponAbilityType> abilityType = matching.left().get();
-                  ItemStack item = click.getInventory().getItem(SWORD_SLOT);
-                  RoyalSword sword = ExtendedItems.ROYAL_SWORD.get(item);
-
-                  assert sword != null : "Sword is somehow null";
-
-                  WeaponAbility existingAbility = sword.getAbility();
-
-                  // Warn if overriding existing ability
-                  if (existingAbility != null
-                      && existingAbility.getType() != abilityType.getValue()
-                      && !context.getOrThrow(WARNED)
-                  ) {
-                    context.set(WARNED, true);
-
-                    user.sendMessage(
-                        Text.format(
-                            "Your sword has the {0} upgrade, "
-                                + "adding {1} will override the first upgrade!"
-                                + "\n&eClick again to override upgrade",
-
-                            existingAbility.getType().fullDisplayName(user),
-                            abilityType.getValue().fullDisplayName(user)
-                        )
-                    );
-
-                    return;
-                  }
-
-                  // Apply ability upgrade or apply ability to sword if existing
-                  // one is null or different
-                  if (existingAbility == null
-                      || !existingAbility.getType().equals(abilityType.getValue())
-                  ) {
-                    sword.setAbility(abilityType.getValue().create(user));
-
-                    user.sendMessage(
-                        Text.format("Set sword's upgrade to &e{0}&r.",
-                            NamedTextColor.GOLD,
-                            sword.getAbility().displayName()
-                        )
-                    );
-                  }
-
-                  // Else, they're just upgrading current sword's
-                  // ability to the next level
-                  else {
-                    int max = existingAbility.getType().getMaxLevel();
-                    existingAbility.setLevel(existingAbility.getLevel() + 1);
-
-                    user.sendMessage(
-                        Text.format(
-                            "Upgraded &e{0}&r to &e{1, number, -roman}&r.",
-                            NamedTextColor.GOLD,
-                            existingAbility.displayName(),
-                            existingAbility.getLevel()
-                        )
-                    );
-
-                    // If max level now
-                    if (existingAbility.getLevel() == max) {
-                      user.sendMessage(
-                          text("Max level reached!", NamedTextColor.YELLOW)
-                      );
-                    }
-                  }
-
-                  sword.update(item);
-
-                  // Remove all items used in ability recipe
-                  var items = abilityType.getValue().getRecipe();
-                  for (var slot: SLOTS) {
-                    var ingredient = click.getInventory().getItem(slot);
-
-                    for (var recipeItem: items) {
-                      if (!recipeItem.isSimilar(ingredient)
-                          || ingredient.getAmount() < recipeItem.getAmount()
-                      ) {
-                        continue;
-                      }
-
-                      ingredient.subtract(recipeItem.getAmount());
-                      break;
-                    }
-                  }
-
-                  boolean playAnim = !user.get(Properties.SKIP_ABILITY_ANIM);
-
-                  if (playAnim) {
-                    AbilityAnimation.getInstance().start(
-                        item,
-                        context.getOrThrow(SLIME_POSITION),
-                        user
-                    );
-                  } else {
-                    // Check if ability upgrade or other stuff can be
-                    // applied again
-                    checkValidRecipe(click.getInventory(), user);
-                  }
-                })
+                .setRunnable(AbilityMenus::onCraftClick)
                 .build()
         )
 
@@ -347,11 +243,14 @@ public class AbilityMenus extends MenuPage {
         // Place the no ability item in the inventory with a correct
         // explanation as to why it's there in the item's name
         .setOpenCallback((user, context, inventory) -> {
+          opened = true;
           checkValidRecipe(inventory, user);
         })
 
         // Give all items back to user when inventory is closed
         .setCloseCallback((inventory, user, reason) -> {
+          opened = false;
+
           for (var s: RESERVED_SLOTS) {
             ItemStack item = inventory.getItem(s);
 
@@ -386,6 +285,93 @@ public class AbilityMenus extends MenuPage {
         .setName("&Upgrade crafting menu")
         .addLore("&7Back to main menu")
         .build();
+  }
+
+  private static void onCraftClick(User user,
+                                   Context context,
+                                   ClickContext click
+  ) throws CommandSyntaxException {
+    click.cancelEvent(true);
+    var matching = matchingAbility(click.getInventory(), user);
+
+    if (matching.left().isEmpty()) {
+      // Left empty == right present, no need for isPresent check
+      throw Exceptions.format(matching.right().get());
+    }
+
+    Holder<WeaponAbilityType> abilityType = matching.left().get();
+    ItemStack item = click.getInventory().getItem(SWORD_SLOT);
+    RoyalSword sword = ExtendedItems.ROYAL_SWORD.get(item);
+
+    assert sword != null : "Sword is somehow null";
+
+    WeaponAbility existingAbility = sword.getAbility();
+
+    // Warn if overriding existing ability
+    if (existingAbility != null
+        && existingAbility.getType() != abilityType.getValue()
+        && !context.getOrThrow(WARNED)
+    ) {
+      context.set(WARNED, true);
+
+      user.sendMessage(
+          Text.format(
+              "Your sword has the {0} upgrade, "
+                  + "adding {1} will override the first upgrade!"
+                  + "\n&eClick again to override upgrade",
+
+              existingAbility.getType().fullDisplayName(user),
+              abilityType.getValue().fullDisplayName(user)
+          )
+      );
+
+      return;
+    }
+
+    // Apply ability upgrade or apply ability to sword if existing
+    // one is null or different
+    if (existingAbility == null
+        || !existingAbility.getType().equals(abilityType.getValue())
+    ) {
+      sword.setAbility(
+          abilityType.getValue()
+              .create(user, sword.getTotalUses(abilityType))
+      );
+
+      user.sendMessage(
+          Text.format("Set sword's upgrade to &e{0}&r.",
+              NamedTextColor.GOLD,
+              sword.getAbility().displayName()
+          )
+      );
+    }
+
+    sword.update(item);
+
+    // Remove all items used in ability recipe
+    var items = abilityType.getValue().getRecipe();
+    ItemList menuItems = new ItemArrayList();
+
+    for (var slot: SLOTS) {
+      var ingredient = click.getInventory().getItem(slot);
+      menuItems.add(ingredient);
+    }
+
+    menuItems.removeAllMatching(items);
+
+    boolean playAnim = !user.get(Properties.SKIP_ABILITY_ANIM);
+
+    if (playAnim) {
+      AbilityAnimation.getInstance().start(
+          item,
+          context.getOrThrow(SLIME_POSITION),
+          user
+      );
+    } else {
+      // Check if ability upgrade or other stuff can be
+      // applied again
+      checkValidRecipe(click.getInventory(), user);
+    }
   }
 
   private static void checkValidRecipe(MenuInventory inventory, User user) {
@@ -433,7 +419,7 @@ public class AbilityMenus extends MenuPage {
     }
 
     existing.setValue(sword.getAbility());
-    List<ItemStack> items = new ObjectArrayList<>();
+    ItemList menuItems = new ItemArrayList();
 
     for (var s: SLOTS) {
       var item = inventory.getItem(s);
@@ -442,11 +428,12 @@ public class AbilityMenus extends MenuPage {
         continue;
       }
 
-      items.add(item);
+      menuItems.add(item);
     }
 
     Optional<Either<Holder<WeaponAbilityType>, String>> first
-        = SwordAbilityManager.getInstance().getRegistry().entries()
+        = SwordAbilityManager.getInstance().getRegistry()
+        .entries()
         .stream()
         .filter(holder -> {
           var val = holder.getValue();
@@ -463,47 +450,19 @@ public class AbilityMenus extends MenuPage {
           }
 
           ImmutableList<ItemStack> recipe = val.getRecipe();
-
-          if (items.size() != recipe.size()) {
-            return false;
-          }
-
-          for (var i: recipe) {
-            if (contains(items, i)) {
-              continue;
-            }
-
-            return false;
-          }
-
-          return true;
+          return menuItems.containsAtLeastAll(recipe);
         })
         .findFirst()
         .map(holder -> {
           var ability = existing.getValue();
 
-          if (ability != null
-              && ability.getType().equals(holder.getValue())
-              && ability.getLevel() >= ability.getType().getMaxLevel()
-          ) {
-            return Either.right("Max level reached");
+          if (ability != null && ability.getType().equals(holder.getValue())) {
+            return Either.right("Ability already on sword");
           }
 
           return Either.left(holder);
         });
 
     return first.orElse(Either.right("No matching recipe found"));
-  }
-
-  private static boolean contains(Collection<ItemStack> items, ItemStack item) {
-    for (var i: items) {
-      if (!item.isSimilar(i) || i.getAmount() < item.getAmount()) {
-        continue;
-      }
-
-      return true;
-    }
-
-    return false;
   }
 }

@@ -4,7 +4,7 @@ import java.util.Set;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.dungeons.DungeonWorld;
-import net.forthecrown.dungeons.level.room.DungeonRoom;
+import net.forthecrown.dungeons.level.room.RoomPiece;
 import net.forthecrown.events.Events;
 import net.forthecrown.useables.TriggerManager;
 import net.forthecrown.utils.math.Bounds3i;
@@ -44,6 +44,7 @@ public class LevelListener implements Listener {
     registered = false;
   }
 
+  @SuppressWarnings({"rawtypes", "unchecked"})
   @EventHandler(ignoreCancelled = true)
   public void onPlayerMove(PlayerMoveEvent event) {
     if (!inLevel(event.getFrom())
@@ -57,8 +58,8 @@ public class LevelListener implements Listener {
     Bounds3i totalArea = origin.combine(destination);
 
     Set allPieces = level.getIntersecting(totalArea);
-    allPieces.removeIf(piece -> !(piece instanceof DungeonRoom));
-    var pieces = (Set<DungeonRoom>) allPieces;
+    allPieces.removeIf(piece -> !(piece instanceof RoomPiece));
+    var pieces = (Set<RoomPiece>) allPieces;
 
     if (pieces.isEmpty()) {
       return;

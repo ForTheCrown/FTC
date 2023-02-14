@@ -2,11 +2,13 @@ package net.forthecrown.utils.math;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.TypeAdapter;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector2;
 import com.sk89q.worldedit.math.Vector3;
 import lombok.experimental.UtilityClass;
+import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.DoubleTag;
@@ -123,7 +125,15 @@ public class Vectors {
    */
   public final int CHUNK_SIZE = 1 << CHUNK_BITS;
 
-  /* ----------------------------- WORLD EDIT CONVERSIONS ------------------------------ */
+  /* --------------------------- TYPE ADAPTERS ---------------------------- */
+
+  public static final TypeAdapter<Vector3i> V3I_ADAPTER
+      = JsonUtils.createAdapter(Vectors::writeJson, Vectors::read3i);
+
+  public static final TypeAdapter<Vector3d> V3D_ADAPTER
+      = JsonUtils.createAdapter(Vectors::writeJson, Vectors::read3d);
+
+  /* ----------------------- WORLD EDIT CONVERSIONS ----------------------- */
 
   public Vector3i from(BlockVector3 v) {
     return Vector3i.from(v.getX(), v.getY(), v.getZ());

@@ -1,10 +1,13 @@
 package net.forthecrown.inventory.weapon.ability;
 
+import static net.forthecrown.inventory.weapon.ability.WeaponAbility.START_LEVEL;
 import static net.forthecrown.inventory.weapon.ability.WeaponAbility.UNLIMITED_USES;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.Getter;
@@ -44,7 +47,6 @@ import org.bukkit.inventory.ItemStack;
 public class WeaponAbilityType {
   private final ImmutableList<ItemStack> recipe;
   private final ItemStack item;
-  private final int maxLevel;
 
   private final Component displayName;
   private final ImmutableList<Component> description;
@@ -59,10 +61,11 @@ public class WeaponAbilityType {
 
   private final AbilityTrialArea trialArea;
 
+  private final IntList levelRequirements;
+
   public WeaponAbilityType(Builder builder) {
     this.recipe = builder.items.build();
     this.item = builder.item;
-    this.maxLevel = builder.maxLevel;
 
     this.displayName = Objects.requireNonNull(builder.displayName);
     this.description = builder.description.build();
@@ -74,7 +77,7 @@ public class WeaponAbilityType {
     this.args = Objects.requireNonNull(builder.args);
 
     this.advancementKey = builder.advancementKey;
-
+    this.levelRequirements = builder.levelRequirements;
     this.trialArea = builder.trialArea;
 
     // Check arguments
@@ -117,7 +120,7 @@ public class WeaponAbilityType {
     return Optional.empty();
   }
 
-  public WeaponAbility create() {
+  private WeaponAbility create() {
     var script = Script.of(source);
     script.compile(args);
     script.put("cooldown", cooldown);
@@ -128,11 +131,12 @@ public class WeaponAbilityType {
     return new WeaponAbility(this, script);
   }
 
-  public WeaponAbility create(User user) {
+  public WeaponAbility create(User user, int totalUses) {
     int limit = getLimit().get(user);
     var ability = create();
     ability.setRemainingUses(limit);
-
+    ability.setMaxUses(limit);
+    ability.setLevel(getLevel(totalUses));
     return ability;
   }
 
@@ -140,6 +144,39 @@ public class WeaponAbilityType {
     var ability = create();
     ability.load(tag);
     return ability;
+  }
+
+  public int getMaxLevel() {
+    return levelRequirements.size() + 1;
+  }
+
+  public int getLevel(int totalUses) {
+    if (levelRequirements.isEmpty()) {
+      return START_LEVEL;
+    }
+
+    for (int i = levelRequirements.size() - 1; i >= 0; i--) {
+      int req = levelRequirements.getInt(i);
+
+      if (totalUses >= req) {
+        return 2 + i;
+      }
+    }
+
+    return START_LEVEL;
+  }
+
+  public int getUpgradeUses(int level) {
+    if (levelRequirements.isEmpty()) {
+      return -1;
+    }
+    int index = level - 1;
+
+    if (index < 0 || index >= levelRequirements.size()) {
+      return -1;
+    }
+
+    return levelRequirements.getInt(index);
   }
 
   public ItemStack getItem() {
@@ -196,8 +233,27 @@ public class WeaponAbilityType {
       );
     }
 
-    writer.field("Max Level", Text.format("{0, number, -roman}", maxLevel));
+    writer.field("Max Level", Text.format("{0, number, -roman}", getMaxLevel()));
     writer.field("Uses", Text.formatNumber(limit.get(user)));
+
+    writer.newLine();
+    writer.newLine();
+
+    writer.field("Levelling requirements", "");
+    var prefixed = writer.withPrefix(
+        Component.text("- ", NamedTextColor.GRAY)
+    );
+
+    int level = 2;
+    for (int i: levelRequirements) {
+      prefixed.field(
+          "Level " + level++,
+          Text.format("{0, number} Total Uses", i)
+      );
+    }
+
+    writer.newLine();
+    writer.newLine();
 
     writer.field("Cooldown", cooldown);
 
@@ -209,7 +265,7 @@ public class WeaponAbilityType {
       );
 
       writer.line(
-          "^ Cooldown decrease per sword level",
+          "^ Cooldown decrease per sword rank",
           NamedTextColor.DARK_GRAY
       );
     }
@@ -254,7 +310,8 @@ public class WeaponAbilityType {
                                  TrialInfoNode info,
                                  boolean giveSword,
                                  Script script,
-                                 int level
+                                 int level,
+                                 long cooldownOverride
   ) {
 
     public void start() {
@@ -285,9 +342,9 @@ public class WeaponAbilityType {
 
         // Create ability, give it unlimited uses and a
         // constant 2-second cooldown
-        var ability = type.create(user);
+        var ability = type.create(user, 0);
         ability.setRemainingUses(UNLIMITED_USES);
-        ability.setCooldownOverride(2 * 20);
+        ability.setCooldownOverride(cooldownOverride);
         ability.setLevel(level);
 
         sword.setAbility(ability);
@@ -336,25 +393,25 @@ public class WeaponAbilityType {
   @Accessors(chain = true, fluent = true)
   @RequiredArgsConstructor
   public static class Builder {
-    final ImmutableList.Builder<ItemStack> items = ImmutableList.builder();
 
+    Component displayName;
     final ImmutableList.Builder<Component> description
         = ImmutableList.builder();
 
     ItemStack item;
-    int maxLevel;
-
-    Component displayName;
+    final ImmutableList.Builder<ItemStack> items = ImmutableList.builder();
 
     ScriptSource source;
-    UpgradeCooldown cooldown;
     String[] args;
+
+    UpgradeCooldown cooldown;
+    UseLimit limit;
 
     NamespacedKey advancementKey;
 
-    UseLimit limit;
-
     AbilityTrialArea trialArea;
+
+    final IntList levelRequirements = new IntArrayList();
 
     public Builder addItem(ItemStack item) {
       Validate.isTrue(ItemStacks.notEmpty(item), "Empty item given");

@@ -200,20 +200,21 @@ public class CommandMail extends FtcCommand {
     ));
 
     format.setFooter(
-        Footer.create()
-            .setPageButton((viewerPage, pageSize, context) -> {
-              String cmdFormat;
-              boolean self = context.getOrThrow(SELF);
-              User user = context.getOrThrow(MAIL_USER);
+        Footer.create().setPageButton((viewerPage, pageSize, context) -> {
+          String cmdFormat;
+          boolean self = context.getOrThrow(SELF);
+          User user = context.getOrThrow(MAIL_USER);
 
-              if (self) {
-                cmdFormat = "/mail %s %s";
-              } else {
-                cmdFormat = "/mail read_other " + user.getName() + " %s %s";
-              }
+          if (self) {
+            cmdFormat = "/mail %s %s";
+          } else {
+            cmdFormat = "/mail read_other " + user.getName() + " %s %s";
+          }
 
-              return ClickEvent.runCommand(cmdFormat);
-            })
+          return ClickEvent.runCommand(
+              cmdFormat.formatted(viewerPage, pageSize)
+          );
+        })
     );
     return format;
   });

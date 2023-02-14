@@ -1,7 +1,6 @@
 package net.forthecrown.user.property;
 
 import net.forthecrown.core.TabList;
-import net.forthecrown.core.module.OnEnable;
 import net.forthecrown.core.registry.Registries;
 import net.forthecrown.core.registry.Registry;
 import net.forthecrown.guilds.DiscoverySort;
@@ -18,7 +17,8 @@ public class Properties {
   /**
    * Registry of all properties
    */
-  public static final Registry<UserProperty> USER_PROPERTIES = Registries.newFreezable();
+  public static final Registry<UserProperty> USER_PROPERTIES
+      = Registries.newFreezable();
 
   /**
    * The amount a user will sell in /shop.
@@ -190,8 +190,8 @@ public class Properties {
    */
   SKIP_ABILITY_ANIM = new BoolProperty("skipAbilityAnimation", false),
 
-  /** Currently unused */
-  BYPASS_TRUST = new BoolProperty("bypassClaimTrust", false);
+  /** Used for tracking hiding status when switching to and from spectator */
+  DYNMAP_HIDE = new BoolProperty("dynmapHide", false);
 
   /**
    * Determines a player's TAB prefix.
@@ -258,11 +258,7 @@ public class Properties {
     }
   };
 
-  /**
-   * Empty initializer method to freeze property registry
-   */
-  @OnEnable
-  static void init() {
+  static {
     USER_PROPERTIES.freeze();
   }
 }
