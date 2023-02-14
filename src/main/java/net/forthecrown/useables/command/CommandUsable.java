@@ -43,6 +43,10 @@ public abstract class CommandUsable
     return tag;
   }
 
+  public boolean interact(Player player) {
+    return interact(player, false);
+  }
+
   public boolean interact(Player player, boolean adminInteraction) {
     if (!testInteraction(player)) {
       return false;

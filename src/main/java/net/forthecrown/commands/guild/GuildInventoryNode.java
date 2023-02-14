@@ -1,6 +1,7 @@
 package net.forthecrown.commands.guild;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
+import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 
 public class GuildInventoryNode extends GuildCommandNode {
@@ -8,6 +9,16 @@ public class GuildInventoryNode extends GuildCommandNode {
   protected GuildInventoryNode() {
     super("guildinventory", "inventory");
     setAliases("ginv", "guildinv");
+  }
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("")
+        .addInfo("Opens your guild's inventory");
+
+    factory.usage("<guild>")
+        .setPermission(Permissions.GUILD_ADMIN)
+        .addInfo("Opens a <guild>'s inventory");
   }
 
   @Override

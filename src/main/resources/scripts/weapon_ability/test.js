@@ -1,11 +1,11 @@
- import "@ftc.inventory.weapon.ability.AbilityAnimation";
+import "@ftc.inventory.weapon.ability.AbilityAnimation";
 import "@ftc.inventory.weapon.ability.SwordAbilityManager";
 import "@ftc.inventory.weapon.ability.AbilityMenus";
 import "@ftc.core.Permissions";
 
 function test(user) {
   var instance = AbilityAnimation.getInstance();
-  if (!instance.hasOngoing()) {
+  if (instance.hasOngoing()) {
     return false;
   }
 
