@@ -4,6 +4,7 @@ import static net.forthecrown.user.data.UserTimeTracker.UNSET;
 import static net.kyori.adventure.text.Component.text;
 
 import com.google.common.base.Strings;
+import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Objects;
 import java.util.Optional;
@@ -284,8 +285,13 @@ public final class Waypoints {
    * @return True, if the name is valid, as specified in the above paragraph, false otherwise.
    */
   public static boolean isValidName(String name) {
+    for (var c: name.toCharArray()) {
+      if (!StringReader.isAllowedInUnquotedString(c)) {
+        return false;
+      }
+    }
+
     return !BannedWords.contains(name)
-        && !name.contains(" ")
         && !name.equalsIgnoreCase(WaypointArgument.FLAG_NEAREST)
         && !name.equalsIgnoreCase(WaypointArgument.FLAG_CURRENT)
         && GuildManager.get().getGuild(name) == null

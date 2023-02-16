@@ -282,7 +282,7 @@ public class AbilityMenus extends MenuPage {
                                         @NotNull Context context
   ) {
     return ItemStacks.builder(Material.BREWING_STAND)
-        .setName("&Upgrade crafting menu")
+        .setName("&eUpgrade crafting menu")
         .addLore("&7Back to main menu")
         .build();
   }
@@ -354,6 +354,11 @@ public class AbilityMenus extends MenuPage {
 
     for (var slot: SLOTS) {
       var ingredient = click.getInventory().getItem(slot);
+
+      if (ItemStacks.isEmpty(ingredient)) {
+        continue;
+      }
+
       menuItems.add(ingredient);
     }
 
@@ -416,6 +421,10 @@ public class AbilityMenus extends MenuPage {
 
     if (sword == null) {
       return Either.right("Non-sword in middle slot");
+    }
+
+    if (!user.getUniqueId().equals(sword.getOwner())) {
+      return Either.right("You do not own the sword");
     }
 
     existing.setValue(sword.getAbility());

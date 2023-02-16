@@ -62,22 +62,10 @@ public class ActionDialogue extends UsageAction {
     LOGGER.debug("onUse: entry={} node={}", entryName, nodeName);
 
     registry.get(entryName).ifPresentOrElse(entry -> {
-      if (Strings.isNullOrEmpty(nodeName)) {
-        entry.run(Users.get(player));
-        return;
-      }
+      entry.run(Users.get(player), nodeName).ifPresent(s -> {
+        LOGGER.warn("Couldn't run '{}': {}", entryName, s);
+      });
 
-      var node = entry.getNodeByName(nodeName);
-
-      if (node == null) {
-        LOGGER.warn("Couldn't find node '{}' in entry '{}'",
-            nodeName, entryName
-        );
-
-        return;
-      }
-
-      node.view(Users.get(player));
     }, () -> {
       LOGGER.warn("Couldn't find dialog '{}'", entryName);
     });
@@ -143,7 +131,7 @@ public class ActionDialogue extends UsageAction {
           """
           Dialog '{0}' has no 'entry_node' specified!
           Either specify a node with this input: <dialog file> <node name>
-          Or set a "entry_node":"<node_name>" in the dialog's JSON file
+          Or set a "entryPoint":"<node_name>" in the dialog's settings, in the JSON file
           """,
           holder.getKey()
       );

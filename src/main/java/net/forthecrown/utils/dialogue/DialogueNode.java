@@ -6,16 +6,19 @@ import com.google.gson.JsonElement;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.forthecrown.core.script2.Script;
+import net.forthecrown.core.script2.ScriptSource;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.forthecrown.utils.text.TextJoiner;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
+import org.apache.commons.lang3.ArrayUtils;
 
 @Getter
 public class DialogueNode implements Predicate<User> {
@@ -53,11 +56,13 @@ public class DialogueNode implements Predicate<User> {
 
     var onView = json.get("on_view");
     if (onView != null) {
-      Script viewScript = loadScript(onView, false);
+      var viewScriptSupplier = loadScript(onView, false);
+
       builder.onView(user -> {
-        viewScript.put("reader", user);
-        viewScript.eval();
-        viewScript.getMirror().remove("reader");
+        try (var viewScript = viewScriptSupplier.get()) {
+          viewScript.put("reader", user);
+          viewScript.eval();
+        }
       });
     }
 
@@ -72,9 +77,11 @@ public class DialogueNode implements Predicate<User> {
     return builder.build();
   }
 
-  private static Script loadScript(JsonElement element, boolean assumeRawJs) {
-    Script script = Script.read(element, assumeRawJs);
-    String[] args = {};
+  private static Supplier<Script> loadScript(JsonElement element,
+                                             boolean assumeRawJs
+  ) {
+    ScriptSource source = ScriptSource.readSource(element, assumeRawJs);
+    String[] args;
 
     if (element.isJsonObject()) {
       var obj = element.getAsJsonObject();
@@ -88,11 +95,18 @@ public class DialogueNode implements Predicate<User> {
               .map(JsonElement::getAsString)
               .toArray(String[]::new);
         }
+      } else {
+        args = ArrayUtils.EMPTY_STRING_ARRAY;
       }
+    } else {
+      args = ArrayUtils.EMPTY_STRING_ARRAY;
     }
 
-    script.compile(args);
-    return script;
+    return () -> {
+      Script script = Script.of(source);
+      script.compile(args);
+      return script;
+    };
   }
 
   private static Predicate<User> loadCondition(JsonElement condition) {
@@ -107,12 +121,14 @@ public class DialogueNode implements Predicate<User> {
       return user -> constValue;
     }
 
-    Script script = loadScript(condition, true);
+    var supplier = loadScript(condition, true);
 
     return user -> {
+      Script script = supplier.get();
+
       script.put("reader", user);
       var result = script.eval();
-      script.getMirror().remove("reader");
+      script.close();
 
       return result.asBoolean()
           .orElseThrow();
@@ -145,6 +161,14 @@ public class DialogueNode implements Predicate<User> {
         entry.getDisguisedId(),
         getDisguisedId()
     );
+  }
+
+  public void run(User user) {
+    if (!test(user)) {
+      return;
+    }
+
+    view(user);
   }
 
   public void view(User user) {

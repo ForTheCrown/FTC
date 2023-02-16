@@ -3,6 +3,7 @@ package net.forthecrown.inventory.weapon.ability;
 import static net.forthecrown.inventory.weapon.SwordConfig.swordAnim_initialDistance;
 
 import io.papermc.paper.entity.LookAnchor;
+import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import lombok.Getter;
@@ -22,6 +23,7 @@ import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.Time;
 import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.utils.text.Text;
+import net.forthecrown.utils.text.format.PeriodFormat;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.logging.log4j.Logger;
@@ -139,6 +141,8 @@ public class AbilityAnimation {
     Vector2f center;
 
     ArmorStand swordHolder;
+    ArmorStand stashHolder;
+
     Vector3d[] particles;
 
     boolean itemTaken = false;
@@ -207,7 +211,7 @@ public class AbilityAnimation {
         return;
       }
 
-      var inv = holder.getInventory();
+      var inv = holder.getSnapshotInventory();
       if (inv.firstEmpty() == -1) {
         LOGGER.error(
             "Cannot store ability animation sword "
@@ -219,14 +223,20 @@ public class AbilityAnimation {
         return;
       }
 
-      inv.addItem(getSword());
+      LOGGER.info("Placing sword in container, owner={}", owner);
+      inv.addItem(getSword().clone());
+
       holder.update();
+
+      if (stashHolder != null && !stashHolder.isDead()) {
+        stashHolder.remove();
+      }
     }
 
     void dropSword() {
-      // Offset by 2 blocks, so it doesn't fall in the lava lol
+      // Offset by 2 blocks, so it doesn't fall in the fire lol
       location.getWorld()
-          .dropItem(location.clone().add(2, 0, 0), sword);
+          .dropItem(location.clone().add(2, 0, 0), sword.clone());
     }
 
     void rotateIngredientHolders(int rotationOffset, boolean converge) {
@@ -335,12 +345,22 @@ public class AbilityAnimation {
 
         entity.save(holder.getPersistentDataContainer());
 
+        animation.setStashHolder(holder);
+
         animation.stop();
         animation.itemTaken = false;
 
+        long timeout = TimeUnit.MINUTES.toMillis(5);
         animation.stashTask = Tasks.runLater(
             animation::stash,
-            Time.millisToTicks(TimeUnit.MINUTES.toMillis(5))
+            Time.millisToTicks(timeout)
+        );
+
+        long stashEndTime = System.currentTimeMillis() + timeout;
+        LOGGER.debug(
+            "Stashing away sword in {}, at {}",
+            PeriodFormat.of(timeout),
+            Text.DATE_FORMAT.format(new Date(stashEndTime))
         );
       }
     };

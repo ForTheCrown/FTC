@@ -339,9 +339,9 @@ public class DialogueRenderer {
         var registry = DialogueManager.getDialogues().getRegistry();
         var entry = registry.get(entryName).orElseThrow();
 
-        var node = entry.getNodeByName(
-            nodeName == null ? entry.getEntryNode() : nodeName
-        );
+        var node = nodeName == null
+            ? entry.getEntryPoint()
+            : entry.getNodeByName(nodeName);
 
         if (node == null) {
           throw new IllegalStateException(

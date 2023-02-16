@@ -1,24 +1,25 @@
 package net.forthecrown.utils.dialogue;
 
+import com.google.common.base.Strings;
+import com.mojang.brigadier.StringReader;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import lombok.Getter;
-import lombok.Setter;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.registry.Keys;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.io.JsonWrapper;
+import org.jetbrains.annotations.Nullable;
 
 public class Dialogue {
+
   private final Map<String, DialogueNode> byId
       = new Object2ObjectOpenHashMap<>();
 
   private final Map<String, DialogueNode> byName
       = new Object2ObjectOpenHashMap<>();
-
-  @Getter @Setter
-  private String entryNode;
 
   @Getter
   private final String disguisedId;
@@ -31,25 +32,50 @@ public class Dialogue {
   }
 
   public DialogueNode getEntryPoint() {
-    return entryNode == null ? null : getNodeByName(entryNode);
+    return options.getEntryPoint() != null
+        ? getNodeByName(options.getEntryPoint())
+        : null;
   }
 
-  public void run(User user) {
-    var node = getEntryPoint();
+  public Optional<String> run(User user, @Nullable String nodeName) {
+    DialogueNode node;
+
+    if (Strings.isNullOrEmpty(nodeName)) {
+      node = getEntryPoint();
+
+      if (node == null) {
+        return Optional.of("No 'entry_node' set as entry point");
+      }
+    } else {
+      node = getNodeByName(nodeName);
+
+      if (node == null) {
+        return Optional.of("No node named: '" + nodeName + "'");
+      }
+    }
+
+    node.run(user);
+    return Optional.empty();
+  }
+
+  public Optional<String> run(User user, StringReader reader) {
+    if (!reader.canRead()) {
+      return run(user, "");
+    }
+
+    var word = reader.readUnquotedString();
+    var node = getNodeByRandomId(word);
 
     if (node == null) {
-      Loggers.getLogger().warn("No entry_node found/set, entryNode={}",
-          entryNode
+      return Optional.of(
+          String.format("No node named '%s' found, input='%s'",
+              word, reader.getString()
+          )
       );
-
-      return;
     }
 
-    if (!node.test(user)) {
-      return;
-    }
-
-    node.view(user);
+    node.run(user);
+    return Optional.empty();
   }
 
   public void addEntry(String name, DialogueNode node) {
@@ -79,9 +105,6 @@ public class Dialogue {
     } else {
       entry.options = DialogueOptions.defaultOptions();
     }
-
-    entry.entryNode = json.getString("entry_node", null);
-    json.remove("entry_node");
 
     for (var e: json.entrySet()) {
       String key = e.getKey();

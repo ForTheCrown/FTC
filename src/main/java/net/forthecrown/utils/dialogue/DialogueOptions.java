@@ -32,6 +32,7 @@ public class DialogueOptions {
 
   private final TextColor buttonAvailableColor;
   private final TextColor buttonUnavailableColor;
+  private final String entryPoint;
 
   private DialogueOptions(Builder builder) {
     this.buttonAvailableColor = Objects.requireNonNullElse(
@@ -43,6 +44,8 @@ public class DialogueOptions {
         builder.buttonUnavailableColor,
         BUTTON_UNAVAILABLE
     );
+
+    this.entryPoint = builder.entryPoint;
   }
 
   public static DialogueOptions load(JsonElement element) {
@@ -63,6 +66,8 @@ public class DialogueOptions {
   public static class Builder {
     TextColor buttonAvailableColor;
     TextColor buttonUnavailableColor;
+
+    String entryPoint;
 
     public DialogueOptions build() {
       return new DialogueOptions(this);

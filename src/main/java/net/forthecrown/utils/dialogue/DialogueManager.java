@@ -83,49 +83,15 @@ public class DialogueManager {
 
   public void run(User user, StringReader reader) throws CommandSyntaxException {
     String key = reader.readUnquotedString();
-    Dialogue entry = randomIdIndex.lookupValue(key).orElse(null);
-
-    if (entry == null) {
-      LOGGER.warn("Unknown dialogue node '{}', input={}",
-          key, reader.getString()
-      );
-
-      return;
-    }
-
     reader.skipWhitespace();
-    if (!reader.canRead()) {
-      if (entry.getEntryNode() == null) {
-        LOGGER.warn(
-            "Entry {} cannot be executed! No 'entry_node' set, input={}",
-            key, reader.getString()
-        );
 
-        return;
-      }
-
-      entry.run(user);
-    }
-
-    String word = reader.readUnquotedString();
-    var node = entry.getNodeByRandomId(word);
-
-    if (node == null) {
-      LOGGER.warn("No node found with ID '{}' input={}",
-          word, reader.getString()
-      );
-
-      return;
-    }
-
-    if (!node.test(user)) {
-      return;
-    }
-
-    DialogueRenderer renderer = new DialogueRenderer(user, entry);
-    var text = node.render(renderer);
-
-    user.sendMessage(text);
+    randomIdIndex.lookupValue(key).ifPresentOrElse(dialogue -> {
+      dialogue.run(user, reader).ifPresent(s -> {
+        LOGGER.warn("Couldn't run entry '{}': {}", key, s);
+      });
+    }, () -> {
+      LOGGER.warn("Unknown dialogue '{}' input={}", key, reader.getString());
+    });
   }
 
   @OnLoad

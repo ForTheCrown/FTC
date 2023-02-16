@@ -1,0 +1,124 @@
+{
+  "settings": {
+    "buttonAvailableColor": "white",
+    "buttonUnavailableColor": "gray"
+  },
+
+  "node_greeting": {
+    "text": [
+      { "text": " " },
+      "[&bSwordmaster&r] Ser Hazelborn:",
+      "&bHello there! My name is Ser Hazelborn and I mastered the art of swordplay. What can I do for you?" ,
+      "${button: node=node_lore text='What is this place?'}",
+      "${button: node=node_howto text='How do I learn an ability?'}",
+      "${button: node=node_abilities text='What kind of abilities exist?'}"
+    ]
+  },
+  "node_lore": {
+    "text": [
+      { "text": " " },
+      "[&bSwordmaster&r] Ser Hazelborn:",
+      "&bI am happy that you are interested in learning about this place. I will gladly tell you what my ancestors told me about this place when I grew up in the city of Hazelguard. You see that blue fire over there? It is an old, very powerful fire that the builders of this castle found over 420 years ago, alongside some mystic runes. According to the myth, the old builders only built this  castle because a mysterious voice coming out of the flames told them to do so. That's is why my grandparents always called this fire &6'spark from the gods'&b.",
+      "${button: run_command='/say Hazelguard is such an amazing place!' text='Sounds cool!'}",
+      "${button: run_command='/say I am not a fan of myths!' text='You always believe everything you are told?'}"
+    ]
+  },
+  "node_howto": {
+    "text": [
+      { "text": " " },
+      "[&bSwordmaster&r] Ser Hazelborn:",
+      "&bI will gladly help you understand the basics. You see that blue fire over there? By right-clicking this fire it will open an inventory where you need to place your sword into the slot in the middle. Each ability requires certain items, which you need to place around the sword. Which and how many items you need exactly can you see when clicking the Recipe Book in the upper rigth corner. Even if you do not have the required items you can still go ahead, pick an ability in the recipe book and try it out in a trial. For that just click the Iron Axe that shows up in the ability's recipe."
+    ]
+  },
+  "node_abilities": {
+    "text": [
+      { "text": " " },
+      "[&bSwordmaster&r] Ser Hazelborn:",
+      "&bThere are 9 different abilities that you can smith on your sword. Be aware that you can always only have one ability active at a time. So choose wisely which ability you want to put on your sword. Which ability do you want me to explain?",
+      "${button: node=node_dash text='Dash'}",
+      "${button: node=node_ender_pearl text='Ender Pearl'}",
+      "${button: node=node_far_reach text='Far Reach'}",
+      "${button: node=node_fireball text='Fireball'}",
+      "${button: node=node_regeneration text='Regeneration'}",
+      "${button: node=node_strength text='Strength'}",
+      "${button: node=node_weakness text='Weakness'}",
+      "${button: node=node_tnt text='TNT'}",
+      "${button: node=node_twirl text='Twirl'}"
+    ]
+  },
+  "node_dash": {
+    "text": [
+      { "text": " " },
+      "[&bSwordmaster&r] Ser Hazelborn:",
+      "&bThe &6Dash Ability&b lets you right-click a held sword in order to get a momentum boost in the direction you are looking at. If used while jumping it will let you jump further and higher. The higher the level of the ability the more boost you get."
+    ]
+  },
+  "node_ender_pearl": {
+    "text": [
+      { "text": " " },
+      "[&bSwordmaster&r] Ser Hazelborn:",
+      "&bThe &6Ender Pearl Ability&b lets you right-click a held sword in order to launch an ender pearl which is summoned by the sword. The higher the level of the ability the further you can launch an ender pearl."
+    ]
+  },
+  "node_far_reach": {
+    "text": [
+      { "text": " " },
+      "[&bSwordmaster&r] Ser Hazelborn:",
+      "&bThe &6Far Reach Ability&b enables you to hit mobs and entities that are further away. The higher the level of the ability the further you can reach with the sword."
+    ]
+  },
+  "node_fireball": {
+    "text": [
+      { "text": " " },
+      "[&bSwordmaster&r] Ser Hazelborn:",
+      "&bA ghast in disguise? The &6Fireball Ability&b lets you launch a small but dangerous fireball. The higher the level of the ability the harder the fireball will hit."
+    ]
+  },
+  "node_regeneration": {
+    "text": [
+      { "text": " " },
+      "[&bSwordmaster&r] Ser Hazelborn:",
+      "&bThe &6Regeneration Ability&b gives you regeneration for a short amount of time whenever the sword gets right-clicked. The higher the level of the ability the better the regeneration effect."
+    ]
+  },
+  "node_strength": {
+    "text": [
+      { "text": " " },
+      "[&bSwordmaster&r] Ser Hazelborn:",
+      "&bThe &6Strength Ability&b gives you strength for a short amount of time whenever the sword gets right-clicked. The higher the level of the ability the better the strength effect."
+    ]
+  },
+  "node_weakness": {
+    "text": [
+      { "text": " " },
+      "[&bSwordmaster&r] Ser Hazelborn:",
+      "&bThe &6Weakness Ability&b applies a short lasting weakness effect on mobs that you hit with the sword. The higher the level of the ability the weaker your enemies can become."
+    ]
+  },
+  "node_tnt": {
+    "text": [
+      { "text": " " },
+      "[&bSwordmaster&r] Ser Hazelborn:",
+      "&bThe &6TNT Ability&b lets you launch a primed tnt from you sword when right-clicked. When right-clicked + sneaking you will just poop it out and it might blow up your butt. The higher the level of the ability the further the tnt can be launched."
+    ]
+  },
+  "node_twirl": {
+    "text": [
+      { "text": " " },
+      "[&bSwordmaster&r] Ser Hazelborn:",
+      "&bA beyblade in disguise? The &6Twirl Ability&b allows you to deal damage to mobs that are close enough surrounding you when right-clicked. The higher the level of the ability the stronger of a beyblade you can become.",
+
+      "${button: node=twirl_button text='I wanna try it out'}"
+    ]
+  },
+
+  "twirl_button": {
+    "condition": { "path": "weapon_ability/button/test.js" },
+    "on_view": { "path": "weapon_ability/button/run.js", "args": "twirl" },
+    "text": [
+      { "text": " " },
+      "[&bSwordmaster&r] Ser Hazelborn:",
+      "&bBut of course, try it out!"
+    ]
+  }
+}

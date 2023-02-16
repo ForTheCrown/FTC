@@ -138,7 +138,7 @@ public class WaypointManager extends SerializableObject.NbtDat {
    */
   void onRename(Waypoint waypoint, String oldName, String newName) {
     if (!Strings.isNullOrEmpty(oldName)) {
-      byName.remove(oldName);
+      byName.remove(oldName.toLowerCase());
     }
 
     if (!Strings.isNullOrEmpty(newName)) {
@@ -224,6 +224,32 @@ public class WaypointManager extends SerializableObject.NbtDat {
 
   public Waypoint get(String name) {
     return byName.get(name.toLowerCase());
+  }
+
+  public Waypoint getExtensive(String name) {
+    Waypoint waypoint = get(name);
+
+    if (waypoint != null) {
+      return waypoint;
+    }
+
+    var guild = GuildManager.get().getGuild(name);
+
+    if (guild != null) {
+      waypoint = guild.getSettings().getWaypoint();
+
+      if (waypoint != null) {
+        return waypoint;
+      }
+    }
+
+    try {
+      UUID uuid = UUID.fromString(name);
+      waypoint = get(uuid);
+      return waypoint;
+    } catch (IllegalArgumentException exc) {
+      return null;
+    }
   }
 
   public Stream<String> getNames() {

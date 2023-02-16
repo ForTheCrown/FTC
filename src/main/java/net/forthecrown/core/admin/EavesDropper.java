@@ -115,7 +115,7 @@ public class EavesDropper {
     send(
         edGuildChat(sender, guild, mute, message),
         Properties.EAVES_DROP_GUILD_CHAT,
-        false
+        true
     );
   }
 }
