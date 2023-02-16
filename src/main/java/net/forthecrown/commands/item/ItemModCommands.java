@@ -15,7 +15,8 @@ public class ItemModCommands extends CmdUtil {
       new ItemLoreNode(),
       new ItemNameNode(),
       new ItemDataNode(),
-      new ItemAttributeNode()
+      new ItemAttributeNode(),
+      new ItemCooldownNode()
   };
 
   public static void createCommands() {

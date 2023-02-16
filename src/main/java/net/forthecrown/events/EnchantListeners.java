@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 import net.forthecrown.dungeons.enchantments.FtcEnchant;
 import net.forthecrown.dungeons.enchantments.FtcEnchants;
-import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.text.Text;
@@ -244,7 +243,7 @@ public class EnchantListeners implements Listener {
     hitEntity.getWorld().playSound(hitEntity.getLocation(), Sound.ENTITY_SPIDER_HURT, 0.2f, 0.7f);
   }
 
-  @EventHandler
+  @EventHandler(ignoreCancelled = true)
   public void onEntityDamageEntEvent(EntityDamageByEntityEvent event) {
     if (!(event.getEntity() instanceof Player player)) {
       return;
@@ -261,7 +260,7 @@ public class EnchantListeners implements Listener {
       return;
     }
 
-    if (Cooldown.containsOrAdd(player, "Enchant_HealingBlock", 40)) {
+    if (player.hasCooldown(Material.SHIELD)) {
       return;
     }
 
@@ -272,6 +271,7 @@ public class EnchantListeners implements Listener {
 
     player.setHealth(Math.min(player.getHealth() + 2, maxHealth));
     player.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 0.6f, 1f);
+    player.setCooldown(Material.SHIELD, 2 * 40);
   }
 
   static boolean hasEnchant(@Nullable ItemStack item, FtcEnchant enchant) {
