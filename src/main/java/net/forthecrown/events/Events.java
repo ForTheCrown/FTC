@@ -13,7 +13,7 @@ import net.forthecrown.events.economy.ShopDestroyListener;
 import net.forthecrown.events.economy.ShopInteractionListener;
 import net.forthecrown.events.economy.ShopInventoryListener;
 import net.forthecrown.events.player.AfkListener;
-import net.forthecrown.events.player.AltListener;
+import net.forthecrown.events.player.LoginListener;
 import net.forthecrown.events.player.ChatListener;
 import net.forthecrown.events.player.ChatPacketListener;
 import net.forthecrown.events.player.DurabilityListener;
@@ -95,7 +95,7 @@ public final class Events {
     register(new PotionEffectListener());
     register(new WhitelistListener());
 
-    register(new AltListener());
+    register(new LoginListener());
 
     // Listen for voting plugin votes
     if (Util.isPluginEnabled("VotingPlugin")) {

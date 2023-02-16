@@ -12,10 +12,14 @@ import net.forthecrown.core.registry.Registries;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
+import org.apache.logging.log4j.Logger;
+import org.bukkit.BanEntry;
 import org.bukkit.BanList;
+import org.bukkit.BanList.Type;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerKickEvent.Cause;
 import org.bukkit.permissions.Permission;
 
 /**
@@ -39,7 +43,9 @@ public enum PunishType {
    */
   KICK(Permissions.PUNISH_KICK) {
     @Override
-    public void onPunishmentStart(User user, PunishEntry entry, Punisher punisher,
+    public void onPunishmentStart(User user,
+                                  PunishEntry entry,
+                                  Punisher punisher,
                                   Punishment punishment
     ) {
       if (!user.isOnline()) {
@@ -72,7 +78,9 @@ public enum PunishType {
     }
 
     @Override
-    public void onPunishmentStart(User user, PunishEntry entry, Punisher punisher,
+    public void onPunishmentStart(User user,
+                                  PunishEntry entry,
+                                  Punisher punisher,
                                   Punishment punishment
     ) {
       // Place user in jail
@@ -111,26 +119,12 @@ public enum PunishType {
     }
 
     @Override
-    public void onPunishmentStart(User user, PunishEntry entry, Punisher punisher,
+    public void onPunishmentStart(User user,
+                                  PunishEntry entry,
+                                  Punisher punisher,
                                   Punishment punishment
     ) {
-      BanList list = Bukkit.getBanList(BanList.Type.NAME);
-      list.addBan(
-          user.getUniqueId().toString(),
-          punishment.getReason(),
-          punishment.getExpires() == INDEFINITE_EXPIRY
-              ? null
-              : new Date(punishment.getExpires()),
-
-          punishment.getSource()
-      );
-
-      if (user.isOnline()) {
-        user.getPlayer().kick(
-            Component.text(punishment.getReason()),
-            PlayerKickEvent.Cause.BANNED
-        );
-      }
+       PunishType.placeInBanList(user, punishment, Type.NAME);
     }
 
     @Override
@@ -152,27 +146,12 @@ public enum PunishType {
     }
 
     @Override
-    public void onPunishmentStart(User user, PunishEntry entry, Punisher punisher,
+    public void onPunishmentStart(User user,
+                                  PunishEntry entry,
+                                  Punisher punisher,
                                   Punishment punishment
     ) {
-      // Add IP ban list entry, we're not going
-      // manage bans ourselves after all, that's dumb
-      BanList list = Bukkit.getBanList(BanList.Type.IP);
-      list.addBan(
-          user.getIp(),
-          punishment.getReason(),
-          punishment.getExpires() == INDEFINITE_EXPIRY
-              ? null
-              : new Date(punishment.getExpires()),
-
-          punishment.getSource()
-      );
-
-      // If the player is online, kick them
-      if (user.isOnline()) {
-        user.getPlayer()
-            .kick(Component.text(punishment.getReason()), PlayerKickEvent.Cause.IP_BANNED);
-      }
+      PunishType.placeInBanList(user, punishment, Type.IP);
     }
 
     @Override
@@ -206,7 +185,9 @@ public enum PunishType {
    * @param punisher   The punishment manager instance
    * @param punishment The punishment entry
    */
-  public void onPunishmentStart(User user, PunishEntry entry, Punisher punisher,
+  public void onPunishmentStart(User user,
+                                PunishEntry entry,
+                                Punisher punisher,
                                 Punishment punishment
   ) {
   }
@@ -230,5 +211,57 @@ public enum PunishType {
    */
   public String defaultReason() {
     return null;
+  }
+
+  private static void placeInBanList(User user,
+                                     Punishment punishment,
+                                     Type type
+  ) {
+    Logger logger = Loggers.getLogger();
+    String key = type == Type.IP
+        ? user.getIp()
+        : user.getUniqueId().toString();
+
+    // Add IP ban list entry, we're not going
+    // manage bans ourselves after all, that's dumb
+    BanList list = Bukkit.getBanList(type);
+    var banEntry = list.addBan(
+        key,
+        punishment.getReason(),
+        punishment.getExpires() == INDEFINITE_EXPIRY
+            ? null
+            : new Date(punishment.getExpires()),
+
+        punishment.getSource()
+    );
+
+    if (banEntry == null) {
+      throw new IllegalStateException("Failed to create ban entry for " + user);
+    }
+
+    logger.info(
+        "Created banlist entry for {}, entry={}",
+        user, toString(banEntry)
+    );
+
+    banEntry.save();
+
+    // If the player is online, kick them
+    if (user.isOnline()) {
+      user.getPlayer().kick(
+          Component.text(punishment.getReason()),
+          type == Type.IP ? Cause.IP_BANNED : Cause.BANNED
+      );
+    }
+  }
+
+  private static String toString(BanEntry entry) {
+    return String.format(
+        "BanEntry[target=%s, created=%s, reason=%s, expires=%s]",
+        entry.getTarget(),
+        entry.getCreated(),
+        entry.getReason(),
+        entry.getExpiration()
+    );
   }
 }

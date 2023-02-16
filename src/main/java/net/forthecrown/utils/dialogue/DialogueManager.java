@@ -85,9 +85,9 @@ public class DialogueManager {
     String key = reader.readUnquotedString();
     reader.skipWhitespace();
 
-    randomIdIndex.lookupValue(key).ifPresentOrElse(dialogue -> {
-      dialogue.run(user, reader).ifPresent(s -> {
-        LOGGER.warn("Couldn't run entry '{}': {}", key, s);
+    randomIdIndex.lookup(key).ifPresentOrElse(holder -> {
+      holder.getValue().run(user, reader).ifPresent(s -> {
+        LOGGER.warn("Couldn't run entry '{}': {}", holder.getKey(), s);
       });
     }, () -> {
       LOGGER.warn("Unknown dialogue '{}' input={}", key, reader.getString());
