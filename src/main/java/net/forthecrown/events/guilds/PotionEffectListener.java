@@ -1,4 +1,4 @@
-package net.forthecrown.events;
+package net.forthecrown.events.guilds;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
@@ -34,7 +34,7 @@ public class PotionEffectListener implements Listener {
 
     // Jules: Invert if statements
     // If in guild chunk
-    if (!PlayerMoveGuildChunkListener.isInOwnGuild(playerId)) {
+    if (!GuildMoveListener.isInOwnGuild(playerId)) {
       return;
     }
 
@@ -82,7 +82,7 @@ public class PotionEffectListener implements Listener {
     Player player = event.getPlayer();
     UUID playerId = player.getUniqueId();
 
-    if (PlayerMoveGuildChunkListener.isInOwnGuild(playerId)) {
+    if (GuildMoveListener.isInOwnGuild(playerId)) {
       tryGiveInitialEffects(player);
     } else if (effectReceivers.contains(playerId)) {
       removeEffects(player);

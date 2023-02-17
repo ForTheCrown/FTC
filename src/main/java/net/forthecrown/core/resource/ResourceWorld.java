@@ -150,10 +150,11 @@ public class ResourceWorld {
 
   // The height maps for NMS and Bukkit that are used for height
   // calculation... shocking ik
-  public static final Heightmap.Types
-      HEIGHT_MAP_TYPE = Heightmap.Types.OCEAN_FLOOR_WG;
-  public static final HeightMap
-      BUKKIT_HEIGHT_MAP = CraftHeightMap.fromNMS(HEIGHT_MAP_TYPE);
+  public static final Heightmap.Types HEIGHT_MAP_TYPE
+      = Heightmap.Types.OCEAN_FLOOR_WG;
+
+  public static final HeightMap BUKKIT_HEIGHT_MAP
+      = CraftHeightMap.fromNMS(HEIGHT_MAP_TYPE);
 
   public static final String PORTAL_WARP = "portal";
 

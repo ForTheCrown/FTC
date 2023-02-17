@@ -11,13 +11,13 @@ import net.forthecrown.economy.market.MarketManager;
 import net.forthecrown.user.data.CosmeticData;
 import net.forthecrown.user.data.MailMessage;
 import net.forthecrown.user.data.RankTier;
+import net.forthecrown.user.data.RanksComponent;
 import net.forthecrown.user.data.UserHomes;
 import net.forthecrown.user.data.UserInteractions;
 import net.forthecrown.user.data.UserMail;
 import net.forthecrown.user.data.UserMarketData;
 import net.forthecrown.user.data.UserShopData;
 import net.forthecrown.user.data.UserTimeTracker;
-import net.forthecrown.user.data.UserTitles;
 import net.forthecrown.user.property.Properties;
 import net.forthecrown.user.property.PropertyMap;
 import net.forthecrown.utils.io.JsonWrapper;
@@ -27,43 +27,50 @@ import org.jetbrains.annotations.Nullable;
 /**
  * A class which holds component types as constants.
  * <p>
- * A component is a piece of data which adds functionality to the user class, to that end, adding
- * and removing them should be easily done, without much hassle. This is done by Storing the main
- * components here as constants, but also allowing components to be created at any time.
+ * A component is a piece of data which adds functionality to the user class, to
+ * that end, adding and removing them should be easily done, without much
+ * hassle. This is done by Storing the main components here as constants, but
+ * also allowing components to be created at any time.
  * <p>
- * Mostly this exists because I was getting tired of adding fields to the user class everytime I
- * wanted to add something, so I implemented this to make the data stored in user objects a bit more
- * dynamic and maneuverable.
+ * Mostly this exists because I was getting tired of adding fields to the user
+ * class everytime I wanted to add something, so I implemented this to make the
+ * data stored in user objects a bit more dynamic and maneuverable.
  * <p>
- * In the user object itself, the components are stored in a single array, the way you identify
- * which component is at which index is with the {@link ComponentType#getIndex()} method, the return
- * result for that method will be created in {@link #create(String, Class)} and is just an integer
- * that is incremented everytime a new component type is created/registered.
+ * In the user object itself, the components are stored in a single array, the
+ * way you identify which component is at which index is with the
+ * {@link ComponentType#getIndex()} method, the return result for that method
+ * will be created in {@link #create(String, Class, boolean)} and is just an
+ * integer that is incremented everytime a new component type is
+ * created/registered.
  * <p>
- * Component types also need to be able to create component instances, this is done in
- * {@link ComponentType#create(User)}. For this reason, component types require that any
- * {@link UserComponent} implementation feature a public constructor with 2 parameters: {@link User}
- * and {@link ComponentType}. To ensure this is the case, {@link ComponentType} will test if a
- * constructor with those specifications exists, if it does not, then it throws an exception
+ * Component types also need to be able to create component instances, this is
+ * done in {@link ComponentType#create(User)}. For this reason, component types
+ * require that any {@link UserComponent} implementation feature a public
+ * constructor with 2 parameters: {@link User} and {@link ComponentType}. To
+ * ensure this is the case, {@link ComponentType} will test if a constructor
+ * with those specifications exists, if it does not, then it throws an
+ * exception
  * <p>
  *
- * @see UserJsonSerializer#saveComponents(JsonWrapper, User) to see how components are serialized
- * @see UserJsonSerializer#loadComponents(JsonWrapper, User)  to see how components are deserialized
+ * @see UserJsonSerializer#saveComponents(JsonWrapper, User) to see how
+ * components are serialized
+ * @see UserJsonSerializer#loadComponents(JsonWrapper, User)  to see how
+ * components are deserialized
  */
 public final class Components {
-
-  private Components() {
-  }
+  private Components() {}
 
   /* ----------------------------- LOOKUPS ------------------------------ */
 
   /**
-   * Name -> component type lookup. Names can be specified manually but if {@link #of(Class)} is
-   * called, then it is created automatically  with {@link #filterName(String)}.
+   * Name -> component type lookup. Names can be specified manually but if
+   * {@link #of(Class, boolean)} is called, then it is created automatically
+   * with {@link #filterName(String)}.
    * <p>
-   * This is also the map used to generate component indexes, this is done by taking the size of
-   * this map, making it the index of a type and then adding said type to the map, hence giving it a
-   * unique ID and then incrementing it for the next potential component type
+   * This is also the map used to generate component indexes, this is done by
+   * taking the size of this map, making it the index of a type and then adding
+   * said type to the map, hence giving it a unique ID and then incrementing it
+   * for the next potential component type
    */
   private static final Map<String, ComponentType> BY_NAME = new HashMap<>();
 
@@ -75,8 +82,8 @@ public final class Components {
   /**
    * Component type's user component class -> component type lookup.
    * <p>
-   * Do you know how hard it is using the word type for both component types and classes? I should
-   * stop doing it lol
+   * Do you know how hard it is using the word type for both component types and
+   * classes? I should stop doing it lol
    */
   private static final Map<Class, ComponentType> BY_TYPE = new HashMap<>();
 
@@ -85,8 +92,8 @@ public final class Components {
   /**
    * An immutable, empty component array.
    * <p>
-   * This is the default value of the component array in the {@link User} class to avoid it creating
-   * arrays when they might not be necessary.
+   * This is the default value of the component array in the {@link User} class
+   * to avoid it creating arrays when they might not be necessary.
    */
   public static final UserComponent[] EMPTY_ARRAY = new UserComponent[0];
 
@@ -95,8 +102,8 @@ public final class Components {
    *
    * @see UserTimeTracker
    */
-  public static final ComponentType<UserTimeTracker> TIME_TRACKER = create("timeStamps",
-      UserTimeTracker.class);
+  public static final ComponentType<UserTimeTracker> TIME_TRACKER
+      = create("timeStamps", UserTimeTracker.class, false);
 
   /**
    * Map of user properties.
@@ -104,31 +111,34 @@ public final class Components {
    * @see PropertyMap
    * @see Properties
    */
-  public static final ComponentType<PropertyMap> PROPERTIES = create("properties",
-      PropertyMap.class);
+  public static final ComponentType<PropertyMap> PROPERTIES
+      = create("properties", PropertyMap.class, false);
 
   /**
    * List of homes the user has.
    *
    * @see UserHomes
    */
-  public static final ComponentType<UserHomes> HOMES = of(UserHomes.class);
+  public static final ComponentType<UserHomes> HOMES
+      = of(UserHomes.class, false);
 
   /**
    * The current title, tier and any available titles a user may have
    *
-   * @see UserTitles
+   * @see RanksComponent
    * @see RankTier
    */
-  public static final ComponentType<UserTitles> TITLES = create("rankData", UserTitles.class);
+  public static final ComponentType<RanksComponent> TITLES
+      = create("rankData", RanksComponent.class, false);
 
   /**
-   * Various data about a user's interactions/connections with other users, such as who a user might
-   * be married to, who they've blocked and so forth.
+   * Various data about a user's interactions/connections with other users, such
+   * as who a user might be married to, who they've blocked and so forth.
    *
    * @see UserInteractions
    */
-  public static final ComponentType<UserInteractions> INTERACTIONS = of(UserInteractions.class);
+  public static final ComponentType<UserInteractions> INTERACTIONS
+      = of(UserInteractions.class, false);
 
   /**
    * A list of {@link MailMessage} a user may have received
@@ -136,7 +146,8 @@ public final class Components {
    * @see UserMail
    * @see MailMessage
    */
-  public static final ComponentType<UserMail> MAIL = of(UserMail.class);
+  public static final ComponentType<UserMail> MAIL
+      = of(UserMail.class, false);
 
   /**
    * Data for what active/available cosmetic effects a user has
@@ -145,26 +156,29 @@ public final class Components {
    * @see net.forthecrown.cosmetics.Cosmetic
    * @see net.forthecrown.cosmetics.CosmeticType
    */
-  public static final ComponentType<CosmeticData> COSMETICS = of(CosmeticData.class);
+  public static final ComponentType<CosmeticData> COSMETICS
+      = of(CosmeticData.class, false);
 
   /**
    * Data relating to a user's transaction in the Market region.
    * <p>
-   * I won't lie, this feels like a pretty useless component because it serializes no data and just
-   * holds useless info.
+   * I won't lie, this feels like a pretty useless component because it
+   * serializes no data and just holds useless info.
    *
    * @see UserMarketData
    * @see MarketManager
    * @see net.forthecrown.economy.market.MarketShop
    */
-  public static final ComponentType<UserMarketData> MARKET_DATA = of(UserMarketData.class);
+  public static final ComponentType<UserMarketData> MARKET_DATA
+      = of(UserMarketData.class, false);
 
   /**
    * Data of how much a user has earned from what material in the sell shop.
    *
    * @see UserShopData
    */
-  public static final ComponentType<UserShopData> EARNINGS = of(UserShopData.class);
+  public static final ComponentType<UserShopData> EARNINGS
+      = of(UserShopData.class, true);
 
   /* ----------------------------- METHODS ------------------------------ */
 
@@ -184,23 +198,28 @@ public final class Components {
    * @param typeClass The component's class
    * @param <T>       The component's type
    * @return The created component.
-   * @throws IllegalStateException If either a naming conflict appeared, or the given class was
-   *                               already registered
+   * @throws IllegalStateException If either a naming conflict appeared, or the
+   *                               given class was already registered
    */
-  public static <T extends UserComponent> @NotNull ComponentType<T> create(String name,
-                                                                           Class<T> typeClass
+  public static <T extends UserComponent> @NotNull ComponentType<T> create(
+      String name,
+      Class<T> typeClass,
+      boolean redirectAlt
   ) throws IllegalStateException {
     // Test registration conflicts
     if (BY_NAME.containsKey(name)) {
-      throw new IllegalStateException("Duplicate component names: '" + name + "'");
+      throw new IllegalStateException(
+          "Duplicate component names: '" + name + "'");
     }
 
     if (BY_TYPE.containsKey(typeClass)) {
-      throw new IllegalStateException("Duplicate component classes: " + typeClass);
+      throw new IllegalStateException(
+          "Duplicate component classes: " + typeClass);
     }
 
     // Create type and register
-    ComponentType<T> result = new ComponentType<>(BY_NAME.size(), name, typeClass);
+    ComponentType<T> result = new ComponentType<>(BY_NAME.size(), name,
+        typeClass, redirectAlt);
 
     BY_NAME.put(name, result);
     INDEX_LOOKUP.add(result.getIndex(), result);
@@ -210,17 +229,19 @@ public final class Components {
   }
 
   /**
-   * Gets a matching component type for the given user component class, or creates the component
-   * type.
+   * Gets a matching component type for the given user component class, or
+   * creates the component type.
    * <p>
-   * This will automatically generate a {@link ComponentType#getSerialId()} for the given class by
-   * calling {@link #filterName(String)}.
+   * This will automatically generate a {@link ComponentType#getSerialId()} for
+   * the given class by calling {@link #filterName(String)}.
    *
    * @param typeClass The class to find a component for
    * @param <T>       The component's type
    * @return The found, or created, component.
    */
-  public static <T extends UserComponent> @NotNull ComponentType<T> of(Class<T> typeClass) {
+  public static <T extends UserComponent> @NotNull ComponentType<T> of(
+      Class<T> typeClass, boolean redirectAlt
+  ) {
     var type = get(typeClass);
 
     if (type != null) {
@@ -228,12 +249,12 @@ public final class Components {
     }
 
     var name = filterName(typeClass.getSimpleName());
-    return create(name, typeClass);
+    return create(name, typeClass, redirectAlt);
   }
 
   /**
-   * Filter's the given initial name by removing any "User" prefix and then making the first letter
-   * lower case.
+   * Filter's the given initial name by removing any "User" prefix and then
+   * making the first letter lower case.
    *
    * @param initial The initial name to filter
    * @return The filtered name
@@ -270,13 +291,15 @@ public final class Components {
    * @param <T>       The component's type
    * @return The type that represents the component, or null, if none exists
    */
-  public static <T extends UserComponent> @Nullable ComponentType<T> get(Class<T> typeClass) {
+  public static <T extends UserComponent> @Nullable ComponentType<T> get(
+      Class<T> typeClass
+  ) {
     return BY_TYPE.get(typeClass);
   }
 
   /**
-   * Creates an unmodifiable iterator for looping through all currently existing component type
-   * values.
+   * Creates an unmodifiable iterator for looping through all currently existing
+   * component type values.
    * <p>
    * Used for component serialization in {@link UserJsonSerializer}
    *

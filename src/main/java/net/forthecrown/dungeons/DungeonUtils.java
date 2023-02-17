@@ -26,6 +26,7 @@ public final class DungeonUtils {
   }
 
   public static final NamespacedKey PUNCHING_BAG_KEY = Keys.royals("dummy");
+  public static final String PUNCHING_BAG_TAG = "punching_bag";
 
   public static ItemStack makeDungeonItem(Material material, int amount, @Nullable String name) {
     return makeDungeonItem(

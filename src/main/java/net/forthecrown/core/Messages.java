@@ -194,7 +194,7 @@ public interface Messages {
   /**
    * Uncategorized display name of the "Hit me!" dummy entities
    */
-  TextComponent DUMMY_NAME = text("Hit me!");
+  TextComponent DUMMY_NAME = text("Hit me!", NamedTextColor.GOLD);
 
   /**
    * Red ❤

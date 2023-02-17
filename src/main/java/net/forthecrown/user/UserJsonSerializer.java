@@ -153,7 +153,7 @@ public class UserJsonSerializer implements UserSerializer {
         continue;
       }
 
-      var component = user.getComponent(type);
+      var component = user.getComponentNoRedirect(type);
       var componentJson = json.get(type.getSerialId());
 
       try {

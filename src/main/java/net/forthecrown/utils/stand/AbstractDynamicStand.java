@@ -1,6 +1,8 @@
 package net.forthecrown.utils.stand;
 
 import java.util.Objects;
+import lombok.Getter;
+import lombok.Setter;
 import net.forthecrown.core.FTC;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Chunk;
@@ -14,8 +16,15 @@ public abstract class AbstractDynamicStand {
   private final Location location;
   private final Chunk chunk;
 
-  public AbstractDynamicStand(Location location) {
-    this.location = Objects.requireNonNull(location);
+  @Getter @Setter
+  private NamespacedKey key;
+
+  public AbstractDynamicStand(Location location, NamespacedKey key) {
+    Objects.requireNonNull(location);
+    Objects.requireNonNull(key);
+
+    setKey(key);
+    this.location = location;
 
     this.chunk = location.getChunk();
     chunk.addPluginChunkTicket(FTC.getPlugin());

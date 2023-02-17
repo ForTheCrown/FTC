@@ -16,12 +16,12 @@ import org.apache.commons.lang.WordUtils;
  * <p>
  * Currently, a rank's tier determines how many homes a user is allowed to have and what their luck
  * perms tier is. Although the last one goes both ways. When a user joins
- * {@link UserTitles#ensureSynced()} is called to make sure both the luck perms and rank tiers are
+ * {@link RanksComponent#ensureSynced()} is called to make sure both the luck perms and rank tiers are
  * synced to each other.
  *
- * @see UserTitles#ensureSynced()
+ * @see RanksComponent#ensureSynced()
  * @see UserRank
- * @see UserTitles
+ * @see RanksComponent
  */
 @Getter
 @RequiredArgsConstructor

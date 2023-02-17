@@ -124,15 +124,13 @@ public class CommandTpask extends FtcCommand {
       return;
     }
 
-    if (!isInvalidWorld(world)) {
-      return;
-    }
-
     if (world.equals(Worlds.end()) && !EndConfig.open) {
       throw END_CLOSED;
     }
 
-    throw exc;
+    if (isInvalidWorld(world)) {
+      throw exc;
+    }
   }
 
   public static boolean isInvalidWorld(World world) {

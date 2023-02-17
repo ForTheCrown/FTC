@@ -1,4 +1,4 @@
-package net.forthecrown.events;
+package net.forthecrown.events.guilds;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -16,7 +16,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-public class PlayerMoveGuildChunkListener implements Listener {
+public class GuildMoveListener implements Listener {
 
   // Map<PlayerId, GuildId>, mapping players to the guild that owns the chunk they're currently located in
   private final static Object2ObjectMap<UUID, UUID> MAP = new Object2ObjectOpenHashMap<>();
@@ -26,7 +26,7 @@ public class PlayerMoveGuildChunkListener implements Listener {
     // Add cooldown to limit amount ran per player
     if (Cooldown.containsOrAdd(event.getPlayer(), getClass().getSimpleName(), 4)
         // If player not in Guild World, return
-        || !event.getPlayer().getWorld().equals(Guilds.getWorld())
+        || !event.getTo().getWorld().equals(Guilds.getWorld())
     ) {
       // Jules: Combine 2 if statements into 1
       return;

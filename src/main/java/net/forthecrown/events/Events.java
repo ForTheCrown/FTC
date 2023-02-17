@@ -12,12 +12,14 @@ import net.forthecrown.events.economy.ShopCreateListener;
 import net.forthecrown.events.economy.ShopDestroyListener;
 import net.forthecrown.events.economy.ShopInteractionListener;
 import net.forthecrown.events.economy.ShopInventoryListener;
+import net.forthecrown.events.guilds.GuildDiscordListener;
+import net.forthecrown.events.guilds.GuildEvents;
 import net.forthecrown.events.player.AfkListener;
-import net.forthecrown.events.player.LoginListener;
 import net.forthecrown.events.player.ChatListener;
 import net.forthecrown.events.player.ChatPacketListener;
 import net.forthecrown.events.player.DurabilityListener;
 import net.forthecrown.events.player.JailListener;
+import net.forthecrown.events.player.LoginListener;
 import net.forthecrown.events.player.MarriageListener;
 import net.forthecrown.events.player.MotdListener;
 import net.forthecrown.events.player.PlayerJoinListener;
@@ -91,9 +93,7 @@ public final class Events {
     register(new AutoSellListener());
     register(new DurabilityListener());
 
-    register(new PlayerMoveGuildChunkListener());
-    register(new PotionEffectListener());
-    register(new WhitelistListener());
+    GuildEvents.registerAll();
 
     register(new LoginListener());
 

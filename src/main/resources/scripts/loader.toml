@@ -54,3 +54,6 @@ script = "top_voters.js"
 
 ["raid_village"]
 script = "raid_village/main.js"
+
+["rw_reset_counter"]
+script = "rw_reset_counter.js"

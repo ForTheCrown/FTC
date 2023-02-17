@@ -83,7 +83,7 @@ public class ShopHistory {
   public void load(@Nullable Tag tag) {
     entries.clear();
 
-    if (tag == null) {
+    if (tag == null || tag.getId() != Tag.TAG_LIST) {
       return;
     }
 

@@ -1,0 +1,6 @@
+{
+  "room_replace/overgrowth": {
+    "type": "overgrowth",
+    "min_noise": 0.5
+  }
+}

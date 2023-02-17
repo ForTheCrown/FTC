@@ -4,10 +4,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import lombok.Getter;
 import net.forthecrown.core.logging.Loggers;
+import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.user.ComponentType;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserComponent;
@@ -26,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
  * @see RankTier
  * @see #ensureSynced()
  */
-public class UserTitles extends UserComponent {
+public class RanksComponent extends UserComponent {
   private static final Logger LOGGER = Loggers.getLogger();
 
   public static final String
@@ -54,7 +56,7 @@ public class UserTitles extends UserComponent {
 
   /* ----------------------------- CONSTRUCTORS ------------------------------ */
 
-  public UserTitles(User user, ComponentType<UserTitles> type) {
+  public RanksComponent(User user, ComponentType<RanksComponent> type) {
     super(user, type);
   }
 
@@ -193,6 +195,33 @@ public class UserTitles extends UserComponent {
   /* ----------------------------- TIERS ------------------------------ */
 
   /**
+   * Demotes to the given tier.
+   * <p>
+   * Changes the user's tier, and title, if it's from a tier higher than the
+   * <code>to</code> tier. Removes any extra homes the user may have as a result
+   * of the demotion and sets the user's login cosmetic to null
+   *
+   * @param to The tier to demote to
+   */
+  public void demote(RankTier to) {
+    setTier(to);
+
+    if (title.getTier().ordinal() > to.ordinal()) {
+      setTitle(UserRanks.DEFAULT);
+    }
+
+    var cosmetics = user.getCosmeticData();
+    var login = cosmetics.get(Cosmetics.LOGIN);
+
+    if (login != null && login.getTier().ordinal() > to.ordinal()) {
+      cosmetics.set(Cosmetics.LOGIN, null);
+    }
+
+    var homes = user.getHomes();
+    homes.removeOverMax();
+  }
+
+  /**
    * Tests if the user's current tier is equal to or greater than the given tier
    *
    * @param tier The tier to test against
@@ -246,6 +275,8 @@ public class UserTitles extends UserComponent {
    *                               tier
    */
   public void setTier(RankTier tier, boolean recalculatePermissions) {
+    Objects.requireNonNull(tier);
+
     if (recalculatePermissions) {
       if (getTier() != RankTier.NONE) {
         Bukkit.dispatchCommand(

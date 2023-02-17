@@ -93,15 +93,14 @@ public class JsonChallenge implements Challenge {
     listener.reloadScript(script);
 
     if (eventClass != null) {
-      Bukkit.getPluginManager()
-          .registerEvent(
-              eventClass,
-              listener,
-              EventPriority.NORMAL,
-              listener,
-              FTC.getPlugin(),
-              true
-          );
+      Bukkit.getPluginManager().registerEvent(
+          eventClass,
+          listener,
+          EventPriority.MONITOR,
+          listener,
+          FTC.getPlugin(),
+          true
+      );
     }
 
     listenerRegistered = true;

@@ -49,9 +49,11 @@ public class SellMaterialArgument implements ArgumentType<Material>, VanillaMapp
     for (var d : priceMap) {
       suggest(d, d.getMaterial(), token, builder);
 
-      if (d.canBeCompacted()) {
+      // Compacted materials exist twice in the map, this will cause duplciate
+      // suggestions
+      /*if (d.canBeCompacted()) {
         suggest(d, d.getCompactMaterial(), token, builder);
-      }
+      }*/
     }
 
     return builder.buildFuture();

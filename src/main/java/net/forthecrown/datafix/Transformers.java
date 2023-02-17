@@ -30,8 +30,6 @@ public class Transformers {
   // A list of all current data transformers
   // Add and remove entries from here as needed
   private static final DataUpdater[] CURRENT_TRANSFORMERS = {
-      new DirCleanup(),
-      new ChallengeItemContainerFix()
   };
 
   private static final Set<String> COMPLETED_TRANSFORMERS = new HashSet<>();

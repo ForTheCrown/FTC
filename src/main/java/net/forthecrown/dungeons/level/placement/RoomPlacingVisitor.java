@@ -18,7 +18,7 @@ public class RoomPlacingVisitor implements PieceVisitor {
   private static final Logger LOGGER = Loggers.getLogger();
 
   @Getter @Setter
-  private PostProcessCollector collector;
+  private PostProcessorManager collector;
 
   @Getter
   private int placementCounter = 0;

@@ -25,8 +25,6 @@ import net.forthecrown.core.module.OnSave;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.core.registry.Registries;
 import net.forthecrown.core.registry.Registry;
-import net.forthecrown.datafix.ChallengesLogFix;
-import net.forthecrown.datafix.Transformers;
 import net.forthecrown.economy.Economy;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.Time;
@@ -280,8 +278,6 @@ public class ChallengeManager {
   public void load() {
     clear();
     loadChallenges();
-
-    Transformers.runTransformer(new ChallengesLogFix(storage));
 
     storage.loadEntries()
         .resultOrPartial(LOGGER::error)

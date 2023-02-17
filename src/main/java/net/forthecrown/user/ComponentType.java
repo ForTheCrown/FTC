@@ -32,10 +32,21 @@ public class ComponentType<T extends UserComponent> {
    */
   private final Class<T> typeClass;
 
-  ComponentType(int index, String serialId, Class<T> typeClass) {
+  /**
+   * Whether alt accounts should have access to this component redirected to
+   * their main account
+   */
+  private final boolean redirectAlts;
+
+  ComponentType(int index,
+                String serialId,
+                Class<T> typeClass,
+                boolean redirectAlts
+  ) {
     this.index = index;
     this.serialId = serialId;
     this.typeClass = typeClass;
+    this.redirectAlts = redirectAlts;
 
     // Get the constructor, this will throw an exception
     // if the constructor doesn't exist, thus validating

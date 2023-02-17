@@ -135,7 +135,7 @@ public class UserTeleport {
       return 0;
     }
 
-    return perm.getTier(false, getUser()).orElse(perm.getRange().getMaximum());
+    return perm.getTier(getUser()).orElse(perm.getMaxTier());
   }
 
   /**

@@ -1,4 +1,4 @@
-package net.forthecrown.events;
+package net.forthecrown.events.guilds;
 
 import static net.kyori.adventure.text.Component.text;
 
@@ -16,9 +16,8 @@ import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.text.ChatParser;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.event.Listener;
 
-public class GuildDiscordListener implements Listener {
+public class GuildDiscordListener {
   @Subscribe
   public void onAccountLink(AccountLinkedEvent event) {
     User user = Users.get(event.getPlayer());

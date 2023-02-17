@@ -1,4 +1,4 @@
-package net.forthecrown.events;
+package net.forthecrown.events.guilds;
 
 import com.destroystokyo.paper.event.server.WhitelistToggleEvent;
 import net.forthecrown.guilds.GuildManager;

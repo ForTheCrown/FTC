@@ -1,5 +1,6 @@
 package net.forthecrown.core;
 
+import net.forthecrown.core.TieredPermission.TierPriority;
 import org.bukkit.Bukkit;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.PluginManager;
@@ -155,6 +156,7 @@ public final class Permissions {
 
   public static final TieredPermission MAX_HOMES = TieredPermission.builder()
       .prefix("ftc.homes.")
+      .priority(TierPriority.HIGHEST)
       .allowUnlimited()
       .tiersFrom1To(5)
       .build();
@@ -162,6 +164,7 @@ public final class Permissions {
   public static final TieredPermission TP_DELAY = TieredPermission.builder()
       .prefix("ftc.teleport.delay.")
       .unlimitedPerm("ftc.teleport.bypass")
+      .priority(TierPriority.LOWEST)
       .allowUnlimited()
       .tiersFrom1To(5)
       .build();

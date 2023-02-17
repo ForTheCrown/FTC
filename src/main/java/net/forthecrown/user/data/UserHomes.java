@@ -10,6 +10,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.Getter;
 import net.forthecrown.core.Permissions;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.grenadier.CmdUtil;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.user.ComponentType;
@@ -126,14 +127,36 @@ public class UserHomes extends UserComponent {
    * @return Whether the user is allowed to create new homes
    */
   public boolean canMakeMore() {
-    return size() < Permissions.MAX_HOMES.getTier(true, user)
-        .orElse(Permissions.MAX_HOMES.getRange().getMaximum());
+    return size() < getMaxHomes();
+  }
+
+  public int getMaxHomes() {
+    var perm = Permissions.MAX_HOMES;
+    return perm.getTier(user).orElse(perm.getMinTier());
+  }
+
+  public void removeOverMax() {
+    if (Permissions.MAX_HOMES.hasUnlimited(user)) {
+      return;
+    }
+
+    homes.entrySet().removeIf(home -> {
+      int size = homes.size();
+
+      if (size > getMaxHomes()) {
+        Loggers.getLogger().debug("Removing home {} from {}, over max",
+            home.getKey(), user
+        );
+
+        return true;
+      }
+
+      return false;
+    });
   }
 
   /**
    * Gets whether the user has any homes at all
-   *
-   * @return Just get a hoos
    */
   public boolean isEmpty() {
     return homes.isEmpty();
@@ -198,6 +221,8 @@ public class UserHomes extends UserComponent {
 
   @Override
   public JsonObject serialize() {
+    removeOverMax();
+
     if (homes.isEmpty()) {
       return null;
     }
@@ -235,6 +260,7 @@ public class UserHomes extends UserComponent {
     for (Map.Entry<String, JsonElement> e : json.entrySet()) {
       homes.put(e.getKey(), JsonUtils.readLocation(e.getValue().getAsJsonObject()));
     }
+    removeOverMax();
   }
 
   /**

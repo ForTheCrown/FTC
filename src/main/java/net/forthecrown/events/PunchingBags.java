@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import net.forthecrown.dungeons.DungeonUtils;
+import net.forthecrown.utils.EntityIdentifier;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.sound.SoundStop;
@@ -30,6 +31,10 @@ public class PunchingBags implements Listener {
   private static final Map<UUID, PunchingBagInstance> PUNCHING_BAGS = new HashMap<>();
 
   public static boolean isPunchingBag(Entity entity) {
+    if (entity.getScoreboardTags().contains(DungeonUtils.PUNCHING_BAG_TAG)) {
+      return true;
+    }
+
     return entity
         .getPersistentDataContainer()
         .has(DungeonUtils.PUNCHING_BAG_KEY, PersistentDataType.BYTE);
@@ -42,27 +47,26 @@ public class PunchingBags implements Listener {
     }
 
     LivingEntity dummy = (LivingEntity) event.getEntity();
-    PunchingBagInstance punchingBag = PUNCHING_BAGS.computeIfAbsent(dummy.getUniqueId(), uuid -> {
-      var bag = new PunchingBagInstance();
-      bag.entity = dummy;
+    PunchingBagInstance punchingBag = PUNCHING_BAGS.computeIfAbsent(
+        dummy.getUniqueId(),
+        uuid -> new PunchingBagInstance()
+    );
 
-      return bag;
-    });
-
-    punchingBag.hit(event.getFinalDamage());
+    punchingBag.hit(dummy, event.getFinalDamage());
     event.setDamage(0d);
   }
 
   private static class PunchingBagInstance {
 
     private BukkitTask nameResetTask;
-    private LivingEntity entity;
+    private EntityIdentifier entity;
 
-    void hit(double dmg) {
+    void hit(LivingEntity entity, double dmg) {
       Component name = Text.format("Damage: {0, number}", NamedTextColor.RED, dmg);
       entity.customName(name);
       entity.setCustomNameVisible(true);
 
+      this.entity = EntityIdentifier.of(entity);
       pushbackTask();
     }
 
@@ -70,6 +74,12 @@ public class PunchingBags implements Listener {
       Tasks.cancel(nameResetTask);
 
       nameResetTask = Tasks.runLater(() -> {
+        LivingEntity entity = (LivingEntity) this.entity.get();
+
+        if (entity == null) {
+          return;
+        }
+
         entity.customName(DUMMY_NAME);
         entity.setHealth(entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
       }, 5 * 20);
@@ -91,14 +101,13 @@ public class PunchingBags implements Listener {
       zomzom.setGravity(false);
 
       zomzom.setCustomNameVisible(true);
-      zomzom.customName(Component.text("Hit Me!").color(NamedTextColor.GOLD));
+      zomzom.customName(DUMMY_NAME);
 
       zomzom.setRemoveWhenFarAway(false);
       zomzom.setPersistent(true);
       zomzom.setCanPickupItems(false);
       zomzom.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0);
-      zomzom.getPersistentDataContainer()
-          .set(DungeonUtils.PUNCHING_BAG_KEY, PersistentDataType.BYTE, (byte) 1);
+      zomzom.addScoreboardTag(DungeonUtils.PUNCHING_BAG_TAG);
     });
   }
 }

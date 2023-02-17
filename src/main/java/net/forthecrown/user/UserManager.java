@@ -14,6 +14,7 @@ import java.util.function.IntSupplier;
 import lombok.Getter;
 import net.forthecrown.core.config.GeneralConfig;
 import net.forthecrown.core.logging.Loggers;
+import net.forthecrown.core.module.OnDisable;
 import net.forthecrown.core.module.OnLoad;
 import net.forthecrown.core.module.OnSave;
 import net.forthecrown.core.registry.Keys;
@@ -208,6 +209,11 @@ public final class UserManager implements SerializableObject {
     loadMaps();
 
     reloadUsers();
+  }
+
+  @OnDisable
+  private void onDisable() {
+    online.values().forEach(User::onLeave);
   }
 
   /**

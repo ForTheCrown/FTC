@@ -8,7 +8,6 @@ import static net.forthecrown.waypoint.Waypoints.PLAYER_COLUMN;
 import com.mojang.brigadier.ImmutableStringReader;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import java.time.Duration;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.PunishEntry;
@@ -511,8 +510,10 @@ public interface Exceptions {
   CommandSyntaxException NOT_INVITED = create("You have not been invited");
 
   static CommandSyntaxException overHomeLimit(User user) {
+    var perm = Permissions.MAX_HOMES;
+
     return format("Cannot create more homes (Over limit of {0, number}).",
-        Permissions.MAX_HOMES.getTier(true, user).orElse(5)
+        perm.getTier(user).orElse(perm.getMinTier())
     );
   }
 

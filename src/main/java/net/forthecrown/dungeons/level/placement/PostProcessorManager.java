@@ -12,7 +12,7 @@ import net.forthecrown.structure.FunctionInfo;
 import org.bukkit.World;
 
 @Getter
-public class PostProcessorManager implements PostProcessCollector {
+public class PostProcessorManager {
   private final Map<String, List<FunctionInfo>> postProcessMarkers
       = new Object2ObjectOpenHashMap<>();
 
@@ -43,7 +43,6 @@ public class PostProcessorManager implements PostProcessCollector {
     });
   }
 
-  @Override
   public void addMarker(FunctionInfo info) {
     var list = postProcessMarkers.computeIfAbsent(
         info.getFunctionKey(),

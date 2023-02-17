@@ -54,7 +54,7 @@ import net.forthecrown.user.data.UserMarketData;
 import net.forthecrown.user.data.UserRanks;
 import net.forthecrown.user.data.UserShopData;
 import net.forthecrown.user.data.UserTimeTracker;
-import net.forthecrown.user.data.UserTitles;
+import net.forthecrown.user.data.RanksComponent;
 import net.forthecrown.user.property.BoolProperty;
 import net.forthecrown.user.property.Properties;
 import net.forthecrown.user.property.PropertyMap;
@@ -218,8 +218,8 @@ public class User implements ForwardingAudience.Single,
 
   /**
    * Gets a component by its component class. This method works by calling
-   * {@link #getComponent(ComponentType)} with {@link Components#of(Class)}'s result with the given
-   * class.
+   * {@link #getComponent(ComponentType)} with
+   * {@link Components#of(Class, boolean)}'s result with the given class.
    *
    * @param typeClass The component to get the component of
    * @param <T>       The component's type
@@ -227,21 +227,65 @@ public class User implements ForwardingAudience.Single,
    * @see #getComponent(ComponentType)
    */
   public <T extends UserComponent> @NotNull T getComponent(Class<T> typeClass) {
-    return getComponent(Components.of(typeClass));
+    return getComponent(Components.of(
+        typeClass,
+        typeClass == UserShopData.class
+    ));
   }
 
   /**
    * Gets or creates a component with the given type for this user.
    * <p>
-   * If this user's component array does not contain the given type, then it is added to it, and
-   * potentially resized to allow for it to be added.
+   * If the <code>type</code> says to redirect to a main account version of the
+   * component, and this user has an alt, then instead of this user's instance
+   * of the component being returned, the main account's instance is returned
+   * instead.
+   * <p>
+   * Use, {@link #getComponentNoRedirect(ComponentType)} to avoid this alt/main
+   * account redirection. For most cases however, there's no difference between
+   * this method and the no redirect version.
+   *
+   * <p>
+   * If this user's component array does not contain the given type, then it is
+   * added to it, and potentially resized to allow for it to be added.
    *
    * @param type The type
    * @param <T>  The component's type
    * @return The gotten or created component
    */
+  public <T extends UserComponent> @NotNull T getComponent(
+      @NotNull ComponentType<T> type
+  ) {
+    Objects.requireNonNull(type);
+
+    if (type.isRedirectAlts()) {
+      var alts = UserManager.get().getAlts();
+      var main = alts.getMain(getUniqueId());
+
+      if (main != null) {
+        var user = Users.get(main);
+        return user.getComponent(type);
+      }
+    }
+
+    return getComponentNoRedirect(type);
+  }
+
+  /**
+   * Gets or creates a component with the given type for this user. If the user
+   * has a main account and the given type should be redirected to the main's
+   * component, no such redirect will be initiated.
+   *
+   * @param type Component type
+   * @return Gotten or created component
+   * @param <T> Component's type
+   */
   @SuppressWarnings("unchecked") // The T doesn't even exist in runtime, stop screaming
-  public <T extends UserComponent> @NotNull T getComponent(ComponentType<T> type) {
+  public <T extends UserComponent> @NotNull T getComponentNoRedirect(
+      @NotNull ComponentType<T> type
+  ) {
+    Objects.requireNonNull(type);
+
     var index = type.getIndex();
     components = ObjectArrays.ensureCapacity(components, index + 1);
 
@@ -400,7 +444,7 @@ public class User implements ForwardingAudience.Single,
    * @see #getComponent(ComponentType)
    * @see Components#TITLES
    */
-  public UserTitles getTitles() {
+  public RanksComponent getTitles() {
     return getComponent(Components.TITLES);
   }
 

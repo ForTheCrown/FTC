@@ -4,6 +4,8 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.commands.DataCommands;
+import net.forthecrown.commands.DataCommands.DataAccessor;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -32,6 +34,8 @@ import org.bukkit.inventory.ItemStack;
 
 public class CommandEditShop extends FtcCommand {
 
+  private final Component usageMessage;
+
   public CommandEditShop() {
     super("editshop");
 
@@ -43,6 +47,24 @@ public class CommandEditShop extends FtcCommand {
 
     register();
   }
+
+  private final DataAccessor dataAccess = new DataAccessor() {
+    @Override
+    public CompoundTag getTag(CommandContext<CommandSource> context)
+        throws CommandSyntaxException {
+      var shop = getShop(context.getSource().asPlayer());
+      CompoundTag tag = new CompoundTag();
+      shop.save(tag);
+      return tag;
+    }
+
+    @Override
+    public void setTag(CommandContext<CommandSource> context, CompoundTag tag)
+        throws CommandSyntaxException {
+      var shop = getShop(context.getSource().asPlayer());
+      shop.load(tag);
+    }
+  };
 
   private Component makeUsageMessage() {
     final Component border = Component.text("                  ")
@@ -84,7 +106,31 @@ public class CommandEditShop extends FtcCommand {
         .build();
   }
 
-  private final Component usageMessage;
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("", "Displays help information");
+
+    factory.usage("buy", "Makes the shop you're looking at a buy shop");
+    factory.usage("sell", "Makes the shop you're looking at a sell shop");
+
+    factory.usage("line <2 | 3> <text>")
+        .addInfo("Changes either the 2nd or 3rd line of the")
+        .addInfo("sign shop you're looking at");
+
+    factory.usage("amount <amount: number(1..64)>")
+        .addInfo("Changes the amount of items the shop sells/buys");
+
+    factory.usage("price <value: number(1..)>")
+        .addInfo("Changes the price of the shop you're looking at");
+
+    factory.usage("transfer <player>")
+        .addInfo("Transfers the shop you're looking at to another <player>");
+
+    var data = factory.withPermission(Permissions.ADMIN)
+        .withPrefix("data");
+
+    DataCommands.addUsages(data, "Shop", null);
+  }
 
   @Override
   protected void createCommand(BrigadierCommand command) {
@@ -94,19 +140,8 @@ public class CommandEditShop extends FtcCommand {
           return 0;
         })
 
-        .then(literal("data")
-            .executes(c -> {
-              Player player = c.getSource().asPlayer();
-              SignShop shop = getShop(player);
-
-              CompoundTag tag = new CompoundTag();
-              shop.save(tag);
-
-              Component display = Text.displayTag(tag, true);
-
-              c.getSource().sendMessage(display);
-              return 0;
-            })
+        .then(DataCommands.dataAccess("Shop", dataAccess)
+            .requires(source -> source.hasPermission(Permissions.ADMIN))
         )
 
         .then(literal("buy").executes(c -> setType(c, false)))

@@ -81,9 +81,7 @@ public class CommandHomeList extends FtcCommand {
     }
 
     if (!Permissions.MAX_HOMES.hasUnlimited(user)) {
-      int max = Permissions.MAX_HOMES.getTier(true, user)
-          .orElse(Permissions.MAX_HOMES.getRange().getMaximum());
-
+      int max = user.getHomes().getMaxHomes();
       int homeCount = homes.size();
 
       builder.append(

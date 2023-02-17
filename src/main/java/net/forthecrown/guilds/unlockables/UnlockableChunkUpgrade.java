@@ -7,7 +7,7 @@ import static net.kyori.adventure.text.Component.text;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
-import net.forthecrown.events.PotionEffectListener;
+import net.forthecrown.events.guilds.PotionEffectListener;
 import net.forthecrown.guilds.Guild;
 import net.forthecrown.guilds.GuildPermission;
 import net.forthecrown.utils.inventory.ItemStacks;
