@@ -1,6 +1,8 @@
 package net.forthecrown.useables;
 
 import com.google.common.base.Strings;
+import net.forthecrown.core.script2.Script;
+import net.forthecrown.useables.util.UsablesScripts;
 import org.jetbrains.annotations.Nullable;
 import org.openjdk.nashorn.internal.objects.NativeJSON;
 import org.openjdk.nashorn.internal.runtime.JSONFunctions;
@@ -34,4 +36,8 @@ public interface UsableScriptHolder {
   String getScriptName();
 
   String[] getArgs();
+
+  default Script compileScript(UsageTypeHolder holder) {
+    return UsablesScripts.getScript(holder, this);
+  }
 }

@@ -42,7 +42,7 @@ public class ActionScript extends UsageAction implements UsableScriptHolder {
 
   @Override
   public void onUse(Player player, Usable holder) {
-    try (var _script = UsablesScripts.getScript(holder, this)) {
+    try (var _script = compileScript(holder)) {
       _script.invoke("onUse", Users.get(player));
     }
   }

@@ -54,7 +54,7 @@ public class TestScript extends UsageTest implements UsableScriptHolder {
 
   @Override
   public boolean test(Player player, CheckHolder holder) {
-    var script = UsablesScripts.getScript(holder, this);
+    var script = compileScript(holder);
 
     if (!script.hasMethod("test")) {
       script.close();
@@ -71,7 +71,7 @@ public class TestScript extends UsageTest implements UsableScriptHolder {
 
   @Override
   public @Nullable Component getFailMessage(Player player, CheckHolder holder) {
-    var script = UsablesScripts.getScript(holder, this);
+    var script = compileScript(holder);
 
     if (!script.hasMethod("getFailMessage")) {
       script.close();
@@ -93,7 +93,7 @@ public class TestScript extends UsageTest implements UsableScriptHolder {
 
   @Override
   public void postTests(Player player, CheckHolder holder) {
-    try (var script = UsablesScripts.getScript(holder, this)) {
+    try (var script = compileScript(holder)) {
       script.invokeIfExists("onTestsPassed", Users.get(player));
     }
   }
