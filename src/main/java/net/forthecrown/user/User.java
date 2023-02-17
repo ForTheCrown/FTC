@@ -1452,7 +1452,7 @@ public class User implements ForwardingAudience.Single,
       boolean hide = UserPreference.DYNMAP_HIDE.getState(this);
       set(Properties.DYNMAP_HIDE, hide);
 
-      UserPreference.DYNMAP_HIDE.setState(this, false);
+      UserPreference.DYNMAP_HIDE.setState(this, true);
     }
   }
 
