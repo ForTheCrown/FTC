@@ -10,7 +10,7 @@ import org.apache.logging.log4j.Logger;
 
 @Getter
 @RequiredArgsConstructor
-public class RegistryIndex<V, I> implements RegistryListener<V> {
+public class RegistryIndex<I, V> implements RegistryListener<V> {
   private static final Logger LOGGER = Loggers.getLogger();
 
   private final Map<I, Holder<V>> index = new Object2ObjectOpenHashMap<>();

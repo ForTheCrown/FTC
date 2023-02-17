@@ -40,7 +40,7 @@ public class DialogueManager {
   @Getter
   private final Registry<Dialogue> registry = Registries.newRegistry();
 
-  private final RegistryIndex<Dialogue, String> randomIdIndex
+  private final RegistryIndex<String, Dialogue> randomIdIndex
       = new RegistryIndex<>(holder -> holder.getValue().getDisguisedId());
 
   private DialogueManager() {
