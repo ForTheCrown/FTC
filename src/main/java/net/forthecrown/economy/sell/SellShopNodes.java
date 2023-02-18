@@ -3,21 +3,14 @@ package net.forthecrown.economy.sell;
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import net.forthecrown.core.Messages;
-import net.forthecrown.core.Permissions;
 import net.forthecrown.user.data.SellAmount;
-import net.forthecrown.user.data.UserShopData;
 import net.forthecrown.user.property.BoolProperty;
 import net.forthecrown.user.property.Properties;
-import net.forthecrown.utils.inventory.DefaultItemBuilder;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.inventory.menu.MenuNode;
 import net.forthecrown.utils.inventory.menu.Slot;
-import net.forthecrown.utils.text.writer.LoreWriter;
-import net.forthecrown.utils.text.writer.TextWriters;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
@@ -36,14 +29,14 @@ public final class SellShopNodes {
   /**
    * Node to toggle selling items with names
    */
-  static final MenuNode SELLING_NAMED = toggleProperty("Named Items",
-      Properties.SELLING_NAMED_ITEMS);
+  static final MenuNode SELLING_NAMED
+      = toggleProperty("Named Items", Properties.SELLING_NAMED_ITEMS);
 
   /**
    * Node to toggle selling items with lore
    */
-  static final MenuNode SELLING_LORE = toggleProperty("Items With Lore",
-      Properties.SELLING_LORE_ITEMS);
+  static final MenuNode SELLING_LORE
+      = toggleProperty("Items With Lore", Properties.SELLING_LORE_ITEMS);
 
   /**
    * Slot 2 node map of sell amount options
@@ -70,6 +63,23 @@ public final class SellShopNodes {
         context.shouldClose(true);
       })
 
+      .build();
+
+  static final MenuNode INFO = MenuNode.builder()
+      .setItem(
+          ItemStacks.builder(Material.BOOK)
+              .setName("&eInfo")
+
+              .addLore("&7Here you can sell items to earn &eRhines&7!")
+              .addLore("")
+              .addLore("&7If you sell a lot of items, their prices will drop.")
+              .addLore("&7The bigger the item's initial price, the faster")
+              .addLore("&7the price drops")
+              .addLore("")
+              .addLore("&7Item prices will recover over time")
+
+              .build()
+      )
       .build();
 
   /**
@@ -119,8 +129,8 @@ public final class SellShopNodes {
     return MenuNode.builder()
         .setItem(user -> {
           var builder = ItemStacks.builder(Material.BLACK_STAINED_GLASS_PANE)
-              .setName((user.get(property) ? "Selling " : "Ignoring ") + name)
-              .addLore("Click to switch");
+              .setName("&e" + (user.get(property) ? "Selling " : "Ignoring ") + name)
+              .addLore("&7Click to switch");
 
           if (user.get(property)) {
             builder
@@ -177,107 +187,11 @@ public final class SellShopNodes {
    * @return The created node
    */
   static MenuNode sellNode(ItemSellData data) {
+    var node = new SellableItemNode(data);
+
     return MenuNode.builder()
-        .setItem(user -> {
-          boolean compacted = user.get(Properties.SELLING_COMPACTED)
-              && data.canBeCompacted();
-
-          UserShopData earnings = user.getComponent(UserShopData.class);
-          Material material = compacted ? data.getCompactMaterial() : data.getMaterial();
-          int amount = user.get(Properties.SELL_AMOUNT).getItemAmount();
-          int mod = compacted ? data.getCompactMultiplier() : 1;
-          int originalPrice = mod * data.getPrice();
-
-          int price = ItemSell.calculateValue(material, data, earnings, 1).getEarned();
-
-          SellResult stackResult = ItemSell.calculateValue(
-              material,
-              data,
-              earnings,
-              material.getMaxStackSize()
-          );
-
-          LoreWriter writer = TextWriters.loreWriter();
-
-          writer.formattedLine("Value: {0, rhines} per item.",
-              NamedTextColor.YELLOW, price
-          );
-
-          if (originalPrice < price) {
-            writer.formattedLine("Original value: {0, rhines}",
-                NamedTextColor.GRAY,
-                originalPrice
-            );
-          }
-
-          writer.formattedLine("Value per stack ({0}): {1, rhines}",
-              NamedTextColor.GOLD,
-              material.getMaxStackSize(),
-              stackResult.getEarned()
-          );
-
-          if (stackResult.getSold() < material.getMaxStackSize()) {
-            writer.formattedLine("Can only sell {0} until price drops to {1, rhines}",
-                NamedTextColor.GRAY,
-                stackResult.getSold(), 0
-            );
-          }
-
-          writer.formattedLine("Amount you will sell: {0}",
-              NamedTextColor.GRAY,
-              user.get(Properties.SELL_AMOUNT).amountText()
-          );
-
-          writer.line("Change the amount you sell on the right", NamedTextColor.GRAY);
-
-          DefaultItemBuilder builder = ItemStacks.builder(material)
-              .setAmount(amount);
-
-          if (user.hasPermission(Permissions.AUTO_SELL)) {
-            if (earnings.getAutoSelling().contains(material)) {
-              builder
-                  .addEnchant(Enchantment.BINDING_CURSE, 1)
-                  .setFlags(ItemFlag.HIDE_ENCHANTS);
-
-              writer.line("&7Shift-Click to stop auto selling this item");
-            } else {
-              writer.line("&7Shift-Click to start auto selling this item");
-            }
-          }
-
-          builder.setLore(writer.getLore());
-          return builder.build();
-        })
-
-        .setRunnable((user, context) -> {
-          boolean compacted = user.get(Properties.SELLING_COMPACTED)
-              && data.canBeCompacted();
-
-          var material = compacted ? data.getCompactMaterial() : data.getMaterial();
-
-          // If toggling auto sell
-          if (context.getClickType() == ClickType.SHIFT_LEFT
-              || context.getClickType() == ClickType.SHIFT_RIGHT
-              && user.hasPermission(Permissions.AUTO_SELL)
-          ) {
-            var autoSelling = user.getComponent(UserShopData.class)
-                .getAutoSelling();
-
-            if (autoSelling.contains(material)) {
-              autoSelling.remove(material);
-            } else {
-              autoSelling.add(material);
-            }
-
-            context.shouldReloadMenu(true);
-            return;
-          }
-
-          ItemSeller handler = ItemSeller.inventorySell(user, material, data);
-          handler.run(true);
-
-          context.shouldReloadMenu(true);
-        })
+        .setItem(node)
+        .setRunnable(node)
 
         .setPlaySound(false)
         .build();

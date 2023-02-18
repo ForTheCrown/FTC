@@ -1,19 +1,23 @@
 package net.forthecrown.economy.sell;
 
+import co.aikar.timings.Timing;
+import co.aikar.timings.Timings;
 import lombok.Getter;
+import net.forthecrown.core.FTC;
 import net.forthecrown.user.data.UserShopData;
 import org.bukkit.Material;
 
 /**
  * Represents the data behind an item sell
  * <p>
- * This functions by selling the 'items' 1 item at a time to prevent abuse of item price scaling.
- * The items there are in quotation marks because the items being 'sold' are purely virtual, meaning
- * the only thing that's changing is an integer value, no actual items are being sold or edited.
+ * This functions by selling the 'items' 1 item at a time to prevent abuse of
+ * item price scaling. The items there are in quotation marks because the items
+ * being 'sold' are purely virtual, meaning the only thing that's changing is an
+ * integer value, no actual items are being sold or edited.
  * <p>
- * If you want to see how the item sell logic itself is ran, look at {@link #sell()}. If you wish to
- * see how the other part of item selling is done, the part of actually removing items, then see
- * {@link ItemSeller}.
+ * If you want to see how the item sell logic itself is ran, look at
+ * {@link #sell()}. If you wish to see how the other part of item selling is
+ * done, the part of actually removing items, then see {@link ItemSeller}.
  *
  * @see #sell()
  * @see ItemSeller
@@ -21,12 +25,24 @@ import org.bukkit.Material;
 @Getter
 public class ItemSell {
 
+  /* ----------------------------- TIMINGS ------------------------------- */
+
+  private static final Timing SELL_CALCULATION
+      = Timings.of(FTC.getPlugin(), "ItemSell_Calculation");
+
+  private static final Timing SINGLE_PRICE_CALCULATION
+      = Timings.of(FTC.getPlugin(), "ItemSell_SingleItem");
+
+  /* ----------------------------- CONSTANTS ------------------------------ */
+
   /**
    * An unlimited {@link #target} value.
    * <p>
    * Unlimited means it will sell as many items as there is remaining
    */
   public static final int UNLIMITED_TARGET = -1;
+
+  /* -------------------------- INSTANCE FIELDS --------------------------- */
 
   /**
    * The price data used for price and earnings calculation
@@ -46,8 +62,9 @@ public class ItemSell {
   /**
    * The price scalar to apply to each item during the sell process.
    * <p>
-   * In effect, this basically multiplies the size of the {@link #getItemQuantity()} value to
-   * correctly simulate the selling of compact item stacks
+   * In effect, this basically multiplies the size of the
+   * {@link #getItemQuantity()} value to correctly simulate the selling of
+   * compact item stacks
    */
   private final int scalar;
 
@@ -57,8 +74,8 @@ public class ItemSell {
   private int sold;
 
   /**
-   * The amount of items that have not yet been sold. Unless any sell logic has been executed, this
-   * will be equal to {@link #getItemQuantity()}
+   * The amount of items that have not yet been sold. Unless any sell logic has
+   * been executed, this will be equal to {@link #getItemQuantity()}
    */
   private int remaining;
 
@@ -68,7 +85,8 @@ public class ItemSell {
   private int earned;
 
   /**
-   * Gets the total amount of rhines earned from selling items of the same type.
+   * Gets the total amount of rhines earned from selling items of the same
+   * type.
    */
   private int totalEarned;
 
@@ -97,8 +115,8 @@ public class ItemSell {
   }
 
   /**
-   * Calculates the value of the given material, used for price display calculation in SellShop
-   * menus
+   * Calculates the value of the given material, used for price display
+   * calculation in SellShop menus
    *
    * @param mat    The material to find the value of
    * @param price  The item data of the material
@@ -106,7 +124,9 @@ public class ItemSell {
    * @param amount The amount of items to find the value of
    * @return The found sell result
    */
-  public static SellResult calculateValue(Material mat, ItemSellData price, UserShopData data,
+  public static SellResult calculateValue(Material mat,
+                                          ItemSellData price,
+                                          UserShopData data,
                                           int amount
   ) {
     return new ItemSell(mat, price, data, amount, amount).sell();
@@ -128,10 +148,11 @@ public class ItemSell {
   /**
    * Tests if this item sell has reached its target sold quantity.
    * <p>
-   * If {@link #isUnlimited()} returns true, then this returns the negated value of
-   * {@link #hasRemaining()}
+   * If {@link #isUnlimited()} returns true, then this returns the negated value
+   * of {@link #hasRemaining()}
    *
-   * @return True, if the {@link #getSold()} value is less than or equal to {@link #getTarget()}
+   * @return True, if the {@link #getSold()} value is less than or equal to
+   * {@link #getTarget()}
    */
   public boolean hasReachedTarget() {
     if (isUnlimited()) {
@@ -142,8 +163,8 @@ public class ItemSell {
   }
 
   /**
-   * Tests if this item sell instance is selling all the items it has or is trying to reach a
-   * certain goal
+   * Tests if this item sell instance is selling all the items it has or is
+   * trying to reach a certain goal
    *
    * @return True, if this sell has no end item quantity target
    */
@@ -161,20 +182,22 @@ public class ItemSell {
   }
 
   /**
-   * Runs the sell logic to calculate how many items can be sold and how much can be earned from
-   * them
+   * Runs the sell logic to calculate how many items can be sold and how much
+   * can be earned from them
    * <p>
-   * If {@link #hasFoundEnough()} returns false, this instantly returns a failed result.
+   * If {@link #hasFoundEnough()} returns false, this instantly returns a failed
+   * result.
    * <p>
-   * This function works by looping for as long as {@link #hasReachedTarget()} returns false and
-   * then returning the amount of items sold in the result.
+   * This function works by looping for as long as {@link #hasReachedTarget()}
+   * returns false and then returning the amount of items sold in the result.
    * <p>
-   * In the loop, {@link #calculateSingleItemEarnings()} is called to get the earnings of a single
-   * stack, if that returns 0, it means the price has dropped to 0 and we cannot sell anymore and it
-   * returns a failed result with how many items it managed to sell before the price dropped to 0.
+   * In the loop, {@link #calculateSingleItemEarnings()} is called to get the
+   * earnings of a single stack, if that returns 0, it means the price has
+   * dropped to 0 and we cannot sell anymore and it returns a failed result with
+   * how many items it managed to sell before the price dropped to 0.
    * <p>
-   * If the loop finishes without the price dropping to 0 then this returns a successful sell
-   * result
+   * If the loop finishes without the price dropping to 0 then this returns a
+   * successful sell result
    *
    * @return The result of the selling... great description I know
    * @see SellResult
@@ -191,6 +214,8 @@ public class ItemSell {
       return cachedResult = SellResult.notEnoughItems(this);
     }
 
+    SELL_CALCULATION.startTiming();
+
     while (!hasReachedTarget()) {
       // Get the amount of rhines we can earn from
       // a single item stack's 1 quantity
@@ -201,6 +226,7 @@ public class ItemSell {
       // sell anymore, so return a failed
       // result
       if (singleEarnings == 0) {
+        SELL_CALCULATION.stopTiming();
         return cachedResult = SellResult.cannotSellMore(this);
       }
 
@@ -210,35 +236,42 @@ public class ItemSell {
       totalEarned += singleEarnings;
     }
 
+    SELL_CALCULATION.stopTiming();
     return cachedResult = SellResult.success(this);
   }
 
   /**
-   * Calculates the value of a single item stack given the current{@link #getTotalEarned()} value.
+   * Calculates the value of a single item stack given the
+   * current{@link #getTotalEarned()} value.
    * <p>
-   * This functions by running a for loop for with {@link #getScalar()} iterations and adding the
-   * the item's calculated price onto the result + {@link #getTotalEarned()}.
+   * This functions by running a for loop for with {@link #getScalar()}
+   * iterations and adding the item's calculated price onto the result +
+   * {@link #getTotalEarned()}.
    * <p>
-   * If that calculated price ever reaches 0, it means we cannot fully sell the item stack and our
-   * price has dropped to 0
+   * If that calculated price ever reaches 0, it means we cannot fully sell the
+   * item stack and our price has dropped to 0
    *
-   * @return The calculated value of a single item stack, or 0, if the price dropped to 0 and the
-   * item could not be sold
+   * @return The calculated value of a single item stack, or 0, if the price
+   * dropped to 0 and the item could not be sold
    */
   private int calculateSingleItemEarnings() {
     final int earned = this.totalEarned;
     int result = 0;
 
+    SINGLE_PRICE_CALCULATION.startTiming();
+
     for (int i = 0; i < scalar; i++) {
       int single = itemData.calculatePrice(earned + result);
 
       if (single <= 0) {
+        SINGLE_PRICE_CALCULATION.stopTiming();
         return 0;
       }
 
       result += single;
     }
 
+    SINGLE_PRICE_CALCULATION.stopTiming();
     return result;
   }
 }

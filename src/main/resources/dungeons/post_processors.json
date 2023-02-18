@@ -1,7 +1,0 @@
-{
-  "furniture/tables": {
-    "type": "pool",
-    "marker": "table",
-    "pool": "dungeons/tables"
-  }
-}

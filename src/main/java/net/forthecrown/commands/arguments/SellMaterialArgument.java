@@ -10,8 +10,6 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import java.util.concurrent.CompletableFuture;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.economy.Economy;
-import net.forthecrown.economy.sell.ItemSellData;
-import net.forthecrown.grenadier.CmdUtil;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.royalgrenadier.VanillaMappedArgument;
@@ -44,38 +42,18 @@ public class SellMaterialArgument implements ArgumentType<Material>, VanillaMapp
 
     var priceMap = Economy.get()
         .getSellShop()
-        .getPriceMap();
+        .getPriceMap()
+        .keyIterator();
 
-    for (var d : priceMap) {
-      suggest(d, d.getMaterial(), token, builder);
+    priceMap.forEachRemaining(s -> {
+      if (!CompletionProvider.startsWith(token, s)) {
+        return;
+      }
 
-      // Compacted materials exist twice in the map, this will cause duplciate
-      // suggestions
-      /*if (d.canBeCompacted()) {
-        suggest(d, d.getCompactMaterial(), token, builder);
-      }*/
-    }
+      builder.suggest(s);
+    });
 
     return builder.buildFuture();
-  }
-
-  private void suggest(ItemSellData d, Material label, String token, SuggestionsBuilder builder) {
-    var suggestion = label.name().toLowerCase();
-
-    if (!CompletionProvider.startsWith(token, suggestion)) {
-      return;
-    }
-
-    var tooltip = String.format(
-        "type='%s', price=%s, maxEarnable=%s, compactSize=%s, compactType='%s'",
-        d.getMaterial(),
-        d.getPrice(),
-        d.getMaxEarnings(),
-        d.getCompactMultiplier(),
-        d.getCompactMaterial()
-    );
-
-    builder.suggest(suggestion, CmdUtil.toTooltip(tooltip));
   }
 
   @Override

@@ -1,6 +1,5 @@
 package net.forthecrown.economy.sell;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
@@ -11,7 +10,6 @@ import org.jetbrains.annotations.Nullable;
  */
 @Getter
 @RequiredArgsConstructor
-@Builder(builderClassName = "Builder")
 public class ItemSellData {
   /* ----------------------------- INSTANCE FIELDS ------------------------------ */
 
@@ -52,11 +50,31 @@ public class ItemSellData {
   /**
    * Vars for math
    */
-  private final double
-          B = 0.00015d,
-          C = B * maxEarnings / 2d,
-          D = price / 2d,
-          A = -price / (2* Math.atan(C));
+  private static final double B = 0.00015d;
+
+  private final double C;
+  private final double D;
+  private final double A;
+
+  @lombok.Builder(builderClassName = "Builder")
+  public ItemSellData(Material material,
+                      @Nullable Material compactMaterial,
+                      int price,
+                      int compactMultiplier,
+                      int maxEarnings,
+                      int inventoryIndex
+  ) {
+    this.material = material;
+    this.compactMaterial = compactMaterial;
+    this.price = price;
+    this.compactMultiplier = compactMultiplier;
+    this.maxEarnings = maxEarnings;
+    this.inventoryIndex = inventoryIndex;
+
+    C = B * maxEarnings / 2d;
+    D = price / 2d;
+    A = -price / (2* Math.atan(C));
+  }
 
   /* ----------------------------- METHODS ------------------------------ */
 

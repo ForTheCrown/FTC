@@ -135,17 +135,15 @@ public class ItemPriceMap implements Iterable<ItemSellData> {
           return null;
         }
 
-        if (data.getCompactMaterial() == null
-            || data.getMaterial().ordinal() == pos
-        ) {
+        if (pos == data.getMaterial().ordinal()) {
           return data.getMaterial()
               .name()
               .toLowerCase();
+        } else {
+          return data.getCompactMaterial()
+              .name()
+              .toLowerCase();
         }
-
-        return data.getCompactMaterial()
-            .name()
-            .toLowerCase();
       }
 
       @Override

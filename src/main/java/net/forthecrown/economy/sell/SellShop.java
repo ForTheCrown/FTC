@@ -79,6 +79,8 @@ public class SellShop {
         )
     );
 
+    builder.add(Slot.of(4, 3), SellShopNodes.INFO);
+
     this.mainMenu = builder.build();
   }
 

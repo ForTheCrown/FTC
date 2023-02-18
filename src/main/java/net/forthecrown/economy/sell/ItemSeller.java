@@ -114,6 +114,11 @@ public final class ItemSeller {
         .amount(result.getEarned())
         .log();
 
+    Loggers.getLogger().info(
+        "Selling complete! seller={} material={} quantity={} earned={}",
+        player, material, result.getSold(), result.getEarned()
+    );
+
     if (send) {
       player.sendMessage(Messages.soldItems(result, material));
       player.playSound(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);

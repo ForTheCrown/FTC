@@ -42,7 +42,7 @@ public class CommandSell extends FtcCommand {
   @Override
   public boolean test(CommandSource source) {
     return super.test(source)
-        && source.textName().startsWith("__"); // Bedrock player prefix
+        && (source.textName().startsWith("__") || source.isOp());
   }
 
   @Override
