@@ -47,6 +47,23 @@ public class CommandMergeShop extends FtcCommand {
    */
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    factory = factory.withPrefix("<user>");
+
+    factory.usage("")
+        .addInfo("Requests to merge your shop with a <user>'s shop");
+
+    factory.usage("confirm")
+        .addInfo("Confirms a merge request that came from a <user>");
+
+    factory.usage("deny")
+        .addInfo("Denies a merge request that came from a <user>");
+
+    factory.usage("cancel")
+        .addInfo("Cancels a merge request sent to a <user>");
+  }
+
+  @Override
   protected void createCommand(BrigadierCommand command) {
     command
         .then(argument("user", Arguments.ONLINE_USER)

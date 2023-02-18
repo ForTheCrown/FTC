@@ -1,11 +1,14 @@
 package net.forthecrown.core.challenge;
 
 import com.google.common.collect.ImmutableList;
-import net.forthecrown.core.FTC;
+import java.util.concurrent.CompletionStage;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.user.User;
+import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.forthecrown.utils.text.writer.TextWriters;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import org.jetbrains.annotations.Nullable;
@@ -38,14 +41,20 @@ public interface Challenge {
    */
   default Component displayName(@Nullable User viewer) {
     TextWriter writer = TextWriters.newWriter();
-    var formatter = getPlaceholderFormatter();
 
     for (Component component : getDescription()) {
-      writer.line(formatter.format(component, viewer));
+      writer.line(component);
     }
 
-    int streak = Challenges.queryStreak(this, viewer)
-        .orElse(0);
+    int streak;
+    if (viewer != null) {
+      streak = ChallengeManager.getInstance()
+          .getEntry(viewer.getUniqueId())
+          .getStreak(getStreakCategory())
+          .get();
+    } else {
+      streak = 0;
+    }
 
     var reward = getReward();
     if (!reward.isEmpty(streak)) {
@@ -55,12 +64,29 @@ public interface Challenge {
       writer.setFieldStyle(Style.style(NamedTextColor.GRAY));
       writer.setFieldValueStyle(Style.style(NamedTextColor.GRAY));
 
-      reward.write(writer, streak);
+      reward.write(
+          writer,
+          streak,
+          viewer == null ? null : viewer.getUniqueId()
+      );
     }
 
-    return formatter.format(getName(), viewer)
+    var displayName = getName()
         .color(NamedTextColor.YELLOW)
         .hoverEvent(writer.asComponent());
+
+    return replacePlaceholders(displayName, viewer);
+  }
+
+  default Component replacePlaceholders(Component component, User user) {
+    float goal = getGoal(user);
+
+    return component.replaceText(
+        TextReplacementConfig.builder()
+            .matchLiteral("%goal")
+            .replacement(Text.formatNumber(goal))
+            .build()
+    );
   }
 
   /**
@@ -89,13 +115,6 @@ public interface Challenge {
   }
 
   /**
-   * Gets the placeholder tag formatter for this challenge
-   */
-  default ChallengePlaceholders getPlaceholderFormatter() {
-    return ChallengePlaceholders.of(this);
-  }
-
-  /**
    * Gets the challenge's goal
    */
   StreakBasedValue getGoal();
@@ -104,7 +123,17 @@ public interface Challenge {
    * Gets the effective goal for the given user
    */
   default float getGoal(User user) {
-    int streak = Challenges.queryStreak(this, user).orElse(0);
+    int streak;
+
+    if (user != null) {
+      streak = ChallengeManager.getInstance()
+          .getEntry(user)
+          .getStreak(getStreakCategory())
+          .get();
+    } else {
+      streak = 0;
+    }
+
     return getGoal().getValue(streak);
   }
 
@@ -121,8 +150,10 @@ public interface Challenge {
    * By default, this will simply give the {@link #getReward()} to the player
    */
   default void onComplete(User user) {
-    int streak = Challenges.queryStreak(this, user)
-        .orElse(0);
+    int streak = ChallengeManager.getInstance()
+        .getEntry(user)
+        .getStreak(getStreakCategory())
+        .get();
 
     if (getReward().isEmpty(streak)) {
       return;
@@ -133,7 +164,7 @@ public interface Challenge {
     // Find the challenge's entry and then use it's key to log the
     // user completing this challenge
     Challenges.apply(this, holder -> {
-      FTC.getLogger().info("{} completed the {} challenge",
+      Loggers.getLogger().info("{} completed the {} challenge",
           user.getName(), holder.getKey()
       );
     });
@@ -153,7 +184,7 @@ public interface Challenge {
    * @return Extra info to display in the {@link net.forthecrown.log.DataLog} for activated
    * challenges
    */
-  String activate(boolean reset);
+  CompletionStage<String> activate(boolean reset);
 
   /**
    * Triggers this challenge.

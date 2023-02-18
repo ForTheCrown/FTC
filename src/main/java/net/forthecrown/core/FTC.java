@@ -2,7 +2,8 @@ package net.forthecrown.core;
 
 import co.aikar.timings.Timing;
 import co.aikar.timings.Timings;
-import org.apache.logging.log4j.Logger;
+import net.forthecrown.core.config.GeneralConfig;
+import net.forthecrown.utils.VanillaAccess;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class FTC {
@@ -17,12 +18,14 @@ public final class FTC {
     return JavaPlugin.getPlugin(Main.class);
   }
 
-  public static Logger getLogger() {
-    return getPlugin().logger;
-  }
-
   public static boolean inDebugMode() {
     return getPlugin().debugMode;
+  }
+
+  public static boolean debugLoggingEnabled() {
+    return inDebugMode()
+        || VanillaAccess.getServer().isDebugging()
+        || GeneralConfig.debugLoggerEnabled;
   }
 
   public static Timing timing(String name) {

@@ -14,7 +14,8 @@ import org.jetbrains.annotations.Nullable;
 public class TestEmptyInventory extends UsageTest {
 
   // --- TYPE ---
-  public static final UsageType<TestEmptyInventory> TYPE = UsageType.of(TestEmptyInventory.class);
+  public static final UsageType<TestEmptyInventory> TYPE = UsageType.of(TestEmptyInventory.class)
+      .requiresInput(false);
 
   @UsableConstructor(ConstructType.EMPTY)
   public TestEmptyInventory() {

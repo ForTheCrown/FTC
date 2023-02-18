@@ -1,27 +1,3 @@
 {
-  "root": {
-    "structure": "dungeons/root_room",
-    "options": [ "root" ],
-    "variants": {}
-  },
-  "connectors/short_hallway_0": {
-    "structure": "dungeons/short_hallway_0",
-    "options": [ "connector" ],
-    "variants": {}
-  },
-  "connectors/t_shape_0": {
-    "structure": "dungeons/t_shape_0",
-    "options": [ "connector" ],
-    "variants": {}
-  },
-  "connectors/4_way_0": {
-    "structure": "dungeons/4_way",
-    "options": [ "connector" ],
-    "variants": {}
-  },
-  "connectors/l_shape_0": {
-    "structure": "dungeons/l_turn",
-    "options": [ "connector" ],
-    "variants": {}
-  }
+
 }

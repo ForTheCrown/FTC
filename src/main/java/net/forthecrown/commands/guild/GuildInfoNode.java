@@ -5,7 +5,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.guilds.menu.GuildMenus;
-import net.forthecrown.utils.text.writer.TextWriter;
 
 class GuildInfoNode extends GuildCommandNode {
 
@@ -14,9 +13,9 @@ class GuildInfoNode extends GuildCommandNode {
   }
 
   @Override
-  protected void writeHelpInfo(TextWriter writer, CommandSource source) {
-    writer.field("info", "Displays info about your guild");
-    writer.field("info <guild>", "Displays info about a specific guild");
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("", "Displays info about your guild");
+    factory.usage("<guild>", "Displays info about a specific guild");
   }
 
   @Override

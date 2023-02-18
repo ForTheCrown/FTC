@@ -8,7 +8,7 @@ import net.forthecrown.core.challenge.ChallengeLogs;
 import net.forthecrown.core.challenge.ChallengeManager;
 import net.forthecrown.core.config.ConfigManager;
 import net.forthecrown.core.config.Configs;
-import net.forthecrown.core.holidays.ServerHolidays;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.ModuleServices;
 import net.forthecrown.core.resource.ResourceWorld;
 import net.forthecrown.core.resource.ResourceWorldTracker;
@@ -17,7 +17,6 @@ import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.datafix.Transformers;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.dungeons.DungeonManager;
-import net.forthecrown.dungeons.enchantments.FtcEnchants;
 import net.forthecrown.economy.Economy;
 import net.forthecrown.economy.Transactions;
 import net.forthecrown.events.Events;
@@ -26,6 +25,8 @@ import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.guilds.GuildManager;
 import net.forthecrown.guilds.unlockables.Unlockables;
 import net.forthecrown.inventory.ExtendedItems;
+import net.forthecrown.inventory.weapon.ability.AbilityAnimation;
+import net.forthecrown.inventory.weapon.ability.SwordAbilityManager;
 import net.forthecrown.log.LogManager;
 import net.forthecrown.structure.Structures;
 import net.forthecrown.useables.Usables;
@@ -34,7 +35,7 @@ import net.forthecrown.user.UserManager;
 import net.forthecrown.user.data.UserRanks;
 import net.forthecrown.user.packet.PacketListeners;
 import net.forthecrown.user.property.Properties;
-import net.forthecrown.utils.text.ChatEmotes;
+import net.forthecrown.utils.dialogue.DialogueManager;
 import net.forthecrown.utils.world.WorldLoader;
 import net.forthecrown.waypoint.WaypointManager;
 import net.forthecrown.waypoint.WaypointProperties;
@@ -49,10 +50,17 @@ import org.apache.logging.log4j.Logger;
 final class BootStrap {
   private BootStrap() {}
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getPluginLogger();
 
   static void init() {
     RoyalCommandException.ENABLE_HOVER_STACK_TRACE = FTC.inDebugMode();
+
+    long freeMem = Runtime.getRuntime().freeMemory();
+
+    // Tools
+    init(InventoryStorage::getStorage);
+    init(Cooldowns::getCooldowns);
+    init(DialogueManager::getDialogues);
 
     // Guilds
     init(Unlockables.class);
@@ -80,21 +88,22 @@ final class BootStrap {
     init(Structures::get);
 
     // Dungeons
-    init(FtcEnchants.class);
     init(Bosses.class);
 
     // Only load dungeons for testing purposes
     if (FTC.inDebugMode()) {
-      init(DungeonManager::getInstance);
+      init(DungeonManager::getDungeons);
     }
 
-    // Bunch of miscellaneous modules
-    init(ChatEmotes.class);
+    // Item stuff, like crown and royal sword
+    init(SwordAbilityManager::getInstance);
     init(ExtendedItems.class);
+
+    // Bunch of miscellaneous modules
+    init(AbilityAnimation::getInstance);
     init(Cosmetics.class);
     init(Usables::getInstance);
     init(ResourceWorldTracker::get);
-    init(ServerHolidays::get);
     init(Announcer::get);
     init(Economy::get);
     init(Configs.class);
@@ -126,7 +135,7 @@ final class BootStrap {
     init(Events.class);
 
     init(ScriptManager::getInstance);
-    init(ServerIcons::getInstance);
+    init(ServerListDisplay::getInstance);
 
     // Save and load the banner words list
     FTC.getPlugin().saveResource("banned_words.json", true);
@@ -134,7 +143,7 @@ final class BootStrap {
 
     // Schedule and run module services
     ModuleServices.DAY_CHANGE.schedule();
-    ModuleServices.AUTO_SAVE.schedule();
+    ModuleServices.SAVE.schedule();
     ModuleServices.ON_ENABLE.run();
     ModuleServices.RELOAD.run();
 
@@ -144,12 +153,22 @@ final class BootStrap {
         .clear();
 
     Transformers.runCurrent();
+
+    long freeMemAfter = Runtime.getRuntime().freeMemory();
+    long lostMemory = freeMemAfter - freeMem;
+    LOGGER.debug("Plugin initialization took {}MB or {} bytes",
+        lostMemory / 1024 / 1024,
+        lostMemory
+    );
   }
 
   static <T> void init(Supplier<T> supplier) {
     init(supplier.get());
   }
 
+  // There is no way Object#getClass() returns anything other than
+  // its own class, ie, T#getClass() MUST return a Class<T>
+  @SuppressWarnings("unchecked")
   static <T> void init(T instance) {
     _init(instance, (Class<T>) instance.getClass());
   }

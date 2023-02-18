@@ -22,6 +22,7 @@ public class CommandMarketAppeal extends FtcCommand {
 
     setPermission(Permissions.MARKETS);
     setDescription("Appeals an automated market eviction");
+    simpleUsages();
 
     register();
   }

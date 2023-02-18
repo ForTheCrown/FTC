@@ -1,5 +1,8 @@
 package net.forthecrown.waypoint.visit;
 
+import static net.forthecrown.events.dynamic.HulkSmashListener.GAME_TICKS_PER_COSMETIC_TICK;
+import static net.kyori.adventure.util.Ticks.TICKS_PER_SECOND;
+
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.Set;
@@ -23,7 +26,6 @@ import net.forthecrown.waypoint.Waypoints;
 import net.forthecrown.waypoint.type.WaypointTypes;
 import net.forthecrown.waypoint.visit.handlers.OwnedEntityHandler;
 import net.forthecrown.waypoint.visit.handlers.VehicleVisitHandler;
-import net.kyori.adventure.util.Ticks;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -248,8 +250,8 @@ public class WaypointVisit implements Runnable {
       // their peek
       Tasks.runTimer(
           new GoingUp(),
-          HulkSmashListener.GAME_TICKS_PER_COSMETIC_TICK,
-          HulkSmashListener.GAME_TICKS_PER_COSMETIC_TICK
+          GAME_TICKS_PER_COSMETIC_TICK,
+          GAME_TICKS_PER_COSMETIC_TICK
       );
     } else {
       // Execute travel effect, if they have one
@@ -264,7 +266,7 @@ public class WaypointVisit implements Runnable {
       }
 
       // Just TP them to pole... boring
-      user.getPlayer().teleport(getTeleportLocation());
+      user.getPlayer().teleport(getTeleportLocation(), true, true);
       user.playSound(Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
 
       runTpHandlers();
@@ -285,8 +287,7 @@ public class WaypointVisit implements Runnable {
 
   private class GoingUp implements Consumer<BukkitTask> {
 
-    byte tick = (byte) (0.75 * (Ticks.TICKS_PER_SECOND
-        / HulkSmashListener.GAME_TICKS_PER_COSMETIC_TICK));
+    int tick = (int) (0.75 * (TICKS_PER_SECOND / GAME_TICKS_PER_COSMETIC_TICK));
 
     @Override
     public void accept(BukkitTask task) {
@@ -301,7 +302,7 @@ public class WaypointVisit implements Runnable {
         if (--tick < 0) {
           task.cancel();
 
-          user.getPlayer().teleport(getTeleportLocation());
+          user.getPlayer().teleport(getTeleportLocation(), true, true);
           user.playSound(Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
 
           runTpHandlers();

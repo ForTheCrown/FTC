@@ -1,6 +1,6 @@
 package net.forthecrown.user.property;
 
-import net.forthecrown.core.module.OnEnable;
+import net.forthecrown.core.TabList;
 import net.forthecrown.core.registry.Registries;
 import net.forthecrown.core.registry.Registry;
 import net.forthecrown.guilds.DiscoverySort;
@@ -17,19 +17,20 @@ public class Properties {
   /**
    * Registry of all properties
    */
-  public static final Registry<UserProperty> USER_PROPERTIES = Registries.newFreezable();
+  public static final Registry<UserProperty> USER_PROPERTIES
+      = Registries.newFreezable();
 
   /**
    * The amount a user will sell in /shop.
    */
-  public static final EnumProperty<SellAmount>
-      SELL_AMOUNT = new EnumProperty<>("sellAmount", SellAmount.PER_1);
+  public static final EnumProperty<SellAmount> SELL_AMOUNT
+      = new EnumProperty<>("sellAmount", SellAmount.PER_1);
 
-  public static final EnumProperty<MemberSort>
-      MEMBER_SORT = new EnumProperty<>("memberSort", MemberSort.BY_RANK);
+  public static final EnumProperty<MemberSort> MEMBER_SORT
+      = new EnumProperty<>("memberSort", MemberSort.BY_RANK);
 
-  public static final EnumProperty<DiscoverySort>
-      DISCOVERY_SORT = new EnumProperty<>("guildDiscovery", DiscoverySort.BY_NAME);
+  public static final EnumProperty<DiscoverySort> DISCOVERY_SORT
+      = new EnumProperty<>("guildDiscovery", DiscoverySort.BY_NAME);
 
   /**
    * Determines whether a user is allowed to send and receive command emotes such as '/kiss'.
@@ -178,9 +179,19 @@ public class Properties {
    * Determines whether only public guilds are shown in the guild
    * discovery menu
    */
-  G_DISC_PUBLIC_ONLY   = new BoolProperty("guildDiscovery_onlyPublic", true),
+  G_DISC_PUBLIC_ONLY = new BoolProperty("guildDiscovery_onlyPublic", true),
 
-  G_CHAT_TOGGLE        = new BoolProperty("guildChatToggled", false);
+  /** Determines whether all messages will go guild chat or not */
+  G_CHAT_TOGGLE = new BoolProperty("guildChatToggled", false),
+
+  /**
+   * Determines whether the animation when upgrading/setting a weapon ability
+   * should be skipped or not
+   */
+  SKIP_ABILITY_ANIM = new BoolProperty("skipAbilityAnimation", false),
+
+  /** Used for tracking hiding status when switching to and from spectator */
+  DYNMAP_HIDE = new BoolProperty("dynmapHide", false);
 
   /**
    * Determines a player's TAB prefix.
@@ -220,6 +231,10 @@ public class Properties {
     @Override
     public void onUpdate(User user) {
       user.updateVanished();
+
+      // Tablist contains player count, so update it
+      // to add/remove the vanished player from the count
+      TabList.update();
     }
   };
 
@@ -243,11 +258,7 @@ public class Properties {
     }
   };
 
-  /**
-   * Empty initializer method to freeze property registry
-   */
-  @OnEnable
-  static void init() {
+  static {
     USER_PROPERTIES.freeze();
   }
 }

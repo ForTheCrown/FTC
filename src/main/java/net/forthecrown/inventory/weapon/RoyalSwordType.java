@@ -3,6 +3,7 @@ package net.forthecrown.inventory.weapon;
 import static net.forthecrown.utils.text.Text.nonItalic;
 
 import java.util.UUID;
+import net.forthecrown.core.config.ConfigManager;
 import net.forthecrown.core.registry.Keys;
 import net.forthecrown.dungeons.enchantments.FtcEnchants;
 import net.forthecrown.inventory.ExtendedItemType;
@@ -29,7 +30,9 @@ public class RoyalSwordType implements ExtendedItemType<RoyalSword> {
       RANK_5_NAME = makeName("Royal", NamedTextColor.YELLOW, NamedTextColor.GOLD, true),
       RANK_FINAL_NAME = makeName("Dragon's", NamedTextColor.RED, NamedTextColor.DARK_RED, true);
 
-  private static Component makeName(String name, TextColor nameColor, TextColor borderColor,
+  private static Component makeName(String name,
+                                    TextColor nameColor,
+                                    TextColor borderColor,
                                     boolean bold
   ) {
     return Component.text()
@@ -41,8 +44,7 @@ public class RoyalSwordType implements ExtendedItemType<RoyalSword> {
   }
 
   public RoyalSwordType() {
-    SwordRanks.init();
-    WeaponAbilities.init();
+    ConfigManager.get().registerConfig(SwordConfig.class);
   }
 
   @Pattern(Keys.VALID_KEY_REGEX)
@@ -62,7 +64,7 @@ public class RoyalSwordType implements ExtendedItemType<RoyalSword> {
   }
 
   @Override
-  public @NotNull BaseItemBuilder createBaseItem() {
+  public @NotNull BaseItemBuilder<?> createBaseItem() {
     return ItemStacks.builder(Material.WOODEN_SWORD)
         .setNameRaw(RANK_1_NAME)
         .setUnbreakable(true)

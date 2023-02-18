@@ -2,7 +2,7 @@ package net.forthecrown.useables.test;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.commands.manager.Commands;
+import net.forthecrown.commands.arguments.RegistryArguments;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.useables.CheckHolder;
 import net.forthecrown.useables.ConstructType;
@@ -20,7 +20,8 @@ import org.bukkit.entity.Player;
 
 public class TestRank extends UsageTest {
 
-  public static final UsageType<TestRank> TYPE = UsageType.of(TestRank.class);
+  public static final UsageType<TestRank> TYPE = UsageType.of(TestRank.class)
+      .setSuggests(RegistryArguments.RANKS::listSuggestions);
 
   private final UserRank title;
 
@@ -54,9 +55,8 @@ public class TestRank extends UsageTest {
 
   @UsableConstructor
   public static TestRank parse(StringReader reader, CommandSource source)
-      throws CommandSyntaxException
-  {
-    return new TestRank(Commands.RANK.parse(reader).getValue());
+      throws CommandSyntaxException {
+    return new TestRank(RegistryArguments.RANKS.parse(reader).getValue());
   }
 
   @UsableConstructor(ConstructType.TAG)

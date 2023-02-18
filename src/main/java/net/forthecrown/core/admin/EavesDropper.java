@@ -9,8 +9,8 @@ import static net.forthecrown.core.Messages.edPrependPrefix;
 import static net.forthecrown.core.Messages.edSign;
 
 import java.util.List;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.Permissions;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.guilds.Guild;
 import net.forthecrown.user.DirectMessage;
 import net.forthecrown.user.MarriageMessage;
@@ -30,7 +30,7 @@ import org.bukkit.entity.Player;
  */
 public class EavesDropper {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   public static void send(Component message, BoolProperty property, boolean log) {
     var formatted = edPrependPrefix(message);
@@ -115,7 +115,7 @@ public class EavesDropper {
     send(
         edGuildChat(sender, guild, mute, message),
         Properties.EAVES_DROP_GUILD_CHAT,
-        false
+        true
     );
   }
 }

@@ -4,6 +4,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import github.scarsz.discordsrv.DiscordSRV;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnEnable;
 import net.forthecrown.events.economy.AutoSellListener;
 import net.forthecrown.events.economy.MarketListener;
@@ -11,11 +12,14 @@ import net.forthecrown.events.economy.ShopCreateListener;
 import net.forthecrown.events.economy.ShopDestroyListener;
 import net.forthecrown.events.economy.ShopInteractionListener;
 import net.forthecrown.events.economy.ShopInventoryListener;
+import net.forthecrown.events.guilds.GuildDiscordListener;
+import net.forthecrown.events.guilds.GuildEvents;
 import net.forthecrown.events.player.AfkListener;
 import net.forthecrown.events.player.ChatListener;
 import net.forthecrown.events.player.ChatPacketListener;
 import net.forthecrown.events.player.DurabilityListener;
 import net.forthecrown.events.player.JailListener;
+import net.forthecrown.events.player.LoginListener;
 import net.forthecrown.events.player.MarriageListener;
 import net.forthecrown.events.player.MotdListener;
 import net.forthecrown.events.player.PlayerJoinListener;
@@ -84,11 +88,14 @@ public final class Events {
 
     register(new ResourceWorldListener());
     register(new WeaponListener());
+    register(new SwordFireballListener());
 
     register(new AutoSellListener());
     register(new DurabilityListener());
-    register(new PlayerMoveGuildChunkListener());
-    register(new PotionEffectListener());
+
+    GuildEvents.registerAll();
+
+    register(new LoginListener());
 
     // Listen for voting plugin votes
     if (Util.isPluginEnabled("VotingPlugin")) {
@@ -98,10 +105,9 @@ public final class Events {
     PacketListeners.register(new PlayerPacketListener());
     PacketListeners.register(new ChatPacketListener());
 
-    var listener = new GuildDiscordListener();
     var api = DiscordSRV.api;
-
-    api.subscribe(listener);
+    api.subscribe(new GuildDiscordListener());
+    api.subscribe(new AnnouncementForwardingListener());
   }
 
   /**
@@ -143,7 +149,7 @@ public final class Events {
 
       Exceptions.handleSyntaxException(sender, e);
     } catch (Throwable e) {
-      FTC.getLogger().error(
+      Loggers.getLogger().error(
           "Error executing event {}",
           event.getEventName(),
           e

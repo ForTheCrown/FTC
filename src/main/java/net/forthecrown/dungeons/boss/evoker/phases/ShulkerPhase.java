@@ -65,6 +65,7 @@ public class ShulkerPhase implements AttackPhase {
         shulker.setAware(false);
         shulker.customName(Component.text("Shulker Guardian", NamedTextColor.RED));
         shulker.setColor(DyeColor.RED);
+        shulker.setRemoveWhenFarAway(false);
 
         shulker.getPersistentDataContainer()
             .set(SHULKER_STATUS_KEY, PersistentDataType.BYTE, STATUS_FIGHTING);

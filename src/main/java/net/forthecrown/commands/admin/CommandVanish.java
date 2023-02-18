@@ -18,6 +18,7 @@ public class CommandVanish extends FtcCommand {
 
     setPermission(Permissions.VANISH);
     setAliases("v");
+    setDescription("Makes you or another player vanish");
 
     register();
   }
@@ -36,6 +37,23 @@ public class CommandVanish extends FtcCommand {
    *
    * Author: Julie
    */
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("")
+        .addInfo("Silently vanishes/unvanishes you");
+
+    factory.usage("-joinLeaveMessage")
+        .addInfo("Vanishes/unvanishes you, and broadcasts a")
+        .addInfo("Join/leave message");
+
+    factory.usage("<player>")
+        .addInfo("Silently vanishes/unvanishes a <player>");
+
+    factory.usage("<player> -joinLeaveMessage")
+        .addInfo("Vanishes/unvanishes a <player>, and")
+        .addInfo("broadcasts a Join/leave message");
+  }
 
   @Override
   protected void createCommand(BrigadierCommand command) {

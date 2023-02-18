@@ -88,17 +88,17 @@ public abstract class AbstractBounds3i<T extends AbstractBounds3i<T>> implements
     );
   }
 
-  public T combine(AbstractBounds3i... others) {
+  public T combine(AbstractBounds3i<?>... others) {
     T result = clone();
 
-    for (AbstractBounds3i<T> o : others) {
+    for (AbstractBounds3i<?> o : others) {
       result = result.combine(o);
     }
 
     return result;
   }
 
-  public T combine(AbstractBounds3i o) {
+  public T combine(AbstractBounds3i<?> o) {
     return combine(o.minX(), o.minY(), o.minZ(), o.maxX(), o.maxY(), o.maxZ());
   }
 
@@ -128,7 +128,7 @@ public abstract class AbstractBounds3i<T extends AbstractBounds3i<T>> implements
     );
   }
 
-  public T intersection(AbstractBounds3i o) {
+  public T intersection(AbstractBounds3i<?> o) {
     return intersection(o.minX(), o.minY(), o.minZ(), o.maxX(), o.maxY(), o.maxZ());
   }
 
@@ -192,7 +192,7 @@ public abstract class AbstractBounds3i<T extends AbstractBounds3i<T>> implements
     return overlaps(Bounds3i.of(box));
   }
 
-  public boolean overlaps(AbstractBounds3i o) {
+  public boolean overlaps(AbstractBounds3i<?> o) {
     return overlaps(o.minX(), o.minY(), o.minZ(), o.maxX(), o.maxY(), o.maxZ());
   }
 
@@ -212,7 +212,7 @@ public abstract class AbstractBounds3i<T extends AbstractBounds3i<T>> implements
         && ((double) this.minZ) < maxZ && ((double) this.maxZ) + 1.0D > minZ;
   }
 
-  public boolean contains(AbstractBounds3i o) {
+  public boolean contains(AbstractBounds3i<?> o) {
     return contains(o.minX(), o.minY(), o.minZ(), o.maxX(), o.maxY(), o.maxZ());
   }
 

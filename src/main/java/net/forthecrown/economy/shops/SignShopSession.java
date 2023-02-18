@@ -3,10 +3,10 @@ package net.forthecrown.economy.shops;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.challenge.Challenges;
 import net.forthecrown.core.config.GeneralConfig;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.economy.Economy;
 import net.forthecrown.economy.TransactionType;
 import net.forthecrown.economy.Transactions;
@@ -205,7 +205,7 @@ public class SignShopSession {
     if (shouldLog()) {
       // Brilliant logger statement, I can't wait until we have
       // an economy logger to throw this into
-      FTC.getLogger().info(
+      Loggers.getLogger().info(
           "{} {} {} {} at a{} shop, location: {} for {}, shop price: {}",
 
           customer.getName(),

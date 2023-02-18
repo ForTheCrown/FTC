@@ -17,6 +17,8 @@ public class CommandMarriageDeny extends FtcCommand {
     setDescription("Deny a person's marriage request");
     setAliases("mdeny");
     setPermission(Permissions.MARRY);
+    simpleUsages();
+
     register();
   }
 

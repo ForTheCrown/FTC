@@ -15,13 +15,13 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import org.apache.commons.io.file.PathUtils;
 import org.apache.logging.log4j.Logger;
 
 public class FtcJar {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   /**
    * Flag for resource save operation which allows jar resources to overwrite existing files if, and

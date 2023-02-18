@@ -13,6 +13,7 @@ import java.util.Objects;
 import java.util.Optional;
 import lombok.Getter;
 import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.utils.Util;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 public class ModuleService implements Runnable {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   private final Class<? extends Annotation> annotationType;
 
@@ -121,12 +122,12 @@ public class ModuleService implements Runnable {
       }
     }
 
+    timing.stopTiming();
     LOGGER.info(
         "Ran {} on {} modules",
         annotationType.getSimpleName(),
         ran
     );
-    timing.stopTiming();
   }
 
   public void invoke(@Nullable Object instance,

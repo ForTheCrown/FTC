@@ -4,8 +4,8 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Iterator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.config.GeneralConfig;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.dungeons.boss.BossContext;
 import net.forthecrown.dungeons.boss.evoker.BossMessage;
 import net.forthecrown.dungeons.boss.evoker.EvokerBoss;
@@ -118,7 +118,7 @@ public class PotionPhase implements AttackPhase {
       Player p = findTarget(boss);
 
       if (p == null) {
-        FTC.getLogger().warn("Found no targets for PotionPhase");
+        Loggers.getLogger().warn("Found no targets for PotionPhase");
         return;
       }
 

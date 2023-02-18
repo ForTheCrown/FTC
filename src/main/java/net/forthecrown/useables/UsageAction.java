@@ -8,5 +8,5 @@ public abstract class UsageAction extends UsageInstance {
     super(type);
   }
 
-  public abstract void onUse(Player player, ActionHolder holder);
+  public abstract void onUse(Player player, Usable holder);
 }

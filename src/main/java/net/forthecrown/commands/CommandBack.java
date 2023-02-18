@@ -16,6 +16,7 @@ public class CommandBack extends FtcCommand {
     setPermission(Permissions.BACK);
     setAliases("return");
     setDescription("Teleports you to your previous location");
+    simpleUsages();
 
     register();
   }

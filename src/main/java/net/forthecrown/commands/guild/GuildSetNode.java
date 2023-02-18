@@ -13,6 +13,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Objects;
+import java.util.function.Predicate;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.Permissions;
@@ -21,9 +22,10 @@ import net.forthecrown.guilds.Guild;
 import net.forthecrown.guilds.GuildManager;
 import net.forthecrown.guilds.GuildPermission;
 import net.forthecrown.guilds.Guilds;
+import net.forthecrown.guilds.unlockables.DiscordUnlocks;
+import net.forthecrown.user.Users;
 import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.utils.text.Text;
-import net.forthecrown.utils.text.writer.TextWriter;
 import net.forthecrown.waypoint.Waypoint;
 import net.forthecrown.waypoint.Waypoints;
 import net.forthecrown.waypoint.type.WaypointTypes;
@@ -36,42 +38,56 @@ class GuildSetNode extends GuildCommandNode {
     setAliases("gset");
   }
 
-  @Override
-  protected void writeHelpInfo(TextWriter writer, CommandSource source) {
-    writer.field("set name <name>", "Sets your guild name");
-    writer.field("set leader <user>", "Sets your guild's leader");
-
-    writer.field("set waypoint", "Sets your guilds waypoint to the one " +
-        "you're looking at, or the one you're close to"
-    );
-
-    writer.field("set discordAnnouncements", "Set whether announcements"
-        + " are sent to the guild's discord channel"
-    );
-
-    if (source.hasPermission(Permissions.GUILD_ADMIN)) {
-      writer.field("set name <name> <guild>", "Sets a guild's name");
-      writer.field("set leader <user> <guild>", "Sets a guild's leader");
-      writer.field("set waypoint <guild>", "Sets the guild's waypoint");
-
-      writer.field(
-          "set unlimitedMembers <guild> <true | false>",
-          "Sets whether a guild can have unlimited members"
-      );
-      writer.field(
-          "set unlimitedMembers <guild>",
-          "Queries whether a guild has unlimited members or not"
-      );
-
-      writer.field(
-          "set unlimitedChunks <guild> <true | false>",
-          "Sets if a guild can claim unlimited amount of chunks"
-      );
-      writer.field(
-          "set unlimitedChunks <guild>",
-          "Queries whether a guild has unlimited chunks or not"
-      );
+  private static final Predicate<CommandSource> CHANNEL_UNLOCKED = source -> {
+    if (!source.isPlayer()) {
+      return true;
     }
+
+    var player = source.asPlayerOrNull();
+    var user = Users.getLoadedUser(player.getUniqueId());
+
+    if (user == null) {
+      return false;
+    }
+
+    var guild = user.getGuild();
+
+    if (guild == null) {
+      return false;
+    }
+
+    return DiscordUnlocks.CHANNEL.isUnlocked(guild);
+  };
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("name <name>", "Sets your guild's name");
+    factory.usage("leader <player>", "Sets your guild's leader");
+
+    factory.usage("waypoint")
+        .addInfo("Sets your guild's waypoint to the waypoint you're looking")
+        .addInfo("at, or the closest one to you");
+
+    factory.usage("discordAnnouncements")
+        .setCondition(CHANNEL_UNLOCKED)
+        .addInfo("Sets whether guild announcements are")
+        .addInfo("forwarded to the guild's discord channel");
+
+    factory.usage("unlimitedMembers <guild> <true | false>")
+        .setPermission(Permissions.GUILD_ADMIN)
+        .addInfo("Sets whether a guild can have unlimited members");
+
+    factory.usage("unlimitedMembers <guild>")
+        .setPermission(Permissions.GUILD_ADMIN)
+        .addInfo("Checks whether a guild has unlimited members.");
+
+    factory.usage("unlimitedChunks <guild> <true | false>")
+        .setPermission(Permissions.GUILD_ADMIN)
+        .addInfo("Sets whether a guild can have unlimited chunks");
+
+    factory.usage("unlimitedChunks <guild>")
+        .setPermission(Permissions.GUILD_ADMIN)
+        .addInfo("Checks whether a guild has unlimited chunks.");
   }
 
   @Override
@@ -94,10 +110,9 @@ class GuildSetNode extends GuildCommandNode {
         .then(donatorArg("roleColor", ROLE_COLOR))
         .then(donatorArg("guildChannel", GUILD_CHANNEL))
 
-        .then(createGuildCommand(
-            "discordAnnouncements",
-            this::discordAnnouncements
-        ))
+        .then(createGuildCommand("discordAnnouncements", this::discordAnnouncements)
+            .requires(CHANNEL_UNLOCKED)
+        )
 
         .then(literal("name")
             .then(nameArg)

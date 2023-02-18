@@ -5,7 +5,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.Getter;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.useables.ActionHolder;
+import net.forthecrown.useables.Usable;
 import net.forthecrown.useables.ConstructType;
 import net.forthecrown.useables.UsableConstructor;
 import net.forthecrown.useables.UsageAction;
@@ -44,7 +44,7 @@ public class ActionItem extends UsageAction {
   }
 
   @Override
-  public void onUse(Player player, ActionHolder holder) {
+  public void onUse(Player player, Usable holder) {
     var inventory = player.getInventory();
 
     for (var i : items) {
@@ -82,8 +82,7 @@ public class ActionItem extends UsageAction {
   @UsableConstructor(ConstructType.PARSE)
   public static ActionItem parse(UsageType<ActionItem> type, StringReader reader,
                                  CommandSource source
-  )
-      throws CommandSyntaxException {
+  ) throws CommandSyntaxException {
     return new ActionItem(
         type,
         UsageUtil.parseItems(reader, source)

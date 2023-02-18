@@ -1,8 +1,8 @@
 package net.forthecrown.commands.usables;
 
 import net.forthecrown.commands.arguments.RegistryArguments;
-import net.forthecrown.useables.ActionHolder;
 import net.forthecrown.useables.CheckHolder;
+import net.forthecrown.useables.Usable;
 import net.forthecrown.useables.UsageAction;
 import net.forthecrown.useables.UsageInstance;
 import net.forthecrown.useables.UsageTest;
@@ -33,9 +33,9 @@ interface UsageTypeAccessor<T extends UsageInstance, H extends UsageTypeHolder> 
   };
 
 
-  UsageTypeAccessor<UsageAction, ActionHolder> ACTIONS = new UsageTypeAccessor<>() {
+  UsageTypeAccessor<UsageAction, Usable> ACTIONS = new UsageTypeAccessor<>() {
     @Override
-    public UsageTypeList getList(ActionHolder holder) {
+    public UsageTypeList getList(Usable holder) {
       return holder.getActions();
     }
 

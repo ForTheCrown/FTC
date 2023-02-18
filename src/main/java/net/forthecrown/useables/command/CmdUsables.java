@@ -12,13 +12,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.Getter;
+import net.forthecrown.core.Permissions;
 import net.forthecrown.utils.io.SerializableObject;
 import net.minecraft.nbt.CompoundTag;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class CmdUsables<T extends CommandUsable> extends SerializableObject.NbtDat implements
-    Iterable<T> {
+public class CmdUsables<T extends CommandUsable>
+    extends SerializableObject.NbtDat
+    implements Iterable<T>
+{
 
   /**
    * Entry factory to deserialize entries
@@ -61,7 +64,7 @@ public class CmdUsables<T extends CommandUsable> extends SerializableObject.NbtD
     List<T> result = new ArrayList<>();
 
     for (var e : entries.values()) {
-      if (!e.test(player)) {
+      if (!player.hasPermission(Permissions.ADMIN) && !e.test(player)) {
         continue;
       }
 

@@ -10,10 +10,6 @@ import net.forthecrown.utils.text.writer.TextWriter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.nbt.CompoundTag;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -31,26 +27,27 @@ public class RoyalCrown extends ExtendedItem {
   @Setter
   private int rank;
 
-  public RoyalCrown(ExtendedItemType type, CompoundTag tag) {
+  public RoyalCrown(CrownType type, CompoundTag tag) {
     super(type, tag);
 
     this.queen = tag.getBoolean(TAG_QUEEN);
     this.rank = tag.getInt(TAG_RANK);
   }
 
-  public RoyalCrown(ExtendedItemType type, UUID owner) {
+  public RoyalCrown(CrownType type, UUID owner) {
     super(type, owner);
 
     rank = 1;
     queen = false;
   }
 
-  public void upgrade(ItemStack item) {
+  // Unused
+  /*public void upgrade(ItemStack item) {
     rank++;
     item.editMeta(this::applyRank);
 
     update(item);
-  }
+  }*/
 
   @Override
   protected void onUpdate(ItemStack item, ItemMeta meta) {
@@ -82,7 +79,8 @@ public class RoyalCrown extends ExtendedItem {
     tag.putBoolean(TAG_QUEEN, queen);
   }
 
-  public void applyRank(ItemMeta meta) {
+  // Unused
+  /*public void applyRank(ItemMeta meta) {
     int rank = getRank();
     int enchantRank = rank;
     int extraHearts = rank * 2;
@@ -117,5 +115,5 @@ public class RoyalCrown extends ExtendedItem {
           )
       );
     }
-  }
+  }*/
 }

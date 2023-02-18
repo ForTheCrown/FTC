@@ -2,9 +2,8 @@ package net.forthecrown.commands.manager;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.context.StringRange;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import java.util.HashMap;
-import java.util.Map;
 import net.forthecrown.commands.CommandAfk;
 import net.forthecrown.commands.CommandBack;
 import net.forthecrown.commands.CommandChallenges;
@@ -20,6 +19,7 @@ import net.forthecrown.commands.CommandMail;
 import net.forthecrown.commands.CommandMe;
 import net.forthecrown.commands.CommandNear;
 import net.forthecrown.commands.CommandNickname;
+import net.forthecrown.commands.CommandNpcDialogue;
 import net.forthecrown.commands.CommandProfile;
 import net.forthecrown.commands.CommandRank;
 import net.forthecrown.commands.CommandReply;
@@ -35,6 +35,7 @@ import net.forthecrown.commands.ToolBlockCommands;
 import net.forthecrown.commands.UserMapCommand;
 import net.forthecrown.commands.UserMapTopCommand;
 import net.forthecrown.commands.admin.CommandBroadcast;
+import net.forthecrown.commands.admin.CommandCooldown;
 import net.forthecrown.commands.admin.CommandDungeons;
 import net.forthecrown.commands.admin.CommandEndOpener;
 import net.forthecrown.commands.admin.CommandFtcStruct;
@@ -42,9 +43,9 @@ import net.forthecrown.commands.admin.CommandGameMode;
 import net.forthecrown.commands.admin.CommandGetOffset;
 import net.forthecrown.commands.admin.CommandGetPos;
 import net.forthecrown.commands.admin.CommandGift;
-import net.forthecrown.commands.admin.CommandHolidays;
 import net.forthecrown.commands.admin.CommandHologram;
 import net.forthecrown.commands.admin.CommandIllegalWorlds;
+import net.forthecrown.commands.admin.CommandInvStore;
 import net.forthecrown.commands.admin.CommandJoinInfo;
 import net.forthecrown.commands.admin.CommandLaunch;
 import net.forthecrown.commands.admin.CommandMakeAward;
@@ -68,7 +69,6 @@ import net.forthecrown.commands.admin.CommandTop;
 import net.forthecrown.commands.admin.CommandVanish;
 import net.forthecrown.commands.admin.CommandWorld;
 import net.forthecrown.commands.admin.SaveReloadCommands;
-import net.forthecrown.commands.arguments.RegistryArguments;
 import net.forthecrown.commands.click.CommandClickableText;
 import net.forthecrown.commands.economy.CommandBecomeBaron;
 import net.forthecrown.commands.economy.CommandDeposit;
@@ -81,6 +81,8 @@ import net.forthecrown.commands.economy.CommandWithdraw;
 import net.forthecrown.commands.emotes.EmotePet;
 import net.forthecrown.commands.emotes.EmotePog;
 import net.forthecrown.commands.guild.GuildCommands;
+import net.forthecrown.commands.help.CommandHelp;
+import net.forthecrown.commands.help.FtcHelpMap;
 import net.forthecrown.commands.help.HelpCommand;
 import net.forthecrown.commands.home.CommandDeleteHome;
 import net.forthecrown.commands.home.CommandHome;
@@ -120,27 +122,22 @@ import net.forthecrown.commands.user.UserCommands;
 import net.forthecrown.commands.waypoint.CommandCreateWaypoint;
 import net.forthecrown.commands.waypoint.CommandHomeWaypoint;
 import net.forthecrown.commands.waypoint.CommandInvite;
+import net.forthecrown.commands.waypoint.CommandListWaypoints;
 import net.forthecrown.commands.waypoint.CommandMoveIn;
 import net.forthecrown.commands.waypoint.CommandVisit;
 import net.forthecrown.commands.waypoint.CommandWaypoints;
 import net.forthecrown.core.FTC;
 import net.forthecrown.core.module.OnEnable;
-import net.forthecrown.user.data.UserRank;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.text.format.page.PageEntryIterator;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.spongepowered.math.GenericMath;
 
 public final class Commands {
+  private Commands() {}
 
   public static final StringReader EMPTY_READER = new StringReader("");
-
-  public static final Map<String, FtcCommand> BY_NAME = new HashMap<>();
-  public static final RegistryArguments<UserRank> RANK
-      = RegistryArguments.RANKS;
-
-  private Commands() {
-  }
 
   //Command loading
   @OnEnable
@@ -172,7 +169,6 @@ public final class Commands {
     new CommandSetSpawn();
     new CommandDungeons();
     new CommandPlayerTime();
-    new CommandHolidays();
     new CommandEndOpener();
     new CommandSpeed();
     new CommandSign();
@@ -192,6 +188,8 @@ public final class Commands {
     new CommandGetOffset();
     new CommandStructFunction();
     new CommandScripts();
+    new CommandInvStore();
+    new CommandCooldown();
 
     InteractableCommands.createCommands();
     CommandSpecificGameMode.createCommands();
@@ -227,6 +225,7 @@ public final class Commands {
     new CommandHat();
     new CommandSay();
     new CommandChallenges();
+    new CommandNpcDialogue();
 
     CommandDumbThing.createCommands();
     ToolBlockCommands.createCommands();
@@ -285,6 +284,7 @@ public final class Commands {
     new CommandInvite();
     new CommandHomeWaypoint();
     new CommandCreateWaypoint();
+    new CommandListWaypoints();
 
     //emote, other emotes are initialized by cosmetics in CosmeticEmotes.init()
     new EmotePog();
@@ -292,6 +292,9 @@ public final class Commands {
 
     //help commands
     HelpCommand.createCommands();
+
+    new CommandHelp();
+    FtcHelpMap.getInstance().update();
   }
 
   /* ----------------------------- UTILITY ------------------------------ */
@@ -333,10 +336,28 @@ public final class Commands {
   public static String findInput(String argument, CommandContext<?> context) {
     for (var parsedNode : context.getNodes()) {
       if (parsedNode.getNode().getName().equals(argument)) {
-        return parsedNode.getRange().get(context.getInput());
+        var inputLength = context.getInput().length();
+        var range = parsedNode.getRange();
+
+        StringRange clamped = new StringRange(
+            GenericMath.clamp(range.getStart(), 0, inputLength),
+            GenericMath.clamp(range.getEnd(),   0, inputLength)
+        );
+
+        return clamped.get(context.getInput());
       }
     }
 
     return null;
+  }
+
+  public static String optionallyQuote(String quote, String s) {
+    for (var c: s.toCharArray()) {
+      if (!StringReader.isAllowedInUnquotedString(c)) {
+        return quote + s + quote;
+      }
+    }
+
+    return s;
   }
 }

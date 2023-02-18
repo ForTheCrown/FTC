@@ -18,6 +18,7 @@ public class CommandMoveIn extends FtcCommand {
     setPermission(Permissions.WAYPOINTS);
     setDescription("Sets your home waypoint");
     setAliases("sethomepole", "sethomepost");
+    simpleUsages();
 
     register();
   }

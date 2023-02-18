@@ -2,10 +2,13 @@ package net.forthecrown.utils;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.UUID;
 import lombok.Data;
 import net.forthecrown.grenadier.types.UUIDArgument;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.ChunkPos;
 import org.bukkit.Bukkit;
@@ -28,28 +31,56 @@ public class EntityIdentifier {
   private final String worldName;
   private final ChunkPos chunk;
 
+  private Reference<Entity> reference;
+
   public World getWorld() {
     return Bukkit.getWorld(getWorldName());
   }
 
+  public boolean hasReference() {
+    return reference != null && reference.get() != null;
+  }
+
   public Entity get() {
+    if (hasReference()) {
+      return reference.get();
+    }
+
     World w = getWorld();
     if (w == null) {
       return null;
     }
 
     Chunk c = w.getChunkAt(chunk.x, chunk.z);
-    return w.getEntity(getUniqueId());
+    var result = w.getEntity(getUniqueId());
+
+    if (result != null) {
+      reference = new WeakReference<>(result);
+    }
+
+    return result;
   }
 
   public static EntityIdentifier of(Entity e) {
     Location l = e.getLocation();
     ChunkPos chunkPos = new ChunkPos(l.getBlockX() >> 4, l.getBlockZ() >> 4);
 
-    return new EntityIdentifier(e.getUniqueId(), l.getWorld().getName(), chunkPos);
+    var identifier = new EntityIdentifier(
+        e.getUniqueId(),
+        l.getWorld().getName(),
+        chunkPos
+    );
+
+    identifier.reference = new WeakReference<>(e);
+
+    return identifier;
   }
 
   public static EntityIdentifier load(Tag t) {
+    if (t.getId() == Tag.TAG_STRING) {
+      return parse(t.getAsString());
+    }
+
     CompoundTag tag = (CompoundTag) t;
 
     return of(
@@ -76,6 +107,7 @@ public class EntityIdentifier {
     reader.expect(FIELD_SEPARATOR);
 
     int chunkZ = reader.readInt();
+    reader.expect(FIELD_SEPARATOR);
 
     UUID id = UUIDArgument.uuid().parse(reader);
 
@@ -84,17 +116,13 @@ public class EntityIdentifier {
 
   @Override
   public String toString() {
-    return worldName + FIELD_SEPARATOR + chunk.x + FIELD_SEPARATOR + chunk.z + FIELD_SEPARATOR
-        + uniqueId;
+    return worldName
+        + FIELD_SEPARATOR + chunk.x
+        + FIELD_SEPARATOR + chunk.z
+        + FIELD_SEPARATOR + uniqueId;
   }
 
   public Tag save() {
-    CompoundTag tag = new CompoundTag();
-
-    tag.putUUID("uuid", uniqueId);
-    tag.putString("world_name", worldName);
-    tag.putLong("chunk", chunk.longKey);
-
-    return tag;
+    return StringTag.valueOf(toString());
   }
 }

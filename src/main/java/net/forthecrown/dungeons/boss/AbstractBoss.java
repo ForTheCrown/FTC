@@ -9,6 +9,7 @@ import it.unimi.dsi.fastutil.objects.ObjectSets;
 import java.util.Set;
 import java.util.function.Consumer;
 import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.dungeons.boss.components.BossComponent;
 import net.forthecrown.utils.math.WorldBounds3i;
 import org.apache.logging.log4j.Logger;
@@ -28,7 +29,7 @@ public abstract class AbstractBoss implements DungeonBoss {
   private static Timing BOSS_TICK_TIMING
       = Timings.of(FTC.getPlugin(), "Boss Tick");
 
-  protected static final Logger LOGGER = FTC.getLogger();
+  protected static final Logger LOGGER = Loggers.getLogger();
 
   // Final variables that give details about boss
   private final String name;

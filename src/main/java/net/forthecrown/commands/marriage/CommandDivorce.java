@@ -15,7 +15,9 @@ public class CommandDivorce extends FtcCommand {
     super("divorce");
 
     setPermission(Permissions.MARRY);
-    setDescription("Divorce your spouse");
+    setDescription("Divorces your spouse");
+    simpleUsages();
+
     register();
   }
 

@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Map;
 import java.util.UUID;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.registry.Registries;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.io.JsonWrapper;
@@ -93,7 +93,7 @@ public class Punisher extends SerializableObject.Json {
       var keyOptional = Registries.JAILS.getKey(c);
 
       if (keyOptional.isEmpty()) {
-        FTC.getLogger().warn("Unknown jail found, skipping serialization");
+        Loggers.getLogger().warn("Unknown jail found, skipping serialization");
         continue;
       }
 
@@ -120,7 +120,7 @@ public class Punisher extends SerializableObject.Json {
       UUID id = UUID.fromString(e.getKey());
 
       if (!Users.isPlayerId(id)) {
-        FTC.getLogger().warn("Found invalid ID loading punishments: {}", id);
+        Loggers.getLogger().warn("Found invalid ID loading punishments: {}", id);
         continue;
       }
 

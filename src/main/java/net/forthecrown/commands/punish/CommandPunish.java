@@ -11,6 +11,10 @@ public class CommandPunish extends FtcCommand {
   public CommandPunish() {
     super("Punish");
 
+    setDescription("Opens the punishment menu for a specific user");
+    setAliases("p");
+    simpleUsages();
+
     register();
   }
 

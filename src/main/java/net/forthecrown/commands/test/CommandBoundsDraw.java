@@ -4,8 +4,8 @@ import com.mojang.brigadier.context.CommandContext;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.List;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.Worlds;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
@@ -21,7 +21,7 @@ import org.spongepowered.math.vector.Vector3d;
 
 public class CommandBoundsDraw extends FtcCommand {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   public static final List<BoundingBox> BOXES = new ObjectArrayList<>();
 

@@ -9,17 +9,17 @@ import net.minecraft.network.protocol.Packet;
 import org.bukkit.entity.Player;
 
 @RequiredArgsConstructor
-public class PacketHandlerList<T extends Packet> {
+public class PacketHandlerList<T extends Packet<?>> {
 
   final Class<T> packetClass;
   final List<PacketExecutor<T>> executors = new ObjectArrayList<>();
 
   public void addExecutor(PacketExecutor<T> executor) {
     executors.add(executor);
-    executors.sort(Comparator.comparingInt(PacketExecutor::getPrio));
+    executors.sort(Comparator.comparingInt(PacketExecutor::getPriority));
   }
 
-  public void removeAll(Class c) {
+  public void removeAll(Class<?> c) {
     executors.removeIf(executor -> c == executor.getExecutorClass());
   }
 

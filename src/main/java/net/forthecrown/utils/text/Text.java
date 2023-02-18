@@ -37,16 +37,17 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.format.TextDecoration.State;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.translation.Translatable;
+import net.kyori.adventure.util.HSVLike;
 import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.TextComponentTagVisitor;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.Permissible;
 import org.intellij.lang.annotations.RegExp;
@@ -64,29 +65,32 @@ public final class Text {
   /**
    * The server's number formatter, uses the US locale :\
    */
-  public static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.US);
+  public static final NumberFormat NUMBER_FORMAT
+      = NumberFormat.getInstance(Locale.US);
 
   /**
-   * The user-friendly date time format to show to users, an example of this type's output is: "22
-   * Aug 2022 20:33 UTC"
+   * The user-friendly date time format to show to users, an example of this
+   * type's output is: "22 Aug 2022 20:33 UTC"
    */
-  public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("d LLL yyyy HH:mm z");
+  public static final SimpleDateFormat DATE_FORMAT
+      = new SimpleDateFormat("d LLL yyyy HH:mm z");
 
   /**
    * A simple style that has the italic text decoration disabled
    */
-  @NotNull
   public static final Style NON_ITALIC = Style.style()
       .decoration(TextDecoration.ITALIC, false)
       .build();
 
-  public static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.builder()
+  public static final LegacyComponentSerializer LEGACY
+      = LegacyComponentSerializer.builder()
       .character('&')
       .extractUrls()
       .hexColors()
       .build();
 
-  public static final LegacyComponentSerializer SECTION_LEGACY = LegacyComponentSerializer.builder()
+  public static final LegacyComponentSerializer SECTION_LEGACY
+      = LegacyComponentSerializer.builder()
       .extractUrls()
       .hexColors()
       .build();
@@ -94,7 +98,8 @@ public final class Text {
   /* ----------------------------- UTILITY METHODS ------------------------------ */
 
   /**
-   * Renders the given text to a string with section symbols to denote color codes.
+   * Renders the given text to a string with section symbols to denote color
+   * codes.
    *
    * @param text The text to render
    * @return The rendered string
@@ -141,33 +146,31 @@ public final class Text {
   }
 
   /**
-   * Wraps the given text so that when it's placed onto either an item lore or item name, it will be
-   * a non-italic white text, instead of a purple italic text
+   * Wraps the given text so that when it's placed onto either an item lore or
+   * item name, it will be a non-italic white text, instead of a purple italic
+   * text
    *
    * @param text The text to wrap
    * @return The wrapped text
    */
   public static Component wrapForItems(Component text) {
-    return Component.text()
-        .decoration(TextDecoration.ITALIC, false)
-        .color(NamedTextColor.WHITE)
-        .append(text)
-        .build();
+    var color = text.color();
+    var italicState = text.decoration(TextDecoration.ITALIC);
+
+    if (color == null) {
+      text = text.color(NamedTextColor.WHITE);
+    }
+
+    if (italicState == State.NOT_SET) {
+      text = text.decoration(TextDecoration.ITALIC, false);
+    }
+
+    return text;
   }
 
   /**
-   * Renders any emotes, color codes and links in the given text by converting the given text to a
-   * string and then calling {@link #renderString(String)} on it.
-   *
-   * @param c The text to render
-   * @return The formatted message
-   */
-  public static Component render(Component c) {
-    return renderString(toString(c));
-  }
-
-  /**
-   * Renders the string, formatting all color codes, links and emotes in the string
+   * Renders the string, formatting all color codes, links and emotes in the
+   * string
    *
    * @param s The string to render
    * @return The rendered message
@@ -179,7 +182,7 @@ public final class Text {
   /**
    * Renders the given string with the permissions of the given user
    *
-   * @param permissible The permissible rendering the messagee
+   * @param permissible The permissible rendering the message
    * @param s           The string to render
    * @return The formatted message
    */
@@ -193,8 +196,8 @@ public final class Text {
    * Uses the vanilla tag formatter to display the tag and format it
    *
    * @param tag              The tag to format
-   * @param allowIndentation Whether to allow indentation in the formatting, this makes the
-   *                         resulting tag more readable
+   * @param allowIndentation Whether to allow indentation in the formatting,
+   *                         this makes the resulting tag more readable
    * @return The formatted tag
    */
   public static Component displayTag(Tag tag, boolean allowIndentation) {
@@ -209,7 +212,8 @@ public final class Text {
   }
 
   /**
-   * Tests if the given text is a dash-clear text. Aka, if it's a plain text equal to "-clear"
+   * Tests if the given text is a dash-clear text. Aka, if it's a plain text
+   * equal to "-clear"
    *
    * @param text The text to test
    * @return True, if it's a clear text, false otherwise
@@ -218,22 +222,34 @@ public final class Text {
     return Messages.DASH_CLEAR.equals(text);
   }
 
+  public static TextComponent gradient(String input, TextColor... colors) {
+    return gradient(input, false, colors);
+  }
+
   /**
    * Creates a text with a gradient color
    * <p>
    * If the given input is null, then this method returns null.
    * <p>
-   * If the input is less than 2 characters long, then the input is returned with the
+   * If the input is less than 2 characters long, then the input is returned
+   * with the
    * <code>start</code> color.
    *
-   * @param input The input
-   * @param start The starting color, on the left
-   * @param end   The end color, on the right
+   * @param input  The input
+   * @param colors The colors to create the gradient with
    * @return The text colored as a gradient
    */
-  public static TextComponent gradient(String input, TextColor start, TextColor end) {
+  public static TextComponent gradient(String input, boolean hsv, TextColor... colors) {
     if (input == null) {
       return null;
+    }
+
+    if (colors.length < 1) {
+      return text(input);
+    }
+
+    if (colors.length == 1) {
+      return text(input, colors[0]);
     }
 
     int length = input.length();
@@ -241,33 +257,108 @@ public final class Text {
 
     // Not enough space for gradient
     if (length < 2) {
-      return Component.text(input, start);
+      return Component.text(input, colors[0]);
     }
 
     var builder = Component.text();
 
     for (int i = 0; i < length; i++) {
-      var c = chars[i];
-      float progress = ((float) i) / (length - 1);
+      char c = chars[i];
+      float progress = (float) i / length;
+      TextColor color = _lerp(hsv, progress, colors);
 
-      builder.append(
-          Component.text(c, TextColor.lerp(progress, start, end))
-      );
+      builder.append(text(c, color));
     }
 
     return builder.build();
   }
 
+  public static TextColor rgbLerp(float progress, TextColor... colors) {
+    return lerp(false, progress, colors);
+  }
+
+  public static TextColor hsvLerp(float progress, TextColor... colors) {
+    return lerp(true, progress, colors);
+  }
+
+  /**
+   * Linearly interpolates between an array of colors.
+   * <p>
+   * If the color array is empty, null is returned, if the length is 1, the only
+   * color is returned, otherwise, interpolation goes on as normal
+   *
+   * @param progress The progress to interpolate, from 0 to 1
+   * @param colors   The colors to interpolate
+   * @return The interpolated color
+   */
+  public static TextColor lerp(boolean hsv, float progress, TextColor... colors) {
+    if (colors.length == 0) {
+      return null;
+    } else if (colors.length == 1) {
+      return colors[0];
+    }
+
+    if (progress <= 0) {
+      return colors[0];
+    }
+
+    if (progress >= 1) {
+      return colors[colors.length - 1];
+    }
+
+    return _lerp(hsv, progress, colors);
+  }
+
+  private static TextColor _lerp(boolean hsv, float progress, TextColor... colors) {
+    if (colors.length == 2) {
+      return hsvLerp(hsv, progress, colors[0], colors[1]);
+    }
+
+    final int maxIndex = colors.length - 1;
+
+    // I couldn't figure this part out myself, so I copied this gist:
+    // https://gist.github.com/Tetr4/3c7a4eddb78ae537c995
+    //  - Jules
+
+    int firstIndex = (int) (progress * maxIndex);
+    float firstStep = (float) firstIndex / maxIndex;
+    float localStep = (progress - firstStep) * maxIndex;
+
+    TextColor c1 = colors[firstIndex];
+    TextColor c2 = colors[firstIndex + 1];
+
+    return hsvLerp(hsv, localStep, c1, c2);
+  }
+
+  private static TextColor hsvLerp(boolean hsv, float p, TextColor c1, TextColor c2) {
+    if (!hsv) {
+      return TextColor.lerp(p, c1, c2);
+    }
+
+    HSVLike hsv1 = c1.asHSV();
+    HSVLike hsv2 = c2.asHSV();
+
+    HSVLike result = HSVLike.hsvLike(
+        // min + (step * (max - min))
+        hsv1.h() + p * (hsv2.h() - hsv1.h()),
+        hsv1.s() + p * (hsv2.s() - hsv1.s()),
+        hsv1.v() + p * (hsv2.v() - hsv1.v())
+    );
+
+    return TextColor.color(result);
+  }
+
   /**
    * Gets an items display name.
    * <p>
-   * If the item has a custom name, returns that, otherwise it'll return a translatable component
-   * for the item's type.
+   * If the item has a custom name, returns that, otherwise it'll return a
+   * translatable component for the item's type.
    * <p>
-   * It should be noted that this function works differently to {@link ItemStack#displayName()} as
-   * this is made to function more as a chat-friendly version of that function, meaning it doesn't
-   * automatically apply any colors to the item's display name or force italics, if they've been
-   * disabled.
+   * It should be noted that this function works differently to
+   * {@link ItemStack#displayName()} as this is made to function more as a
+   * chat-friendly version of that function, meaning it doesn't automatically
+   * apply any colors to the item's display name or force italics, if they've
+   * been disabled.
    *
    * @param item The item to get the display name for
    * @return The item's display name
@@ -317,14 +408,17 @@ public final class Text {
   }
 
   /**
-   * Creates a location message that when clicked teleports you to the location.
+   * Creates a location message that when clicked teleports you to the
+   * location.
    *
-   * @param l            The location to fomrat for
+   * @param l            The location to format for
    * @param includeWorld Whether to include the world in the message
    * @return The formatted and clickable message
    * @see #prettyLocation(Location, boolean)
    */
-  public static TextComponent clickableLocation(Location l, boolean includeWorld) {
+  public static TextComponent clickableLocation(Location l,
+                                                boolean includeWorld
+  ) {
     return prettyLocation(l, includeWorld)
         .hoverEvent(text("Click to teleport!"))
         .clickEvent(CommandTeleportExact.createLocationClick(l));
@@ -332,10 +426,8 @@ public final class Text {
 
   /**
    * Formats an item's name and amount into a message, eg: "12 Oak Sign".
-   * <p></p>
-   * If you wanna figure out how to pluralize this mess, have fun
    *
-   * @param itemStack The itemstack to format for
+   * @param itemStack The item stack to format for
    * @param amount    The amount to show
    * @return The formatted message
    */
@@ -349,7 +441,8 @@ public final class Text {
   }
 
   /**
-   * Same as {@link #itemAndAmount(ItemStack, int)} except uses the item's amount
+   * Same as {@link #itemAndAmount(ItemStack, int)} except uses the item's
+   * amount
    *
    * @param item The item to format for
    * @return The formatted message with the item's amount.
@@ -361,16 +454,17 @@ public final class Text {
   /**
    * Gets a display name from the given {@link CommandSource} object.
    * <p>
-   * If the source is a player it will return {@link User#displayName()}, else it just returns the
-   * default {@link CommandSource#displayName()}
+   * If the source is a player it will return {@link User#displayName()}, else
+   * it just returns the default {@link CommandSource#displayName()}
    *
    * @param source The source to get the display name of
    * @return The source's display name
    */
   public static Component sourceDisplayName(CommandSource source) {
     if (source.isPlayer()) {
-      return Users.get(source.asOrNull(Player.class))
-          .displayName();
+      var player = source.asPlayerOrNull();
+      assert player != null;
+      return Users.get(player).displayName();
     }
 
     return source.displayName();
@@ -400,8 +494,8 @@ public final class Text {
   }
 
   /**
-   * Formats a number, by adding decimals, commas and so on, making the given number more
-   * human-readable
+   * Formats a number, by adding decimals, commas and so on, making the given
+   * number more human-readable
    *
    * @param number The number to format
    * @return The formatted number
@@ -426,10 +520,11 @@ public final class Text {
   /**
    * Formats the given world name.
    * <p>
-   * If the given world is the over world, it returns "Overworld", or if the input is the resource
-   * world, then "Resource World" is returned, otherwise it replaces all underscores in the world's
-   * name and replaces them with spaces, it then capitalizes the first letter of each word in the
-   * resulting string.
+   * If the given world is the over world, it returns "Overworld", or if the
+   * input is the resource world, then "Resource World" is returned, otherwise
+   * it replaces all underscores in the world's name and replaces them with
+   * spaces, it then capitalizes the first letter of each word in the resulting
+   * string.
    *
    * @param world The world's name to format
    * @return The formatted world name
@@ -453,11 +548,13 @@ public final class Text {
   /* ----------------------------- FORMATTERS ------------------------------ */
 
   /**
-   * Formats a given component in the same way as {@link java.text.MessageFormat}. If the given
-   * string contains any {@link ChatEmotes} or color codes, they will be formatted before the
+   * Formats a given component in the same way as
+   * {@link java.text.MessageFormat}. If the given string contains any
+   * {@link ChatEmotes} or color codes, they will be formatted before the
    * arguments of the format are formatted
    * <p>
-   * Delegate method for {@link #format(String, Style, Object...)} with an empty {@link Style}
+   * Delegate method for {@link #format(String, Style, Object...)} with an empty
+   * {@link Style}
    *
    * @param format The message format to use
    * @param args   Any optional arguments to use in formatting
@@ -469,12 +566,13 @@ public final class Text {
   }
 
   /**
-   * Formats the given component in the same way as {@link java.text.MessageFormat}. If the given
-   * string contains any {@link ChatEmotes} or color codes, they will be formatted before the
+   * Formats the given component in the same way as
+   * {@link java.text.MessageFormat}. If the given string contains any
+   * {@link ChatEmotes} or color codes, they will be formatted before the
    * arguments of the format are formatted
    * <p>
-   * Delegate method for {@link #format(String, Style, Object...)} wit the style set to the given
-   * color
+   * Delegate method for {@link #format(String, Style, Object...)} wit the style
+   * set to the given color
    *
    * @param format The message format to use
    * @param color  The color to apply to the base component
@@ -482,14 +580,17 @@ public final class Text {
    * @return The formatted component
    * @see #format(String, Style, Object...)
    */
-  public static Component format(String format, TextColor color, Object... args) {
+  public static Component format(String format, TextColor color, Object... args
+  ) {
     return format(format, Style.style(color), args);
   }
 
   /**
-   * Formats the given component in the same style as {@link java.text.MessageFormat} and Adventure
-   * APIs {@link TranslatableComponent}s. If the given string contains any {@link ChatEmotes} or
-   * color codes, they will be formatted before the arguments of the format are formatted
+   * Formats the given component in the same style as
+   * {@link java.text.MessageFormat} and Adventure APIs
+   * {@link TranslatableComponent}s. If the given string contains any
+   * {@link ChatEmotes} or color codes, they will be formatted before the
+   * arguments of the format are formatted
    * <p>
    * Delegate method for {@link #format(Component, Object...)}
    *
@@ -504,13 +605,14 @@ public final class Text {
   }
 
   /**
-   * Formats the given component in the same style as {@link java.text.MessageFormat} and Adventure
-   * APIs {@link TranslatableComponent}s.
+   * Formats the given component in the same style as
+   * {@link java.text.MessageFormat} and Adventure APIs
+   * {@link TranslatableComponent}s.
    * <p>
    * Uses {@link ComponentFormat} to format the given input.
    *
-   * @param format The message to format, eg: '{0} had a good day today! Did you have {0} day today
-   *               too?'
+   * @param format The message to format, eg: '{0} had a good day today! Did you
+   *               have {0} day today too?'
    * @param args   Any optional arguments to use in formatting
    * @return The formatted component, this will return
    * <code>format</code> if args are null or empty
@@ -519,7 +621,7 @@ public final class Text {
   public static Component format(Component format, Object... args) {
     // Arguments are null or empty, we've got nothing
     // to format, return the base format
-    if (args == null || args.length <= 0) {
+    if (args == null || args.length == 0) {
       return format;
     }
 
@@ -533,18 +635,19 @@ public final class Text {
   /**
    * Gets the component value of the arg object
    * <p>
-   * If the given value is a {@link ComponentLike} or {@link Component} then the argument itself is
-   * returned.
+   * If the given value is a {@link ComponentLike} or {@link Component} then the
+   * argument itself is returned.
    * <p>
-   * Then this method tests if the given argument is either a {@link Translatable} object or a
-   * {@link net.kyori.adventure.text.KeybindComponent.KeybindLike} object, if it is, it returns a
-   * component respective to its type.
+   * Then this method tests if the given argument is either a
+   * {@link Translatable} object or a
+   * {@link net.kyori.adventure.text.KeybindComponent.KeybindLike} object, if it
+   * is, it returns a component respective to its type.
    * <p>
    * If the argument is null, then a "null" text component is returned.
    * <p>
    * Otherwise {@link Text#renderString(String)} is used to render the object's
-   * {@link String#valueOf(Object)} result to a component, meaning this method, if given a string
-   * with color codes or emotes, will translate them
+   * {@link String#valueOf(Object)} result to a component, meaning this method,
+   * if given a string with color codes or emotes, will translate them
    *
    * @param arg The arg object
    * @return The component value of the given argument
@@ -623,16 +726,19 @@ public final class Text {
   /**
    * Recursively splits the given text using the given pattern.
    * <p>
-   * As well as splitting, this will, in effect, also flatten the component-children tree. As it
-   * flattens, it will attempt to retain the visual look of the components by merging their styles.
+   * As well as splitting, this will, in effect, also flatten the
+   * component-children tree. As it flattens, it will attempt to retain the
+   * visual look of the components by merging their styles.
    *
    * @param pattern   The Pattern the component will be split with
    * @param component The text to split
-   * @return The split result, will have 1 entry if the text was not split at all
-   * @throws NullPointerException If either the regex or component parameters were null
+   * @return The split result, will have 1 entry if the text was not split at
+   * all
+   * @throws NullPointerException If either the regex or component parameters
+   *                              were null
    */
-  private static @NotNull List<Component> split(@NotNull @RegExp String pattern,
-                                                @NotNull Component component
+  public static @NotNull List<Component> split(@NotNull @RegExp String pattern,
+                                               @NotNull Component component
   ) throws NullPointerException {
     Objects.requireNonNull(pattern);
 
@@ -642,13 +748,16 @@ public final class Text {
   /**
    * Recursively splits the given text using the given pattern.
    * <p>
-   * As well as splitting, this will, in effect, also flatten the component-children tree. As it
-   * flattens, it will attempt to retain the visual look of the components by merging their styles.
+   * As well as splitting, this will, in effect, also flatten the
+   * component-children tree. As it flattens, it will attempt to retain the
+   * visual look of the components by merging their styles.
    *
    * @param pattern   The Pattern the component will be split with
    * @param component The text to split
-   * @return The split result, will have 1 entry if the text was not split at all
-   * @throws NullPointerException If either the regex or component parameters were null
+   * @return The split result, will have 1 entry if the text was not split at
+   * all
+   * @throws NullPointerException If either the regex or component parameters
+   *                              were null
    */
   public static @NotNull List<Component> split(@NotNull Pattern pattern,
                                                @NotNull Component component
@@ -679,9 +788,9 @@ public final class Text {
 
     @Getter
     private final String prefix;
-    private final Map<Argument, String> values = new HashMap<>();
+    private final Map<Argument<?>, String> values = new HashMap<>();
 
-    public ArgJoiner add(Argument argument, String val) {
+    public ArgJoiner add(Argument<?> argument, String val) {
       values.put(argument, val);
       return this;
     }

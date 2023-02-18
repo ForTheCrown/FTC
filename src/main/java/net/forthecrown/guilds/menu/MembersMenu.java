@@ -64,7 +64,7 @@ public class MembersMenu extends ListPage<GuildMember> {
 
     var builder = ItemStacks.headBuilder()
         .setProfile(memberUser)
-        .setName(memberUser.listDisplayName(user.get(Properties.RANKED_NAME_TAGS)));
+        .setName(memberUser.listDisplayName(user.get(Properties.RANKED_NAME_TAGS), false));
 
     var writer = TextWriters.loreWriter();
     writer.setFieldStyle(Style.style(NamedTextColor.GRAY));

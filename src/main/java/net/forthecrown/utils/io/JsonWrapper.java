@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -136,11 +137,11 @@ public final class JsonWrapper {
     return parsed == null ? def : parsed;
   }
 
-  public <T> Collection<T> getList(String name, Function<JsonElement, T> func) {
+  public <T> List<T> getList(String name, Function<JsonElement, T> func) {
     return getList(name, func, Collections.emptyList());
   }
 
-  public <T> Collection<T> getList(String name, Function<JsonElement, T> func, Collection<T> def) {
+  public <T> List<T> getList(String name, Function<JsonElement, T> func, List<T> def) {
     if (missingOrNull(name)) {
       return def;
     }
@@ -333,11 +334,13 @@ public final class JsonWrapper {
   public <K, V> Map<K, V> getMap(String name, Function<String, K> keyFunc,
                                  Function<JsonElement, V> valueFunc
   ) {
-    return getMap(name, keyFunc, valueFunc, false);
+    return getMap(name, keyFunc, valueFunc, true);
   }
 
-  public <K, V> Map<K, V> getMap(String name, Function<String, K> keyFunc,
-                                 Function<JsonElement, V> valueFunc, boolean returnEmptyIfMissing
+  public <K, V> Map<K, V> getMap(String name,
+                                 Function<String, K> keyFunc,
+                                 Function<JsonElement, V> valueFunc,
+                                 boolean returnEmptyIfMissing
   ) {
     if (missingOrNull(name)) {
       return returnEmptyIfMissing ? new HashMap<>() : null;
@@ -393,9 +396,14 @@ public final class JsonWrapper {
     source.add(name, array);
   }
 
-  public <T> T[] getArray(String name, Function<JsonElement, T> parser,
+  public <T> T[] getArray(String name,
+                          Function<JsonElement, T> parser,
                           IntFunction<T[]> arrayCreator
   ) {
+    if (missingOrNull(name)) {
+      return arrayCreator.apply(0);
+    }
+
     JsonArray array = getArray(name);
     T[] arr = arrayCreator.apply(array.size());
 
@@ -412,7 +420,7 @@ public final class JsonWrapper {
   }
 
   public void addTimeStamp(String name, long time) {
-    addDate(name, new Date(time));
+    add(name, JsonUtils.writeTimestamp(time));
   }
 
   public long getTimeStamp(String name) {
@@ -420,18 +428,7 @@ public final class JsonWrapper {
   }
 
   public long getTimeStamp(String name, long def) {
-    if (missingOrNull(name)) {
-      return def;
-    }
-
-    var get = getPrimitive(name);
-
-    if (get.isNumber()) {
-      return get.getAsLong();
-    }
-
-    return JsonUtils.readDate(get)
-        .getTime();
+    return JsonUtils.readTimestamp(get(name), def);
   }
 
   public void addDate(String name, Date date) {

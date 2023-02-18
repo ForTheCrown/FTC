@@ -16,6 +16,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import it.unimi.dsi.fastutil.objects.ObjectSets;
+import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -24,16 +25,17 @@ import java.util.UUID;
 import lombok.Getter;
 import net.forthecrown.core.Announcer;
 import net.forthecrown.core.DynmapUtil;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.config.ConfigManager;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnDayChange;
-import net.forthecrown.core.module.OnEnable;
 import net.forthecrown.core.module.OnLoad;
 import net.forthecrown.core.module.OnSave;
+import net.forthecrown.guilds.multiplier.ExpModifiers;
 import net.forthecrown.guilds.unlockables.UnlockableColor;
 import net.forthecrown.guilds.unlockables.Upgradable;
 import net.forthecrown.user.User;
+import net.forthecrown.user.Users;
 import net.forthecrown.utils.UUID2IntMap;
 import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.waypoint.Waypoints;
@@ -72,6 +74,9 @@ public class GuildManager {
   @Getter
   private final ExpModifiers expModifier = new ExpModifiers();
 
+  @Getter
+  private final BannerRenderer renderer;
+
   private GuildManager() {
     storage = new GuildDataStorage(PathUtil.getPluginDirectory("guilds"));
 
@@ -82,15 +87,18 @@ public class GuildManager {
           ? uuid + " doesn't belong to a guild!"
           : null;
     });
+
+    ConfigManager.get().registerConfig(GuildConfig.class);
+
+    try {
+      this.renderer = new BannerRenderer();
+    } catch (IOException exc) {
+      throw new IllegalStateException(exc);
+    }
   }
 
   public static GuildManager get() {
     return inst;
-  }
-
-  @OnEnable
-  private void onEnable() {
-    ConfigManager.get().registerConfig(GuildConfig.class);
   }
 
   @OnDayChange
@@ -101,9 +109,11 @@ public class GuildManager {
 
     // If start of weekend or end of weekend, announce multiplier state change
     if (time.getDayOfWeek() == DayOfWeek.SATURDAY) {
-      announcer.announce(
-          Messages.weekendMultiplierActive(expModifier.getModifier())
-      );
+      Users.getOnline()
+          .forEach(user -> {
+            float mod = expModifier.getModifier(user.getUniqueId());
+            user.sendMessage(Messages.weekendMultiplierActive(mod));
+          });
     } else if (time.getDayOfWeek() == DayOfWeek.MONDAY) {
       announcer.announce(Messages.WEEKEND_MULTIPLIER_INACTIVE);
     }
@@ -327,7 +337,7 @@ public class GuildManager {
       Guild guild = storage.loadGuild(uuid);
 
       LongSet chunks = storage.loadChunks(uuid)
-          .resultOrPartial(FTC.getLogger()::error)
+          .resultOrPartial(Loggers.getLogger()::error)
           .orElseGet(LongSets::emptySet);
 
       addGuild(guild, chunks);

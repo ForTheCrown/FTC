@@ -1,0 +1,14 @@
+[item_head]
+description = [
+  "Willhelm perished in an attack on Questmoor.",
+  "However, the business of selling heads is",
+  "still alive and well"
+]
+slot = 20
+reward = { rhines = 100 }
+
+[item_item]
+slot = 22
+
+[item_potion]
+slot = 24

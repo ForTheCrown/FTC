@@ -1,5 +1,7 @@
 package net.forthecrown.commands;
 
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -10,6 +12,7 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.Worlds;
+import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.WorldArgument;
 import net.forthecrown.grenadier.types.selectors.EntityArgument;
@@ -56,6 +59,20 @@ public class CommandWild extends FtcCommand {
    */
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("")
+        .addInfo("Teleports you into the wilderness.")
+        .addInfo("This command only works at spawn or")
+        .addInfo("in the Resource World");
+
+    factory.usage("<entities> [<world>]")
+        .setPermission(Permissions.ADMIN)
+        .addInfo("Teleports a <player> into the wilderness")
+        .addInfo("in a [world]. If [world] is not set, then")
+        .addInfo("the <entities> is teleported in their own world");
+  }
+
+  @Override
   protected void createCommand(BrigadierCommand command) {
     command
         // /wild
@@ -76,23 +93,33 @@ public class CommandWild extends FtcCommand {
         .then(argument("player", EntityArgument.multipleEntities())
             .requires(c -> c.hasPermission(Permissions.ADMIN))
 
+            .executes(c -> wildEntities(c, false))
+
             // /wild <player> <world>
             .then(argument("world", WorldArgument.world())
                 .requires(c -> c.hasPermission(Permissions.ADMIN))
 
-                .executes(c -> {
-                  Collection<? extends Entity> players = c.getArgument("player",
-                      EntitySelector.class).getEntities(c.getSource());
-                  World world = c.getArgument("world", World.class);
-
-                  for (Entity p : players) {
-                    wildTP(p, world);
-                  }
-
-                  return 1;
-                })
+                .executes(c -> wildEntities(c, true))
             )
         );
+  }
+
+  private int wildEntities(CommandContext<CommandSource> c, boolean worldSet)
+      throws CommandSyntaxException
+  {
+    Collection<? extends Entity> players
+        = c.getArgument("player", EntitySelector.class)
+        .getEntities(c.getSource());
+
+    World world = worldSet
+        ? c.getArgument("world", World.class)
+        : null;
+
+    for (Entity p : players) {
+      wildTP(p, world == null ? p.getWorld() : world);
+    }
+
+    return 0;
   }
 
   boolean test(Player p) {

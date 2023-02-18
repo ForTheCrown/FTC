@@ -14,6 +14,7 @@ public class CommandTpDenyAll extends FtcCommand {
 
     setPermission(Permissions.TPA);
     setDescription("Denies all incoming tpa requests");
+    simpleUsages();
 
     register();
   }

@@ -1,14 +1,7 @@
 package net.forthecrown.events;
 
-import static org.bukkit.entity.EntityType.ARMOR_STAND;
-import static org.bukkit.entity.EntityType.GLOW_ITEM_FRAME;
-import static org.bukkit.entity.EntityType.ITEM_FRAME;
-import static org.bukkit.entity.EntityType.PLAYER;
-import static org.bukkit.entity.EntityType.WITHER;
-
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Collection;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
 import net.forthecrown.core.Worlds;
@@ -22,7 +15,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -30,7 +22,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class ResourceWorldListener implements Listener {
@@ -102,35 +93,6 @@ public class ResourceWorldListener implements Listener {
 
     ResourceWorldTracker.get()
         .setNonNatural(Vectors.from(event.getBlock()));
-  }
-
-  // All entity types that aren't allowed to have their
-  // drops doubled
-  public static EnumSet<EntityType> ILLEGAL_ENTITIES = EnumSet.of(
-      ITEM_FRAME, GLOW_ITEM_FRAME,
-      ARMOR_STAND, WITHER,
-      PLAYER
-  );
-
-  @EventHandler(ignoreCancelled = true)
-  public void onEntityDeath(EntityDeathEvent event) {
-    // Cancel entity double drop if:
-    // Entity is not allowed to drop anything
-    if (ILLEGAL_ENTITIES.contains(event.getEntityType())
-
-        // Not in the rw
-        || !testWorld(event.getEntity().getWorld())
-
-        // They were unlucky :(
-        || ResourceWorldConfig.doubleDropRate < RANDOM.nextFloat(1f)
-    ) {
-      return;
-    }
-
-    Collection<ItemStack> drops = processDrops(event.getDrops());
-
-    event.getDrops().clear();
-    event.getDrops().addAll(drops);
   }
 
   private Collection<ItemStack> processDrops(Collection<ItemStack> drops) {

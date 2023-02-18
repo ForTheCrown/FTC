@@ -4,8 +4,8 @@ import static org.apache.commons.lang3.CharUtils.LF;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.dungeons.level.gate.DungeonGate;
-import net.forthecrown.dungeons.level.room.DungeonRoom;
+import net.forthecrown.dungeons.level.gate.GatePiece;
+import net.forthecrown.dungeons.level.room.RoomPiece;
 
 @Getter
 @RequiredArgsConstructor
@@ -17,7 +17,7 @@ public class DebugVisitor implements PieceVisitor {
   private int indent;
 
   @Override
-  public Result onGate(DungeonGate gate) {
+  public Result onGate(GatePiece gate) {
     field("Type", "GATE");
 
     field("Open", gate.isOpen());
@@ -30,7 +30,7 @@ public class DebugVisitor implements PieceVisitor {
   }
 
   @Override
-  public Result onRoom(DungeonRoom room) {
+  public Result onRoom(RoomPiece room) {
     field("Type", "ROOM");
     append(room);
     return Result.CONTINUE;

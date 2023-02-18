@@ -3,15 +3,14 @@ package net.forthecrown.user.data;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import it.unimi.dsi.fastutil.objects.ObjectArrays;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.EnumSet;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.config.GeneralConfig;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.user.ComponentType;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserComponent;
@@ -25,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class UserShopData extends UserComponent implements Iterable<UserShopData.Entry> {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   /**
    * The JSON key of the auto sell material list
@@ -74,7 +73,7 @@ public class UserShopData extends UserComponent implements Iterable<UserShopData
    * Sets the amount of rhines earned from the given material
    * <p>
    * If the given value is less than or equal to 0, this will remove the given material instead of
-   * setting it's value
+   * setting its value
    *
    * @param material The material to set the value of
    * @param value    The amount of rhines earned from the given material
@@ -159,22 +158,22 @@ public class UserShopData extends UserComponent implements Iterable<UserShopData
   public void onLogin(UserTimeTracker tracker) {
     long lastLogin = tracker.get(TimeField.LAST_LOGIN);
 
-    ZonedDateTime now = ZonedDateTime.now();
-    ZonedDateTime lastLoginDate = Time.dateTime(lastLogin);
-    int days = (int) ChronoUnit.DAYS.between(now, lastLoginDate);
+    LocalDate now = LocalDate.now();
+    LocalDate lastLoginDate = Time.localDate(lastLogin);
+    long days = now.toEpochDay() - lastLoginDate.toEpochDay();
 
     if (days < 1) {
       return;
     }
 
-    int amount = days * GeneralConfig.dailySellShopPriceLoss;
+    long amount = days * GeneralConfig.dailySellShopPriceLoss;
     var it = ArrayIterator.modifiable(earnings);
 
-    LOGGER.debug("Lowering {}'s earnings by {}", getUser(), amount);
+    LOGGER.info("Lowering {}'s earnings by {}", getUser(), amount);
 
     while (it.hasNext()) {
       var entry = it.next();
-      entry.value = entry.value - amount;
+      entry.value = (int) (entry.value - amount);
 
       if (entry.value <= 0) {
         it.remove();

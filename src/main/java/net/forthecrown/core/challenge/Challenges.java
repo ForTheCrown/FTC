@@ -15,18 +15,19 @@ import co.aikar.timings.Timing;
 import com.google.common.base.Strings;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.chrono.ChronoLocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.UUID;
 import java.util.function.Consumer;
 import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.core.registry.Registry;
 import net.forthecrown.economy.sell.SellShop;
 import net.forthecrown.economy.sell.SellShopNodes;
 import net.forthecrown.log.DataLogs;
+import net.forthecrown.log.DateRange;
 import net.forthecrown.log.LogEntry;
 import net.forthecrown.log.LogQuery;
 import net.forthecrown.user.User;
@@ -38,7 +39,6 @@ import net.forthecrown.utils.inventory.menu.Menus;
 import net.forthecrown.utils.inventory.menu.Slot;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.apache.commons.lang3.Range;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 
@@ -58,8 +58,11 @@ public final class Challenges {
 
       METHOD_STREAK_INCREASE = "onStreakIncrease";
 
-  public static final Timing COMPLETION_QUERY = FTC.timing("Challenge Completion Query");
-  public static final Timing STREAK_QUERY = FTC.timing("Challenge Streak Query");
+  public static final Timing COMPLETION_QUERY
+      = FTC.timing("Challenge Completion Query");
+
+  public static final Timing STREAK_QUERY
+      = FTC.timing("Challenge Streak Query");
 
   public static void logActivation(Holder<Challenge> challenge, String extra) {
     LogEntry entry = LogEntry.of(ACTIVE)
@@ -81,22 +84,23 @@ public final class Challenges {
     DataLogs.log(COMPLETED, entry);
   }
 
-  public static boolean hasCompleted(Challenge challenge, UUID uuid) {
+  @Deprecated
+  public static boolean legacy_hasCompleted(Challenge challenge, UUID uuid) {
     return ChallengeManager.getInstance()
         .getChallengeRegistry()
         .getHolderByValue(challenge)
-        .map(holder -> hasCompleted(holder, uuid))
+        .map(holder -> legacy_hasCompleted(holder, uuid))
         .orElse(false);
   }
 
-  public static boolean hasCompleted(Holder<Challenge> challenge, UUID uuid) {
+  @Deprecated
+  public static boolean legacy_hasCompleted(Holder<Challenge> challenge, UUID uuid) {
     var reset = challenge.getValue()
         .getResetInterval();
 
     LocalDate start = switch (reset) {
       case DAILY -> LocalDate.now();
-      case WEEKLY -> LocalDate.now()
-          .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+      case WEEKLY -> LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
       case MANUAL -> LocalDate.MIN;
     };
 
@@ -104,7 +108,7 @@ public final class Challenges {
     var result = !DataLogs.query(
         LogQuery.builder(COMPLETED)
             .maxResults(1)
-            .queryRange(Range.between(start, LocalDate.now()))
+            .queryRange(DateRange.between(start, LocalDate.now()))
 
             .field(C_PLAYER)
             .add(uuid1 -> Objects.equals(uuid1, uuid))
@@ -123,10 +127,21 @@ public final class Challenges {
     apply(challengeName, challenge -> challenge.trigger(input));
   }
 
-  public static boolean isActive(Challenge challenge) {
+  @Deprecated
+  public static boolean legacy_isActive(Challenge challenge) {
     return ChallengeManager.getInstance()
         .getActiveChallenges()
         .contains(challenge);
+  }
+
+  public static boolean isActive(Challenge challenge) {
+    var manager = ChallengeManager.getInstance();
+
+    return manager
+        .getChallengeRegistry()
+        .getHolderByValue(challenge)
+        .map(holder -> manager.getActiveChallenges().contains(holder))
+        .orElse(false);
   }
 
   public static void apply(Challenge challenge,
@@ -188,6 +203,10 @@ public final class Challenges {
         continue;
       }
 
+      Loggers.getLogger().debug("Adding item challenge to shop menu: {}",
+          h.getKey()
+      );
+
       builder.add(
           item.getMenuSlot(),
           item.toInvOption()
@@ -205,8 +224,10 @@ public final class Challenges {
               .setName("&bDaily Item Challenges")
               .setFlags(ItemFlag.HIDE_ATTRIBUTES);
 
-          int streak = queryStreak(StreakCategory.ITEMS, user)
-              .orElse(0);
+          int streak = ChallengeManager.getInstance()
+              .getEntry(user.getUniqueId())
+              .getStreak(StreakCategory.ITEMS)
+              .get();
 
           builder.addLore(
               Text.format(
@@ -221,24 +242,26 @@ public final class Challenges {
         .build();
   }
 
-  public static OptionalInt queryStreak(Challenge challenge, User user) {
+  @Deprecated
+  public static OptionalInt legacy_queryStreak(Challenge challenge, User user) {
     if (user == null
         || challenge.getResetInterval() == ResetInterval.MANUAL
     ) {
       return OptionalInt.empty();
     }
 
-    return queryStreak(challenge.getStreakCategory(), user);
+    return legacy_queryStreak(challenge.getStreakCategory(), user);
   }
 
-  public static OptionalInt queryStreak(StreakCategory category, User viewer) {
+  @Deprecated
+  public static OptionalInt legacy_queryStreak(StreakCategory category, User viewer) {
     if (viewer == null) {
       return OptionalInt.empty();
     }
 
     UUID uuid = viewer.getUniqueId();
     LocalDate start = LocalDate.now();
-    Range<ChronoLocalDate> range = null;
+    DateRange range = null;
 
     int streak = 0;
 
@@ -289,7 +312,7 @@ public final class Challenges {
     );
   }
 
-  private static boolean hasStreak(Range<ChronoLocalDate> dateRange,
+  private static boolean hasStreak(DateRange dateRange,
                                    StreakCategory category,
                                    UUID uuid
   ) {

@@ -2,7 +2,7 @@ package net.forthecrown.user.data;
 
 import com.google.gson.JsonElement;
 import java.util.Arrays;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.registry.Registries;
 import net.forthecrown.core.registry.Registry;
 import net.forthecrown.user.ComponentType;
@@ -126,6 +126,7 @@ public class UserTimeTracker extends UserComponent {
     for (int i = 0; i < stamps.length; i++) {
       // Get time stamp by its ID
       var field = TIME_FIELDS.orNull(i);
+      assert field != null;
 
       // Don't serialize transient time stamps
       if (!field.isSerialized()) {
@@ -161,17 +162,26 @@ public class UserTimeTracker extends UserComponent {
 
       // Couldn't find field
       if (field.isEmpty()) {
-        FTC.getLogger().warn("Found unknown time field: '{}'", e.getKey());
+        Loggers.getLogger().warn("Found unknown time field: '{}'", e.getKey());
         continue;
       }
 
       // Deserialize value, if it's a string, it's a date object, if it's a long
       // it's a serialized time stamp, serialize accordingly
       var jsonVal = e.getValue().getAsJsonPrimitive();
-      var val = jsonVal.isString() ? JsonUtils.readDate(jsonVal).getTime() : jsonVal.getAsLong();
+      TimeField timeField = field.get();
 
-      // Set field's value
-      set(field.get(), val);
+      try {
+        var val = JsonUtils.readTimestamp(jsonVal, UNSET);
+
+        // Set field's value
+        set(timeField, val);
+      } catch (NumberFormatException | IllegalStateException exc) {
+        Loggers.getLogger()
+            .error("Error reading timestamp '{}'", jsonVal, exc);
+
+        remove(timeField);
+      }
     }
   }
 }

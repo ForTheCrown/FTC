@@ -87,7 +87,9 @@ public interface Keys {
     try {
       return argumentType().parse(reader);
     } catch (CommandSyntaxException e) {
-      throw new IllegalStateException("Could not parse '%s' to key".formatted(reader.getString()));
+      throw new IllegalStateException(
+          "Could not parse '%s' to key".formatted(reader.getString())
+      );
     }
   }
 
@@ -109,8 +111,12 @@ public interface Keys {
    */
   static @org.intellij.lang.annotations.Pattern(VALID_KEY_REGEX) String ensureValid(String s)
       throws IllegalArgumentException {
-    Validate.isTrue(isValidKey(s), "Invalid key: '%s', did not match '%s' pattern", s,
-        VALID_KEY_REGEX);
+    Validate.isTrue(
+        isValidKey(s),
+        "Invalid key: '%s', did not match '%s' pattern",
+        s, VALID_KEY_REGEX
+    );
+
     return s;
   }
 

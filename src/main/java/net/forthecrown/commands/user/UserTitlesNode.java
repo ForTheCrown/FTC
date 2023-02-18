@@ -13,7 +13,7 @@ import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.user.User;
 import net.forthecrown.user.data.RankTier;
 import net.forthecrown.user.data.UserRank;
-import net.forthecrown.user.data.UserTitles;
+import net.forthecrown.user.data.RanksComponent;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.TextJoiner;
 import net.forthecrown.utils.text.writer.TextWriter;
@@ -32,13 +32,32 @@ class UserTitlesNode extends UserCommandNode {
   }
 
   @Override
+  void createUsages(UsageFactory factory) {
+    factory.usage("")
+        .addInfo("Displays a user's active title,")
+        .addInfo("available titles and tier");
+
+    factory.usage("tier", "Shows a user's tier");
+    factory.usage("tier <tier>", "Sets the user's tiers");
+
+    factory.usage("title", "Show's a user's active title");
+    factory.usage("title <title>", "Sets a user's active title");
+
+    var prefix = factory.withPrefix("available_titles");
+
+    prefix.usage("", "Lists a user's available titles");
+    prefix.usage("add <title list>", "Adds all titles to a user");
+    prefix.usage("remove <title list>", "Removes all titles from a user");
+  }
+
+  @Override
   protected <T extends ArgumentBuilder<CommandSource, T>> void create(T command,
                                                                       UserProvider provider
   ) {
     command
         .executes(c -> {
           User user = provider.get(c);
-          UserTitles title = user.getTitles();
+          RanksComponent title = user.getTitles();
 
           if (title.getAvailable().isEmpty()) {
             throw Exceptions.NOTHING_TO_LIST;
@@ -62,7 +81,7 @@ class UserTitlesNode extends UserCommandNode {
         .then(literal("title")
             .executes(c -> {
               User user = provider.get(c);
-              UserTitles titles = user.getTitles();
+              RanksComponent titles = user.getTitles();
 
               c.getSource().sendMessage(
                   Text.format("{0, user}'s title: {1}",
@@ -92,7 +111,7 @@ class UserTitlesNode extends UserCommandNode {
         .then(literal("tier")
             .executes(c -> {
               User user = provider.get(c);
-              UserTitles titles = user.getTitles();
+              RanksComponent titles = user.getTitles();
 
               c.getSource().sendMessage(
                   Text.format("{0, user}'s tier: {1}",
@@ -106,35 +125,36 @@ class UserTitlesNode extends UserCommandNode {
                 .then(argument("tier", TIER_ARG)
                     .executes(c -> {
                       User user = provider.get(c);
-                      UserTitles titles = user.getTitles();
+                      RanksComponent titles = user.getTitles();
                       RankTier tier = c.getArgument("tier", RankTier.class);
+                      var current = titles.getTier();
 
-                      titles.setTier(tier);
+                      if (tier == current) {
+                        throw Exceptions.format(
+                            "User {0, user}'s tier is already {1}",
+                            user, current.getDisplayName()
+                        );
+                      }
 
-                      c.getSource().sendAdmin(
-                          Text.format("Set {1, user}'s tier to {0}",
-                              tier, user
-                          )
-                      );
-                      return 0;
-                    })
-                )
-            )
+                      if (tier.ordinal() < current.ordinal()) {
+                        titles.demote(tier);
 
-            .then(literal("add")
-                .then(argument("tier", TIER_ARG)
-                    .executes(c -> {
-                      User user = provider.get(c);
-                      UserTitles titles = user.getTitles();
-                      RankTier tier = c.getArgument("tier", RankTier.class);
+                        c.getSource().sendAdmin(
+                            Text.format("Demoted {0, user} to {1}",
+                                user,
+                                tier.getDisplayName()
+                            )
+                        );
+                      } else {
+                        titles.addTier(tier);
 
-                      titles.addTier(tier);
+                        c.getSource().sendAdmin(
+                            Text.format("Set {1, user}'s tier to {0}",
+                                tier, user
+                            )
+                        );
+                      }
 
-                      c.getSource().sendAdmin(
-                          Text.format("Added tier {0} to {1, user}",
-                              tier, user
-                          )
-                      );
                       return 0;
                     })
                 )
@@ -144,7 +164,7 @@ class UserTitlesNode extends UserCommandNode {
         .then(literal("available_titles")
             .executes(c -> {
               var user = provider.get(c);
-              UserTitles titles = user.getTitles();
+              RanksComponent titles = user.getTitles();
               var titleList = titles.getAvailable();
 
               if (titleList.isEmpty()) {
@@ -179,7 +199,7 @@ class UserTitlesNode extends UserCommandNode {
                                 boolean remove
   ) throws CommandSyntaxException {
     var user = provider.get(c);
-    UserTitles userTitles = user.getTitles();
+    RanksComponent userTitles = user.getTitles();
 
     Collection<Holder<UserRank>> rankHolders
         = c.getArgument("titles", Collection.class);

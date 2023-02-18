@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 import lombok.Getter;
 import net.forthecrown.commands.manager.FtcSuggestions;
 import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.io.JsonUtils;
@@ -36,9 +37,10 @@ import org.bukkit.OfflinePlayer;
  */
 public class UserLookup extends SerializableObject.AbstractSerializer<JsonArray> {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
-  private static final Timing LOOKUP_TIMING = FTC.timing("User Lookup load");
+  private static final Timing LOAD_TIMING = FTC.timing("User Lookup load");
+  private static final Timing QUERY_TIMING = FTC.timing("User Lookup Query");
 
   /**
    * Expected size of the 2 primary maps for tracking names and UUIDs
@@ -112,7 +114,7 @@ public class UserLookup extends SerializableObject.AbstractSerializer<JsonArray>
   }
 
   protected void load(JsonArray array) {
-    LOOKUP_TIMING.startTiming();
+    LOAD_TIMING.startTiming();
     clear();
 
     for (JsonElement e : array) {
@@ -131,7 +133,7 @@ public class UserLookup extends SerializableObject.AbstractSerializer<JsonArray>
       addEntry(entry);
     }
 
-    LOOKUP_TIMING.stopTiming();
+    LOAD_TIMING.stopTiming();
     unsaved = false;
   }
 
@@ -293,7 +295,7 @@ public class UserLookup extends SerializableObject.AbstractSerializer<JsonArray>
    * it that has played on the server before.
    */
   void clearInvalid() {
-    LOGGER.info("clearInvalid called");
+    LOGGER.debug("clearInvalid called");
     var iterator = identified.entrySet().iterator();
 
     while (iterator.hasNext()) {
@@ -304,6 +306,7 @@ public class UserLookup extends SerializableObject.AbstractSerializer<JsonArray>
         LOGGER.info("{} has not played before, removing entry", e.getKey());
 
         iterator.remove();
+        unsaved = true;
 
         if (cache.getName() != null) {
           named.remove(cache.getName());
@@ -409,6 +412,14 @@ public class UserLookup extends SerializableObject.AbstractSerializer<JsonArray>
    * @return The cache entry for the given string
    */
   public UserLookupEntry get(String str) {
+    var t = QUERY_TIMING.startTiming();
+    var entry = _get(str);
+    t.stopTiming();
+
+    return entry;
+  }
+
+  private UserLookupEntry _get(String str) {
     UserLookupEntry entry;
 
     // Attempt to parse String into UUID

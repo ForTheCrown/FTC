@@ -6,9 +6,10 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.With;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.Readers;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.grenadier.types.args.ArgsArgument;
 import net.forthecrown.grenadier.types.args.Argument;
 import net.forthecrown.grenadier.types.args.ParsedArgs;
@@ -28,10 +29,11 @@ import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
 
 @Getter
+@With
 @RequiredArgsConstructor
 public class FunctionInfo {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   /* ----------------------------- CONSTANTS ------------------------------ */
 

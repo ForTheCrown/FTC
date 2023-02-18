@@ -15,6 +15,7 @@ public class CommandTpaCancel extends FtcCommand {
 
     setPermission(Permissions.TPA);
     setDescription("Cancels a tpa request");
+    simpleUsages();
 
     register();
   }

@@ -17,7 +17,7 @@ public class DynamicArmorStand extends AbstractDynamicStand {
   private Reference<ArmorStand> armorStand;
 
   public DynamicArmorStand(Location location) {
-    super(location);
+    super(location, STAND_KEY);
   }
 
   public void update(Component displayName) {
@@ -33,13 +33,14 @@ public class DynamicArmorStand extends AbstractDynamicStand {
     if (armorStand != null && armorStand.get() != null) {
       armorStand.get().remove();
       armorStand = null;
+      return;
     }
 
-    kill(STAND_KEY);
+    kill(getKey());
   }
 
   private ArmorStand spawn(Component displayName) {
-    var stand = spawn(getLocation(), STAND_KEY, displayName);
+    var stand = spawn(getLocation(), getKey(), displayName);
 
     armorStand = new WeakReference<>(stand);
     return stand;
@@ -56,7 +57,7 @@ public class DynamicArmorStand extends AbstractDynamicStand {
 
     var nearby = getLocation().getNearbyLivingEntities(
         1.5D,
-        entity -> entity.getPersistentDataContainer().has(STAND_KEY)
+        entity -> entity.getPersistentDataContainer().has(getKey())
     );
 
     if (nearby.isEmpty()) {

@@ -1,16 +1,16 @@
 package net.forthecrown.utils.world;
 
-import com.google.common.collect.Queues;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Deque;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import lombok.experimental.UtilityClass;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.config.GeneralConfig;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnDisable;
 import net.forthecrown.utils.VanillaAccess;
 import net.forthecrown.utils.math.Vectors;
@@ -35,7 +35,7 @@ import org.spongepowered.math.GenericMath;
  */
 public @UtilityClass class WorldLoader {
 
-  private final Logger LOGGER = FTC.getLogger();
+  private final Logger LOGGER = Loggers.getLogger();
 
   /**
    * The amount of chunks that have to be loaded before the logger logs a progress update message
@@ -142,8 +142,6 @@ public @UtilityClass class WorldLoader {
 
   /**
    * Shuts down the loader.
-   * <p></p>
-   * ONLY TO BE USED BY onDisable IN MAIN
    */
   @OnDisable
   public void shutdown() {
@@ -300,13 +298,17 @@ public @UtilityClass class WorldLoader {
     }
 
     private void complete() {
-      // Shutdown this loader instance
-      onCancel();
-      progress.onFinish();
-      WorldLoader.complete(world);
-
       // Complete the result callback
       result.complete(world);
+      progress.onFinish();
+
+      // Shutdown this loader instance
+      close();
+    }
+
+    private void close() {
+      WorldLoader.complete(world);
+      onCancel();
     }
 
     @Override
@@ -314,7 +316,12 @@ public @UtilityClass class WorldLoader {
       LOGGER.info("Started load of world: " + world.getName());
 
       if (GeneralConfig.chunkLoaderRunsInSeries) {
-        EXECUTOR.execute(this::loadSingleSectioned);
+        try {
+          EXECUTOR.execute(this::loadSingleSectioned);
+        } catch (Throwable t) {
+          result.completeExceptionally(t);
+          close();
+        }
       } else {
         // Start all sections
         for (LoadSection s : sections) {
@@ -326,7 +333,7 @@ public @UtilityClass class WorldLoader {
     // Method called to load the current world one section at a time
     // instead of having all sections run in parallel
     private void loadSingleSectioned() {
-      Deque<LoadSection> queue = Queues.newArrayDeque();
+      Deque<LoadSection> queue = new LinkedList<>();
 
       // Fill deque
       for (var s : sections) {
@@ -420,8 +427,7 @@ public @UtilityClass class WorldLoader {
                 // We're just generating the chunks beforehand, not
                 // trying to overwhelm the server here
                 if (!Bukkit.isPrimaryThread()) {
-                  VanillaAccess.getServer()
-                      .execute(() -> chunk.unload(true));
+                  VanillaAccess.getServer().execute(() -> chunk.unload(true));
                 } else {
                   chunk.unload(true);
                 }

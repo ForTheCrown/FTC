@@ -36,22 +36,32 @@ public class UserParseResult implements ParseResult<User> {
   }
 
   public User get(CommandSource source, boolean validate)
-      throws CommandSyntaxException {
-    User result = isSelectorUsed() ? Users.get(selector.getPlayer(source)) : user;
+      throws CommandSyntaxException
+  {
+    User result = isSelectorUsed()
+        ? Users.get(selector.getPlayer(source))
+        : user;
+
+    assert result != null : "Result is null???";
+
+    if (!offlineAllowed && !result.isOnline()) {
+      throw Exceptions.notOnline(result);
+    }
 
     if (validate
         && result.get(Properties.VANISHED)
-        && !isOfflineAllowed()
         && !source.hasPermission(Permissions.VANISH_SEE)
+        && !offlineAllowed
     ) {
-      throw Exceptions.notOnline(user);
+      throw Exceptions.notOnline(result);
     }
 
     return result;
   }
 
   public List<User> getUsers(CommandSource source, boolean checkVanished)
-      throws CommandSyntaxException {
+      throws CommandSyntaxException
+  {
     if (selector == null) {
       if (!offlineAllowed
           && checkVanished
@@ -70,9 +80,18 @@ public class UserParseResult implements ParseResult<User> {
 
         // Optionally filter out vanished users
         .filter(u -> {
-          return offlineAllowed
-              || !checkVanished
-              || source.hasPermission(Permissions.VANISH_SEE);
+          if (checkVanished
+              && !source.hasPermission(Permissions.VANISH_SEE)
+              && u.get(Properties.VANISHED)
+          ) {
+            return false;
+          }
+
+          if (offlineAllowed) {
+            return true;
+          }
+
+          return u.isOnline();
         })
         .collect(Collectors.toList());
 

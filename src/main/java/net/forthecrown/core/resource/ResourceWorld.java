@@ -32,6 +32,7 @@ import net.forthecrown.core.FTC;
 import net.forthecrown.core.FtcDiscord;
 import net.forthecrown.core.Worlds;
 import net.forthecrown.core.admin.StaffChat;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnDayChange;
 import net.forthecrown.structure.BlockStructure;
 import net.forthecrown.structure.StructurePlaceConfig;
@@ -82,7 +83,7 @@ import org.spongepowered.math.vector.Vector3i;
 @Getter
 public class ResourceWorld {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   private static final ResourceWorld INSTANCE = new ResourceWorld();
 
@@ -149,10 +150,11 @@ public class ResourceWorld {
 
   // The height maps for NMS and Bukkit that are used for height
   // calculation... shocking ik
-  public static final Heightmap.Types
-      HEIGHT_MAP_TYPE = Heightmap.Types.OCEAN_FLOOR_WG;
-  public static final HeightMap
-      BUKKIT_HEIGHT_MAP = CraftHeightMap.fromNMS(HEIGHT_MAP_TYPE);
+  public static final Heightmap.Types HEIGHT_MAP_TYPE
+      = Heightmap.Types.OCEAN_FLOOR_WG;
+
+  public static final HeightMap BUKKIT_HEIGHT_MAP
+      = CraftHeightMap.fromNMS(HEIGHT_MAP_TYPE);
 
   public static final String PORTAL_WARP = "portal";
 
@@ -448,12 +450,12 @@ public class ResourceWorld {
 
   @OnDayChange
   void onDayChange() {
-    if (!enabled) {
-      LOGGER.info("Resource world auto reset is disabled, not running");
+    if (!Time.isPast(resetInterval + lastReset)) {
       return;
     }
 
-    if (!Time.isPast(resetInterval + lastReset)) {
+    if (!enabled) {
+      LOGGER.info("Resource world auto reset is disabled, not running");
       return;
     }
 
@@ -509,7 +511,7 @@ public class ResourceWorld {
         }
       }
 
-      LOGGER.info("Took {} attempts to find valid seed", safeGuard);
+      LOGGER.info("Took {} attempts to find seed", safeGuard);
 
       seedSearchActive = false;
       return seed;
@@ -566,7 +568,9 @@ public class ResourceWorld {
     return true;
   }
 
-  private boolean isAreaGood(int x, int z, NoiseBasedChunkGenerator gen, int baseY,
+  private boolean isAreaGood(int x, int z,
+                             NoiseBasedChunkGenerator gen,
+                             int baseY,
                              RandomState randomState
   ) {
     int blockX = QuartPos.toBlock(x);
@@ -592,8 +596,9 @@ public class ResourceWorld {
         && dif >= -MAX_Y_DIF;
   }
 
-
-  private boolean hasBiomes(NoiseBasedChunkGenerator gen, int halfSize, int y,
+  private boolean hasBiomes(NoiseBasedChunkGenerator gen,
+                            int halfSize,
+                            int y,
                             RandomState randomState
   ) {
     int max = QuartPos.fromBlock(halfSize);

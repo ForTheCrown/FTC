@@ -7,10 +7,12 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
+import net.forthecrown.core.registry.Holder;
 import net.forthecrown.inventory.ExtendedItem;
-import net.forthecrown.inventory.ExtendedItemType;
+import net.forthecrown.inventory.weapon.ability.SwordAbilityManager;
 import net.forthecrown.inventory.weapon.ability.WeaponAbility;
+import net.forthecrown.inventory.weapon.ability.WeaponAbilityType;
 import net.forthecrown.inventory.weapon.goals.WeaponGoal;
 import net.forthecrown.user.data.RankTier;
 import net.forthecrown.utils.Tasks;
@@ -36,7 +38,7 @@ import org.bukkit.inventory.meta.ItemMeta;
  */
 @Getter
 public class RoyalSword extends ExtendedItem {
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   public static final String
       TAG_RANK = "rank",
@@ -44,10 +46,13 @@ public class RoyalSword extends ExtendedItem {
       TAG_EXTRA_DATA = "extraData",
       TAG_GOALS = "goals",
       TAG_ABILITY = "ability",
-      TAG_ABILITY_TYPE = "abilityType";
+      TAG_ABILITY_TYPE = "abilityType",
+      TAG_ABILITY_USES = "abilityUses";
 
-  public static final Component BORDER = Component.text("------------------------------",
-      nonItalic(NamedTextColor.DARK_GRAY));
+  public static final Component BORDER = Component.text(
+      "------------------------------",
+      nonItalic(NamedTextColor.DARK_GRAY)
+  );
 
   @Setter
   private SwordRank rank;
@@ -57,14 +62,18 @@ public class RoyalSword extends ExtendedItem {
   @Setter
   private WeaponAbility ability;
 
-  private final Object2IntMap<String> progress = new Object2IntOpenHashMap<>();
+  private final Object2IntMap<String> progress
+      = new Object2IntOpenHashMap<>();
 
-  public RoyalSword(ExtendedItemType<RoyalSword> type, CompoundTag tag) {
+  private final Object2IntMap<String> abilityUses
+      = new Object2IntOpenHashMap<>();
+
+  public RoyalSword(RoyalSwordType type, CompoundTag tag) {
     super(type, tag);
     load(tag);
   }
 
-  public RoyalSword(ExtendedItemType<RoyalSword> type, UUID owner) {
+  public RoyalSword(RoyalSwordType type, UUID owner) {
     super(type, owner);
   }
 
@@ -73,6 +82,16 @@ public class RoyalSword extends ExtendedItem {
     if (rank == null) {
       incrementRank(item);
     }
+
+    if (ability != null) {
+      ability.onUpdate();
+    }
+  }
+
+  public void onAbilityUse(Holder<WeaponAbilityType> holder) {
+    int currentUses = this.abilityUses.getOrDefault(holder.getKey(), 0);
+    currentUses++;
+    abilityUses.put(holder.getKey(), currentUses);
   }
 
   public void damage(Player killer, EntityDamageByEntityEvent event, ItemStack item) {
@@ -198,6 +217,10 @@ public class RoyalSword extends ExtendedItem {
     return true;
   }
 
+  public int getTotalUses(Holder<WeaponAbilityType> holder) {
+    return abilityUses.getOrDefault(holder.getKey(), 0);
+  }
+
   /* ------------------------------- LORE --------------------------------- */
 
   @Override
@@ -213,8 +236,49 @@ public class RoyalSword extends ExtendedItem {
       writer.line(BORDER);
     }
 
-    if (ability != null) {
-      ability.write(writer);
+    if (ability != null && hasPlayerOwner()) {
+      writer.line("Ability Upgrade: (", NamedTextColor.GRAY);
+      writer.write(ability.displayName());
+
+      writer.formatted(" {0, number, -roman}",
+          NamedTextColor.GRAY,
+          ability.getLevel()
+      );
+
+      writer.write(")", NamedTextColor.GRAY);
+
+      var prefixed = writer.withPrefix(
+          Component.text("• ", NamedTextColor.GRAY)
+      );
+
+      ability.write(prefixed, getRank());
+
+      SwordAbilityManager.getInstance().getRegistry()
+          .getHolderByValue(ability.getType())
+
+          .ifPresent(holder -> {
+            var type = holder.getValue();
+            int maxLevel = type.getMaxLevel();
+
+            if (ability.getLevel() >= maxLevel) {
+              return;
+            }
+
+            int totalUses = getTotalUses(holder);
+            int levelUpUses = type.getUpgradeUses(ability.getLevel());
+
+            if (levelUpUses == -1) {
+              return;
+            }
+
+            int remainingUses = levelUpUses - totalUses;
+            prefixed.formattedLine(
+                "Level up after {0, number} more uses",
+                NamedTextColor.GRAY,
+                remainingUses
+            );
+          });
+
       writer.newLine();
       writer.newLine();
     }
@@ -296,20 +360,17 @@ public class RoyalSword extends ExtendedItem {
 
   /* --------------------------- SERIALIZATION ---------------------------- */
 
-  private void load(CompoundTag tag) {
+  public void load(CompoundTag tag) {
     if (tag.contains(TAG_LAST_FLAVOR)) {
       int lastFlavor = tag.getInt(TAG_LAST_FLAVOR);
       setLastFlavorChange(SwordRanks.RANKS[lastFlavor]);
     }
 
-    if (!tag.contains(TAG_RANK)) {
-      return;
-    }
-
-    this.rank = SwordRanks.RANKS[tag.getInt(TAG_RANK)];
-
     if (tag.contains(TAG_ABILITY_TYPE)) {
-      WeaponAbilities.REGISTRY.readTag(tag.get(TAG_ABILITY_TYPE))
+      SwordAbilityManager.getInstance()
+          .getRegistry()
+          .readTag(tag.get(TAG_ABILITY_TYPE))
+
           .ifPresentOrElse(type -> {
             CompoundTag abilityTag = tag.getCompound(TAG_ABILITY);
             setAbility(type.load(abilityTag));
@@ -320,12 +381,26 @@ public class RoyalSword extends ExtendedItem {
           });
     }
 
+    if (tag.contains(TAG_ABILITY_USES)) {
+      CompoundTag usesTag = tag.getCompound(TAG_ABILITY_USES);
+      abilityUses.clear();
+      usesTag.getAllKeys().forEach(s -> {
+        abilityUses.put(s, usesTag.getInt(s));
+      });
+    }
+
+    if (!tag.contains(TAG_RANK)) {
+      return;
+    }
+
+    this.rank = SwordRanks.RANKS[tag.getInt(TAG_RANK)];
+
     if (tag.contains(TAG_GOALS)) {
       for (var e : tag.getCompound(TAG_GOALS).tags.entrySet()) {
         WeaponGoal g = rank.getGoals().get(e.getKey());
 
         if (g == null) {
-          FTC.getLogger().warn("Unknown goal '{}', found in sword, owner={}",
+          Loggers.getLogger().warn("Unknown goal '{}', found in sword, owner={}",
               e.getKey(), getOwner()
           );
           continue;
@@ -364,8 +439,17 @@ public class RoyalSword extends ExtendedItem {
       tag.putInt(TAG_LAST_FLAVOR, lastFlavorChange.getIndex());
     }
 
+    if (!abilityUses.isEmpty()) {
+      CompoundTag usesTag = new CompoundTag();
+      abilityUses.forEach(usesTag::putInt);
+      tag.put(TAG_ABILITY_USES, usesTag);
+    }
+
     if (ability != null) {
-      WeaponAbilities.REGISTRY.writeTag(ability.getType())
+      SwordAbilityManager.getInstance()
+          .getRegistry()
+          .writeTag(ability.getType())
+
           .ifPresentOrElse(keyTag -> {
             CompoundTag abilityTag = new CompoundTag();
             ability.save(abilityTag);

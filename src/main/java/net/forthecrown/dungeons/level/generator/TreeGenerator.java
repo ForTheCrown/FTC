@@ -17,17 +17,17 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.Getter;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.dungeons.DungeonManager;
 import net.forthecrown.dungeons.level.DungeonLevel;
 import net.forthecrown.dungeons.level.DungeonPiece;
-import net.forthecrown.dungeons.level.room.DungeonRoom;
+import net.forthecrown.dungeons.level.room.RoomPiece;
 import net.forthecrown.dungeons.level.Gates;
 import net.forthecrown.dungeons.level.PieceVisitor;
 import net.forthecrown.dungeons.level.Pieces;
 import net.forthecrown.dungeons.level.room.RoomType;
-import net.forthecrown.dungeons.level.gate.DungeonGate;
+import net.forthecrown.dungeons.level.gate.GatePiece;
 import net.forthecrown.dungeons.level.gate.GateType;
 import net.forthecrown.utils.math.Transform;
 import org.apache.commons.lang3.Range;
@@ -36,7 +36,7 @@ import org.apache.logging.log4j.Logger;
 @Getter
 public class TreeGenerator {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   public static final int MAX_OVERLAP = 2;
 
@@ -174,7 +174,7 @@ public class TreeGenerator {
     finished = false;
     genQueue.clear();
 
-    DungeonRoom root = Pieces.getRoot().getValue().create();
+    RoomPiece root = Pieces.getRoot().getValue().create();
     root.apply(Transform.offset(config.getLocation()));
 
     level = new DungeonLevel();
@@ -269,15 +269,22 @@ public class TreeGenerator {
       }
 
       case MAX_SECTION_DEPTH -> {
-        genQueue.addFirst(switchGeneratorType(section, section.getOrigin(), section.getParent()));
+        genQueue.addFirst(switchGeneratorType(
+            section,
+            section.getOrigin(),
+            section.getParent()
+        ));
       }
 
-      default ->
-          throw new IllegalArgumentException("Invalid return code: " + result.getResultCode());
+      default -> {
+        throw new IllegalArgumentException(
+            "Invalid return code: " + result.getResultCode()
+        );
+      }
     }
   }
 
-  PieceGenerator switchGeneratorType(PieceGenerator existing, DungeonGate origin,
+  PieceGenerator switchGeneratorType(PieceGenerator existing, GatePiece origin,
                                      PieceGenerator parent
   ) {
     var type = existing.getType().next();
@@ -291,17 +298,17 @@ public class TreeGenerator {
 
     PieceVisitor visitor = new PieceVisitor() {
       @Override
-      public Result onGate(DungeonGate gate) {
+      public Result onGate(GatePiece gate) {
         if (gate.hasChildren()
             || config.getRandom().nextFloat() > config.getDecorateGateRate()
         ) {
           return Result.CONTINUE;
         }
 
-        DungeonRoom parent = (DungeonRoom) gate.getParent();
+        RoomPiece parent = (RoomPiece) gate.getParent();
         Holder<GateType> gateType = Pieces.getClosed(config.getRandom());
 
-        DungeonGate g = gateType.getValue().create();
+        GatePiece g = gateType.getValue().create();
         NodeAlign.align(g, gate.getParentExit(),
             gateType.getValue().getGates().get(GATE_INDEX_ENTRANCE));
 
@@ -316,7 +323,7 @@ public class TreeGenerator {
       }
 
       @Override
-      public Result onRoom(DungeonRoom room) {
+      public Result onRoom(RoomPiece room) {
         return Result.CONTINUE;
       }
     };
@@ -324,21 +331,21 @@ public class TreeGenerator {
     root.visit(visitor);
   }
 
-  private boolean removeDeadEnds(DungeonRoom root) {
-    Set<DungeonRoom> endRooms = new ObjectOpenHashSet<>();
+  private boolean removeDeadEnds(RoomPiece root) {
+    Set<RoomPiece> endRooms = new ObjectOpenHashSet<>();
 
     PieceVisitor visitor = new PieceVisitor() {
       @Override
-      public Result onGate(DungeonGate gate) {
+      public Result onGate(GatePiece gate) {
         if (!gate.hasChildren()) {
-          endRooms.add((DungeonRoom) gate.getParent());
+          endRooms.add((RoomPiece) gate.getParent());
         }
 
         return Result.CONTINUE;
       }
 
       @Override
-      public Result onRoom(DungeonRoom room) {
+      public Result onRoom(RoomPiece room) {
         return Result.CONTINUE;
       }
     };
@@ -349,7 +356,7 @@ public class TreeGenerator {
     boolean result = false;
 
     for (var d : endRooms) {
-      DungeonGate parent = (DungeonGate) d.getParent();
+      GatePiece parent = (GatePiece) d.getParent();
 
       if (!d.hasChildren() || canRemoveNode(d)) {
         parent.removeChild(d);
@@ -361,12 +368,12 @@ public class TreeGenerator {
     return result;
   }
 
-  private boolean canRemoveNode(DungeonRoom piece) {
+  private boolean canRemoveNode(RoomPiece piece) {
     AtomicBoolean atomicBoolean = new AtomicBoolean(true);
 
     PieceVisitor visitor = new PieceVisitor() {
       @Override
-      public Result onGate(DungeonGate gate) {
+      public Result onGate(GatePiece gate) {
         if (gate.hasChildren()) {
           atomicBoolean.set(false);
           return Result.STOP;
@@ -376,7 +383,7 @@ public class TreeGenerator {
       }
 
       @Override
-      public Result onRoom(DungeonRoom room) {
+      public Result onRoom(RoomPiece room) {
         if (room.equals(piece)) {
           return Result.CONTINUE;
         }
@@ -391,7 +398,7 @@ public class TreeGenerator {
   }
 
   void addBossRoom(LevelGenResult result) {
-    RoomType bossRoom = DungeonManager.getInstance().getRoomTypes()
+    RoomType bossRoom = DungeonManager.getDungeons().getRoomTypes()
         .getRandom(
             config.getRandom(),
             roomTypeHolder -> roomTypeHolder.getValue().hasFlags(
@@ -405,8 +412,8 @@ public class TreeGenerator {
       return;
     }
 
-    for (DungeonGate g : result.endGates) {
-      DungeonRoom room = bossRoom.create();
+    for (GatePiece g : result.endGates) {
+      RoomPiece room = bossRoom.create();
 
       NodeAlign.align(
           room,
@@ -431,7 +438,7 @@ public class TreeGenerator {
   record LevelGenResult(DungeonLevel level,
                         int nonConnectorRooms,
                         IntSummaryStatistics endDepthStats,
-                        List<DungeonGate> endGates,
+                        List<GatePiece> endGates,
                         int totalRoomCount,
                         int closedEndConnectors
   ) {
@@ -440,14 +447,14 @@ public class TreeGenerator {
 
   static class ValidationVisitor implements PieceVisitor {
 
-    private final List<DungeonGate> endGates = new ObjectArrayList<>();
+    private final List<GatePiece> endGates = new ObjectArrayList<>();
 
     private int nonConnectorRooms;
     private int totalRoomCount;
     private int closedEndConnectors;
 
     @Override
-    public Result onGate(DungeonGate gate) {
+    public Result onGate(GatePiece gate) {
       // Close gates that have no children
       if (gate.hasChildren()) {
         return Result.CONTINUE;
@@ -459,7 +466,7 @@ public class TreeGenerator {
         gate.setOpen(false);
       }
 
-      if (gate.getParent() instanceof DungeonRoom room
+      if (gate.getParent() instanceof RoomPiece room
           && room.getType().hasFlags(Pieces.FLAG_CONNECTOR)
       ) {
         closedEndConnectors++;
@@ -469,7 +476,7 @@ public class TreeGenerator {
     }
 
     @Override
-    public Result onRoom(DungeonRoom room) {
+    public Result onRoom(RoomPiece room) {
       if (!room.getType().hasFlags(Pieces.FLAG_CONNECTOR)) {
         ++nonConnectorRooms;
       }

@@ -75,7 +75,7 @@ public class WaypointArgument implements ArgumentType<ParseResult<Waypoint>> {
     }
 
     // Suggest players
-    FtcSuggestions.suggestPlayerNames(source, builder, true);
+    FtcSuggestions.suggestPlayerNames(source, builder, false);
 
     // Suggest guilds
     CompletionProvider.suggestMatching(builder,

@@ -8,14 +8,17 @@ import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import it.unimi.dsi.fastutil.longs.LongSets;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
 import java.util.UUID;
+import javax.imageio.ImageIO;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
+import net.forthecrown.guilds.multiplier.ExpModifiers;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.forthecrown.utils.io.PathUtil;
@@ -30,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 @RequiredArgsConstructor
 public class GuildDataStorage {
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   /**
    * The guild directory, contains the individual guild files, the archive directory and the chunk
@@ -50,6 +53,8 @@ public class GuildDataStorage {
 
   private final Path modifiers;
 
+  private final Path icons;
+
   /* ---------------------------- CONSTRUCTOR ----------------------------- */
 
   GuildDataStorage(Path directory) {
@@ -57,6 +62,27 @@ public class GuildDataStorage {
     this.archiveDirectory = directory.resolve("archive");
     this.chunkFile = directory.resolve("chunks.json");
     this.modifiers = directory.resolve("modifiers.json");
+    this.icons = directory.resolve("icons");
+
+    PathUtil.ensureDirectoryExists(icons)
+        .orThrow();
+  }
+
+  public Path getIcon(Guild guild) {
+    return icons.resolve(guild.getId() + ".png");
+  }
+
+  public void saveIcon(Guild guild, BufferedImage image) {
+    var path = getIcon(guild);
+    try {
+      Files.deleteIfExists(path);
+
+      try (var output = Files.newOutputStream(path)) {
+        ImageIO.write(image, "png", output);
+      }
+    } catch (IOException exc) {
+      LOGGER.error("Couldn't save {} icon file.", guild.getId(), exc);
+    }
   }
 
   /* ------------------------ GUILD SERIALIZATION ------------------------- */
@@ -81,25 +107,13 @@ public class GuildDataStorage {
 
     try (var stream = Files.newDirectoryStream(getDirectory())) {
       for (var p : stream) {
-        if (p.equals(getChunkFile())
-            || p.equals(getArchiveDirectory())
-            || p.equals(getModifiers())
-            || p.toString().contains("config.json")
-        ) {
+        if (!PathUtil.isFilenameUUID(p)) {
           continue;
         }
 
-        try {
-          UUID id = UUID.fromString(
-              p.getFileName()
-                  .toString()
-                  .replaceAll(".json", "")
-          );
-
-          result.add(id);
-        } catch (IllegalArgumentException exc) {
-          LOGGER.error("Couldn't parse file {} to UUID", p, exc);
-        }
+        PathUtil.getFilenameUUID(p)
+            .resultOrPartial(LOGGER::error)
+            .ifPresent(result::add);
       }
     } catch (IOException exc) {
       LOGGER.error("Couldn't iterate guild directory", exc);
@@ -278,7 +292,7 @@ public class GuildDataStorage {
 
     SerializationHelper.readFile(
         this.modifiers,
-        file -> JsonUtils.readFile(file).getAsJsonArray(),
+        JsonUtils::readFile,
         modifiers::deserialize
     );
   }

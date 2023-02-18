@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.text.Text;
@@ -127,7 +127,7 @@ public class GuildRank {
               try {
                 return JsonUtils.readEnum(GuildPermission.class, element);
               } catch (IllegalArgumentException exc) {
-                FTC.getLogger().warn("Unknown permission: {}", element);
+                Loggers.getLogger().warn("Unknown permission: {}", element);
                 return null;
               }
             })
@@ -136,7 +136,7 @@ public class GuildRank {
       }
       // Invalid element, warn the console
       else {
-        FTC.getLogger().warn("Invalid JSON element found for guild rank permissions: {}",
+        Loggers.getLogger().warn("Invalid JSON element found for guild rank permissions: {}",
             perms
         );
       }

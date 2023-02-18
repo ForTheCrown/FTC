@@ -9,6 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.StringJoiner;
 import lombok.Getter;
 import lombok.Setter;
@@ -99,6 +100,11 @@ public class UsageType<T extends UsageInstance> {
     try {
       return executable.invoke(type, params);
     } catch (InvocationTargetException exc) {
+      var cause = exc.getCause();
+
+      if (cause instanceof CommandSyntaxException syntaxException) {
+        throw syntaxException;
+      }
 
       // Invocation target exception means the constructor or
       // method screwed up, and it's not our fault, so we throw
@@ -112,6 +118,7 @@ public class UsageType<T extends UsageInstance> {
     }
   }
 
+  @SuppressWarnings("unchecked")
   private static <T extends UsageInstance> void findConstructors(UsageType<T> type) {
     var c = type.getTypeClass();
 
@@ -154,7 +161,9 @@ public class UsageType<T extends UsageInstance> {
     }
   }
 
-  private static boolean validate(UsableConstructor loader, Executable executable,
+  @SuppressWarnings("rawtypes")
+  private static boolean validate(UsableConstructor loader,
+                                  Executable executable,
                                   UsageType usageType
   ) {
     var type = loader.value();
@@ -215,7 +224,7 @@ public class UsageType<T extends UsageInstance> {
     return typeFirst;
   }
 
-  private static String joinClassArray(Class[] arr) {
+  private static String joinClassArray(Class<?>[] arr) {
     StringJoiner joiner = new StringJoiner(", ");
 
     var it = ArrayIterator.unmodifiable(arr);
@@ -226,7 +235,34 @@ public class UsageType<T extends UsageInstance> {
     return joiner.toString();
   }
 
-  /* ----------------------------- SUB CLASSES ------------------------------ */
+  /* -------------------------- OBJECT OVERRIDES -------------------------- */
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof UsageType<?> usageType)) {
+      return false;
+    }
+
+    return getTypeClass().equals(usageType.getTypeClass())
+        && Objects.equals(getTagLoader(), usageType.getTagLoader())
+        && Objects.equals(getParser(), usageType.getParser())
+        && Objects.equals(getEmptyConstructor(), usageType.getEmptyConstructor());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        getTypeClass(),
+        getTagLoader(),
+        getParser(),
+        getEmptyConstructor()
+    );
+  }
+
+  /* ---------------------------- SUB CLASSES ----------------------------- */
 
   interface ReflectionExecutable<T extends UsageInstance> {
 

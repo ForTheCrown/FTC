@@ -1,0 +1,25 @@
+# A list of import statement placeholders that will be replaced by their values
+# in import statements during JavaScript preprocessing
+#
+# Note:
+# These placeholders do not work inside regular 'Java.type()' imports
+# ------------------------------------------------------------------------------
+# Format:
+# ------------------------------------------------------------------------------
+# placeholder = package name
+# All placeholders must be prefixed with an '@' in import statements
+#
+# Usage example:
+# - import "@ftc.core.Worlds";
+#  Imports the net.forthecrown.core.Worlds class
+# ------------------------------------------------------------------------------
+
+ftc = "net.forthecrown"
+fastutil = "it.unimi.dsi.fastutil"
+bukkit = "org.bukkit"
+nio = "java.nio"
+jutil = "java.util"
+jlang = "java.lang"
+worldguard = "com.sk89q.worldguard"
+worldedit = "com.sk89q.worldedit"
+kyori = "net.kyori.adventure"

@@ -18,6 +18,7 @@ public class CommandTime extends FtcCommand {
   public CommandTime() {
     super("time");
 
+    setDescription("Sets the time in your world");
     register();
   }
 
@@ -35,6 +36,24 @@ public class CommandTime extends FtcCommand {
    *
    * Main Author: Julie
    */
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("set <day | noon | night | midnight>")
+        .addInfo("Sets the time in your world to a ")
+        .addInfo("corresponding constant");
+
+    factory.usage("set <time: world time>")
+        .addInfo("Sets the world time");
+
+    factory.usage("add <time: world time>")
+        .addInfo("Adds to <time> the world's time");
+
+    factory.usage("get [<world>]")
+        .addInfo("Gets the current world time in [world].")
+        .addInfo("If [world] is not set, gets the time in")
+        .addInfo("the world you're in");
+  }
 
   @Override
   protected void createCommand(BrigadierCommand command) {

@@ -8,7 +8,6 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.core.challenge.ChallengeManager;
 import net.forthecrown.core.config.ConfigManager;
-import net.forthecrown.core.holidays.ServerHolidays;
 import net.forthecrown.core.module.ModuleServices;
 import net.forthecrown.core.resource.ResourceWorldTracker;
 import net.forthecrown.core.script2.ScriptManager;
@@ -16,10 +15,12 @@ import net.forthecrown.economy.Economy;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.guilds.GuildManager;
+import net.forthecrown.inventory.weapon.ability.SwordAbilityManager;
 import net.forthecrown.log.LogManager;
 import net.forthecrown.structure.Structures;
 import net.forthecrown.useables.Usables;
 import net.forthecrown.user.UserManager;
+import net.forthecrown.utils.dialogue.DialogueManager;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.waypoint.WaypointManager;
 import net.kyori.adventure.text.Component;
@@ -38,7 +39,22 @@ public class SaveReloadCommands extends FtcCommand {
     this.save = save;
 
     setPermission(Permissions.ADMIN);
+    setDescription(
+        (save ? "Saves" : "Reloads") + " the FTC plugin, or a single module"
+    );
+
     register();
+  }
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    String action = (save ? "Saves" : "Reloads");
+
+    factory.usage("")
+        .addInfo("%s the entire FTC plugin", action);
+
+    factory.usage("<module>")
+        .addInfo("%s the <module>", action);
   }
 
   @Override
@@ -171,19 +187,13 @@ public class SaveReloadCommands extends FtcCommand {
     ),
 
     SELL_SHOP(
-        () -> {
-        },
+        () -> {},
         Economy.get().getSellShop()::load
     ),
 
     ANNOUNCER(
         Announcer.get()::save,
         Announcer.get()::reload
-    ),
-
-    HOLIDAYS(
-        ServerHolidays.get()::save,
-        ServerHolidays.get()::reload
     ),
 
     STRUCTURES(
@@ -209,6 +219,16 @@ public class SaveReloadCommands extends FtcCommand {
     SCRIPTS(
         null,
         ScriptManager.getInstance()::load
+    ),
+
+    SWORD_ABILITIES(
+        null,
+        SwordAbilityManager.getInstance()::loadAbilities
+    ),
+
+    DIALOGUES(
+        null,
+        DialogueManager.getDialogues()::load
     ),
 
     CONFIG(

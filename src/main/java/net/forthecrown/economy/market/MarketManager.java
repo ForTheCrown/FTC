@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import lombok.Getter;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnDayChange;
 import net.forthecrown.user.User;
 import net.forthecrown.user.data.TimeField;
@@ -27,7 +27,7 @@ import org.apache.logging.log4j.Logger;
 
 public class MarketManager {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   /* ----------------------------- INSTANCE FIELDS ------------------------------ */
 

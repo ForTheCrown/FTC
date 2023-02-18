@@ -58,7 +58,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.chat.Keybinds;
 import org.apache.commons.lang3.Range;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -195,7 +194,7 @@ public interface Messages {
   /**
    * Uncategorized display name of the "Hit me!" dummy entities
    */
-  TextComponent DUMMY_NAME = text("Hit me!");
+  TextComponent DUMMY_NAME = text("Hit me!", NamedTextColor.GOLD);
 
   /**
    * Red ❤
@@ -233,13 +232,6 @@ public interface Messages {
    * use a message argument while testing if the input is meant to be a clear command or not
    */
   TextComponent DASH_CLEAR = text("-clear");
-
-  /**
-   * The "[Claim the items!]" button holiday mail messages show
-   */
-  TextComponent HOLIDAYS_GO_CLAIM = text("[Claim the items right now!]", NamedTextColor.AQUA)
-      .hoverEvent(CLICK_ME)
-      .clickEvent(runCommand("/mail claim 1"));
 
   /**
    * Text informing the viewer of lacking permissions
@@ -390,7 +382,7 @@ public interface Messages {
    * @return The formatted message
    */
   static Component chatMessage(User sender, Component message, boolean prependRank) {
-    return chatMessage(sender.listDisplayName(prependRank), message);
+    return chatMessage(sender.listDisplayName(prependRank, false), message);
   }
 
   static Component chatMessage(Component displayName, Component message) {
@@ -684,10 +676,6 @@ public interface Messages {
    */
   TextComponent CANNOT_SEND_MCHAT = text("Cannot send Marriage Chat message", NamedTextColor.GRAY);
 
-  TextComponent BOTH_ALLOW_RIDING = text("You must both allow riding", NamedTextColor.GRAY);
-
-  TextComponent CANNOT_RIDE_HERE = text("Cannot ride here!", NamedTextColor.GRAY);
-
   /**
    * Creates a message that says you are now married to the given user
    *
@@ -803,7 +791,7 @@ public interface Messages {
   }
 
   /**
-   * Creates an AFK message stating the the viewer went AFK.
+   * Creates an AFK message stating the viewer went AFK.
    * <p>
    * if <code>reason == null</code> {@link #AFK_SELF} is returned instead.
    *
@@ -1366,7 +1354,7 @@ public interface Messages {
    * @return The formatted message
    */
   static Component edMarriageChat(MarriageMessage message, Mute mute) {
-    return format("{0} {1}{2, user} > {2}",
+    return format("{0} {1}{2, user} > {3}",
         MARRIAGE_PREFIX,
         mute.getPrefix(),
         message.getSender(),
@@ -2482,8 +2470,8 @@ public interface Messages {
         shop.getExampleItem(),
         shop.getPrice(),
 
-        keybind(Keybinds.SNEAK),
-        keybind(Keybinds.USE)
+        keybind("key.sneak"),
+        keybind("key.use")
     );
   }
 
@@ -2492,9 +2480,12 @@ public interface Messages {
   // ------------------------
 
   Component HOME_WAYPOINT_SET = text(
-      "Set home waypoint." +
-          "\nUse /invite <player> to invite others " +
-          "\nUse /home to come to this waypoint when near another waypoint.",
+      """
+      Set home waypoint.
+      Use /invite <player> to invite others\s
+      Use /home to come to this waypoint when near another waypoint.
+      """,
+
       NamedTextColor.YELLOW
   );
 
@@ -2620,8 +2611,6 @@ public interface Messages {
       .hoverEvent(CLICK_ME)
       .clickEvent(runCommand("/marketappeal"));
 
-  TextComponent MARKET_BOUGHT = text("You bought this shop!", NamedTextColor.YELLOW);
-
   Component UNCLAIM_CONFIRM = format(
       "Are you sure you wish to unclaim your shop? {0}" +
           "\n&cEverything inside will be removed and you won't be able to get it back",
@@ -2640,6 +2629,13 @@ public interface Messages {
       NamedTextColor.RED);
 
   TextComponent MARKET_APPEALED_EVICTION = text("Eviction appealed!", NamedTextColor.YELLOW);
+
+  static Component marketBought(int price) {
+    return format("You bought this shop for &6{0, rhines}&r.",
+        NamedTextColor.YELLOW,
+        price
+    );
+  }
 
   static Component shopTrustSender(User target) {
     return format("Trusted &e{0, user}&r.",
@@ -3016,9 +3012,17 @@ public interface Messages {
     );
   }
 
+  static Component multiplierDecremented(float mod) {
+    return format(
+        "Guild Exp multiplier decreased to &e{0, number}x&r.",
+        NamedTextColor.GRAY,
+        mod
+    );
+  }
+
   static Component weekendMultiplierActive(float mod) {
     return format(
-        "Weekend Guild Exp multiplier is now active! &6({0, number}x)",
+        "Weekend Guild Exp multiplier is now active! &6(now {0, number}x)",
         NamedTextColor.YELLOW,
         mod
     );
@@ -3035,8 +3039,9 @@ public interface Messages {
   /* ---------------------------- CHALLENGES ----------------------------- */
 
   static Component challengeCompleted(Challenge challenge, User user) {
-    return format("Completed challenge &e{0}&r.",
+    return format("Completed {0} challenge &e{1}&r.",
         NamedTextColor.GRAY,
+        challenge.getResetInterval().getDisplayName(),
         challenge.displayName(user)
     );
   }

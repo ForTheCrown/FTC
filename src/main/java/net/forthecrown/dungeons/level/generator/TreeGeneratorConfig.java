@@ -1,37 +1,23 @@
 package net.forthecrown.dungeons.level.generator;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import java.util.Random;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.forthecrown.utils.io.JsonWrapper;
+import net.forthecrown.utils.Util;
 import net.forthecrown.utils.math.Vectors;
 import org.spongepowered.math.vector.Vector3i;
 
 @Getter
 public class TreeGeneratorConfig {
 
-  private static final String
-      KEY_MAX_DEPTH = "maxDepth",
-      KEY_MIN_DEPTH = "minDepth",
-
-  KEY_MIN_ROOM_DEPTH = "minRoomDepth",
-      KEY_MAX_ROOM_DEPTH = "maxRoomDepth",
-
-  KEY_MIN_CONNECTOR_DEPTH = "minConnectorDepth",
-      KEY_MAX_CONNECTOR_DEPTH = "maxConnectorDepth",
-
-  KEY_MAX_CONNECTOR_EXITS = "maxConnectorExits",
-      KEY_MAX_ROOM_EXITS = "maxRoomExits",
-
-  KEY_OPEN_CHANCE = "openRoomChance",
-      KEY_REQUIRED_ROOMS = "requiredRoomCount",
-
-  KEY_POTENTIAL_LEVELS = "potentialLevels",
-      KEY_LOCATION = "location",
-      KEY_CHEST_CHANCE = "chestChance",
-      KEY_SEED = "seed";
+  private static final Gson GSON = new GsonBuilder()
+      .setPrettyPrinting()
+      .registerTypeAdapter(Vector3i.class, Vectors.V3I_ADAPTER)
+      .create();
 
   /**
    * Max depth, to avoid infinite growth
@@ -75,7 +61,8 @@ public class TreeGeneratorConfig {
    */
   private final float chestRate;
 
-  private final Random random;
+  private transient final Random random;
+  private final long seed;
 
   public TreeGeneratorConfig(Builder builder) {
     this.maxDepth = builder.maxDepth;
@@ -96,7 +83,9 @@ public class TreeGeneratorConfig {
 
     this.location = builder.location;
     this.chestRate = builder.chestRate;
-    this.random = builder.random;
+
+    this.random = new Random(builder.seed);
+    this.seed = builder.seed;
 
     this.potentialLevels = builder.potentialLevels;
   }
@@ -110,66 +99,11 @@ public class TreeGeneratorConfig {
   }
 
   public static TreeGeneratorConfig deserialize(JsonElement element) {
-    JsonWrapper json = JsonWrapper.wrap(element.getAsJsonObject());
-    var builder = builder();
+    return GSON.fromJson(element, Builder.class).build();
+  }
 
-    if (json.has(KEY_MAX_DEPTH)) {
-      builder.maxDepth(json.getInt(KEY_MAX_DEPTH));
-    }
-
-    if (json.has(KEY_MIN_DEPTH)) {
-      builder.minDepth(json.getInt(KEY_MIN_DEPTH));
-    }
-
-    if (json.has(KEY_MIN_CONNECTOR_DEPTH)) {
-      builder.minConnectorDepth(json.getInt(KEY_MIN_CONNECTOR_DEPTH));
-    }
-
-    if (json.has(KEY_MAX_CONNECTOR_DEPTH)) {
-      builder.maxConnectorDepth(json.getInt(KEY_MAX_CONNECTOR_DEPTH));
-    }
-
-    if (json.has(KEY_MAX_CONNECTOR_EXITS)) {
-      builder.maxConnectorExits(json.getInt(KEY_MAX_CONNECTOR_EXITS));
-    }
-
-    if (json.has(KEY_MAX_ROOM_EXITS)) {
-      builder.maxRoomExits(json.getInt(KEY_MAX_ROOM_EXITS));
-    }
-
-    if (json.has(KEY_POTENTIAL_LEVELS)) {
-      builder.potentialLevels(json.getInt(KEY_POTENTIAL_LEVELS));
-    }
-
-    if (json.has(KEY_LOCATION)) {
-      builder.location(Vectors.read3i(json.get(KEY_LOCATION)));
-    }
-
-    if (json.has(KEY_CHEST_CHANCE)) {
-      builder.chestRate(json.getFloat(KEY_CHEST_CHANCE));
-    }
-
-    if (json.has(KEY_SEED)) {
-      builder.random(new Random(json.getLong(KEY_SEED)));
-    }
-
-    if (json.has(KEY_MIN_ROOM_DEPTH)) {
-      builder.minRoomDepth(json.getInt(KEY_MIN_ROOM_DEPTH));
-    }
-
-    if (json.has(KEY_MAX_ROOM_DEPTH)) {
-      builder.maxRoomDepth(json.getInt(KEY_MAX_ROOM_DEPTH));
-    }
-
-    if (json.has(KEY_OPEN_CHANCE)) {
-      builder.roomOpenChance(json.getInt(KEY_OPEN_CHANCE));
-    }
-
-    if (json.has(KEY_REQUIRED_ROOMS)) {
-      builder.requiredRooms(json.getInt(KEY_REQUIRED_ROOMS));
-    }
-
-    return builder.build();
+  public JsonElement serialize() {
+    return GSON.toJsonTree(this);
   }
 
   @Getter
@@ -197,7 +131,7 @@ public class TreeGeneratorConfig {
     private int potentialLevels = 35;
     private Vector3i location = Vector3i.ZERO;
     private float chestRate = 0.3f;
-    private Random random = new Random();
+    private long seed = Util.RANDOM.nextLong();
 
     public TreeGeneratorConfig build() {
       return new TreeGeneratorConfig(this);

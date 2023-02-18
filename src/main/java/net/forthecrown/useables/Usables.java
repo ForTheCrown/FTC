@@ -1,12 +1,7 @@
 package net.forthecrown.useables;
 
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.nio.file.Path;
-import java.util.Map;
-import java.util.UUID;
 import lombok.Getter;
-import net.forthecrown.core.FTC;
-import net.forthecrown.core.Main;
 import net.forthecrown.core.module.OnEnable;
 import net.forthecrown.core.module.OnLoad;
 import net.forthecrown.core.module.OnSave;
@@ -33,14 +28,8 @@ import org.bukkit.persistence.PersistentDataType;
 public class Usables implements SerializableObject {
 
   public static final NamespacedKey
-      USABLE_KEY = new NamespacedKey(FTC.getPlugin(), "useablesign"),
-      LEGACY_KEY = new NamespacedKey(Main.OLD_NAMESPACE, "useablesign"),
-
-  BLOCK_KEY = Keys.forthecrown("usable_block"),
+      BLOCK_KEY = Keys.forthecrown("usable_block"),
       ENTITY_KEY = Keys.forthecrown("usable_entity");
-
-  private final Map<WorldVec3i, UsableBlock> loadedBlocks = new Object2ObjectOpenHashMap<>();
-  private final Map<UUID, UsableEntity> loadedEntities = new Object2ObjectOpenHashMap<>();
 
   /**
    * Global triggers
@@ -132,32 +121,10 @@ public class Usables implements SerializableObject {
     }
 
     var pos = WorldVec3i.of(block);
-    var result = loadedBlocks.get(pos);
-
-    if (result == null) {
-      result = new UsableBlock(pos.getWorld(), pos.getPos());
-      result.load();
-
-      loadedBlocks.put(pos, result);
-    }
+    UsableBlock result = new UsableBlock(pos.getWorld(), pos.getPos());
+    result.load();
 
     return result;
-  }
-
-  /**
-   * Gets a usable representation of the given entity.
-   * <p>
-   * If the given entity is not a usable, or is not loaded, then this will return null
-   *
-   * @param entity The entity to get the usable of
-   * @return The usable representation of the entity
-   */
-  public UsableEntity getLoadedEntity(Entity entity) {
-    if (!isUsableEntity(entity)) {
-      return null;
-    }
-
-    return loadedEntities.get(entity.getUniqueId());
   }
 
   /**
@@ -172,19 +139,9 @@ public class Usables implements SerializableObject {
     }
 
     var id = entity.getUniqueId();
-    var result = loadedEntities.get(id);
-
-    if (result == null) {
-      result = new UsableEntity(id);
-
-      if (result.getIdentifier() == null) {
-        result.setIdentifier(EntityIdentifier.of(entity));
-      }
-
-      result.load();
-
-      loadedEntities.put(id, result);
-    }
+    var result = new UsableEntity(id);
+    result.setIdentifier(EntityIdentifier.of(entity));
+    result.load(entity.getPersistentDataContainer());
 
     return result;
   }
@@ -202,9 +159,7 @@ public class Usables implements SerializableObject {
 
     var pos = WorldVec3i.of(block);
     var result = new UsableBlock(pos.getWorld(), pos.getPos());
-
     result.save();
-    loadedBlocks.put(pos, result);
 
     return result;
   }
@@ -223,9 +178,7 @@ public class Usables implements SerializableObject {
     var id = entity.getUniqueId();
     var result = new UsableEntity(id);
     result.setIdentifier(EntityIdentifier.of(entity));
-
     result.save(entity.getPersistentDataContainer());
-    loadedEntities.put(id, result);
 
     return result;
   }
@@ -235,19 +188,6 @@ public class Usables implements SerializableObject {
    */
   @OnSave
   public void save() {
-    for (var v : loadedEntities.values()) {
-      v.save();
-    }
-
-    loadedBlocks.entrySet().removeIf(entry -> {
-      var block = entry.getKey().getBlock();
-      return !(block.getState() instanceof TileState);
-    });
-
-    for (var v : loadedBlocks.values()) {
-      v.save();
-    }
-
     triggers.saveFile();
 
     warps.save();
@@ -263,14 +203,6 @@ public class Usables implements SerializableObject {
 
     warps.reload();
     kits.reload();
-
-    for (var v : loadedEntities.values()) {
-      v.load();
-    }
-
-    for (var v : loadedBlocks.values()) {
-      v.load();
-    }
   }
 
   /**
@@ -279,8 +211,6 @@ public class Usables implements SerializableObject {
    * @param entity The entity to delete
    */
   public void deleteEntity(UsableEntity entity) {
-    entityUnload(entity);
-
     entity.getEntity().getPersistentDataContainer()
         .remove(ENTITY_KEY);
   }
@@ -291,19 +221,8 @@ public class Usables implements SerializableObject {
    * @param block The block to delete
    */
   public void deleteBlock(UsableBlock block) {
-    loadedBlocks.remove(block.getPosition());
-
     TileState tile = block.getTileEntity();
     tile.getPersistentDataContainer().remove(BLOCK_KEY);
     tile.update();
-  }
-
-  /**
-   * Unloads the given entity
-   *
-   * @param entity The entity to unload
-   */
-  public void entityUnload(UsableEntity entity) {
-    loadedEntities.remove(entity.getId());
   }
 }

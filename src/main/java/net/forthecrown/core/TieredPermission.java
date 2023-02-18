@@ -1,7 +1,12 @@
 package net.forthecrown.core;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectAVLTreeMap;
+import com.google.common.base.Preconditions;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.IntLists;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.function.Predicate;
 import lombok.Getter;
@@ -9,7 +14,6 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.forthecrown.user.User;
 import org.apache.commons.lang3.Range;
-import org.apache.commons.lang3.Validate;
 import org.bukkit.permissions.Permissible;
 import org.bukkit.permissions.Permission;
 
@@ -25,105 +29,158 @@ public class TieredPermission {
    * The range of supported integer values for tiers
    */
   @Getter
-  private final Range<Integer> range;
+  private final IntList tiers;
 
-  private final Int2ObjectAVLTreeMap<Permission> permissions;
+  private final PermissionTier[] permissions;
+
+  @Getter
+  private final TierPriority priority;
 
   @Getter
   private final Permission unlimitedPermission;
 
-  public TieredPermission(String prefix, Range<Integer> range, Permission unlimitedPermission) {
-    this.prefix = prefix;
-    this.range = range;
+  private TieredPermission(Builder builder) {
+    this.prefix = Objects.requireNonNull(builder.prefix);
+    this.priority = Objects.requireNonNull(builder.priority);
+    this.tiers = IntLists.unmodifiable(builder.tiers);
 
-    // Creates a sorted map that's sorted from largest to smallest
-    // this is for iteration in the getTier method, which requires
-    // us to scan from greatest tier to smallest to return an accurate
-    // result
-    permissions = new Int2ObjectAVLTreeMap<>(Comparator.reverseOrder());
+    Preconditions.checkArgument(!tiers.isEmpty(), "Empty tier list");
 
-    // Register all permissions
-    for (int tier = range.getMinimum(); tier <= range.getMaximum(); tier++) {
-      permissions.put(tier, Permissions.register(prefix + tier));
+    this.permissions = new PermissionTier[tiers.size()];
+    this.unlimitedPermission = builder.unlimitedPermission;
+
+    int index = 0;
+    for (int tier: tiers) {
+      PermissionTier perm = new PermissionTier(
+          tier,
+          Permissions.register(prefix + tier)
+      );
+
+      permissions[index++] = perm;
     }
 
-    this.unlimitedPermission = unlimitedPermission;
+    Arrays.sort(permissions, getPriority());
   }
 
   public static Builder builder() {
     return new Builder();
   }
 
-  public OptionalInt getTier(boolean highest, User user) {
-    return _getTier(highest, user::hasPermission);
+  public int getMaxTier() {
+    return priority == TierPriority.HIGHEST
+        ? permissions[0].tier()
+        : permissions[permissions.length - 1].tier();
   }
 
-  public OptionalInt getTier(boolean highest, Permissible permissible) {
-    return _getTier(highest, permissible::hasPermission);
+  public int getMinTier() {
+    return priority == TierPriority.LOWEST
+        ? permissions[0].tier()
+        : permissions[permissions.length - 1].tier();
+  }
+
+  public OptionalInt getTier(User user) {
+    return _getTier(user::hasPermission);
+  }
+
+  public OptionalInt getTier(Permissible permissible) {
+    return _getTier(permissible::hasPermission);
   }
 
   public boolean hasUnlimited(Permissible permissible) {
-    return permissible.hasPermission(getUnlimitedPermission());
+    return getUnlimitedPermission() != null
+        && permissible.hasPermission(getUnlimitedPermission());
   }
 
   public boolean hasUnlimited(User user) {
-    return user.hasPermission(getUnlimitedPermission());
+    return getUnlimitedPermission() != null
+        && user.hasPermission(getUnlimitedPermission());
   }
 
-  private OptionalInt _getTier(boolean highest, Predicate<Permission> validate) {
-    if (validate.test(getUnlimitedPermission())) {
+  private OptionalInt _getTier(Predicate<Permission> permissionHolder) {
+    if (getUnlimitedPermission() != null
+        && permissionHolder.test(getUnlimitedPermission())
+    ) {
       return OptionalInt.of(
-          highest ? Integer.MAX_VALUE : Integer.MIN_VALUE
+          priority == TierPriority.HIGHEST
+              ? Integer.MAX_VALUE
+              : Integer.MIN_VALUE
       );
     }
 
-    Integer result = null;
-
-    for (var v : permissions.int2ObjectEntrySet()) {
-      if (!validate.test(v.getValue())) {
-        continue;
-      }
-
-      if (result == null) {
-        result = v.getIntKey();
-        continue;
-      }
-
-      if (highest) {
-        result = Math.max(result, v.getIntKey());
-      } else {
-        result = Math.min(result, v.getIntKey());
+    for (var t: permissions) {
+      if (permissionHolder.test(t.permission)) {
+        return OptionalInt.of(t.tier);
       }
     }
 
-    return result == null
-        ? OptionalInt.empty()
-        : OptionalInt.of(result);
+    return OptionalInt.empty();
   }
 
   public boolean contains(int tier) {
-    return permissions.containsKey(tier);
+    return getPermission(tier) != null;
   }
 
   public Permission getPermission(int tier) {
-    return permissions.get(tier);
+    for (var t: permissions) {
+      if (t.tier == tier) {
+        return t.permission;
+      }
+    }
+
+    return null;
   }
+
+  public enum TierPriority implements Comparator<PermissionTier> {
+    HIGHEST {
+      @Override
+      public int compare(PermissionTier o1, PermissionTier o2) {
+        return Integer.compare(o2.tier, o1.tier);
+      }
+    },
+
+    LOWEST {
+      @Override
+      public int compare(PermissionTier o1, PermissionTier o2) {
+        return Integer.compare(o1.tier, o2.tier);
+      }
+    }
+  }
+
+  private record PermissionTier(int tier, Permission permission) {}
 
   @Getter
   @Setter
   @Accessors(chain = true, fluent = true)
-  static class Builder {
+  public static class Builder {
 
     private String prefix;
     private Permission unlimitedPermission;
-    private Range<Integer> range = Range.between(1, 5);
+
+    private TierPriority priority = TierPriority.HIGHEST;
+
+    private final IntList tiers = new IntArrayList();
 
     public Builder tiersFrom1To(int end) {
       return range(Range.between(1, end));
     }
 
-    public Builder tiersFrom0To(int end) {
-      return range(Range.between(0, end));
+    public Builder range(Range<Integer> range) {
+      tiers.clear();
+      for (int i = range.getMinimum(); i <= range.getMaximum(); i++) {
+        tiers.add(i);
+      }
+
+      return this;
+    }
+
+    public Builder tiers(int... tiers) {
+      this.tiers.addAll(IntList.of(tiers));
+      return this;
+    }
+
+    public Builder addTier(int tier) {
+      tiers.add(tier);
+      return this;
     }
 
     public Builder unlimitedPerm(String perm) {
@@ -135,11 +192,7 @@ public class TieredPermission {
     }
 
     public TieredPermission build() {
-      return new TieredPermission(
-          Validate.notBlank(prefix),
-          range,
-          unlimitedPermission
-      );
+      return new TieredPermission(this);
     }
   }
 }

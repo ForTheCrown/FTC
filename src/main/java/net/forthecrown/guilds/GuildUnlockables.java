@@ -3,7 +3,7 @@ package net.forthecrown.guilds;
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.guilds.unlockables.Unlockable;
 import net.forthecrown.guilds.unlockables.Unlockables;
 
@@ -27,7 +27,7 @@ public class GuildUnlockables {
       Unlockables.REGISTRY.get(e.getKey())
           .ifPresentOrElse(
               unlockable -> setExpProgress(unlockable, e.getValue().getAsInt()),
-              () -> FTC.getLogger().warn("Unknown unlockable: '{}'", e.getKey())
+              () -> Loggers.getLogger().warn("Unknown unlockable: '{}'", e.getKey())
           );
     }
   }

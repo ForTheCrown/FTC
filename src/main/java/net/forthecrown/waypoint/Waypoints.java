@@ -4,6 +4,7 @@ import static net.forthecrown.user.data.UserTimeTracker.UNSET;
 import static net.kyori.adventure.text.Component.text;
 
 import com.google.common.base.Strings;
+import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Objects;
 import java.util.Optional;
@@ -12,10 +13,10 @@ import net.forthecrown.commands.arguments.WaypointArgument;
 import net.forthecrown.commands.guild.GuildProvider;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.DynmapUtil;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.BannedWords;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.guilds.Guild;
 import net.forthecrown.guilds.GuildManager;
@@ -48,7 +49,6 @@ import org.bukkit.block.Sign;
 import org.bukkit.block.data.type.Snow;
 import org.bukkit.block.data.type.WallSign;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.math.vector.Vector3i;
 
@@ -118,7 +118,7 @@ public final class Waypoints {
     var structure = getRegionPole();
 
     if (structure == null) {
-      FTC.getLogger().warn("No pole structure found in registry! Cannot place!");
+      Loggers.getLogger().warn("No pole structure found in registry! Cannot place!");
       return;
     }
 
@@ -285,8 +285,13 @@ public final class Waypoints {
    * @return True, if the name is valid, as specified in the above paragraph, false otherwise.
    */
   public static boolean isValidName(String name) {
+    for (var c: name.toCharArray()) {
+      if (!StringReader.isAllowedInUnquotedString(c)) {
+        return false;
+      }
+    }
+
     return !BannedWords.contains(name)
-        && !name.contains(" ")
         && !name.equalsIgnoreCase(WaypointArgument.FLAG_NEAREST)
         && !name.equalsIgnoreCase(WaypointArgument.FLAG_CURRENT)
         && GuildManager.get().getGuild(name) == null
@@ -713,42 +718,13 @@ public final class Waypoints {
       return;
     }
 
-    FTC.getLogger().info("Removing waypoint {}, reason: {}",
+    Loggers.getLogger().info("Removing waypoint {}, reason: {}",
         waypoint.identificationInfo(),
         scanResult.getReason()
     );
 
     WaypointManager.getInstance()
         .removeWaypoint(waypoint);
-  }
-
-  /**
-   * Gets the effective name of the waypoint.
-   * <p>
-   * What effective in this case means, is the name that should be displayed on the waypoint. If the
-   * given waypoint is owned by a guild, but has no custom name set, then this will return the
-   * guild's name. If a name is set, then it is returned always, even if the waypoint has a name,
-   *
-   * @param waypoint The waypoint to get the name of
-   * @return The gotten name, may be null
-   */
-  public static @Nullable String getEffectiveName(@NotNull Waypoint waypoint) {
-    if (!Strings.isNullOrEmpty(waypoint.get(WaypointProperties.NAME))) {
-      return waypoint.get(WaypointProperties.NAME);
-    }
-
-    var guildId = waypoint.get(WaypointProperties.GUILD_OWNER);
-    if (guildId == null) {
-      return null;
-    }
-
-    var guild = GuildManager.get().getGuild(guildId);
-
-    if (guild != null) {
-      return guild.getSettings().getName();
-    } else {
-      return null;
-    }
   }
 
   /**

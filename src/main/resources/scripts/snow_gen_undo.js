@@ -1,4 +1,4 @@
-const S_Manager          = Java.type("net.forthecrown.core.script.ScriptManager");
+const S_Manager          = Java.type("net.forthecrown.core.script2.ScriptManager");
 const Worlds             = Java.type("net.forthecrown.core.Worlds");
 const Block              = Java.type("org.bukkit.block.Block");
 const Files              = Java.type("java.nio.file.Files");

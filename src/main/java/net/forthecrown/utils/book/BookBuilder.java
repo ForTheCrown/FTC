@@ -4,7 +4,7 @@ import static net.kyori.adventure.text.Component.text;
 
 import com.google.common.base.Preconditions;
 import java.util.Collection;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.TextInfo;
 import net.kyori.adventure.inventory.Book;
@@ -117,7 +117,7 @@ public class BookBuilder {
     } else if (fSize == 0) {
       filler = Component.empty();
     } else {
-      FTC.getLogger().warn("Option too large for 1 line found: '{}'", Text.plain(field));
+      Loggers.getLogger().warn("Option too large for 1 line found: '{}'", Text.plain(field));
       filler = Component.empty();
     }
 

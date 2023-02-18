@@ -1,20 +1,20 @@
 package net.forthecrown.economy.sell;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.challenge.Challenges;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.economy.Economy;
 import net.forthecrown.economy.TransactionType;
 import net.forthecrown.economy.Transactions;
 import net.forthecrown.user.User;
 import net.forthecrown.user.data.UserShopData;
 import net.forthecrown.user.property.Properties;
+import net.forthecrown.utils.inventory.ItemList;
+import net.forthecrown.utils.inventory.ItemLists;
 import net.forthecrown.utils.inventory.ItemStacks;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -52,9 +52,9 @@ public final class ItemSeller {
   private final Material material;
 
   /**
-   * Inventory index to item map of all the items being sold
+   * List of all items being sold
    */
-  private final Int2ObjectMap<ItemStack> foundItems;
+  private final ItemList foundItems;
 
   /**
    * True, if this sell instance was created because of an item being picked up.
@@ -77,7 +77,9 @@ public final class ItemSeller {
    * @param send True, to send the item 'You sold X for Y' message, false otherwise
    */
   public SellResult run(boolean send) {
-    int beforePrice = sell.getItemData().calculatePrice(sell.getTotalEarned()) * sell.getScalar();
+    int beforePrice
+        = sell.getItemData().calculatePrice(sell.getTotalEarned())
+        * sell.getScalar();
 
     SellResult result = sell.sell();
 
@@ -128,28 +130,13 @@ public final class ItemSeller {
 
   void removeItems(SellResult result) {
     final int target = result.getSold();
-    int removed = 0;
+    final int removed = foundItems.removeItems(target);
 
-    // Loop through each item in the item map
-    // and subtract its quantity until we've
-    // removed enough items corresponding to
-    // the given sell result
-    for (var i : foundItems.values()) {
-      if (removed >= target) {
-        break;
-      }
-
-      var remaining = target - removed;
-
-      // If item quantity is greater than
-      // the remaining amount to remove
-      if (i.getAmount() > remaining) {
-        i.subtract(remaining);
-        return;
-      } else {
-        removed += i.getAmount();
-        i.setAmount(0);
-      }
+    if (removed < target) {
+      Loggers.getLogger().warn(
+          "Tried to remove {} items to sell from {}, only removed {}",
+          target, player, removed
+      );
     }
   }
 
@@ -167,34 +154,19 @@ public final class ItemSeller {
                                          Material material,
                                          ItemSellData priceData
   ) {
-    Int2ObjectMap<ItemStack> items = new Int2ObjectOpenHashMap<>();
-    int found = 0;
-    int target = user.get(Properties.SELL_AMOUNT).getValue();
+    ItemList items = ItemLists.fromInventory(
+        user.getInventory(),
+        itemStack -> matchesFilters(user, material, itemStack)
+    );
 
-    var inventory = user.getInventory();
-    var it = ItemStacks.nonEmptyIterator(inventory);
+    int totalItemCount = items.totalItemCount();
 
-    while (it.hasNext()) {
-      var index = it.nextIndex();
-      var item = it.next();
-
-      if (!matchesFilters(user, material, item)) {
-        continue;
-      }
-
-      found += item.getAmount();
-
-      // Do not clone item, we need to original item to
-      // be able to modify the base item in the inventory
-      items.put(index, item);
-    }
-
-    // Create the item sell
-    var sell = new ItemSell(
+    ItemSell sell = new ItemSell(
         material,
         priceData,
         user.getComponent(UserShopData.class),
-        target, found
+        user.get(Properties.SELL_AMOUNT).getValue(),
+        totalItemCount
     );
 
     return new ItemSeller(user, sell, material, items, false);
@@ -247,6 +219,12 @@ public final class ItemSeller {
     // Return the seller with a singleton map that has the
     // item we're selling inside it, this way, we don't have
     // to change the system for single items :D
-    return new ItemSeller(user, sell, item.getType(), Int2ObjectMaps.singleton(0, item), true);
+    return new ItemSeller(
+        user,
+        sell,
+        item.getType(),
+        ItemLists.newList(item),
+        true
+    );
   }
 }

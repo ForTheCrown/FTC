@@ -41,7 +41,9 @@ public class MessageBoardMenu extends ListPage<GuildMessage> {
   }
 
   @Override
-  protected void onClick(User user, GuildMessage entry, Context context,
+  protected void onClick(User user,
+                         GuildMessage entry,
+                         Context context,
                          ClickContext click
   ) throws CommandSyntaxException {
     entry.toMenuNode().onClick(user, context, click);

@@ -18,7 +18,22 @@ public class CommandSudo extends FtcCommand {
   public CommandSudo() {
     super("sudo");
 
+    setDescription(
+        "Forces another user to perform a command or to write in chat"
+    );
+
     register();
+  }
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory = factory.withPrefix("<user>");
+
+    factory.usage("<command>")
+        .addInfo("Forces a <user> to perform a <command>");
+
+    factory.usage("chat:<message>")
+        .addInfo("Forces a <user> to write in chat");
   }
 
   @Override

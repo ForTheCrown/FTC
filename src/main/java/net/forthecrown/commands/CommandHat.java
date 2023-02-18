@@ -15,6 +15,8 @@ public class CommandHat extends FtcCommand {
 
     setPermission(Permissions.HAT);
     setDescription("Places the item in your hand on your head");
+    simpleUsages();
+
     register();
   }
 

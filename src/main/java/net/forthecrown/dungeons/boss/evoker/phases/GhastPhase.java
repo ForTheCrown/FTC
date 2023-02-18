@@ -1,5 +1,7 @@
 package net.forthecrown.dungeons.boss.evoker.phases;
 
+import java.util.LinkedList;
+import java.util.List;
 import net.forthecrown.dungeons.boss.BossContext;
 import net.forthecrown.dungeons.boss.evoker.BossMessage;
 import net.forthecrown.dungeons.boss.evoker.EvokerBoss;
@@ -21,9 +23,17 @@ public class GhastPhase implements AttackPhase {
       {-277.5, 37, 50.5}
   };
 
+  static final List<Ghast> SPAWNED = new LinkedList<>();
+
   static final BossMessage START = BossMessage.simple("phase_ghast_start");
 
   private int tick;
+
+  public static void killAllSpawned() {
+    SPAWNED.removeIf(org.bukkit.entity.Entity::isDead);
+    SPAWNED.forEach(org.bukkit.entity.Entity::remove);
+    SPAWNED.clear();
+  }
 
   @Override
   public void onStart(EvokerBoss boss, BossContext context) {
@@ -57,6 +67,9 @@ public class GhastPhase implements AttackPhase {
 
         maxHealth.setBaseValue(health);
         ghast.setHealth(health);
+        ghast.setRemoveWhenFarAway(false);
+
+        SPAWNED.add(ghast);
       });
     }
   }

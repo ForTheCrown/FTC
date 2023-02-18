@@ -25,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Holds the active and available data for the cosmetics of a user.
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class CosmeticData extends UserComponent {
   /* ----------------------------- CONSTANTS ------------------------------ */
 
@@ -160,7 +161,10 @@ public class CosmeticData extends UserComponent {
       return Collections.emptyList();
     }
 
-    return Collections.unmodifiableSet(entry.getAvailable());
+    var available = entry.getAvailable();
+    assert available != null : "Available null after passing null check?";
+
+    return Collections.unmodifiableSet(available);
   }
 
   /**
@@ -175,6 +179,7 @@ public class CosmeticData extends UserComponent {
       return;
     }
 
+    assert entry.available != null;
     entry.available.clear();
   }
 
@@ -294,6 +299,7 @@ public class CosmeticData extends UserComponent {
         return false;
       }
 
+      assert available != null;
       return available.contains(effect);
     }
 
@@ -322,6 +328,7 @@ public class CosmeticData extends UserComponent {
         return false;
       }
 
+      assert available != null;
       return available.remove(effect);
     }
 
@@ -367,7 +374,8 @@ public class CosmeticData extends UserComponent {
       }
 
       if (!isAvailableEmpty()) {
-        json.addList(KEY_AVAILABLE, getAvailable(), t -> new JsonPrimitive(t.getSerialId()));
+        assert available != null;
+        json.addList(KEY_AVAILABLE, available, t -> new JsonPrimitive(t.getSerialId()));
       }
 
       return json.getSource();
@@ -375,7 +383,6 @@ public class CosmeticData extends UserComponent {
 
     /**
      * Deserializes an entry with the given type from the given JSON element.
-     * <p>
      *
      * @param element The element to deserialize from
      * @param type    The cosmetic type

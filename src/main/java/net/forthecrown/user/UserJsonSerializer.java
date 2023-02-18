@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.user.data.TimeField;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.forthecrown.utils.io.PathUtil;
@@ -18,7 +18,7 @@ import org.apache.logging.log4j.Logger;
 
 public class UserJsonSerializer implements UserSerializer {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   public static final String
       KEY_LAST_NAME = "lastOnlineName",
@@ -40,8 +40,10 @@ public class UserJsonSerializer implements UserSerializer {
     user.setTimeToNow(TimeField.LAST_LOADED);
 
     try {
-      SerializationHelper.writeJsonFile(getUserFile(user.getUniqueId()),
-          json -> _serialize(user, json));
+      SerializationHelper.writeJsonFile(
+          getUserFile(user.getUniqueId()),
+          json -> _serialize(user, json)
+      );
     } catch (Throwable t) {
       LOGGER.error("Error serializing user: " + user.getUniqueId() + " or " + user.getName(), t);
     }
@@ -52,8 +54,10 @@ public class UserJsonSerializer implements UserSerializer {
     user.setTimeToNow(TimeField.LAST_LOADED);
 
     try {
-      SerializationHelper.readJsonFile(getUserFile(user.getUniqueId()),
-          json -> _deserialize(user, json));
+      SerializationHelper.readJsonFile(
+          getUserFile(user.getUniqueId()),
+          json -> _deserialize(user, json)
+      );
     } catch (Throwable t) {
       LOGGER.error("Error deserializing user: " + user.getUniqueId() + " or " + user.getName(), t);
     }
@@ -149,17 +153,22 @@ public class UserJsonSerializer implements UserSerializer {
         continue;
       }
 
-      var component = user.getComponent(type);
+      var component = user.getComponentNoRedirect(type);
       var componentJson = json.get(type.getSerialId());
-      component.deserialize(componentJson);
+
+      try {
+        component.deserialize(componentJson);
+      } catch (Throwable throwable) {
+        LOGGER.error("Couldn't deserialize component {} for {}",
+            component, user, throwable
+        );
+      }
     }
   }
 
   @Override
   public void delete(UUID id) {
     UserManager.get().remove(id);
-    UserManager.get().getOnline()
-        .remove(id);
 
     try {
       Files.delete(getUserFile(id));

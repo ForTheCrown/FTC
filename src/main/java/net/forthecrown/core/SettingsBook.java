@@ -14,7 +14,7 @@ import net.forthecrown.utils.book.BookBuilder;
 import net.forthecrown.utils.book.BookSetting;
 import net.kyori.adventure.text.Component;
 
-public final class SettingsBook {
+public final class  SettingsBook {
 
   private SettingsBook() {
   }

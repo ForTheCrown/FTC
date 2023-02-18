@@ -2,6 +2,7 @@ package net.forthecrown.commands.arguments.chat;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
@@ -34,7 +35,7 @@ public class MessageArgument implements ArgumentType<MessageArgument.Result>,
 
   @Override
   public ArgumentType<?> getVanillaArgumentType() {
-    return net.minecraft.commands.arguments.MessageArgument.message();
+    return StringArgumentType.greedyString();
   }
 
   @RequiredArgsConstructor

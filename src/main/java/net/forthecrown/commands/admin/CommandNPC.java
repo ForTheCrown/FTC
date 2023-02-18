@@ -32,6 +32,7 @@ public class CommandNPC extends FtcCommand {
    */
 
   @Override
+  @SuppressWarnings("unchecked")
   protected void createCommand(BrigadierCommand command) {
     command
         .then(argument("entities", EntityArgument.multipleEntities())

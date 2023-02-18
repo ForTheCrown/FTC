@@ -93,6 +93,12 @@ public class PunishEntry implements JsonSerializable {
    * @return True, if they are, false otherwise
    */
   public boolean isPunished(PunishType type) {
+    // Check if we have or don't have a current
+    // punishment active with the given type
+    if (getCurrent(type) != null) {
+      return true;
+    }
+
     // Bans have to be treated differently as
     // They are recorded in minecraft's own ban
     // list, to ensure we're returning a correct
@@ -106,10 +112,7 @@ public class PunishEntry implements JsonSerializable {
           .isBanned(getUser().getIp());
     }
 
-    // If we're not checking bans, then just check if we
-    // have or don't have a current punishment active
-    // with the given type
-    return getCurrent(type) != null;
+    return false;
   }
 
   /**
@@ -121,6 +124,13 @@ public class PunishEntry implements JsonSerializable {
     var type = punishment.getType();
     revokePunishment(type, null);
 
+    _punish(punishment);
+
+    type.onPunishmentStart(getUser(), this, Punishments.get(), punishment);
+  }
+
+  private void _punish(Punishment punishment) {
+    var type = punishment.getType();
     current[type.ordinal()] = punishment;
     punishment.startTask(() -> revokePunishment(type, null));
   }
@@ -197,7 +207,7 @@ public class PunishEntry implements JsonSerializable {
 
     Collection<Punishment> list = json.getList("current", Punishment::read);
     for (Punishment p : list) {
-      punish(p);
+      _punish(p);
     }
   }
 

@@ -10,31 +10,33 @@ import net.forthecrown.dungeons.level.gate.GateType;
 import net.forthecrown.dungeons.level.room.RoomType;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
+import org.jetbrains.annotations.Nullable;
 
 public final class Pieces {
   private Pieces() {}
 
-  public static final int
-      FLAG_CONNECTOR = 0x1,
-      FLAG_BOSS_ROOM = 0x2,
-      FLAG_MOB_ROOM = 0x8,
-      FLAG_ROOT = 0x20;
+  public static final int FLAG_CONNECTOR  = 0x01;
+  public static final int FLAG_BOSS_ROOM  = 0x02;
+  public static final int FLAG_MOB_ROOM   = 0x08;
+  public static final int FLAG_ROOT       = 0x20;
 
-  public static final ImmutableMap<String, Integer> FLAGS_BY_NAME = ImmutableMap.<String, Integer>builder()
-      .put("connector", FLAG_CONNECTOR)
-      .put("boss_room", FLAG_BOSS_ROOM)
-      .put("mob_room", FLAG_MOB_ROOM)
-      .put("root", FLAG_ROOT)
-      .build();
+  public static final ImmutableMap<String, Integer> FLAGS_BY_NAME
+      = ImmutableMap.<String, Integer>builder()
+          .put("connector", FLAG_CONNECTOR)
+          .put("boss_room", FLAG_BOSS_ROOM)
+          .put("mob_room", FLAG_MOB_ROOM)
+          .put("root", FLAG_ROOT)
+          .build();
 
-  public static PieceType load(Tag t) {
+  @SuppressWarnings("rawtypes")
+  public static @Nullable PieceType load(Tag t) {
     RegistryKey key = RegistryKey.load(t);
 
     if (key == null) {
       return null;
     }
 
-    Registry<PieceType> registry = DungeonManager.getInstance()
+    Registry<PieceType> registry = DungeonManager.getDungeons()
         .getTypeRegistries()
         .orNull(key.getRegistry());
 
@@ -45,8 +47,9 @@ public final class Pieces {
     return registry.orNull(key.getValue());
   }
 
+  @SuppressWarnings("rawtypes")
   public static StringTag save(PieceType type) {
-    var registry = DungeonManager.getInstance()
+    var registry = DungeonManager.getDungeons()
         .getTypeRegistries();
 
     for (var r : registry.entries()) {
@@ -65,7 +68,7 @@ public final class Pieces {
   }
 
   public static Holder<RoomType> getRoot() {
-    var reg = DungeonManager.getInstance().getRoomTypes();
+    var reg = DungeonManager.getDungeons().getRoomTypes();
 
     for (var e : reg.entries()) {
       if (e.getValue().hasFlags(FLAG_ROOT)) {
@@ -77,13 +80,13 @@ public final class Pieces {
   }
 
   public static Holder<GateType> getClosed(Random random) {
-    return DungeonManager.getInstance().getGateTypes()
+    return DungeonManager.getDungeons().getGateTypes()
         .getRandom(random, holder -> !holder.getValue().isOpenable())
         .orElseThrow();
   }
 
   public static Holder<GateType> getDefaultGate() {
-    return DungeonManager.getInstance().getGateTypes()
+    return DungeonManager.getDungeons().getGateTypes()
         .getHolder("default")
         .orElseThrow(() -> new IllegalStateException("No default gate!"));
   }

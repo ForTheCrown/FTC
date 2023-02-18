@@ -4,14 +4,16 @@ import static net.forthecrown.guilds.menu.GuildMenus.GUILD;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.Exceptions;
+import net.forthecrown.core.Permissions;
 import net.forthecrown.guilds.Guild;
 import net.forthecrown.guilds.GuildMember;
 import net.forthecrown.guilds.GuildPermission;
+import net.forthecrown.guilds.GuildRank;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.ThrowingRunnable;
-import net.forthecrown.utils.inventory.menu.MenuNode;
-import net.forthecrown.utils.inventory.menu.ClickContext;
 import net.forthecrown.utils.context.Context;
+import net.forthecrown.utils.inventory.menu.ClickContext;
+import net.forthecrown.utils.inventory.menu.MenuNode;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -25,6 +27,29 @@ public interface Unlockable {
       .decoration(TextDecoration.ITALIC, false);
 
   default void onUnlock(Guild guild, User user) {
+  }
+
+  default boolean testPermission(Guild guild, User user) {
+    var member = guild.getMember(user.getUniqueId());
+
+    if (member != null) {
+      GuildRank rank = guild.getSettings().getRank(member.getRankId());
+
+      if (!rank.hasPermission(getPerm())) {
+        return false;
+      }
+    }
+
+    return user.hasPermission(Permissions.GUILD_ADMIN);
+  }
+
+  default void ensureHasPermission(Guild guild, User user)
+      throws CommandSyntaxException {
+    if (testPermission(guild, user)) {
+      return;
+    }
+
+    throw Exceptions.NO_PERMISSION;
   }
 
   GuildPermission getPerm();
@@ -91,40 +116,33 @@ public interface Unlockable {
                        Context c,
                        ThrowingRunnable<CommandSyntaxException> r
   ) throws CommandSyntaxException {
-    Guild guild = c.get(GUILD);
-
-    if (guild == null) {
-      return;
-    }
-
+    Guild guild = c.getOrThrow(GUILD);
     GuildMember member = guild.getMember(user.getUniqueId());
-
-    if (member == null) {
-      return;
-    }
 
     context.shouldReloadMenu(true);
 
     if (this.isUnlocked(guild)) {
-      if (member.hasPermission(getPerm())) {
-        r.run();
-      } else {
-        // Member does not have permission
-        throw Exceptions.NO_PERMISSION;
-      }
+      ensureHasPermission(guild, user);
+      r.run();
 
       return;
     }
 
     int spentAmount;
 
-    // Spend all available when shift clicking, else spend EXP_COST
-    spentAmount = member.spendExp(
-        this,
-        context.getClickType().isShiftClick()
-            ? member.getExpAvailable()
-            : EXP_COST
-    );
+    if (member == null) {
+      spentAmount = context.getClickType().isShiftClick()
+          ? getExpRequired()
+          : EXP_COST;
+    } else {
+      // Spend all available when shift clicking, else spend EXP_COST
+      spentAmount = member.spendExp(
+          this,
+          context.getClickType().isShiftClick()
+              ? member.getExpAvailable()
+              : EXP_COST
+      );
+    }
 
     // Send user message
     if (spentAmount == 0) {

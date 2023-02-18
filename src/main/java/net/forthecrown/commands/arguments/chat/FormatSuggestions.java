@@ -24,7 +24,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 
 public class FormatSuggestions {
 
-  static final Map<String, String> FORMAT_SUGGESTIONS = ImmutableMap.<String, String>builder()
+  public static final Map<String, String> FORMAT_SUGGESTIONS = ImmutableMap.<String, String>builder()
       // Copied from LegacyComponentSerializerImpl
       .put(codeEntry('0', BLACK))
       .put(codeEntry('1', DARK_BLUE))
@@ -53,7 +53,7 @@ public class FormatSuggestions {
 
       .build();
 
-  static final Map<String, String> HEX_2_NAME = ImmutableMap.<String, String>builder()
+  public static final Map<String, String> HEX_2_NAME = ImmutableMap.<String, String>builder()
       // Copied from the above map lol
       .put(hexEntry(BLACK))
       .put(hexEntry(DARK_BLUE))

@@ -4,7 +4,7 @@ import java.util.Objects;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.Util;
@@ -16,7 +16,7 @@ import org.bukkit.entity.Player;
 @RequiredArgsConstructor
 public class ChallengeHandle {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   private final JsonChallenge challenge;
 
@@ -33,14 +33,17 @@ public class ChallengeHandle {
     var manager = ChallengeManager.getInstance();
 
     Challenges.apply(challenge, holder -> {
-      manager.getOrCreateEntry(player.getUniqueId())
+      manager.getEntry(player.getUniqueId())
           .addProgress(holder, (float) score);
     });
   }
 
   public boolean hasCompleted(Object playerObject) {
     var player = getPlayer(playerObject);
-    return Challenges.hasCompleted(challenge, player.getUniqueId());
+    var entry = ChallengeManager.getInstance()
+        .getEntry(player.getUniqueId());
+
+    return entry.hasCompleted(challenge);
   }
 
   static Player getPlayer(Object arg) {

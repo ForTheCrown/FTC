@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 @NoArgsConstructor(staticName = "create")
 public class ContextSet {
 
-  private final Set<ContextOption> options = new ObjectOpenHashSet<>();
+  private final Set<ContextOption<?>> options = new ObjectOpenHashSet<>();
 
   /**
    * Creates a new option with a null default value
@@ -41,7 +41,7 @@ public class ContextSet {
     return option;
   }
 
-  public boolean has(ContextOption option) {
+  public boolean has(ContextOption<?> option) {
     return options.contains(option);
   }
 

@@ -2,8 +2,8 @@ package net.forthecrown.guilds;
 
 import it.unimi.dsi.fastutil.longs.LongSet;
 import lombok.experimental.UtilityClass;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.FtcDynmap;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.math.Vectors;
 import net.minecraft.world.level.ChunkPos;
@@ -13,7 +13,7 @@ import org.dynmap.markers.MarkerSet;
 
 public @UtilityClass class GuildDynmap {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   private static final String
       MARKER_SET_ID = "chunk_markers",

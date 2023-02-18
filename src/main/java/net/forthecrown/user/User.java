@@ -36,6 +36,7 @@ import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.core.config.EndConfig;
 import net.forthecrown.core.config.GeneralConfig;
 import net.forthecrown.core.config.JoinInfo;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.events.dynamic.HulkSmashListener;
 import net.forthecrown.grenadier.CommandSource;
@@ -53,14 +54,17 @@ import net.forthecrown.user.data.UserMarketData;
 import net.forthecrown.user.data.UserRanks;
 import net.forthecrown.user.data.UserShopData;
 import net.forthecrown.user.data.UserTimeTracker;
-import net.forthecrown.user.data.UserTitles;
+import net.forthecrown.user.data.RanksComponent;
 import net.forthecrown.user.property.BoolProperty;
 import net.forthecrown.user.property.Properties;
 import net.forthecrown.user.property.PropertyMap;
+import net.forthecrown.user.property.UserPreference;
 import net.forthecrown.user.property.UserProperty;
 import net.forthecrown.utils.ArrayIterator;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.Time;
+import net.forthecrown.utils.Util;
+import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.forthecrown.utils.text.writer.TextWriters;
 import net.kyori.adventure.audience.Audience;
@@ -94,7 +98,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class User implements ForwardingAudience.Single,
-    HoverEventSource<Component>, Identity {
+    HoverEventSource<Component>, Identity
+{
 
   /**
    * The user's unique ID
@@ -213,8 +218,8 @@ public class User implements ForwardingAudience.Single,
 
   /**
    * Gets a component by its component class. This method works by calling
-   * {@link #getComponent(ComponentType)} with {@link Components#of(Class)}'s result with the given
-   * class.
+   * {@link #getComponent(ComponentType)} with
+   * {@link Components#of(Class, boolean)}'s result with the given class.
    *
    * @param typeClass The component to get the component of
    * @param <T>       The component's type
@@ -222,20 +227,65 @@ public class User implements ForwardingAudience.Single,
    * @see #getComponent(ComponentType)
    */
   public <T extends UserComponent> @NotNull T getComponent(Class<T> typeClass) {
-    return getComponent(Components.of(typeClass));
+    return getComponent(Components.of(
+        typeClass,
+        typeClass == UserShopData.class
+    ));
   }
 
   /**
    * Gets or creates a component with the given type for this user.
    * <p>
-   * If this user's component array does not contain the given type, then it is added to it, and
-   * potentially resized to allow for it to be added.
+   * If the <code>type</code> says to redirect to a main account version of the
+   * component, and this user has an alt, then instead of this user's instance
+   * of the component being returned, the main account's instance is returned
+   * instead.
+   * <p>
+   * Use, {@link #getComponentNoRedirect(ComponentType)} to avoid this alt/main
+   * account redirection. For most cases however, there's no difference between
+   * this method and the no redirect version.
+   *
+   * <p>
+   * If this user's component array does not contain the given type, then it is
+   * added to it, and potentially resized to allow for it to be added.
    *
    * @param type The type
    * @param <T>  The component's type
    * @return The gotten or created component
    */
-  public <T extends UserComponent> @NotNull T getComponent(ComponentType<T> type) {
+  public <T extends UserComponent> @NotNull T getComponent(
+      @NotNull ComponentType<T> type
+  ) {
+    Objects.requireNonNull(type);
+
+    if (type.isRedirectAlts()) {
+      var alts = UserManager.get().getAlts();
+      var main = alts.getMain(getUniqueId());
+
+      if (main != null) {
+        var user = Users.get(main);
+        return user.getComponent(type);
+      }
+    }
+
+    return getComponentNoRedirect(type);
+  }
+
+  /**
+   * Gets or creates a component with the given type for this user. If the user
+   * has a main account and the given type should be redirected to the main's
+   * component, no such redirect will be initiated.
+   *
+   * @param type Component type
+   * @return Gotten or created component
+   * @param <T> Component's type
+   */
+  @SuppressWarnings("unchecked") // The T doesn't even exist in runtime, stop screaming
+  public <T extends UserComponent> @NotNull T getComponentNoRedirect(
+      @NotNull ComponentType<T> type
+  ) {
+    Objects.requireNonNull(type);
+
     var index = type.getIndex();
     components = ObjectArrays.ensureCapacity(components, index + 1);
 
@@ -268,7 +318,7 @@ public class User implements ForwardingAudience.Single,
    * @param type The type to test for
    * @return True, if this user has a component with the given type
    */
-  public boolean hasComponent(ComponentType type) {
+  public boolean hasComponent(ComponentType<?> type) {
     if (type == null) {
       return false;
     }
@@ -300,7 +350,7 @@ public class User implements ForwardingAudience.Single,
    * @return True, if the user has any non-null components, false otherwise
    */
   public boolean hasComponents() {
-    if (components.length <= 0) {
+    if (components.length == 0) {
       return false;
     }
 
@@ -394,7 +444,7 @@ public class User implements ForwardingAudience.Single,
    * @see #getComponent(ComponentType)
    * @see Components#TITLES
    */
-  public UserTitles getTitles() {
+  public RanksComponent getTitles() {
     return getComponent(Components.TITLES);
   }
 
@@ -443,7 +493,10 @@ public class User implements ForwardingAudience.Single,
     }
 
     // Update IP
-    ip = getPlayer().getAddress().getHostString();
+    var socketAddress = getPlayer().getAddress();
+    if (socketAddress != null) {
+      ip = socketAddress.getHostString();
+    }
 
     // Show join info, if we should
     var joinInfo = JoinInfo.display();
@@ -481,17 +534,19 @@ public class User implements ForwardingAudience.Single,
     // Inform of guild Exp Multiplier
     var modifier = GuildManager.get()
         .getExpModifier()
-        .getModifier();
+        .getModifier(getUniqueId());
 
     if (getGuild() != null && modifier > 1) {
-      Tasks.runLaterAsync(() -> sendMessage(Messages.guildMultiplierActive(modifier)), 60);
+      Tasks.runLaterAsync(
+          () -> sendMessage(Messages.guildMultiplierActive(modifier)),
+          60
+      );
     }
 
     // Tell admin if this user has notes
     if (Punishments.hasNotes(this)) {
       var writer = TextWriters.newWriter();
-      var notes = Punishments.entry(this)
-          .getNotes();
+      var notes = Punishments.entry(this).getNotes();
 
       EntryNote.writeNotes(notes, writer, this);
 
@@ -560,12 +615,16 @@ public class User implements ForwardingAudience.Single,
     }
 
     // Log play time
-    logTime().resultOrPartial(FTC.getLogger()::warn)
-        .ifPresent(integer -> {
-          UserManager.get()
-              .getPlayTime()
-              .add(getUniqueId(), integer);
-        });
+    logTime().resultOrPartial(Loggers.getLogger()::warn).ifPresent(integer -> {
+      Loggers.getLogger().info("Adding {} seconds or {} hours to {}'s playtime",
+          integer,
+          TimeUnit.SECONDS.toHours(integer),
+          this
+      );
+
+      UserManager.get().getPlayTime()
+          .add(getUniqueId(), integer);
+    });
 
     lastOnlineName = getName();
 
@@ -623,7 +682,6 @@ public class User implements ForwardingAudience.Single,
     }
 
     sendMessage(
-        senderUser == null ? Identity.nil() : senderUser,
         Messages.mailReceived(
             text, senderUser,
             !MailAttachment.isEmpty(message.getAttachment())
@@ -934,8 +992,10 @@ public class User implements ForwardingAudience.Single,
         .build();
 
     if (lpManager.isLoaded(getUniqueId())) {
-      return lpManager.getUser(getUniqueId())
-          .getCachedData()
+      var cachedData = lpManager.getUser(getUniqueId());
+      assert cachedData != null : "User has no LP cache data";
+
+      return cachedData.getCachedData()
           .getPermissionData(options)
           .checkPermission(name)
           .asBoolean();
@@ -949,7 +1009,7 @@ public class User implements ForwardingAudience.Single,
           .checkPermission(name)
           .asBoolean();
     } catch (ExecutionException | InterruptedException e) {
-      FTC.getLogger().error("Couldn't fetch permission data from LuckPerms", e);
+      Loggers.getLogger().error("Couldn't fetch permission data from LuckPerms", e);
     }
 
     return false;
@@ -1194,8 +1254,29 @@ public class User implements ForwardingAudience.Single,
   public void updateTabName() throws UserOfflineException {
     ensureOnline();
 
-    Component displayName = listDisplayName(true);
+    Component displayName = listDisplayName(true, true);
     getPlayer().playerListName(displayName);
+
+    // Mmm yes, let's put our API on an insecure HTTP protocol instead
+    // of an HTTPS protocol
+    Component prefix = getEffectivePrefix(true);
+    Component suffix = get(Properties.SUFFIX);
+
+    Util.consoleCommand("nte player %s clear", getName());
+
+    if (!prefix.equals(Component.empty())) {
+      Util.consoleCommand("nte player %s prefix '%s &r'",
+          getName(),
+          Text.LEGACY.serialize(prefix)
+      );
+    }
+
+    if (!suffix.equals(Component.empty())) {
+      Util.consoleCommand("nte player %s suffix ' %s'",
+          getName(),
+          Text.LEGACY.serialize(suffix)
+      );
+    }
 
     TabList.update();
   }
@@ -1205,8 +1286,8 @@ public class User implements ForwardingAudience.Single,
    *
    * @return The user's TAB display name
    */
-  public Component listDisplayName(boolean prependRank) {
-    return Users.createListName(this, getTabName(), prependRank);
+  public Component listDisplayName(boolean prependRank, boolean allowAfk) {
+    return Users.createListName(this, getTabName(), prependRank, allowAfk);
   }
 
   public Component getTabName() {
@@ -1242,8 +1323,8 @@ public class User implements ForwardingAudience.Single,
    *
    * @see PropertyMap#flip(BoolProperty)
    */
-  public boolean flip(BoolProperty property) {
-    return getProperties().flip(property);
+  public void flip(BoolProperty property) {
+    getProperties().flip(property);
   }
 
   /**
@@ -1322,7 +1403,10 @@ public class User implements ForwardingAudience.Single,
     var player = getPlayer();
 
     if (godMode) {
-      player.setHealth(getPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+      var attr = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+      assert attr != null : "Player has no Max Health attribute";
+
+      player.setHealth(attr.getValue());
       player.setFoodLevel(20);
     }
 
@@ -1347,11 +1431,29 @@ public class User implements ForwardingAudience.Single,
     return getPlayer().getGameMode();
   }
 
-  public void setGameMode(GameMode gameMode) throws UserOfflineException {
+  public void setGameMode(GameMode newGameMode) throws UserOfflineException {
     ensureOnline();
 
-    getPlayer().setGameMode(gameMode);
+    var currentGameMode = getGameMode();
+
+    if (currentGameMode == GameMode.SPECTATOR
+        && newGameMode != GameMode.SPECTATOR
+    ) {
+      boolean hide = get(Properties.DYNMAP_HIDE);
+      UserPreference.DYNMAP_HIDE.setState(this, hide);
+    }
+
+    getPlayer().setGameMode(newGameMode);
     updateFlying();
+
+    if (newGameMode == GameMode.SPECTATOR
+        && currentGameMode != GameMode.SPECTATOR
+    ) {
+      boolean hide = UserPreference.DYNMAP_HIDE.getState(this);
+      set(Properties.DYNMAP_HIDE, hide);
+
+      UserPreference.DYNMAP_HIDE.setState(this, true);
+    }
   }
 
   private static boolean canFly(GameMode mode) {

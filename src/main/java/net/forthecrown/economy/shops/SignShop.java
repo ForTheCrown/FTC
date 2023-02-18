@@ -3,24 +3,27 @@ package net.forthecrown.economy.shops;
 import static net.forthecrown.economy.shops.SignShops.DEFAULT_INV_SIZE;
 import static net.forthecrown.economy.shops.SignShops.LINE_PRICE;
 import static net.forthecrown.economy.shops.SignShops.LINE_TYPE;
+import static net.forthecrown.utils.inventory.menu.Menus.MAX_INV_SIZE;
 
 import java.util.Objects;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.config.GeneralConfig;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.economy.Economy;
 import net.forthecrown.utils.LocationFileName;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.Time;
 import net.forthecrown.utils.inventory.ItemStacks;
+import net.forthecrown.utils.inventory.menu.Menus;
 import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.math.WorldVec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntArrayTag;
 import net.minecraft.nbt.Tag;
 import org.apache.commons.lang3.Validate;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -31,8 +34,12 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.math.GenericMath;
 
 public class SignShop implements InventoryHolder {
+
+  private static final Logger LOGGER = Loggers.getLogger();
+
   /* ----------------------------- CONSTANTS ------------------------------ */
 
   /**
@@ -237,6 +244,8 @@ public class SignShop implements InventoryHolder {
    * @param newSize THe new inventory size
    */
   public void resizeInventory(int newSize) {
+    newSize = ensureCorrectInventorySize(newSize);
+
     if (newSize == getInventory().getSize()) {
       return;
     }
@@ -247,6 +256,21 @@ public class SignShop implements InventoryHolder {
     // Attempt to move all items from
     // last inventory to new one
     ItemStacks.forEachNonEmptyStack(old, i -> inventory.addItem(i));
+  }
+
+  private static int ensureCorrectInventorySize(int size) {
+    if (Menus.isValidSize(size)) {
+      return size;
+    }
+
+    LOGGER.error(
+        "Invalid shop inventory size: {}, must be in bounds [9..54] "
+            + "and a multiple of 9",
+        size
+    );
+
+    int rows = (size / 9) + 1;
+    return Math.min(MAX_INV_SIZE, Menus.sizeFromRows(rows));
   }
 
   /**
@@ -273,7 +297,7 @@ public class SignShop implements InventoryHolder {
    * Lastly, it returns true if the shop's inventory contains enough of the example item to complete
    * a successful transaction
    *
-   * @return
+   * @return True, if the shop is in stock, false otherwise
    */
   public boolean inStock() {
     if (ItemStacks.isEmpty(exampleItem)) {
@@ -287,16 +311,16 @@ public class SignShop implements InventoryHolder {
 
     // If it's full and a sell shop, then it's considered
     // out of stock due to the fact it cannot operate
-    if (isFull() && !getType().isBuyType()) {
-      return false;
+    if (!getType().isBuyType()) {
+      return !isFull();
+    } else {
+      // Check if inventory contains enough of the example item
+      // to be considered 'in stock'
+      return getInventory().containsAtLeast(
+          getExampleItem(),
+          getExampleItem().getAmount()
+      );
     }
-
-    // Check if inventory contains enough of the example item
-    // to be considered 'in stock'
-    return getInventory().containsAtLeast(
-        getExampleItem(),
-        getExampleItem().getAmount()
-    );
   }
 
   /**
@@ -360,7 +384,7 @@ public class SignShop implements InventoryHolder {
     var state = getBlock().getState();
 
     if (!(state instanceof Sign sign)) {
-      FTC.getLogger().warn("Shop at {} is not a sign block", getPosition());
+      Loggers.getLogger().warn("Shop at {} is not a sign block", getPosition());
       return null;
     }
 
@@ -428,7 +452,7 @@ public class SignShop implements InventoryHolder {
     // Update the ingame tile entity by
     // calling bukkit's update method here.
     // what did I just say???
-    s.update(true);
+    s.update();
   }
 
   /* ----------------------------- SERIALIZATION ------------------------------ */
@@ -515,6 +539,8 @@ public class SignShop implements InventoryHolder {
    */
   public void load(CompoundTag tag) {
     price = tag.getInt(TAG_PRICE);
+    price = GenericMath.clamp(price, 0, GeneralConfig.maxSignShopPrice);
+
     type = TagUtil.readEnum(ShopType.class, tag.get(TAG_TYPE));
 
     // Read owner if there is one, if there isn't,
@@ -546,8 +572,26 @@ public class SignShop implements InventoryHolder {
       getInventory().clear();
       resizeInventory(tag.getInt(TAG_INVENTORY_SIZE));
 
+      if (ItemStacks.isEmpty(exampleItem)) {
+        LOGGER.warn("Shop {} loaded empty example item", getPosition());
+      }
+
       int itemCount = tag.getInt(TAG_ITEM_COUNT);
       int stackSize = exampleItem.getMaxStackSize();
+
+      int maxInvCapacity = stackSize * inventory.getSize();
+
+      if (itemCount > maxInvCapacity) {
+        LOGGER.warn(
+            "itemCount above max inventory capacity! "
+                + "itemCount={}, inventorySize={} invCapacity={}",
+            itemCount,
+            inventory.getSize(),
+            maxInvCapacity
+        );
+
+        itemCount = maxInvCapacity;
+      }
 
       for (int i = 0; i < inventory.getSize(); i++) {
         if (itemCount <= 0) {

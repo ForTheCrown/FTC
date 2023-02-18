@@ -3,12 +3,13 @@ package net.forthecrown.user.property;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.ObjectArrays;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.user.ComponentType;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserComponent;
 import net.forthecrown.utils.ArrayIterator;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
  * A map of {@link UserProperty} properties
  */
 public class PropertyMap extends UserComponent {
+  private static final Logger LOGGER = Loggers.getLogger();
 
   /**
    * The backing object array that stores property values. What index corresponds to what property
@@ -44,6 +46,7 @@ public class PropertyMap extends UserComponent {
    * @return The set value of the property, or the property's default value
    */
   @NotNull
+  @SuppressWarnings("unchecked")
   public <T> T get(@NotNull UserProperty<T> property) {
     if (!contains(property)) {
       return property.getDefaultValue();
@@ -114,7 +117,7 @@ public class PropertyMap extends UserComponent {
    * @param property The property to remove
    * @return True, if the property was contained in this map before removal, false otherwise
    */
-  public boolean remove(@NotNull UserProperty property) {
+  public boolean remove(@NotNull UserProperty<?> property) {
     if (!contains(property)) {
       return false;
     }
@@ -129,7 +132,7 @@ public class PropertyMap extends UserComponent {
    * @param property The property to test
    * @return True, if the given property has a set value in this map.
    */
-  public boolean contains(@NotNull UserProperty property) {
+  public boolean contains(@NotNull UserProperty<?> property) {
     if (values.length <= property.getIndex()) {
       return false;
     }
@@ -157,6 +160,7 @@ public class PropertyMap extends UserComponent {
   /* ----------------------------- SERIALIZATION ------------------------------ */
 
   @Override
+  @SuppressWarnings("unchecked")
   public void deserialize(JsonElement element) {
     clear();
 
@@ -169,11 +173,11 @@ public class PropertyMap extends UserComponent {
     var obj = element.getAsJsonObject();
     for (var e : obj.entrySet()) {
       // Get property by entry name
-      UserProperty property = Properties.USER_PROPERTIES.orNull(e.getKey());
+      UserProperty<Object> property = Properties.USER_PROPERTIES.orNull(e.getKey());
 
       // Test the property isn't null
       if (property == null) {
-        FTC.getLogger().warn("Found unknown user property: '{}', skipping", e.getKey());
+        Loggers.getLogger().warn("Found unknown user property: '{}', skipping", e.getKey());
         continue;
       }
 
@@ -183,6 +187,7 @@ public class PropertyMap extends UserComponent {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public JsonElement serialize() {
     var json = new JsonObject();
 
@@ -193,7 +198,15 @@ public class PropertyMap extends UserComponent {
     // length with the first read entry
     for (int i = values.length - 1; i >= 0; i--) {
       // Get the property by the current index
-      UserProperty property = Properties.USER_PROPERTIES.orNull(i);
+      UserProperty<Object> property = Properties.USER_PROPERTIES.orNull(i);
+
+      if (property == null) {
+        LOGGER.warn("Found unregistered property {} in {}",
+            i, getUser()
+        );
+
+        continue;
+      }
 
       // contains() check here to test if the
       // set value is null or the default, if

@@ -15,6 +15,8 @@ public class CommandHomeWaypoint extends FtcCommand {
 
     setPermission(Permissions.WAYPOINTS);
     setAliases("homepole", "homepost");
+    setDescription("Takes you to your home waypoint");
+    simpleUsages();
 
     register();
   }

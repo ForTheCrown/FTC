@@ -13,4 +13,6 @@ public final class GuildConfig {
   public static long roleUpdateInterval = TimeUnit.MINUTES.toMillis(10);
 
   public static long guildsChannelCategory = 0L;
+
+  public static String webhookAvatarPath = "guilds/steven_avatar.png";
 }

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.utils.Tasks;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.scheduler.BukkitTask;
@@ -13,7 +13,7 @@ import org.bukkit.scheduler.BukkitTask;
 @Getter
 @RequiredArgsConstructor
 public class ScriptTasks {
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   private final Script script;
   private final List<TaskWrapper> tasks = new ObjectArrayList<>();
@@ -30,12 +30,12 @@ public class ScriptTasks {
     return add(wrapper);
   }
 
-  public TaskWrapper runTimer(long initialDelayMillis,
-                              long delayMillis,
+  public TaskWrapper runTimer(long initialDelayTicks,
+                              long delayTicks,
                               Consumer<TaskWrapper> consumer
   ) {
     TaskWrapper wrapper = new TaskWrapper(consumer, this);
-    wrapper.task = Tasks.runTimer(wrapper::run, initialDelayMillis, delayMillis);
+    wrapper.task = Tasks.runTimer(wrapper::run, initialDelayTicks, delayTicks);
     return add(wrapper);
   }
 
@@ -69,7 +69,7 @@ public class ScriptTasks {
     }
 
     public int getTaskId() {
-      return task.getTaskId();
+      return task == null ? 0 : task.getTaskId();
     }
 
     public void cancel() {

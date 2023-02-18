@@ -14,6 +14,7 @@ public class CommandCreateWaypoint extends FtcCommand {
     setPermission(Permissions.WAYPOINTS_ADMIN);
     setDescription("Creates a new waypoint");
     setAliases("waypointcreate");
+    simpleUsages();
 
     register();
   }
@@ -30,6 +31,20 @@ public class CommandCreateWaypoint extends FtcCommand {
    *
    * Main Author:
    */
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("", "Attempts to create a waypoint from the block")
+        .addInfo("you're looking at");
+
+    factory.usage("-admin")
+        .addInfo("Creates an invisible admin waypoint")
+        .addInfo("where you're standing");
+
+    factory.usage("-region_pole")
+        .addInfo("Creates a region pole waypoint from the block")
+        .addInfo("you're looking at");
+  }
 
   @Override
   protected void createCommand(BrigadierCommand command) {

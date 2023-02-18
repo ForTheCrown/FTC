@@ -1,10 +1,9 @@
 package net.forthecrown.core;
 
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.ModuleServices;
-import net.forthecrown.core.module.OnDisable;
-import net.forthecrown.core.module.OnSave;
+import net.forthecrown.dungeons.enchantments.FtcEnchants;
 import net.kyori.adventure.key.Namespaced;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -20,27 +19,22 @@ public final class Main extends JavaPlugin implements Namespaced {
       OLD_NAMESPACE = "ftccore";
 
   boolean debugMode;
-  FtcLogger logger;
 
   @Override
   public void onEnable() {
+    setDebugMode();
+
     // Register dynmap hook connection thing
     DynmapUtil.registerListener();
-
-    setDebugMode();
-    ensureLoggerExists();
-
     BootStrap.init();
 
-    FTC.getLogger().info("FTC started");
+    getLog4JLogger().info("FTC started");
   }
 
   @Override
   public void onLoad() {
-    setDebugMode();
-    ensureLoggerExists();
-
     FtcFlags.init();
+    FtcEnchants.init();
   }
 
   @Override
@@ -48,22 +42,8 @@ public final class Main extends JavaPlugin implements Namespaced {
     Bukkit.getScheduler()
         .cancelTasks(this);
 
-    ModuleServices.run(OnSave.class);
-    ModuleServices.run(OnDisable.class);
-  }
-
-  private void ensureLoggerExists() {
-    if (logger != null) {
-      return;
-    }
-
-    getLogger().addHandler(DiscordErrorLogHandler.INSTANCE);
-    Bukkit.getLogger().addHandler(DiscordErrorLogHandler.INSTANCE);
-
-    logger = new FtcLogger(
-        LogManager.getContext()
-            .getLogger(getLogger().getName())
-    );
+    ModuleServices.SAVE.run();
+    ModuleServices.ON_DISABLE.run();
   }
 
   private void setDebugMode() {
@@ -81,7 +61,6 @@ public final class Main extends JavaPlugin implements Namespaced {
 
   @Override
   public @NotNull Logger getLog4JLogger() {
-    ensureLoggerExists();
-    return logger;
+    return Loggers.getPluginLogger();
   }
 }

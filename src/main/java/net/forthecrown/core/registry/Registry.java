@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import lombok.Getter;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.user.property.PropertyMap;
 import net.forthecrown.user.property.UserProperty;
 import net.forthecrown.utils.AbstractListIterator;
@@ -33,6 +33,7 @@ import net.forthecrown.utils.Util;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
+import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.intellij.lang.annotations.Pattern;
 import org.jetbrains.annotations.NotNull;
@@ -82,9 +83,12 @@ import org.jetbrains.annotations.Nullable;
 public class Registry<V> implements Iterable<V> {
   /* ----------------------------- CONSTANTS ------------------------------ */
 
+  private static final Logger LOGGER = Loggers.getLogger();
+
   /**
    * An empty and immutable holder array
    */
+  @SuppressWarnings("rawtypes")
   private static final Holder[] EMPTY_ARRAY = new Holder[0];
 
   /**
@@ -123,10 +127,11 @@ public class Registry<V> implements Iterable<V> {
   /**
    * ID to entry lookup array
    */
+  @SuppressWarnings("unchecked")
   private Holder<V>[] byId = EMPTY_ARRAY;
 
   @Getter
-  private RegistryIndex<V, ?> index;
+  private RegistryListener<V> listener;
 
   /**
    * True, if the registry has been frozen and was made immutable, false otherwise
@@ -220,7 +225,7 @@ public class Registry<V> implements Iterable<V> {
                                      @NonNegative int id
   ) throws IllegalArgumentException,
       NullPointerException {
-    return register(new Holder<>(removeNamespace(key), id, value));
+    return register(new Holder<>(removeNamespace(key).intern(), id, value));
   }
 
   /**
@@ -282,14 +287,16 @@ public class Registry<V> implements Iterable<V> {
 
     byId[holder.getId()] = holder;
     byKey.put(holder.getKey(), holder);
+    holder.setRegistry(this);
+
     var existing = byValue.put(holder.getValue(), holder);
 
-    if (index != null) {
-      index.onRegister(holder);
+    if (listener != null) {
+      listener.onRegister(holder);
     }
 
     if (existing != null) {
-      FTC.getLogger().warn(
+      LOGGER.warn(
           "Registry value hash collision! Entry '{}' replaced " +
               "'{}' in the value-lookup map",
 
@@ -405,6 +412,11 @@ public class Registry<V> implements Iterable<V> {
     byKey.remove(holder.getKey());
     byValue.remove(holder.getValue());
 
+    if (listener != null) {
+      listener.onUnregister(holder);
+    }
+
+    holder.setRegistry(null);
     return true;
   }
 
@@ -444,8 +456,13 @@ public class Registry<V> implements Iterable<V> {
    *
    * @throws IllegalStateException If the registry is frozen
    */
+  @SuppressWarnings("unchecked")
   public void clear() throws IllegalArgumentException {
     testFrozen();
+
+    if (listener != null) {
+      byKey.values().forEach(listener::onUnregister);
+    }
 
     byValue.clear();
     byKey.clear();
@@ -481,35 +498,31 @@ public class Registry<V> implements Iterable<V> {
     }
   }
 
-  /* ----------------------------- INDEXING ------------------------------- */
+  /* ----------------------------- LISTENING ------------------------------ */
 
   /**
-   * Sets the registry's indexer.
+   * Sets the registry's listener.
    * <p>
-   * The indexer's job is to provide an additional mapping for entries
-   * registered into this registry.
-   * <p>
-   * A registry's indexer can only be set once, afterwards, any attempted
-   * changes to an indexer, will result in an exception being thrown
+   * A registry listener can only be set once, afterwards, any attempted
+   * changes to a listener, will result in an exception being thrown
    *
-   * @param index The indexer to set
-   * @param <T> The Indexer's type
+   * @param listener The listener to set
    * @throws IllegalArgumentException If an indexer is already set
    */
-  public <T> void setIndex(RegistryIndex<V, T> index)
+  public void setListener(RegistryListener<V> listener)
       throws IllegalArgumentException
   {
-    Objects.requireNonNull(index);
+    Objects.requireNonNull(listener);
 
-    if (this.index != null) {
-      throw Util.newException("Registry indexer already set!");
+    if (this.listener != null) {
+      throw Util.newException("Registry listener already set!");
     }
 
-    this.index = index;
+    this.listener = listener;
 
     if (!isEmpty()) {
       byKey.values()
-          .forEach(index::onRegister);
+          .forEach(listener::onRegister);
     }
   }
 
@@ -530,7 +543,7 @@ public class Registry<V> implements Iterable<V> {
   public @NotNull Optional<Holder<V>> getHolder(@Pattern(VALID_KEY_REGEX) String key)
       throws IllegalArgumentException {
     return Optional.ofNullable(byKey.get(
-        Keys.ensureValid(removeNamespace(key))
+        Keys.ensureValid(removeNamespace(key)).intern()
     ));
   }
 

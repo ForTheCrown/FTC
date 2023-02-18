@@ -10,6 +10,8 @@ import net.forthecrown.utils.io.FtcCodecs;
 import net.minecraft.core.UUIDUtil;
 
 public final class ChallengeLogs {
+  private ChallengeLogs() {}
+
   /* ---------------------------- COMPLETIONS ----------------------------- */
 
   public static final Holder<LogSchema> COMPLETED;
@@ -61,11 +63,6 @@ public final class ChallengeLogs {
     );
 
     STREAK_SCHEMA = builder.register();
-  }
-
-  private ChallengeLogs() {
-    throw new UnsupportedOperationException(
-        "This is a utility class and cannot be instantiated");
   }
 
   @OnEnable

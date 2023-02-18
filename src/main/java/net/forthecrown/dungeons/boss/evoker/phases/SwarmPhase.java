@@ -180,6 +180,7 @@ public class SwarmPhase implements AttackPhase {
 
         double health = maxHealth.getValue();
         vex.setHealth(health);
+        vex.setRemoveWhenFarAway(false);
 
         if (target != null) {
           vex.lookAt(target);

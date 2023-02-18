@@ -1,21 +1,16 @@
 package net.forthecrown.dungeons.level.room;
 
-import java.util.Map;
 import lombok.Getter;
-import net.forthecrown.dungeons.level.PieceStyle;
 import net.forthecrown.dungeons.level.PieceType;
 import net.minecraft.nbt.CompoundTag;
 
 @Getter
-public class RoomType extends PieceType<DungeonRoom> {
+public class RoomType extends PieceType<RoomPiece> {
 
   private final int flags;
 
-  public RoomType(String structureName,
-                  Map<PieceStyle, String> variants,
-                  int flags
-  ) {
-    super(structureName, variants);
+  public RoomType(String structureName, int flags) {
+    super(structureName);
     this.flags = flags;
   }
 
@@ -24,12 +19,12 @@ public class RoomType extends PieceType<DungeonRoom> {
   }
 
   @Override
-  public DungeonRoom create() {
-    return new DungeonRoom(this);
+  public RoomPiece create() {
+    return new RoomPiece(this);
   }
 
   @Override
-  public DungeonRoom load(CompoundTag tag) {
-    return new DungeonRoom(this, tag);
+  public RoomPiece load(CompoundTag tag) {
+    return new RoomPiece(this, tag);
   }
 }

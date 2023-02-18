@@ -17,6 +17,7 @@ import java.util.concurrent.CompletableFuture;
 import net.forthecrown.core.admin.StaffChat;
 import net.forthecrown.core.config.EndConfig;
 import net.forthecrown.core.config.JoinInfo;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnDayChange;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.VanillaAccess;
@@ -45,11 +46,10 @@ import org.bukkit.craftbukkit.v1_19_R2.block.CraftBlock;
  */
 public class EndOpener {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
   private static final EndOpener INSTANCE = new EndOpener();
 
-  private EndOpener() {
-  }
+  private EndOpener() {}
 
   public static EndOpener get() {
     return INSTANCE;
@@ -134,6 +134,8 @@ public class EndOpener {
             }
 
             LOGGER.info("Placed end exit portal and gateways");
+            StaffChat.send(Component.text("End reset finished"), false);
+            FtcDiscord.staffLog(C_END, "End reset finished");
           });
         });
   }

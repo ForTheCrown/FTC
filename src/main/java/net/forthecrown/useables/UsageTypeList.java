@@ -8,7 +8,7 @@ import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.registry.Registries;
 import net.forthecrown.core.registry.Registry;
 import net.forthecrown.utils.text.Text;
@@ -33,7 +33,7 @@ public class UsageTypeList<V extends UsageInstance> implements Iterable<V> {
       TAG_TYPE = "type",
       TAG_VALUE = "value";
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   @Getter
   private final Registry<UsageType<? extends V>> registry;

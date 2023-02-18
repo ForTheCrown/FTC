@@ -6,7 +6,7 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 
 public class InteractableCommands {
 
-  static final InteractableNode[] NODES = {
+  static final InteractableNode<?>[] NODES = {
       new TriggerNode(),
       new UsableBlockNode(),
       new UsableEntityNode()
@@ -23,6 +23,14 @@ public class InteractableCommands {
 
       setPermission(Permissions.ADMIN);
       setAliases("usable");
+    }
+
+    @Override
+    public void populateUsages(UsageFactory factory) {
+      for (var n: NODES) {
+        var prefixed = factory.withPrefix(n.argumentName);
+        n.populateUsages(prefixed);
+      }
     }
 
     @Override

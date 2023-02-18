@@ -12,6 +12,7 @@ import net.forthecrown.dungeons.boss.evoker.EvokerEffects;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.math.Vectors;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.spongepowered.math.vector.Vector3d;
@@ -106,10 +107,14 @@ public class SummonPhase implements AttackPhase {
 
     double[] rawPos = SPAWNS[currentIndex++];
     double randomRange = rawPos[3];
-    double xOffset =
-        randomRange == 0 ? 0 : Util.RANDOM.nextDouble(-randomRange + 0.1D, randomRange);
-    double zOffset =
-        randomRange == 0 ? 0 : Util.RANDOM.nextDouble(-randomRange + 0.1D, randomRange);
+
+    double xOffset = randomRange == 0
+        ? 0
+        : Util.RANDOM.nextDouble(-randomRange + 0.1D, randomRange);
+
+    double zOffset = randomRange == 0
+        ? 0
+        : Util.RANDOM.nextDouble(-randomRange + 0.1D, randomRange);
 
     spawning = currentIndex < SPAWNS.length;
 
@@ -122,6 +127,10 @@ public class SummonPhase implements AttackPhase {
     Entity e = spawner.create(pos, boss.getWorld(), context);
     spawned.add(e);
     TOTAL_SPAWNED.add(e);
+
+    if (e instanceof LivingEntity liv) {
+      liv.setRemoveWhenFarAway(false);
+    }
 
     EvokerEffects.summoningEffect(boss.getWorld(), Vectors.doubleFrom(e.getLocation()),
         e.getHeight(), e.getWidth());

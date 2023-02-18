@@ -20,7 +20,6 @@ import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.TextJoiner;
 import net.forthecrown.utils.text.format.ComponentFormat;
-import net.forthecrown.utils.text.writer.TextWriter;
 import net.forthecrown.waypoint.Waypoint;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.world.level.ChunkPos;
@@ -37,30 +36,27 @@ class GuildChunkNode extends GuildCommandNode {
   }
 
   @Override
-  protected void writeHelpInfo(TextWriter writer, CommandSource source) {
-    writer.field("chunk list", "Displays the chunks your guild owns");
-    writer.field("chunk claim", "Claims the chunk you're in for your guild");
-    writer.field("chunk unclaim", "Unclaims the chunk you're in");
-    writer.field("chunk unclaimall", "Unclaims ALL chunks owned by your guild");
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("list", "Displays thechunks your guild owns");
+    factory.usage("claim", "Claims the chunk you're in for your guild");
+    factory.usage("unclaim", "Unclaims the chunk you're in for your guild");
+    factory.usage("unclaimall", "Unclaims ALL chunks owned by your guild");
 
-    if (source.hasPermission(Permissions.GUILD_ADMIN)) {
-      writer.field(
-          "chunk list <guild>",
-          "Lists the chunks of a guild"
-      );
-      writer.field(
-          "chunk claim <guild>",
-          "Claims the chunk you're in for a guild"
-      );
-      writer.field(
-          "chunk unclaim <guild>",
-          "Unclaims the chunk you're in for a guild"
-      );
-      writer.field(
-          "chunk unclaimall <guild>",
-          "Unclaims ALL the chunks of a guild"
-      );
-    }
+    factory.usage("list <guild>")
+        .setPermission(Permissions.GUILD_ADMIN)
+        .addInfo("List the chunks of a guild");
+
+    factory.usage("claim <guild")
+        .setPermission(Permissions.GUILD_ADMIN)
+        .addInfo("Claims the chunk you're in for a guild");
+
+    factory.usage("unclaim <guild>")
+        .setPermission(Permissions.GUILD_ADMIN)
+        .addInfo("Unclaims the chunk you're in for a guild");
+
+    factory.usage("unclaimall <guild>")
+        .setPermission(Permissions.GUILD_ADMIN)
+        .addInfo("Unclaims all the chunks of a guild");
   }
 
   @Override

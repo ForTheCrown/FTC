@@ -13,7 +13,6 @@ import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
@@ -57,10 +56,11 @@ public class MobHealthBar implements Listener {
     HITMOBS.put(damaged, task); //Put delay in map
   }
 
-  public static void showHealthbar(LivingEntity damaged, double finalDamage, String heartChar,
+  public static void showHealthbar(LivingEntity damaged, double finalDamage,
+                                   String heartChar,
                                    boolean autoRemove
   ) {
-    if (damaged.getHealth() - finalDamage <= 0) {
+    if (damaged.getHealth() - finalDamage <= 0 || finalDamage <= 0) {
       return;
     }
 
@@ -68,19 +68,20 @@ public class MobHealthBar implements Listener {
 
     // Only affect entities that only show names when player hovers mouse over them:
     // (Note: colored names can get replaced, they return properly anyway)
-    if (name != null) {
-      if (!name.contains(heartChar)) {
-        if (damaged.isCustomNameVisible()) {
-          return; // Don't change names of entities with always visible names (without hearts in them)
-        } else {
-          NAMES.put(damaged, damaged.customName()); // Save names of player-named entities
-        }
+    if (name != null && !name.contains(heartChar)) {
+
+      // Don't change names of entities with always visible names
+      // (without hearts in them)
+      if (damaged.isCustomNameVisible()) {
+        return;
+      } else {
+        // Save names of player-named entities
+        NAMES.put(damaged, damaged.customName());
       }
     }
 
     // Calculate hearts to show:
-    int maxHealth = (int) Math.ceil(
-        damaged.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue() / 2);
+    int maxHealth = (int) Math.ceil(damaged.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue() / 2);
     int remainingHRTS = (int) Math.ceil((damaged.getHealth() - finalDamage) / 2);
 
     if (remainingHRTS < 0) {
@@ -91,25 +92,24 @@ public class MobHealthBar implements Listener {
       return;
     }
 
-    int heartsToShow = Math.min(maxHealth,
-        20); // Entities with too many hearts, can at max show 20 hearts, if their health is above that, hearts don't show.
+    // Entities with too many hearts, can at max show 20 hearts, if their
+    // health is above that, hearts don't show.
+    int heartsToShow = Math.min(maxHealth, 20);
 
     // Construct name with correct hearts:
-    String healthBar = ChatColor.RED + "";
-    for (int i = 0; i < remainingHRTS; i++) {
-      healthBar += heartChar;
-    }
-
-    healthBar += ChatColor.GRAY + "";
-    for (int i = remainingHRTS; i < heartsToShow; i++) {
-      healthBar += heartChar;
-    }
+    String reds = heartChar.repeat(remainingHRTS);
+    String grays = heartChar.repeat(Math.max(0, heartsToShow - remainingHRTS));
 
     // Show hearts + set timer to remove hearts
     // By having a Map<LivingEntity, BukkitRunnable>, we can dynamically delay the custom name being
     // turned back into normal
     damaged.setCustomNameVisible(true);
-    damaged.setCustomName(healthBar);
+    damaged.customName(
+        Component.text()
+            .append(Component.text(reds, NamedTextColor.RED))
+            .append(Component.text(grays, NamedTextColor.GRAY))
+            .build()
+    );
 
     if (autoRemove) {
       delay(damaged);

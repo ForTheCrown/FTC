@@ -1,10 +1,10 @@
 package net.forthecrown.core.challenge;
 
 import com.google.common.base.Strings;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.DataResult;
 import net.forthecrown.core.FTC;
-import net.forthecrown.core.script2.Script;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.forthecrown.utils.io.Results;
@@ -18,15 +18,17 @@ public class ChallengeParser {
       KEY_NAME = "displayName",
       KEY_DESC = "description",
 
-  KEY_SCRIPT = "script",
+      KEY_SCRIPT = "script",
       KEY_EVENT_CLASS = "eventClass",
 
-  KEY_RESET_INTERVAL = "type",
+      KEY_RESET_INTERVAL = "type",
 
-  KEY_REWARD = "reward",
+      KEY_REWARD = "reward",
       KEY_GOAL = "goal",
 
-  EVENT_CUSTOM = "custom";
+      KEY_ARGS = "inputs",
+
+      EVENT_CUSTOM = "custom";
 
   public static DataResult<JsonChallenge> parse(JsonObject object) {
     JsonWrapper json = JsonWrapper.wrap(object);
@@ -66,6 +68,7 @@ public class ChallengeParser {
         && !className.equalsIgnoreCase(EVENT_CUSTOM)
     ) {
       try {
+        @SuppressWarnings("rawtypes")
         Class eventClass = Class.forName(
             className, true,
 
@@ -108,19 +111,20 @@ public class ChallengeParser {
       );
     }
 
-    if (Strings.isNullOrEmpty(builder.script())) {
-      return build(builder, null);
+    String[] args = null;
+    if (json.has(KEY_ARGS)) {
+      args = json.getArray(KEY_ARGS, JsonElement::getAsString, String[]::new);
     }
 
-    return build(builder, Script.read(builder.script()));
+    return build(builder, args);
   }
 
   static DataResult<JsonChallenge> build(JsonChallenge.Builder builder,
-                                         Script script
+                                         String[] args
   ) {
     JsonChallenge challenge = builder.build();
     ChallengeHandle handle = new ChallengeHandle(challenge);
-    challenge.listener = new ScriptEventListener(script, handle);
+    challenge.listener = new ScriptEventListener(args, handle);
 
     return DataResult.success(challenge);
   }

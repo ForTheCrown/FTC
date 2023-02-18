@@ -14,6 +14,8 @@ public class CommandTop extends FtcCommand {
     super("top");
 
     setPermission(Permissions.ADMIN);
+    setDescription("Teleports you to the top block in your X and Z pos");
+
     register();
   }
 

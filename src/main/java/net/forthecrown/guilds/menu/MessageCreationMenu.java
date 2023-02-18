@@ -2,7 +2,7 @@ package net.forthecrown.guilds.menu;
 
 import static net.forthecrown.guilds.menu.GuildMenus.GUILD;
 
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.events.dynamic.GuildSignPacketListener;
 import net.forthecrown.guilds.GuildMessage;
 import net.forthecrown.user.User;
@@ -73,7 +73,7 @@ public class MessageCreationMenu extends MenuPage {
                       )
                   );
                 } catch (Throwable t) {
-                  FTC.getLogger().error("Couldn't send sign packet", t);
+                  Loggers.getLogger().error("Couldn't send sign packet", t);
                 }
               })
 

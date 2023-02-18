@@ -1,5 +1,6 @@
 package net.forthecrown.core;
 
+import net.forthecrown.core.TieredPermission.TierPriority;
 import org.bukkit.Bukkit;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.PluginManager;
@@ -41,6 +42,8 @@ public final class Permissions {
       CHAT_EMOTES             = register("ftc.chat.emotes"),
       CHAT_COLORS             = register("ftc.chat.color"),
       CHAT_LINKS              = register("ftc.chat.links"),
+      CHAT_PLAYER_TAGGING     = register("ftc.chat.tagging"),
+      CHAT_TIMESTAMPS         = register("ftc.chat.timestamps"),
       CHAT_CLEAN_LINKS        = registerPrefixed(CHAT_LINKS, "clean"),
       CHAT_GRADIENTS          = register("ftc.chat.gradients"),
 
@@ -146,10 +149,14 @@ public final class Permissions {
       MARKETS                 = register("ftc.markets"),
       MARKET_WARNING          = registerPrefixed(MARKETS, "warning"),
 
-      DEFAULT                 = register("ftc.default");
+      DEFAULT                 = register("ftc.default"),
+
+      CLAIMING                = register("ftc.claiming"),
+      CLAIM_ADMIN             = registerPrefixed(CLAIMING, "override_flags");
 
   public static final TieredPermission MAX_HOMES = TieredPermission.builder()
       .prefix("ftc.homes.")
+      .priority(TierPriority.HIGHEST)
       .allowUnlimited()
       .tiersFrom1To(5)
       .build();
@@ -157,6 +164,7 @@ public final class Permissions {
   public static final TieredPermission TP_DELAY = TieredPermission.builder()
       .prefix("ftc.teleport.delay.")
       .unlimitedPerm("ftc.teleport.bypass")
+      .priority(TierPriority.LOWEST)
       .allowUnlimited()
       .tiersFrom1To(5)
       .build();

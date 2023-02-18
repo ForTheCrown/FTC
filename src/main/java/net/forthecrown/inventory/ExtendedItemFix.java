@@ -8,7 +8,7 @@ import static net.forthecrown.inventory.ExtendedItems.TAG_TYPE;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.inventory.weapon.RoyalSword;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.minecraft.nbt.CompoundTag;
@@ -83,7 +83,7 @@ class ExtendedItemFix {
       CompoundTag newGoals = new CompoundTag();
 
       for (var e : oldTag.getCompound(OLD_TAG_GOALS).tags.entrySet()) {
-        String key = e.getKey();
+        String key = e.getKey().replaceAll("ftccore:", "forthecrown:");
         int value = ((IntTag) e.getValue()).getAsInt();
 
         if (key.contains("r9")) {
@@ -100,7 +100,7 @@ class ExtendedItemFix {
           key = GOAL_RENAMES.get(key);
 
           if (Strings.isNullOrEmpty(key)) {
-            FTC.getLogger().error("Unknown goal: '{}', cannot update", e.getKey());
+            Loggers.getLogger().error("Unknown goal: '{}', cannot update", e.getKey());
             continue;
           }
         }

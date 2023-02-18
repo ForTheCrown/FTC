@@ -47,7 +47,18 @@ public class CommandTeleportExact extends FtcCommand {
     super("tp_exact");
 
     setPermission(Permissions.CMD_TELEPORT);
+    setDescription("Command for more precise teleportation");
+
     register();
+  }
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage(
+        "world=<world> x=<cord> y=<cord> z=<cord> "
+            + "[yaw=<value>] [pitch=<value>]"
+        )
+        .addInfo("Teleports you to the location specified in the parameters");
   }
 
   public static ClickEvent createLocationClick(Location location) {

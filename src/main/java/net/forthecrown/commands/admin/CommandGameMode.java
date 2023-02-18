@@ -19,7 +19,19 @@ public class CommandGameMode extends FtcCommand {
 
     setPermission(Permissions.CMD_GAMEMODE);
     setAliases("gamemode");
+    setDescription("Sets your or another player's gamemode");
+
     register();
+  }
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory = factory.withPrefix("<game mode>");
+    factory.usage("")
+        .addInfo("Sets your game mode to <game mode>");
+
+    factory.usage("<player>")
+        .addInfo("Sets a <player>'s game mode to <game mode>");
   }
 
   @Override

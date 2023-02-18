@@ -15,6 +15,7 @@ public class CommandTpaAccept extends FtcCommand {
 
     setPermission(Permissions.TPA);
     setDescription("Accepts a tpa request");
+    simpleUsages();
 
     register();
   }

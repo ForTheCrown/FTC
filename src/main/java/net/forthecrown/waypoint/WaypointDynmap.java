@@ -38,7 +38,7 @@ class WaypointDynmap {
    */
   static void updateMarker(Waypoint waypoint) {
     var set = getSet();
-    var name = Waypoints.getEffectiveName(waypoint);
+    var name = waypoint.getEffectiveName();
     var marker = set.findMarker(waypoint.getMarkerId());
 
     if (Strings.isNullOrEmpty(name)

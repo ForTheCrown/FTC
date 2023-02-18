@@ -181,30 +181,38 @@ public final class JsonUtils {
     return arr;
   }
 
-  public static JsonArray writeIntArray(int... arr) {
-    JsonArray array = new JsonArray(arr.length);
-
-    for (int j : arr) {
-      array.add(j);
-    }
-
-    return array;
-  }
-
   public static Date readDate(JsonElement element) {
     try {
       return DATE_FORMAT.parse(element.getAsString());
     } catch (ParseException e) {
-      try {
-        return LEGACY_FORMAT.parse(element.getAsString());
-      } catch (ParseException e1) {
-        return new Date();
-      }
+      throw new IllegalStateException(e);
     }
   }
 
   public static JsonElement writeDate(Date date) {
     return new JsonPrimitive(DATE_FORMAT.format(date));
+  }
+
+  public static long readTimestamp(JsonElement element) {
+    return readTimestamp(element, -1L);
+  }
+
+  public static long readTimestamp(JsonElement element, long def) {
+    if (element == null || !element.isJsonPrimitive()) {
+      return def;
+    }
+
+    JsonPrimitive primitive = element.getAsJsonPrimitive();
+
+    if (primitive.isString()) {
+      return readDate(element).getTime();
+    }
+
+    return primitive.getAsLong();
+  }
+
+  public static JsonElement writeTimestamp(long time) {
+    return writeDate(new Date(time));
   }
 
   public static Component readText(JsonElement element) {
@@ -251,7 +259,7 @@ public final class JsonUtils {
   public static <T> TypeAdapter<T> createAdapter(Function<T, JsonElement> serializer,
                                                  Function<JsonElement, T> deserializer
   ) {
-    return new TypeAdapter<T>() {
+    return new TypeAdapter<>() {
       @Override
       public void write(JsonWriter out, T value) throws IOException {
         var element = serializer.apply(value);
@@ -274,6 +282,7 @@ public final class JsonUtils {
     return (JsonArray) JsonOps.INSTANCE.createList(stream);
   }
 
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public static class EnumTypeAdapter implements TypeAdapterFactory {
 
     @Override

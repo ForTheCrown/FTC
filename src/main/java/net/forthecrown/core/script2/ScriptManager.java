@@ -3,6 +3,7 @@ package net.forthecrown.core.script2;
 import static net.forthecrown.utils.io.FtcJar.ALLOW_OVERWRITE;
 import static net.forthecrown.utils.io.FtcJar.OVERWRITE_IF_NEWER;
 
+import com.google.gson.JsonElement;
 import it.unimi.dsi.fastutil.objects.ObjectLists;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,10 +11,12 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnDayChange;
 import net.forthecrown.core.module.OnLoad;
 import net.forthecrown.core.registry.Keys;
@@ -23,8 +26,10 @@ import net.forthecrown.events.Events;
 import net.forthecrown.utils.MonthDayPeriod;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.io.FtcJar;
+import net.forthecrown.utils.io.JsonWrapper;
 import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.utils.io.SerializationHelper;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -34,7 +39,7 @@ import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
 @Getter
 public class ScriptManager {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   private static final Set<String> ILLEGAL_CLASSES = Set.of(
       BukkitScheduler.class.getName(),
@@ -53,7 +58,7 @@ public class ScriptManager {
   /**
    * The JSON file from which scripts are loaded
    */
-  private final Path loaderJson;
+  private final Path loaderFile;
 
   /**
    * Factory to create script engines
@@ -62,14 +67,14 @@ public class ScriptManager {
       factory = new NashornScriptEngineFactory();
 
   /**
-   * Currently loaded scripts, specified in <code>loader.json</code>
+   * Currently loaded scripts, specified in <code>loader.toml</code>
    */
   private final Registry<LoadedScript>
       loadedScripts = Registries.newRegistry();
 
   public ScriptManager() {
     this.directory = PathUtil.getPluginDirectory("scripts");
-    loaderJson = directory.resolve("loader.json");
+    loaderFile = directory.resolve("loader.toml");
 
     //Set the language to ECMA Script 6 mode
     System.setProperty("nashorn.args.prepend", "--language=es6");
@@ -82,12 +87,14 @@ public class ScriptManager {
           ALLOW_OVERWRITE | OVERWRITE_IF_NEWER
       );
     } catch (IOException exc) {
-      LOGGER.error("Couldn't save default scripts! {}", exc);
+      LOGGER.error("Couldn't save default scripts!", exc);
     }
   }
 
   @OnLoad
   public void load() {
+    JsPreProcessor.placeHolders = null;
+
     loadedScripts.forEach(script -> {
       // Prevent script closing errors from
       // preventing script clear
@@ -102,11 +109,11 @@ public class ScriptManager {
     });
     loadedScripts.clear();
 
-    if (!Files.exists(loaderJson)) {
+    if (!Files.exists(loaderFile)) {
       return;
     }
 
-    SerializationHelper.readJsonFile(loaderJson, wrapper -> {
+    SerializationHelper.readTomlAsJson(loaderFile, wrapper -> {
       for (var e : wrapper.entrySet()) {
         if (!Keys.isValidKey(e.getKey())) {
           LOGGER.warn("'{}' is an invalid key", e.getKey());
@@ -119,19 +126,26 @@ public class ScriptManager {
         // Constantly loaded script
         if (element.isJsonPrimitive()) {
           Script script = Script.of(element.getAsString());
-          loadedScript = new LoadedScript(null, script);
+          loadedScript = new LoadedScript(null, script, null);
         }
         // Script loaded during a specific period
         else {
-          var obj = element.getAsJsonObject();
+          JsonWrapper obj = JsonWrapper.wrap(element.getAsJsonObject());
           MonthDayPeriod period = null;
+          String[] args = ArrayUtils.EMPTY_STRING_ARRAY;
 
           if (obj.has("period")) {
             period = MonthDayPeriod.load(obj.get("period"));
           }
 
-          Script script = Script.of(obj.get("script").getAsString());
-          loadedScript = new LoadedScript(period, script);
+          if (obj.has("args")) {
+            args = obj.getArray(
+                "args", JsonElement::getAsString, String[]::new
+            );
+          }
+
+          Script script = Script.read(obj.get("script"), false);
+          loadedScript = new LoadedScript(period, script, args);
         }
 
         LOGGER.debug("Loaded active script {}", e.getKey());
@@ -146,7 +160,7 @@ public class ScriptManager {
         continue;
       }
 
-      s.script().load();
+      s.load();
     }
   }
 
@@ -161,12 +175,11 @@ public class ScriptManager {
         if (script.isCompiled()) {
           // Invoke the day change callback, if it exists
           script.invokeIfExists("__onDayChange", time);
-
           continue;
         }
 
         LOGGER.debug("Loading script {}", script.getName());
-        script.load();
+        s.load();
       } else if (script.isCompiled()) {
         LOGGER.debug("Closing script {}", script.getName());
         script.close();
@@ -194,7 +207,7 @@ public class ScriptManager {
 
   public NashornScriptEngine createEngine(String... args) {
     return (NashornScriptEngine) factory.getScriptEngine(
-        args,
+        Objects.requireNonNullElse(args, ArrayUtils.EMPTY_STRING_ARRAY),
         getClassLoader(),
         this::canAccessClass
     );

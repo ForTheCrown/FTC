@@ -45,8 +45,9 @@ public final class AttackPhases {
   public static final AttackPhase ZOMBIES = new SummonPhase(
       (pos, world, context) -> {
         Class<? extends Monster> spawnClass =
-            Util.RANDOM.nextInt(100) < EvokerConfig.zombies_skeletonChance ?
-                Skeleton.class : Zombie.class;
+            Util.RANDOM.nextInt(100) < EvokerConfig.zombies_skeletonChance
+                ? Skeleton.class
+                : Zombie.class;
 
         return world.spawn(new Location(world, pos.x(), pos.y(), pos.z()), spawnClass, zombie -> {
           modifyHealth(zombie, 20.0D, context);
@@ -70,7 +71,9 @@ public final class AttackPhases {
       (pos, world, context) -> {
         boolean ravager = Util.RANDOM.nextInt(100) < EvokerConfig.illager_ravagerChance + Math.ceil(
             context.modifier());
-        Class<? extends Raider> clazz = ravager ? Ravager.class
+
+        Class<? extends Raider> clazz = ravager
+            ? Ravager.class
             : (Util.RANDOM.nextBoolean() ? Pillager.class : Vindicator.class);
 
         return world.spawn(

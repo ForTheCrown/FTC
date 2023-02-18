@@ -5,18 +5,18 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import org.apache.logging.log4j.Logger;
 
 @Getter
 @RequiredArgsConstructor
-public class RegistryIndex<V, I> {
-  private static final Logger LOGGER = FTC.getLogger();
+public class RegistryIndex<I, V> implements RegistryListener<V> {
+  private static final Logger LOGGER = Loggers.getLogger();
 
   private final Map<I, Holder<V>> index = new Object2ObjectOpenHashMap<>();
   private final IndexGetter<I, V> getter;
 
-  void onRegister(Holder<V> holder) {
+  public void onRegister(Holder<V> holder) {
     I val = getter.get(holder);
 
     if (val == null) {
@@ -30,6 +30,17 @@ public class RegistryIndex<V, I> {
           holder.getKey()
       );
     }
+  }
+
+  @Override
+  public void onUnregister(Holder<V> value) {
+    var val = getter.get(value);
+
+    if (val == null) {
+      return;
+    }
+
+    index.remove(val);
   }
 
   public Optional<Holder<V>> lookup(I val) {

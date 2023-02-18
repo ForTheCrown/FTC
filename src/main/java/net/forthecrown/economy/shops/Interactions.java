@@ -91,7 +91,7 @@ final class Interactions {
       }
 
       //Check shop has space for any more items
-      if (session.getShop().inStock()) {
+      if (!session.getShop().inStock()) {
         session.getShop().update();
         throw Exceptions.SHOP_NO_SPACE;
       }

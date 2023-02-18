@@ -1,0 +1,401 @@
+# Allows for the creation of challenges that players must beat on a given
+# interval
+# Each table object must start with it's 'registry key'. This is an internal key
+# used to identify a challenge, hence, it has to also be unique.
+#
+# This section of documentation only covers a part of the true scope challenges
+# are made of. Please see the wiki at
+# https://github.com/ForTheCrown/FTC/wiki/challenges
+# for a more complete documentation
+#
+# ------------------------------------------------------------------------------
+# Format
+# ------------------------------------------------------------------------------
+# 'displayName':
+#  The challenge name displayed to users, either in chat or in the challenge
+#  book
+#
+# examples:
+# - displayName = "Do a thing"
+# - displayName = "<gradient=red,blue:A cool challenge>"
+# - displayName = { text = "Foo", color = "red" }
+# ------------------------------------------------------------------------------
+# 'description':
+#  Determines the hover text of a challenge. This can be used to give more info
+#  about how a challenge can be competed, or what it requires.
+#
+# examples:
+# - description = [ "Do X and then do Z" ]
+# - description = [
+#    "Do X and then do Z",
+#    "And don't forget to do Y"
+#  ]
+# ------------------------------------------------------------------------------
+# 'reward':
+#  Sets the rhines/gems/guildExp rewarded to users upon completion of a
+#  challenge
+#
+# examples:
+# - reward = { guildExp = 5 }
+#  Fixed reward, gives 5 everytime
+
+# - reward = { gems = { daphScaled = 10 }}
+#  Scales the reward using the following formula:
+#  value = base * ((1 + streak) * 0.01)
+#  base = daphScaled
+#
+# - reward = { rhines = { base = 10, scalar = 0.5 }}
+#  Simpler value scalar, value = base * (streak * scalar)
+#
+# - [challenge_key.reward]
+#   rhines = 5
+#   gems = { daphScaled = 12 }
+#   guildExp = { base = 5, scalar = 0.5 }
+#  ^ Declaration with more than 1 reward. Any indentation is optional and purely
+#    visual
+# ------------------------------------------------------------------------------
+# 'goal':
+#  The goal of 'points' that must be reached to complete the challenge. Points
+#  are in quotes, as what defines a point is left upto each challenge, a point
+#  may be to walk 1 block, or to kill an entity.
+#
+#  Goal values can be inputted the same way as reward values, either as fixed
+#  values, or as values scaled based off of a player's streak.
+#
+#  Defaults to 1, if not set
+#
+# examples:
+# - goal = 5
+# - goal = { daphScaled = 10 }
+# - goal = { base = 10, scalar = 0.5 }
+# ------------------------------------------------------------------------------
+# I'm not covering the 'script', 'inputs' and 'eventClass' values here, because
+# I just don't have energy. They'll be covered in the wiki mentioned in the
+# beginning of this documentation
+# ------------------------------------------------------------------------------
+
+["daily/log_in"]
+displayName = "Log in"
+eventClass = "org.bukkit.event.player.PlayerJoinEvent"
+script = "challenges/on_join.js"
+description = [ "Log in once a day!" ]
+reward = { guildExp = 5 }
+
+["daily/vote"]
+displayName = "Vote"
+eventClass = "custom"
+script = "challenges/on_vote.js"
+goal = 2
+description = [ "Vote for the server" ]
+reward = { guildExp = 5 }
+
+["daily/bank_run"]
+displayName = "Bank Run"
+eventClass = "custom"
+script = "challenges/on_bank_run.js"
+description = [ "Complete a bank run" ]
+reward = { guildExp = 10 }
+
+["daily/sleep"]
+displayName = "Sleep"
+eventClass = "org.bukkit.event.player.PlayerBedLeaveEvent"
+script = "challenges/on_sleep.js"
+description = [ "Sleep through the night" ]
+reward = { guildExp = 10 }
+
+["daily/walk_1000_blocks"]
+displayName = "Walk %goal blocks"
+goal = 1_000
+eventClass = "org.bukkit.event.player.PlayerMoveEvent"
+script = "challenges/on_walk.js"
+description = [ "Walk %goal blocks on the ground" ]
+reward = { guildExp = 10 }
+
+["weekly/advancement"]
+displayName = "Advancement"
+eventClass = "org.bukkit.event.player.PlayerAdvancementDoneEvent"
+script = "challenges/on_advancement.js"
+type = "weekly"
+description = [ "Get any advancement" ]
+reward = { guildExp = 15 }
+
+["daily/sell"]
+displayName = "Selling"
+goal = 10_000
+eventClass = "custom"
+script = "challenges/on_sell.js"
+description = [ "Sell items in /shop worth %goal Rhines" ]
+reward = { guildExp = 15 }
+
+["daily/buy"]
+displayName = "Buying"
+goal = 3
+eventClass = "custom"
+script = "challenges/on_buy.js"
+description = [ "Buy items from %goal different shop buildings in Hazelguard" ]
+reward = { guildExp = 15 }
+
+["weekly/wither"]
+displayName = "Wither"
+eventClass = "org.bukkit.event.entity.EntityDeathEvent"
+script = "challenges/entity_kill.js"
+inputs = [ "wither" ]
+type = "weekly"
+goal = 5
+description = [ "Kill %goal withers" ]
+reward = { guildExp = 20 }
+
+["weekly/warden"]
+displayName = "Warden"
+eventClass = "org.bukkit.event.entity.EntityDeathEvent"
+script = "challenges/entity_kill.js"
+inputs = [ "warden" ]
+type = "weekly"
+description = [ "Kill a warden" ]
+reward = { guildExp = 20 }
+
+["daily/pay"]
+displayName = "Pay"
+eventClass = "custom"
+script = "challenges/on_pay.js"
+description = [ "Complete by paying 10,000 Rhines" ]
+reward = { guildExp = 20 }
+
+["weekly/lightning"]
+displayName = "Lightning"
+eventClass = "org.bukkit.event.entity.EntityDamageByEntityEvent"
+script = "challenges/on_lightning.js"
+type = "weekly"
+description = [ "Damage any entity by summoning lightning" ]
+reward = { guildExp = 40 }
+
+["weekly/elite_bank_run"]
+displayName = "Elite Bank Run"
+eventClass = "custom"
+script = "challenges/on_bank_run.js"
+type = "weekly"
+goal = 2
+description = [ "Complete %goal elite bank runs" ]
+reward = { guildExp = 45 }
+
+["daily/playtime"]
+displayName = "Playtime"
+goal = 30
+eventClass = "org.bukkit.event.player.PlayerJoinEvent"
+script = "challenges/playtime.js"
+description = [ "Play for %goal minutes" ]
+reward = { guildExp = 25 }
+
+["daily/grow_oaks"]
+displayName = "Oak Trees"
+eventClass = "org.bukkit.event.world.StructureGrowEvent"
+goal = 10
+script = "challenges/tree_grow.js"
+inputs = [ "tree" ]
+description = [ "Grow %goal oak trees with bonemeal." ]
+reward = { guildExp = 10 }
+
+["daily/grow_mangrove"]
+displayName = "Mangrove Tree"
+eventClass = "org.bukkit.event.world.StructureGrowEvent"
+script = "challenges/tree_grow.js"
+inputs = [ "mangrove" ]
+description = [ "Grow a mangrove tree using bonemeal." ]
+reward = { guildExp = 10 }
+
+["daily/bonemeal"]
+displayName = "Bonemeal"
+eventClass = "org.bukkit.event.block.BlockFertilizeEvent"
+script = "challenges/generic.js"
+goal = 100
+description = [ "Use %goal bonemeal." ]
+reward = { guildExp = 15 }
+
+["daily/blaze"]
+displayName = "Blaze"
+eventClass = "org.bukkit.event.entity.EntityDeathEvent"
+script = "challenges/entity_kill.js"
+inputs = [ "blaze" ]
+description = [ "Kill a blaze." ]
+reward = { guildExp = 10 }
+
+["daily/fish"]
+displayName = "Fishing"
+eventClass = "org.bukkit.event.player.PlayerFishEvent"
+script = "challenges/on_fish.js"
+goal = 10
+description = [ "Catch %goal items by fishing." ]
+reward = { guildExp = 15 }
+
+["daily/enderpearl"]
+displayName = "Enderpearl"
+eventClass = "org.bukkit.event.entity.ProjectileHitEvent"
+script = "challenges/on_enderpearl.js"
+description = [ "Throw an enderpearl at an enderman." ]
+reward = { guildExp = 20 }
+
+["daily/glow_berries"]
+displayName = "Glow Berries"
+eventClass = "org.bukkit.event.player.PlayerHarvestBlockEvent"
+script = "challenges/on_glowberry_pick.js"
+goal = 10
+description = [ "Harvest %goal glow berries." ]
+reward = { guildExp = 10 }
+
+["daily/sussy_stew"]
+displayName = "Stew"
+eventClass = "org.bukkit.event.player.PlayerItemConsumeEvent"
+script = "challenges/item_consume.js"
+inputs = [ "SUSPICIOUS_STEW" ]
+description = [ "Drink suspicious stew." ]
+reward = { guildExp = 15 }
+
+["daily/snowball"]
+displayName = "Snowball"
+eventClass = "org.bukkit.event.entity.ProjectileHitEvent"
+script = "challenges/on_snowball.js"
+description = [ "Throw a snowball at a player." ]
+reward = { guildExp = 15 }
+
+["daily/egg"]
+displayName = "Egg"
+eventClass = "org.bukkit.event.entity.ProjectileHitEvent"
+script = "challenges/on_egg.js"
+description = [ "Throw an egg at a player." ]
+reward = { guildExp = 10 }
+
+["daily/sign_dye"]
+displayName = "Sign dye"
+eventClass = "org.bukkit.event.player.PlayerInteractEvent"
+script = "challenges/on_sign_dye.js"
+description = [ "Dye a sign any color." ]
+reward = { guildExp = 10 }
+
+["daily/enchant"]
+displayName = "Enchant"
+eventClass = "org.bukkit.event.enchantment.EnchantItemEvent"
+script = "challenges/on_enchant.js"
+description = [ "Enchant an item with 30 levels." ]
+reward = { guildExp = 15 }
+
+["daily/torch"]
+displayName = "Torch"
+eventClass = "org.bukkit.event.block.BlockPlaceEvent"
+script = "challenges/on_place_torch.js"
+goal = 200
+description = [ "Place %goal torches." ]
+reward = { guildExp = 20 }
+
+["daily/experience"]
+displayName = "Experience"
+eventClass = "org.bukkit.event.player.PlayerExpChangeEvent"
+script = "challenges/on_exp.js"
+goal = 300
+description = [ "Earn %goal experience points." ]
+reward = { guildExp = 10 }
+
+["daily/poisonous_potato"]
+displayName = "Potato"
+eventClass = "org.bukkit.event.player.PlayerItemConsumeEvent"
+script = "challenges/item_consume.js"
+inputs = [ "POISONOUS_POTATO" ]
+description = [ "Eat a poisonous potato." ]
+reward = { guildExp = 15 }
+
+["daily/villager"]
+displayName = "Trade"
+eventClass = "io.papermc.paper.event.player.PlayerTradeEvent"
+script = "challenges/generic.js"
+description = [ "Trade with a villager." ]
+reward = { guildExp = 10 }
+
+["daily/bat"]
+displayName = "Bat"
+eventClass = "org.bukkit.event.entity.EntityDeathEvent"
+script = "challenges/entity_kill.js"
+inputs = [ "bat" ]
+description = [ "Kill a bat." ]
+reward = { guildExp = 10 }
+
+["daily/milk"]
+displayName = "Milk"
+eventClass = "org.bukkit.event.player.PlayerItemConsumeEvent"
+script = "challenges/on_eat_milk.js"
+description = [ "Clear an effect by drinking milk." ]
+reward = { guildExp = 15 }
+
+["daily/jump"]
+displayName = "Jump"
+eventClass = "com.destroystokyo.paper.event.player.PlayerJumpEvent"
+script = "challenges/generic.js"
+goal = 200
+description = [ "Jump %goal times." ]
+reward = { guildExp = 10 }
+
+["daily/ores"]
+displayName = "Mine Ores"
+eventClass = "org.bukkit.event.block.BlockBreakEvent"
+script = "challenges/on_break_ore.js"
+goal = 10
+description = [ "Mine %goal ores of any type." ]
+reward = { guildExp = 10 }
+
+["daily/shop_challenge"]
+displayName = "Item Challenge"
+eventClass = "custom"
+goal = 2
+description = [ "Complete %goal of the daily challenges in /shop." ]
+reward = { guildExp = 40 }
+
+["weekly/break_blocks"]
+displayName = "Block Breaker"
+eventClass = "org.bukkit.event.block.BlockBreakEvent"
+script = "challenges/generic.js"
+type = "weekly"
+goal = 10_000
+description = [ "Break %goal blocks." ]
+reward = { guildExp = 40 }
+
+["weekly/playtime"]
+displayName = "Playtime"
+goal = 300
+eventClass = "org.bukkit.event.player.PlayerJoinEvent"
+script = "challenges/playtime.js"
+type = "weekly"
+description = [ "Play for %goal minutes." ]
+reward = { guildExp = 50 }
+
+["weekly/raid"]
+displayName = "Raid"
+eventClass = "org.bukkit.event.raid.RaidFinishEvent"
+script = "challenges/on_raid.js"
+type = "weekly"
+description = [ "Finish a raid." ]
+reward = { guildExp = 40 }
+
+["weekly/damage"]
+displayName = "Damage"
+goal = 500
+eventClass = "org.bukkit.event.entity.EntityDamageEvent"
+script = "challenges/on_take_damage.js"
+type = "weekly"
+description = [ "Take %goal hearts of damage." ]
+reward = { guildExp = 40 }
+
+["weekly/silverfish"]
+displayName = "Silverfish"
+eventClass = "org.bukkit.event.entity.EntityDeathEvent"
+script = "challenges/entity_kill.js"
+inputs = [ "silverfish" ]
+type = "weekly"
+description = [ "Kill a silverfish." ]
+reward = { guildExp = 20 }
+
+["weekly/villager"]
+displayName = "Trade"
+eventClass = "io.papermc.paper.event.player.PlayerTradeEvent"
+script = "challenges/generic.js"
+type = "weekly"
+goal = 100
+description = [ "Trade %goal times with villagers." ]
+reward = { guildExp = 50 }

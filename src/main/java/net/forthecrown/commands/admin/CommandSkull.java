@@ -16,8 +16,13 @@ public class CommandSkull extends FtcCommand {
 
   public CommandSkull() {
     super("skull");
-
+    setDescription("Gets a player's skull");
     register();
+  }
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("<player>", "Gets a <player>'s skull");
   }
 
   @Override

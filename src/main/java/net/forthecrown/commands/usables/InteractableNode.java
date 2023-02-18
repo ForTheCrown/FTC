@@ -5,12 +5,13 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.commands.DataCommands;
+import net.forthecrown.commands.DataCommands.DataAccessor;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.useables.Usable;
-import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.writer.TextWriters;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +28,33 @@ abstract class InteractableNode<H extends Usable> extends FtcCommand {
   }
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    addCreateUsage(factory.withPrefix("-create"));
+
+    factory = prefixWithType(factory);
+    addUsages(factory);
+  }
+
+  protected void addCreateUsage(UsageFactory factory) {
+    prefixWithType(factory)
+        .usage("")
+        .addInfo("Creates a new usable");
+  }
+
+  protected void addUsages(UsageFactory factory) {
+    factory.usage("remove")
+        .addInfo("Removes the %s", argumentName);
+
+    factory.usage("info")
+        .addInfo("Displays admin information about the %s", argumentName);
+
+    DataCommands.addUsages(factory.withPrefix("data"), argumentName, null);
+
+    UsableCommands.ACTION_NODE.populateUsages(factory, argumentName);
+    UsableCommands.CHECK_NODE.populateUsages(factory, argumentName);
+  }
+
+  @Override
   protected void createCommand(BrigadierCommand command) {
     create(command);
   }
@@ -40,6 +68,35 @@ abstract class InteractableNode<H extends Usable> extends FtcCommand {
         .then(createEditArguments());
   }
 
+  protected abstract UsageFactory prefixWithType(UsageFactory factory);
+
+  protected DataAccessor createAccessor(UsageHolderProvider<H> provider,
+                                        UsableSaveCallback<H> saveCallback
+  ) {
+    return new DataAccessor() {
+      @Override
+      public CompoundTag getTag(CommandContext<CommandSource> context)
+          throws CommandSyntaxException {
+        var holder = provider.get(context);
+
+        CompoundTag tag = new CompoundTag();
+        holder.save(tag);
+        return tag;
+      }
+
+      @Override
+      public void setTag(CommandContext<CommandSource> context, CompoundTag tag)
+          throws CommandSyntaxException {
+        var holder = provider.get(context);
+        holder.load(tag);
+
+        saveCallback.save(holder);
+      }
+    };
+  }
+
+  protected abstract UsableSaveCallback<H> saveCallback();
+
   protected RequiredArgumentBuilder<CommandSource, ?> createEditArguments() {
     var argument = argument("holder_value", getArgumentType());
     UsageHolderProvider<H> provider = context -> get("holder_value", context);
@@ -47,6 +104,8 @@ abstract class InteractableNode<H extends Usable> extends FtcCommand {
     var removeLiteral = literal("remove");
     createRemoveArguments(removeLiteral, provider);
     addEditArguments(argument, provider);
+
+    var saveCallback = saveCallback();
 
     return argument
         .then(literal("info")
@@ -61,23 +120,23 @@ abstract class InteractableNode<H extends Usable> extends FtcCommand {
             })
         )
 
-        .then(literal("data")
-            .executes(c -> {
-              var holder = provider.get(c);
-              CompoundTag tag = new CompoundTag();
-              holder.save(tag);
-
-              c.getSource().sendMessage(
-                  Text.displayTag(tag, true)
-              );
-              return 0;
-            })
+        .then(
+            DataCommands.dataAccess(
+                "Usable",
+                createAccessor(provider, saveCallback)
+            )
         )
 
         .then(removeLiteral)
 
-        .then(UsableCommands.CHECK_NODE.createArguments(provider))
-        .then(UsableCommands.ACTION_NODE.createArguments(provider));
+        .then(
+            UsableCommands.CHECK_NODE
+                .createArguments(provider, saveCallback)
+        )
+        .then(
+            UsableCommands.ACTION_NODE
+                .createArguments(provider, saveCallback)
+        );
   }
 
   protected abstract void createNewUsableArguments(LiteralArgumentBuilder<CommandSource> command);

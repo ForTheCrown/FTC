@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.forthecrown.commands.manager.Exceptions;
+import net.forthecrown.core.registry.Keys;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.inventory.menu.MenuNode;
 import net.forthecrown.utils.inventory.menu.Slot;
@@ -19,16 +20,37 @@ import org.apache.commons.lang3.Validate;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
+import org.intellij.lang.annotations.Pattern;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
 public class UserRank implements ComponentLike {
+  /** The rank's tier */
   private final RankTier tier;
+
+  /** The rank's prefix without the trailing space */
   private final Component truncatedPrefix;
+
+  /** The registry key of the opposite gender variant of this rank */
+  @Pattern(Keys.VALID_KEY_REGEX)
   private final String genderEquivalentKey;
+
+  /** This rank's menu slot, may be null */
   private final Slot menuSlot;
+
+  /** Description text */
   private final ImmutableList<Component> description;
+
+  /**
+   * If true, it means this rank comes free with the tier, otherwise, this
+   * rank will have to be earned in some other way
+   */
   private final boolean defaultTitle;
+
+  /**
+   * If true, means this rank will not be displayed until a user has been given
+   * this rank
+   */
   private final boolean hidden;
 
   /** This rank's menu node, lazily initialized */
@@ -36,12 +58,16 @@ public class UserRank implements ComponentLike {
 
   private UserRank(Builder builder) {
     this.tier = Objects.requireNonNull(builder.tier);
-    this.truncatedPrefix = builder.truncatedPrefix;
+    this.truncatedPrefix = Objects.requireNonNull(builder.truncatedPrefix);
     this.genderEquivalentKey = builder.genderEquivalentKey;
     this.menuSlot = builder.menuSlot;
     this.description = builder.description.build();
     this.defaultTitle = builder.defaultTitle;
     this.hidden = builder.hidden;
+
+    if (!Strings.isNullOrEmpty(genderEquivalentKey)) {
+      Keys.ensureValid(genderEquivalentKey);
+    }
 
     if (defaultTitle) {
       Objects.requireNonNull(
@@ -96,6 +122,7 @@ public class UserRank implements ComponentLike {
           boolean has = titles.hasTitle(this);
           boolean active = titles.getTitle() == this;
 
+          // If hidden, and the user doesn't have it, don't display
           if (hidden && !has) {
             return null;
           }
@@ -106,7 +133,7 @@ public class UserRank implements ComponentLike {
 
           builder.setName(getTruncatedPrefix())
               .addFlags(
-                  ItemFlag.HIDE_POTION_EFFECTS,
+                  ItemFlag.HIDE_ITEM_SPECIFICS,
                   ItemFlag.HIDE_ATTRIBUTES,
                   ItemFlag.HIDE_DYE
               );
@@ -115,7 +142,12 @@ public class UserRank implements ComponentLike {
 
           if (active) {
             builder.addEnchant(Enchantment.BINDING_CURSE, 1)
-                .addFlags(ItemFlag.HIDE_ENCHANTS);
+                .addFlags(ItemFlag.HIDE_ENCHANTS)
+                .addLore("&aYour active title!");
+          }
+
+          if (has) {
+            builder.addLore("&7Click to set as your rank");
           }
 
           return builder.build();
@@ -176,7 +208,10 @@ public class UserRank implements ComponentLike {
   public static class Builder {
     private RankTier tier;
     private Component truncatedPrefix;
+
+    @Pattern(Keys.VALID_KEY_REGEX)
     private String genderEquivalentKey;
+
     private Slot menuSlot;
 
     private boolean defaultTitle = false;

@@ -8,7 +8,6 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.guilds.Guild;
 import net.forthecrown.user.User;
-import net.forthecrown.utils.text.writer.TextWriter;
 import net.kyori.adventure.text.Component;
 
 class GuildChatNode extends GuildCommandNode {
@@ -19,12 +18,13 @@ class GuildChatNode extends GuildCommandNode {
   }
 
   @Override
-  protected void writeHelpInfo(TextWriter writer, CommandSource source) {
-    writer.field("chat <message>", "Sends a chat into the guild chat");
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("<message>")
+        .addInfo("Sends a message into the guild chat");
 
-    if (source.hasPermission(Permissions.GUILD_ADMIN)) {
-      writer.field("chat <guild> <message>", "Sends a message into a guild's chat");
-    }
+    factory.usage("<guild> <message>")
+        .setPermission(Permissions.GUILD_ADMIN)
+        .addInfo("Sends a message into a guild's chat");
   }
 
   @Override

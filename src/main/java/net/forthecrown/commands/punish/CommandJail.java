@@ -29,6 +29,8 @@ public class CommandJail extends FtcCommand {
     super("Jail");
 
     setPermission(Permissions.PUNISH_JAIL);
+    setDescription("Jails a user");
+
     register();
   }
 
@@ -44,6 +46,14 @@ public class CommandJail extends FtcCommand {
    *
    * Main Author:
    */
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("<user> <jail> [length=<length: time>] [reason=<reason>]")
+        .addInfo("Jails the <user> in the <jail>")
+        .addInfo("If the [length] is not set, the user will")
+        .addInfo("be jailed forever.");
+  }
 
   @Override
   protected void createCommand(BrigadierCommand command) {

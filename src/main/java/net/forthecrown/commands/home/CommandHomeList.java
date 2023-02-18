@@ -1,6 +1,9 @@
 package net.forthecrown.commands.home;
 
+import static net.forthecrown.commands.home.CommandHome.HOME_KEYWORDS;
+
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.Collection;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -24,6 +27,19 @@ public class CommandHomeList extends FtcCommand {
     setDescription("Lists all your homes");
 
     register();
+  }
+
+  @Override
+  public Collection<String> createKeywords() {
+    return HOME_KEYWORDS;
+  }
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("", "Lists your homes");
+
+    factory.usage("<user>", "Lists the <user>'s homes")
+        .setPermission(Permissions.HOME_OTHERS);
   }
 
   @Override
@@ -65,9 +81,7 @@ public class CommandHomeList extends FtcCommand {
     }
 
     if (!Permissions.MAX_HOMES.hasUnlimited(user)) {
-      int max = Permissions.MAX_HOMES.getTier(true, user)
-          .orElse(Permissions.MAX_HOMES.getRange().getMaximum());
-
+      int max = user.getHomes().getMaxHomes();
       int homeCount = homes.size();
 
       builder.append(

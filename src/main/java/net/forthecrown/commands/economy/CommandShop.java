@@ -13,6 +13,7 @@ public class CommandShop extends FtcCommand {
   public CommandShop() {
     super("Shop");
 
+    setDescription("Opens the shop menu");
     register();
   }
 

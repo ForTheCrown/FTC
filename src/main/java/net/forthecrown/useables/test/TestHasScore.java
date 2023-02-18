@@ -2,7 +2,7 @@ package net.forthecrown.useables.test;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.types.args.ArgsArgument;
 import net.forthecrown.grenadier.types.args.Argument;
@@ -28,13 +28,11 @@ public class TestHasScore extends UsageTest {
 
   // --- PARSING ---
 
-  static final Argument<Objective> OBJ_ARG = Argument.builder("objective",
-          ObjectiveArgument.objective())
-      .build();
+  static final Argument<Objective> OBJ_ARG
+      = Argument.builder("objective", ObjectiveArgument.objective()).build();
 
-  static final Argument<MinMaxBounds.Ints> BOUNDS_ARG = Argument.builder("bounds",
-          RangeArgument.intRange())
-      .build();
+  static final Argument<MinMaxBounds.Ints> BOUNDS_ARG
+      = Argument.builder("bounds", RangeArgument.intRange()).build();
 
   static final ArgsArgument PARSER = ArgsArgument.builder()
       .addRequired(OBJ_ARG)
@@ -81,7 +79,7 @@ public class TestHasScore extends UsageTest {
         .getObjective(this.objective);
 
     if (objective == null) {
-      FTC.getLogger().warn("Unknown objective in score test usage type in: '{}'",
+      Loggers.getLogger().warn("Unknown objective in score test usage type in: '{}'",
           this.objective
       );
       return false;

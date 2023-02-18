@@ -31,6 +31,37 @@ class TriggerNode extends InteractableNode<UsableTrigger> {
   }
 
   @Override
+  protected UsageFactory prefixWithType(UsageFactory factory) {
+    return factory.withPrefix("<trigger name>");
+  }
+
+  @Override
+  protected void addCreateUsage(UsageFactory factory) {
+    factory.usage("<name>")
+        .addInfo("Creates a trigger from your currently selected WorldEdit")
+        .addInfo("selection");
+
+    factory.usage("<name> <pos1: x,y,z> <pos2: x,y,z>")
+        .addInfo("Creates a trigger from the area between <pos1> and <pos2>");
+  }
+
+  @Override
+  protected void addUsages(UsageFactory factory) {
+    factory.usage("type")
+        .addInfo("Shows a trigger's type");
+
+    factory.usage("type <type>")
+        .addInfo("Sets a trigger's type to <type>");
+
+    super.addUsages(factory);
+  }
+
+  @Override
+  protected UsableSaveCallback<UsableTrigger> saveCallback() {
+    return UsableSaveCallback.empty();
+  }
+
+  @Override
   protected void createNewUsableArguments(LiteralArgumentBuilder<CommandSource> command) {
     command
         .then(argument("name", Arguments.FTC_KEY)

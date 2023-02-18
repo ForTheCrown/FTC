@@ -4,14 +4,16 @@ import static net.forthecrown.user.data.UserTimeTracker.UNSET;
 
 import com.google.common.base.Strings;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 import lombok.Getter;
 import net.forthecrown.core.DynmapUtil;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.config.ConfigManager;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnDayChange;
 import net.forthecrown.core.module.OnEnable;
 import net.forthecrown.guilds.Guild;
@@ -27,7 +29,7 @@ import org.apache.logging.log4j.Logger;
 
 public class WaypointManager extends SerializableObject.NbtDat {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   /**
    * The waypoint manager singleton instance
@@ -136,7 +138,7 @@ public class WaypointManager extends SerializableObject.NbtDat {
    */
   void onRename(Waypoint waypoint, String oldName, String newName) {
     if (!Strings.isNullOrEmpty(oldName)) {
-      byName.remove(oldName);
+      byName.remove(oldName.toLowerCase());
     }
 
     if (!Strings.isNullOrEmpty(newName)) {
@@ -224,12 +226,42 @@ public class WaypointManager extends SerializableObject.NbtDat {
     return byName.get(name.toLowerCase());
   }
 
+  public Waypoint getExtensive(String name) {
+    Waypoint waypoint = get(name);
+
+    if (waypoint != null) {
+      return waypoint;
+    }
+
+    var guild = GuildManager.get().getGuild(name);
+
+    if (guild != null) {
+      waypoint = guild.getSettings().getWaypoint();
+
+      if (waypoint != null) {
+        return waypoint;
+      }
+    }
+
+    try {
+      UUID uuid = UUID.fromString(name);
+      waypoint = get(uuid);
+      return waypoint;
+    } catch (IllegalArgumentException exc) {
+      return null;
+    }
+  }
+
   public Stream<String> getNames() {
     // Don't return the keySet directly, as it contains
     // lowerCase versions of the name for ease of lookup
     return byName.values()
         .stream()
         .map(waypoint -> waypoint.get(WaypointProperties.NAME));
+  }
+
+  public Collection<Waypoint> getWaypoints() {
+    return Collections.unmodifiableCollection(byId.values());
   }
 
   /* --------------------------- SERIALIZATION ---------------------------- */

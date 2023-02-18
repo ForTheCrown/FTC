@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,7 +12,7 @@ import java.nio.file.Paths;
 import java.util.Date;
 import java.util.Set;
 import jdk.jfr.Timestamp;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnLoad;
 import net.forthecrown.core.module.OnSave;
 import net.forthecrown.utils.io.JsonUtils;
@@ -21,7 +22,7 @@ import org.apache.logging.log4j.Logger;
 
 public class ConfigManager {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   private static final ConfigManager inst = new ConfigManager();
 
@@ -83,6 +84,8 @@ public class ConfigManager {
             return;
           }
 
+          invokeStaticIfExists(f.configClass(), "onLoad");
+
           Object value = Configs.GSON.fromJson(json.get(field.getName()), field.getType());
           field.set(null, value);
         });
@@ -108,10 +111,28 @@ public class ConfigManager {
       );
     });
 
+    invokeStaticIfExists(f.configClass(), "onSave");
+
     try {
       JsonUtils.writeFile(json, path);
     } catch (IOException exc) {
       LOGGER.error("Couldn't serialize file '{}'", path, exc);
+    }
+  }
+
+  private static void invokeStaticIfExists(Class c, String name) {
+    try {
+      var onSave = c.getDeclaredMethod(name);
+      onSave.setAccessible(true);
+      onSave.invoke(null);
+    } catch (ReflectiveOperationException exc) {
+      if (!(exc instanceof NoSuchMethodException)) {
+        if (exc instanceof InvocationTargetException e) {
+          exc = e;
+        }
+
+        LOGGER.error("Couldn't invoke onSave in {}", c, exc);
+      }
     }
   }
 

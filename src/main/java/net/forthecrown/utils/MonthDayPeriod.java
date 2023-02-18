@@ -31,6 +31,9 @@ public class MonthDayPeriod {
       .appendValue(ChronoField.MONTH_OF_YEAR, 1, 2, SignStyle.NORMAL)
       .toFormatter();
 
+  public static MonthDayPeriod ALL
+      = between(MonthDay.of(01, 01), MonthDay.of(12, 31));
+
   /**
    * The start date of this period.
    * <p>
@@ -249,7 +252,7 @@ public class MonthDayPeriod {
 
     if (array.size() > 2 || array.isEmpty()) {
       throw Util.newException(
-          "Expected size [1, 2], found: %s", array.size()
+          "Expected size [1..2], found: %s", array.size()
       );
     }
 

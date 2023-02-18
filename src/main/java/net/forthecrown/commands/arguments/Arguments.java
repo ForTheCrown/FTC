@@ -17,13 +17,9 @@ public interface Arguments {
 
   ChatArgument CHAT = new ChatArgument();
 
-  HolidayArgument HOLIDAY = new HolidayArgument();
-
   HomeArgument HOME = new HomeArgument();
 
   MarketArgument MARKET = new MarketArgument();
-
-  RewardRangeArgument REWARD_RANGE = new RewardRangeArgument();
 
   TriggerArgument TRIGGER = new TriggerArgument();
 
@@ -58,17 +54,20 @@ public interface Arguments {
   }
 
   static User getUser(CommandContext<CommandSource> c, String argument)
-      throws CommandSyntaxException {
+      throws CommandSyntaxException
+  {
     UserParseResult result = c.getArgument(argument, UserParseResult.class);
     return result.get(c.getSource(), true);
   }
 
+  @SuppressWarnings("unchecked")
   static Waypoint getWaypoint(CommandContext<CommandSource> c, String argument)
       throws CommandSyntaxException {
     ParseResult<Waypoint> result = c.getArgument(argument, ParseResult.class);
     return result.get(c.getSource(), true);
   }
 
+  @SuppressWarnings("unchecked")
   static Waypoint getWaypointNoChecks(CommandContext<CommandSource> c, String argument)
       throws CommandSyntaxException {
     ParseResult<Waypoint> result = c.getArgument(argument, ParseResult.class);

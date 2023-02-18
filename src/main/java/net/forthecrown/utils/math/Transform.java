@@ -79,15 +79,10 @@ public class Transform {
       return v;
     }
 
-    var pivoted = v.sub(pivot);
-
-    if (rotation != Rotation.NONE) {
-      pivoted = rotation.rotate(pivoted);
-    }
-
-    pivoted = pivoted.mul(scalar);
-
-    return offset.add(pivoted.add(pivot));
+    return rotation.rotate(v.sub(pivot))
+        .mul(scalar)
+        .add(pivot)
+        .add(offset);
   }
 
   public boolean isIdentity() {

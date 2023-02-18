@@ -3,7 +3,6 @@ package net.forthecrown.dungeons.enchantments;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import net.forthecrown.core.module.OnEnable;
 import net.forthecrown.utils.VanillaAccess;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -24,8 +23,7 @@ public class FtcEnchants {
   public static final StrongAim STRONG_AIM = new StrongAim();
   public static final SoulBound SOUL_BOND = new SoulBound();
 
-  @OnEnable
-  private static void init() {
+  public static void init() {
     try {
       Field f = Enchantment.class.getDeclaredField("acceptingNew");
       f.setAccessible(true);

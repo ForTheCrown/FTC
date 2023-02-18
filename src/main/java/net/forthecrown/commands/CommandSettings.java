@@ -11,7 +11,8 @@ public class CommandSettings extends FtcCommand {
     super("settings");
 
     setAliases("options");
-    setDescription("Displays a user's settings");
+    setDescription("Opens the settings book");
+    simpleUsages();
 
     register();
   }

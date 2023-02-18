@@ -10,6 +10,7 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 class EnchantHandle extends Enchantment {
 
@@ -72,10 +73,10 @@ class EnchantHandle extends Enchantment {
   }
 
   @Override
-  public void doPostHurt(LivingEntity user, Entity attacker, int level) {
+  public void doPostHurt(LivingEntity user, @Nullable Entity attacker, int level) {
     wrapper.onHurt(
         user.getBukkitLivingEntity(),
-        attacker.getBukkitEntity(),
+        attacker == null ? null : attacker.getBukkitEntity(),
         level
     );
   }

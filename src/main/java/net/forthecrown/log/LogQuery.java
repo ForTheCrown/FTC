@@ -1,7 +1,6 @@
 package net.forthecrown.log;
 
 import java.time.LocalDate;
-import java.time.chrono.ChronoLocalDate;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
@@ -9,10 +8,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.utils.Util;
-import org.apache.commons.lang3.Range;
 
 @Getter
 @RequiredArgsConstructor
@@ -20,7 +18,7 @@ public class LogQuery implements Predicate<LogEntry> {
 
   private final Predicate[] predicates;
   private final Holder<LogSchema> schema;
-  private final Range<ChronoLocalDate> searchRange;
+  private final DateRange searchRange;
 
   private final Predicate<LogEntry> entryPredicate;
 
@@ -40,7 +38,7 @@ public class LogQuery implements Predicate<LogEntry> {
           return false;
         }
       } catch (Throwable t) {
-        FTC.getLogger().error(
+        Loggers.getLogger().error(
             "Error testing field '{}' on entry, value={}",
             f.name(),
             entry.get(f),
@@ -68,12 +66,12 @@ public class LogQuery implements Predicate<LogEntry> {
     private Predicate<LogEntry> entryPredicate;
 
     private int maxResults = Integer.MAX_VALUE;
-    private Range<ChronoLocalDate> queryRange;
+    private DateRange queryRange;
 
     public Builder(Holder<LogSchema> schema) {
       this.schema = schema;
       this.predicates = new Predicate[schema.getValue().getFields().length];
-      this.queryRange = Range.is(LocalDate.now());
+      this.queryRange = DateRange.exact(LocalDate.now());
     }
 
     private SchemaField lastField;
@@ -105,8 +103,9 @@ public class LogQuery implements Predicate<LogEntry> {
       return _add(predicate, Predicate::and);
     }
 
-    private Builder<F> _add(Predicate<F> predicate,
-                            BiFunction<Predicate<F>, Predicate<F>, Predicate<F>> combiner
+    private Builder<F> _add(
+        Predicate<F> predicate,
+        BiFunction<Predicate<F>, Predicate<F>, Predicate<F>> combiner
     ) {
       Objects.requireNonNull(lastField, "Field not set");
 

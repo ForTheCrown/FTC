@@ -12,7 +12,6 @@ import net.forthecrown.core.admin.Mute;
 import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.utils.text.Text;
-import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -157,9 +156,6 @@ public class DirectMessage {
       mute = Mute.HARD;
     }
 
-    Identity sender = Identity.nil();
-    Identity target = Identity.nil();
-
     EavesDropper.reportDirectMessage(this, mute);
 
     //If no mute whatsoever
@@ -168,13 +164,9 @@ public class DirectMessage {
         User targetUser = Users.get(this.target.asOrNull(Player.class));
         targetUser.setLastMessage(this.sender);
 
-        target = targetUser;
-
         if (this.sender.isPlayer()) {
           User senderUser = Users.get(this.sender.asOrNull(Player.class));
           senderUser.setLastMessage(getTarget());
-
-          sender = senderUser;
 
           // Test if blocked
           if (Users.testBlocked(
@@ -197,7 +189,7 @@ public class DirectMessage {
           .append(formattedText)
           .build();
 
-      this.target.sendMessage(sender, receiverMessage);
+      this.target.sendMessage(receiverMessage);
     }
 
     //If soft or no mute, send to sender
@@ -208,7 +200,7 @@ public class DirectMessage {
           .append(formattedText)
           .build();
 
-      this.sender.sendMessage(target, senderMessage);
+      this.sender.sendMessage(senderMessage);
     }
   }
 

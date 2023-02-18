@@ -21,10 +21,12 @@ public class ToolBlockCommands extends FtcCommand {
   ) {
     super(name);
 
-    this.aliases = aliases;
+    setAliases(aliases);
+    setPermission(permission);
+    setDescription(description);
+    simpleUsages();
+
     this.function = function;
-    this.permission = selfPerm;
-    this.description = description;
 
     register();
   }

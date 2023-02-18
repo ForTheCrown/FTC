@@ -39,6 +39,7 @@ public class PunishmentCommand extends FtcCommand {
     this.type = type;
     setAliases(aliases);
     setPermission(type.getPermission());
+    setDescription("Punishes a user with a " + type.presentableName());
 
     register();
   }
@@ -56,6 +57,14 @@ public class PunishmentCommand extends FtcCommand {
       .addOptional(REASON)
       .addOptional(TIME)
       .build();
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("<user> [reason=<reason>] [length=<length: time>]")
+        .addInfo("Punishes a user with a " + type.presentableName())
+        .addInfo("If [length] is not set, the punishment will")
+        .addInfo("not end automatically");
+  }
 
   @Override
   protected void createCommand(BrigadierCommand command) {

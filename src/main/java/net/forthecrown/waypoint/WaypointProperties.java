@@ -49,8 +49,8 @@ public class WaypointProperties {
    * Property only used for region poles to determine whether they should display their resident
    * count on the pole.
    */
-  public static final WaypointProperty<Boolean>
-      HIDE_RESIDENTS = new WaypointProperty<>("hideResidents", BOOL, false) {
+  public static final WaypointProperty<Boolean> HIDE_RESIDENTS
+      = new WaypointProperty<>("hideResidents", BOOL, false) {
     @Override
     public void onValueUpdate(Waypoint waypoint,
                               @Nullable Boolean oldValue,
@@ -68,8 +68,8 @@ public class WaypointProperties {
    * The region's name, will be used on the dynmap, if they allow for the marker, and can be used by
    * other players to visit this region with '/visit [name]'
    */
-  public static final WaypointProperty<String>
-      NAME = new WaypointProperty<>("name", STRING, null) {
+  public static final WaypointProperty<String> NAME
+      = new WaypointProperty<>("name", STRING, null) {
     @Override
     public void onValueUpdate(Waypoint waypoint,
                               @Nullable String oldValue,
@@ -87,7 +87,7 @@ public class WaypointProperties {
       } else if (waypoint.getType() instanceof PlayerWaypointType) {
         Waypoints.setNameSign(
             waypoint,
-            Waypoints.getEffectiveName(waypoint)
+            waypoint.getEffectiveName()
         );
       }
     }
@@ -96,14 +96,14 @@ public class WaypointProperties {
   /**
    * The UUID of the player that owns the waypoint
    */
-  public static final WaypointProperty<UUID>
-      OWNER = new WaypointProperty<>("owner", SerializerParsers.UUID, null);
+  public static final WaypointProperty<UUID> OWNER
+      = new WaypointProperty<>("owner", SerializerParsers.UUID, null);
 
   /**
    * The UUID of the guild that owns the waypoint
    */
-  public static final WaypointProperty<UUID>
-      GUILD_OWNER = new WaypointProperty<>("guildOwner", SerializerParsers.UUID, null) {
+  public static final WaypointProperty<UUID> GUILD_OWNER
+      = new WaypointProperty<>("guildOwner", SerializerParsers.UUID, null) {
     @Override
     public void onValueUpdate(Waypoint waypoint,
                               @Nullable UUID oldValue,
@@ -113,7 +113,7 @@ public class WaypointProperties {
 
       Waypoints.setNameSign(
           waypoint,
-          Waypoints.getEffectiveName(waypoint)
+          waypoint.getEffectiveName()
       );
     }
   };

@@ -1,5 +1,6 @@
 package net.forthecrown.cosmetics;
 
+import com.google.common.reflect.Reflection;
 import java.util.function.IntSupplier;
 import lombok.Getter;
 import net.forthecrown.core.registry.Registries;
@@ -51,15 +52,10 @@ public class CosmeticType<T extends Cosmetic> {
     this.id = holder.getId();
   }
 
-  static void initializeValues(CosmeticType type, Class c) {
-    try {
-      Class loaded = Class.forName(c.getName(), true, c.getClassLoader());
-      type.effects.freeze();
-
-      type.initializeInventory(36);
-    } catch (ClassNotFoundException e) {
-      e.printStackTrace();
-    }
+  static void initializeValues(CosmeticType<?> type, Class<?> c) {
+    Reflection.initialize(c);
+    type.effects.freeze();
+    type.initializeInventory(36);
   }
 
   public void add(T val) {

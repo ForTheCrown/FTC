@@ -35,6 +35,11 @@ public class CommandMarry extends FtcCommand {
    */
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("<player>", "Propose to a <player>");
+  }
+
+  @Override
   protected void createCommand(BrigadierCommand command) {
     command
         .then(argument("user", Arguments.ONLINE_USER)

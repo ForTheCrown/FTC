@@ -1,6 +1,5 @@
 package net.forthecrown.useables.test;
 
-import com.google.common.collect.Collections2;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.Messages;
@@ -26,10 +25,10 @@ public class TestPermission extends UsageTest {
         return CompletionProvider.suggestMatching(
             builder,
 
-            Collections2.transform(
-                Bukkit.getPluginManager().getPermissions(),
-                Permission::getName
-            )
+            Bukkit.getPluginManager()
+                .getPermissions()
+                .stream()
+                .map(Permission::getName)
         );
       });
 

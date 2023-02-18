@@ -28,7 +28,9 @@ import net.forthecrown.useables.command.Kit;
 import net.forthecrown.useables.command.Warp;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.text.Text;
+import net.forthecrown.utils.text.TextJoiner;
 import net.forthecrown.utils.text.writer.TextWriters;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -54,16 +56,63 @@ public abstract class UseCmdCommand<T extends CommandUsable> extends FtcCommand 
     this.argument = argument;
     this.adminPermission = adminPermission;
 
-    // Create list command too, name only requires
-    // s at the end to pluralize it
-    new CommandUseCmdList<>(name, argument);
-
     register();
+  }
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("")
+        .addInfo("Lists all %ss", getName());
+
+    factory.usage("create <name>")
+        .setPermission(adminPermission)
+        .addInfo("Creates a new %s", getName());
+
+    var prefixed = factory.withPrefix("<" + getName() + ">");
+    prefixed.usage("")
+        .addInfo("Uses a <%s>", getName());
+
+    prefixed = prefixed.withPermission(adminPermission);
+    prefixed.usage("<user>")
+        .addInfo("Makes a <user> use a <%s>", getName());
+
+    prefixed.usage("remove")
+        .addInfo("Removes a <%s>", getName());
+
+    var edit = prefixed.withPrefix("edit");
+
+    addEditUsages(edit);
+    UsableCommands.CHECK_NODE.populateUsages(edit, getName());
+
+  }
+
+  protected void addEditUsages(UsageFactory factory) {
+
   }
 
   @Override
   protected void createCommand(BrigadierCommand command) {
     command
+        .executes(c -> {
+          var user = getUserSender(c);
+          var list = argument.getManager().getUsable(user.getPlayer());
+
+          if (list.isEmpty()) {
+            throw Exceptions.NOTHING_TO_LIST;
+          }
+
+          user.sendMessage(
+              Text.format("{0, class}s: &e{1}",
+                  NamedTextColor.GRAY,
+
+                  argument.getTypeClass(),
+                  TextJoiner.onComma()
+                      .add(list.stream().map(CommandUsable::displayName))
+              )
+          );
+          return 0;
+        })
+
         .then(literal("create")
             .requires(source -> source.hasPermission(adminPermission))
 
@@ -91,7 +140,8 @@ public abstract class UseCmdCommand<T extends CommandUsable> extends FtcCommand 
             .executes(c -> {
               var t = argument.get(c, "usable");
 
-              t.interact(c.getSource().asPlayer());
+              var player = c.getSource().asPlayer();
+              t.interact(player, player.hasPermission(adminPermission));
 
               return 0;
             })
@@ -135,7 +185,11 @@ public abstract class UseCmdCommand<T extends CommandUsable> extends FtcCommand 
             .then(literal("edit")
                 .requires(source -> source.hasPermission(Permissions.ADMIN))
 
-                .then(UsableCommands.CHECK_NODE.createArguments(this::get))
+                .then(
+                    UsableCommands.CHECK_NODE
+                        .createArguments(this::get, UsableSaveCallback.empty())
+                )
+
                 .then(editArgument())
             )
         );
@@ -165,6 +219,28 @@ public abstract class UseCmdCommand<T extends CommandUsable> extends FtcCommand 
           Arguments.KITS,
           "Giving {0, user} kit {1}"
       );
+
+      setDescription("Obtains the specified kit or views all available kits.");
+    }
+
+    @Override
+    protected void addEditUsages(UsageFactory factory) {
+      var prefixed = factory.withPrefix("items");
+
+      prefixed.usage("")
+          .addInfo("Sets the items of a <kit> to the items in your inventory");
+
+      prefixed.usage("list")
+          .addInfo("Lists all the items in a <kit>");
+
+      prefixed.usage("add")
+          .addInfo("Adds the item you're holding to a <kit>");
+
+      prefixed.usage("add <item> <amount: number(1..64)>")
+          .addInfo("Adds an <item> to a <kit>");
+
+      prefixed.usage("remove <index: number(1..)>")
+          .addInfo("Removes an item at <index> from a <kit>");
     }
 
     @Override
@@ -326,6 +402,18 @@ public abstract class UseCmdCommand<T extends CommandUsable> extends FtcCommand 
           Arguments.WARPS,
           "Warping {0, user} to {1}"
       );
+
+      setDescription("List all warps or warp to the specified location.");
+    }
+
+    @Override
+    protected void addEditUsages(UsageFactory factory) {
+      var dest = factory.withPrefix("destination");
+      dest.usage("")
+          .addInfo("Sets a <warp>'s destination to where you're standing");
+
+      dest.usage("[world=<world>] [pos=<x,y,z>] [yaw=<number>] [pitch=<pitch>]")
+          .addInfo("Sets the destination to the given options");
     }
 
     @Override

@@ -1,19 +1,24 @@
 package net.forthecrown.utils.inventory.menu;
 
+import co.aikar.timings.Timing;
+import co.aikar.timings.Timings;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
+import java.util.EnumSet;
+import java.util.Objects;
 import lombok.Getter;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.inventory.FtcInventory;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.inventory.ItemStacks;
+import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
@@ -41,11 +46,6 @@ public class Menu implements InventoryHolder, MenuCloseConsumer {
   private final int size;
 
   /**
-   * True, if items can be removed from the inventory and added it to it by users
-   */
-  private final boolean itemMovingAllowed;
-
-  /**
    * Inventory index 2 menu node map. Immutable
    */
   private final Int2ObjectMap<MenuNode> nodes;
@@ -66,34 +66,64 @@ public class Menu implements InventoryHolder, MenuCloseConsumer {
    */
   private final MenuNode border;
 
+  private final ExternalClickConsumer externalClickCallback;
+
+  private final EnumSet<MenuFlag> flags;
+
+  private final Timing clickTiming;
+  private final Timing openTiming;
+  private final Timing externalClickTiming;
+  private final Timing nodeRunTiming;
+
   /* ----------------------------- CONSTRUCTOR ------------------------------ */
 
   Menu(MenuBuilder builder) {
-    this.title = builder.title;
+    this.title = Objects.requireNonNull(builder.title);
     this.size = builder.size;
+    this.externalClickCallback = builder.externalClickCallback;
 
-    this.itemMovingAllowed = builder.itemMovingAllowed;
+    this.flags = builder.flags;
 
     this.nodes = Int2ObjectMaps.unmodifiable(builder.nodes);
 
     this.openCallback = builder.openCallback;
     this.closeCallback = builder.closeCallback;
     this.border = builder.border;
+
+    String title = Text.plain(this.title);
+    var p = FTC.getPlugin();
+
+    this.clickTiming = Timings.of(p, title + " Click");
+    this.nodeRunTiming = Timings.of(p, title + " Click.NodeRuntime", clickTiming);
+
+    this.openTiming = Timings.of(p, title + " InvCreate");
+    this.externalClickTiming = Timings.of(p, title + " ExternalClick");
   }
 
   /* ----------------------------- FUNCTIONS ------------------------------ */
+
+  public boolean hasFlag(MenuFlag flag) {
+    return flags.contains(flag);
+  }
 
   public void open(User user) {
     open(user, Context.EMPTY);
   }
 
   public void open(User user, Context context) {
-    if (openCallback != null) {
-      openCallback.onOpen(user, context);
-    }
+    getOpenTiming().startTiming();
 
-    var inventory = createInventory(user, context);
-    user.getPlayer().openInventory(inventory);
+    try {
+      var inventory = createInventory(user, context);
+
+      if (openCallback != null) {
+        openCallback.onOpen(user, context, inventory);
+      }
+
+      user.getPlayer().openInventory(inventory);
+    } finally {
+      getOpenTiming().stopTiming();
+    }
   }
 
   public MenuInventory createInventory(User user, Context context) {
@@ -124,25 +154,43 @@ public class Menu implements InventoryHolder, MenuCloseConsumer {
             return;
           }
 
+          if (hasFlag(MenuFlag.PREVENT_ITEM_STACKING)) {
+            Menus.makeUnstackable(item);
+          }
+
           inv.setItem(slot, item);
         });
 
     return inv;
   }
 
+  public void onExternalClick(InventoryClickEvent event) {
+    ExternalClickContext context = new ExternalClickContext(event);
+
+    if (event.isShiftClick() && !hasFlag(MenuFlag.ALLOW_SHIFT_CLICKING)) {
+      context.cancelEvent(true);
+    }
+
+    if (externalClickCallback != null) {
+      externalClickCallback.onShiftClick(
+          context,
+          context.getMenuInventory().getContext()
+      );
+    }
+
+    event.setCancelled(context.cancelEvent());
+  }
+
   public void onMenuClick(InventoryClickEvent event) {
     ClickContext click = new ClickContext(
         (MenuInventory) event.getClickedInventory(),
-        (Player) event.getWhoClicked(),
-        event.getSlot(),
-        event.getCursor(),
-        event.getClick()
+        event
     );
 
     Context context = click.getInventory().getContext();
     User user = Users.get(click.getPlayer());
 
-    if (itemMovingAllowed) {
+    if (hasFlag(MenuFlag.ALLOW_ITEM_MOVING)) {
       event.setCancelled(false);
       click.cancelEvent(false);
     } else {
@@ -151,6 +199,10 @@ public class Menu implements InventoryHolder, MenuCloseConsumer {
     }
 
     if (Cooldown.contains(user, COOLDOWN_CATEGORY)) {
+      // On cooldown, node can't allow or prevent item moving, thus just
+      // flat out disable it here
+      event.setCancelled(true);
+
       return;
     }
 
@@ -167,14 +219,23 @@ public class Menu implements InventoryHolder, MenuCloseConsumer {
         }
       }
 
-      node.onClick(user, context, click);
+      click.node = node;
 
-      if (click.shouldCooldown()) {
-        Cooldown.add(user, COOLDOWN_CATEGORY, click.getCooldownTime());
-      }
+      getNodeRunTiming().startTiming();
+      node.onClick(user, context, click);
+    } catch (CommandSyntaxException exc) {
+      Exceptions.handleSyntaxException(user, exc);
+    } catch (Throwable t) {
+      Loggers.getLogger().error("Error running menu click!", t);
+    } finally {
+      getNodeRunTiming().stopTiming();
 
       if (click.cancelEvent()) {
         event.setCancelled(true);
+      }
+
+      if (click.shouldCooldown()) {
+        Cooldown.add(user, COOLDOWN_CATEGORY, click.getCooldownTime());
       }
 
       if (click.shouldClose()) {
@@ -182,10 +243,6 @@ public class Menu implements InventoryHolder, MenuCloseConsumer {
       } else if (click.shouldReloadMenu()) {
         open(user, context);
       }
-    } catch (CommandSyntaxException exc) {
-      Exceptions.handleSyntaxException(user, exc);
-    } catch (Throwable t) {
-      FTC.getLogger().error("Error running menu click!", t);
     }
   }
 

@@ -22,9 +22,6 @@ public class SwordRanks {
 
   static final SwordRank[] RANKS = createRanks();
 
-  static void init() {
-  }
-
   private static SwordRank[] createRanks() {
     SwordRank.Builder[] ranks = new SwordRank.Builder[MAX_RANK];
 
@@ -121,7 +118,7 @@ public class SwordRanks {
             )
         )
         .addUpgrade(new EnchantUpgrade(Enchantment.LOOT_BONUS_MOBS, 4))
-        .addUpgrade(new ModifierUpgrade(0.5D, 5))
+        .addUpgrade(new ModifierUpgrade(1.5D, 5))
         // Removed bal upgrade: 10_000 rhines
         // Removed gem upgrade: 1000 gems
 

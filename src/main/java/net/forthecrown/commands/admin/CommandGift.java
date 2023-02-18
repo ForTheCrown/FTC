@@ -29,6 +29,10 @@ public class CommandGift extends FtcCommand {
               Player player = EntityArgument.getPlayer(c, "player");
               Location targetLoc = player.getLocation();
 
+              // Hardcoded coordinates, this is a recipe for great things
+              // to happen :)
+              //  -- Jules
+
               // Get shulker:
               Location chestLoc = new Location(Worlds.overworld(), 278, 80, 964);
               Chest chest;

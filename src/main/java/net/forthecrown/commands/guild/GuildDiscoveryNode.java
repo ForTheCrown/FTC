@@ -3,7 +3,6 @@ package net.forthecrown.commands.guild;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.guilds.menu.GuildMenus;
-import net.forthecrown.utils.text.writer.TextWriter;
 
 class GuildDiscoveryNode extends GuildCommandNode {
 
@@ -13,8 +12,8 @@ class GuildDiscoveryNode extends GuildCommandNode {
   }
 
   @Override
-  protected void writeHelpInfo(TextWriter writer, CommandSource source) {
-    writer.field("discover", "Opens a menu to find guilds to join!");
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("", "Opens a menu to find guilds to join");
   }
 
   @Override

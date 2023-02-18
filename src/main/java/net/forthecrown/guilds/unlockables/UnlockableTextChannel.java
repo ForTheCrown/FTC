@@ -1,6 +1,5 @@
 package net.forthecrown.guilds.unlockables;
 
-import static net.forthecrown.commands.guild.GuildCommandNode.testPermission;
 import static net.forthecrown.guilds.GuildDiscord.isArchived;
 import static net.forthecrown.guilds.GuildSettings.GUILD_CHANNEL;
 import static net.forthecrown.guilds.menu.GuildMenus.GUILD;
@@ -11,6 +10,7 @@ import net.forthecrown.guilds.Guild;
 import net.forthecrown.guilds.GuildConfig;
 import net.forthecrown.guilds.GuildDiscord;
 import net.forthecrown.guilds.GuildPermission;
+import net.forthecrown.guilds.menu.GuildMenus;
 import net.forthecrown.utils.Time;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.inventory.menu.MenuNode;
@@ -24,10 +24,8 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemFlag;
 
 public class UnlockableTextChannel implements Unlockable {
-  public static final UnlockableTextChannel CHANNEL
-      = new UnlockableTextChannel();
 
-  private UnlockableTextChannel() {
+  UnlockableTextChannel() {
   }
 
   @Override
@@ -72,6 +70,15 @@ public class UnlockableTextChannel implements Unlockable {
               .addLore("&7Creates a private Discord channel for the guild!")
               .addLore("");
 
+          if (!DiscordUnlocks.ROLE.isUnlocked(guild)) {
+            builder.addLore(
+                Text.format("Requires {0}",
+                    NamedTextColor.RED,
+                    DiscordUnlocks.ROLE.getName()
+                )
+            );
+          }
+
           if (isUnlocked(guild)) {
             guild.getDiscord().getChannel().ifPresentOrElse(channel -> {
               if (isArchived(channel)) {
@@ -106,8 +113,14 @@ public class UnlockableTextChannel implements Unlockable {
 
         .setRunnable((user, context, click) -> {
           var guild = context.getOrThrow(GUILD);
+          ensureHasPermission(guild, user);
 
-          testPermission(user, guild, getPerm(), Exceptions.NO_PERMISSION);
+          if (!DiscordUnlocks.ROLE.isUnlocked(guild)) {
+            throw Exceptions.format(
+                "Requires {0}",
+                DiscordUnlocks.ROLE.getName()
+            );
+          }
 
           if (!isUnlocked(guild)) {
             throw Exceptions.format(
@@ -127,14 +140,34 @@ public class UnlockableTextChannel implements Unlockable {
             );
           }
 
-          click.shouldReloadMenu(true);
-
           boolean archived = channelOpt.map(GuildDiscord::isArchived)
               .orElse(false);
 
-          if (channelOpt.isEmpty() || archived) {
-            if (archived) {
-              guild.getDiscord().unarchiveChannel();
+          var disc = guild.getDiscord();
+          var page = GuildMenus.MAIN_MENU
+              .getUpgradesMenu()
+              .getDiscordMenu();
+
+          // Note:
+          // Since any method involving Discord can fail, every method call
+          // here is async and can have a different output to the user
+          // depending on if the method call failed or succeeded. If it
+          // succeeded, A normal message is shown and GuildMenus.open() is
+          // called to reload the page, else an error message is shown and
+          // nothing more
+          //   -- Jules
+
+          // Archived -> Unarchive the channel
+          if (archived) {
+            disc.unarchiveChannel().whenComplete((unused, throwable) -> {
+              if (throwable != null) {
+                guild.sendMessage(
+                    Component.text("Internal error unarchiving channel",
+                        NamedTextColor.RED
+                    )
+                );
+                return;
+              }
 
               guild.sendMessage(
                   Text.format(
@@ -144,33 +177,61 @@ public class UnlockableTextChannel implements Unlockable {
                   )
               );
 
-              return;
-            }
-
-            guild.getDiscord().createChannel();
-            guild.sendMessage(
-                Text.format(
-                    "&e{0, user}&r created a Text channel for the guild",
-                    NamedTextColor.GOLD,
-                    user
-                )
-            );
+              GuildMenus.open(page, user, guild);
+            });
 
             return;
           }
 
+          // Channel doesn't exist -> Create it
+          if (channelOpt.isEmpty()) {
+            disc.createChannel().whenComplete((channel, throwable) -> {
+              if (throwable != null) {
+                guild.sendMessage(
+                    Component.text("Internal error creating text channel",
+                        NamedTextColor.RED
+                    )
+                );
+                return;
+              }
+
+              guild.sendMessage(
+                  Text.format(
+                      "&e{0, user}&r created a Text channel for the guild",
+                      NamedTextColor.GOLD,
+                      user
+                  )
+              );
+              GuildMenus.open(page, user, guild);
+            });
+
+            return;
+          }
+
+          // Channel exists, and is shift clicked -> Archive channel
           if (click.getClickType() != ClickType.SHIFT_LEFT) {
             return;
           }
 
-          guild.getDiscord().archiveChannel("");
-          guild.sendMessage(
-              Text.format(
-                  "&e{0, user}&r archived the guild's text channel",
-                  NamedTextColor.GOLD,
-                  user
-              )
-          );
+          disc.archiveChannel("").whenComplete((unused, throwable) -> {
+            if (throwable != null) {
+              guild.sendMessage(
+                  Component.text("Internal error archiving guild",
+                      NamedTextColor.RED
+                  )
+              );
+              return;
+            }
+
+            guild.sendMessage(
+                Text.format(
+                    "&e{0, user}&r archived the guild's text channel",
+                    NamedTextColor.GOLD,
+                    user
+                )
+            );
+            GuildMenus.open(page, user, guild);
+          });
         })
 
         .build();

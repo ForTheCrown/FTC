@@ -1,23 +1,27 @@
 package net.forthecrown.dungeons.level.generator;
 
-import lombok.experimental.UtilityClass;
 import net.forthecrown.dungeons.level.DungeonPiece;
 import net.forthecrown.dungeons.level.gate.AbsoluteGateData;
-import net.forthecrown.dungeons.level.gate.DungeonGate;
 import net.forthecrown.dungeons.level.gate.GateData;
+import net.forthecrown.dungeons.level.gate.GatePiece;
 import net.forthecrown.structure.Rotation;
 import net.forthecrown.utils.math.Bounds3i;
 import net.forthecrown.utils.math.Transform;
 import org.spongepowered.math.vector.Vector3i;
 
-public @UtilityClass class NodeAlign {
+public final class NodeAlign {
+  private NodeAlign() {}
 
-  public void align(DungeonPiece created, AbsoluteGateData exit, GateData entrance) {
+  public static void align(DungeonPiece created,
+                           AbsoluteGateData exit,
+                           GateData entrance
+  ) {
     Vector3i exitRight = exit.rightSide();
 
     // Derive rotation from direction difference between entrance and exit
     // and subtract 180 degrees, so they'd face each other when rotated
-    Rotation rotation = entrance.direction().deriveRotationFrom(exit.direction())
+    Rotation rotation = entrance.direction()
+        .deriveRotationFrom(exit.direction())
         .add(Rotation.CLOCKWISE_180);
 
     // Get the relative entrance origin point
@@ -46,21 +50,21 @@ public @UtilityClass class NodeAlign {
             .withIPivot(created.getPivotPosition())
     );
 
-    if (created instanceof DungeonGate gate) {
+    if (created instanceof GatePiece gate) {
       gate.setParentExit(exit);
       gate.setOriginGate(entrance.toAbsolute(gate));
     }
   }
 
-  public Vector3i pivotPoint(Bounds3i bb, Rotation rotation) {
+  public static Vector3i pivotPoint(Bounds3i bb, Rotation rotation) {
     var min = bb.min();
     var max = bb.max();
 
     return switch (rotation) {
-      case NONE -> min;
-      case CLOCKWISE_90 -> min.withX(max.x());
-      case COUNTERCLOCKWISE_90 -> min.withZ(max.z());
-      case CLOCKWISE_180 -> max.withY(min.y());
+      case NONE                 -> min;
+      case CLOCKWISE_90         -> min.withX(max.x());
+      case COUNTERCLOCKWISE_90  -> min.withZ(max.z());
+      case CLOCKWISE_180        -> max.withY(min.y());
     };
   }
 }

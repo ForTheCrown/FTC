@@ -13,6 +13,7 @@ public class CommandTpCancel extends FtcCommand {
 
     setPermission(Permissions.TPA);
     setDescription("Cancels a teleport");
+    simpleUsages();
 
     register();
   }

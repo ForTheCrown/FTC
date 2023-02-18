@@ -12,13 +12,13 @@ import java.io.IOException;
 import java.nio.file.Path;
 import net.forthecrown.core.module.OnEnable;
 import net.forthecrown.utils.io.JsonUtils;
+import net.forthecrown.utils.io.JsonUtils.EnumTypeAdapter;
 import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.utils.math.Bounds3i;
 import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.utils.math.WorldVec3i;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.minecraft.server.players.BanListEntry;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -52,7 +52,7 @@ public final class Configs {
     GsonBuilder builder = new GsonBuilder()
         .setPrettyPrinting()
 
-        .setDateFormat(BanListEntry.DATE_FORMAT.toPattern())
+        .setDateFormat(JsonUtils.DATE_FORMAT.toPattern())
 
         .registerTypeHierarchyAdapter(
             Key.class,
@@ -116,21 +116,22 @@ public final class Configs {
             }
         )
 
+        .registerTypeAdapter(Vector3i.class, Vectors.V3I_ADAPTER)
+        .registerTypeAdapter(Vector3d.class, Vectors.V3D_ADAPTER)
+
         .registerTypeAdapter(
-            Vector3i.class, JsonUtils.createAdapter(Vectors::writeJson, Vectors::read3i)
+            Vector2i.class,
+            JsonUtils.createAdapter(Vectors::writeJson, Vectors::read2i)
         )
         .registerTypeAdapter(
-            Vector3d.class, JsonUtils.createAdapter(Vectors::writeJson, Vectors::read3d)
+            Vector2d.class,
+            JsonUtils.createAdapter(Vectors::writeJson, Vectors::read2d)
         )
         .registerTypeAdapter(
-            Vector2i.class, JsonUtils.createAdapter(Vectors::writeJson, Vectors::read2i)
+            WorldVec3i.class,
+            JsonUtils.createAdapter(WorldVec3i::serialize, WorldVec3i::of)
         )
-        .registerTypeAdapter(
-            Vector2d.class, JsonUtils.createAdapter(Vectors::writeJson, Vectors::read2d)
-        )
-        .registerTypeAdapter(
-            WorldVec3i.class, JsonUtils.createAdapter(WorldVec3i::serialize, WorldVec3i::of)
-        );
+        .registerTypeAdapterFactory(new EnumTypeAdapter());
 
     return GsonComponentSerializer.gson()
         .populator()

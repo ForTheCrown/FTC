@@ -18,7 +18,15 @@ public class CommandWorld extends FtcCommand {
     super("world");
 
     setPermission(Permissions.CMD_TELEPORT);
+    setDescription("Teleports you or another player into a world");
+
     register();
+  }
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("<world>", "Teleports you into a <world>");
+    factory.usage("<world> <user>", "Teleports a <user> into a <world>");
   }
 
   @Override

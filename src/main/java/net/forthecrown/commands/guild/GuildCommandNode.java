@@ -15,7 +15,6 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.guilds.Guild;
 import net.forthecrown.guilds.GuildPermission;
 import net.forthecrown.user.User;
-import net.forthecrown.utils.text.writer.TextWriter;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,14 +28,18 @@ public abstract class GuildCommandNode extends FtcCommand {
     this.argumentName = Validate.notEmpty(argumentName);
 
     setPermission(Permissions.GUILD);
+    setDescription("Guild command, see '/help guild' for more info");
+  }
+
+  @Override
+  public String getHelpListName() {
+    return "g " + argumentName[0];
   }
 
   @Override
   protected void createCommand(BrigadierCommand command) {
     create(command);
   }
-
-  protected abstract void writeHelpInfo(TextWriter writer, CommandSource source);
 
   protected abstract <T extends ArgumentBuilder<CommandSource, T>> void create(T command);
 

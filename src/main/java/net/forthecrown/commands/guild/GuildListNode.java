@@ -42,7 +42,7 @@ class GuildListNode extends GuildCommandNode {
 
     result.setFooter(Footer.ofButton("/g list %s %s"));
 
-    result.setEntry((writer, entry, viewerIndex, context) -> {
+    result.setEntry((writer, entry, viewerIndex, context, it) -> {
       int members = entry.getMemberSize();
 
       User viewer = context.getOrThrow(VIEWER);
@@ -67,8 +67,8 @@ class GuildListNode extends GuildCommandNode {
   }
 
   @Override
-  protected void writeHelpInfo(TextWriter writer, CommandSource source) {
-    writer.field("list", "Lists all guilds");
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("", "Lists all guilds");
   }
 
   @Override

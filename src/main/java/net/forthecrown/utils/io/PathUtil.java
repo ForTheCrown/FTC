@@ -1,5 +1,7 @@
 package net.forthecrown.utils.io;
 
+import static java.util.regex.Pattern.CASE_INSENSITIVE;
+
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.DataResult;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -11,18 +13,25 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
+import java.util.UUID;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import org.apache.logging.log4j.Logger;
 
 public final class PathUtil {
+  private PathUtil() {}
 
-  private PathUtil() {
-  }
+  private static final Logger LOGGER = Loggers.getLogger();
 
-  private static final Logger LOGGER = FTC.getLogger();
+  public static final Pattern UUID_PATTERN
+      = Pattern.compile(
+          "[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}",
+          CASE_INSENSITIVE
+        );
 
   /**
    * Gets the plugin's data folder
@@ -278,6 +287,31 @@ public final class PathUtil {
           exc.getMessage()
       );
     }
+  }
+
+  public static boolean isFilenameUUID(Path path) {
+    return UUID_PATTERN.matcher(path.getFileName().toString()).find();
+  }
+
+  public static DataResult<UUID> getFilenameUUID(Path path) {
+    var matcher = UUID_PATTERN.matcher(path.getFileName().toString());
+    var arr = matcher.results()
+        .map(result -> UUID.fromString(result.group()))
+        .toArray(UUID[]::new);
+
+    if (arr.length < 1) {
+      return Results.errorResult("File %s is not a UUID file", path);
+    }
+
+    if (arr.length > 1) {
+      return Results.partialResult(
+          arr[0],
+          "Path %s contained more than 1 UUID",
+          path
+      );
+    }
+
+    return DataResult.success(arr[0]);
   }
 
   /* ---------------------------- SUB CLASSES ----------------------------- */

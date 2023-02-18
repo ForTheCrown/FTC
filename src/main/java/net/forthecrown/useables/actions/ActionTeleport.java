@@ -10,7 +10,7 @@ import net.forthecrown.grenadier.types.args.Argument;
 import net.forthecrown.grenadier.types.args.ParsedArgs;
 import net.forthecrown.grenadier.types.pos.Position;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
-import net.forthecrown.useables.ActionHolder;
+import net.forthecrown.useables.Usable;
 import net.forthecrown.useables.ConstructType;
 import net.forthecrown.useables.UsableConstructor;
 import net.forthecrown.useables.UsageAction;
@@ -25,10 +25,10 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
-public class ActionTeleport extends UsageAction {
+public class  ActionTeleport extends UsageAction {
 
-  private static final Argument<Position> POS_ARG = Argument.builder("pos",
-          PositionArgument.position())
+  private static final Argument<Position> POS_ARG
+      = Argument.builder("pos", PositionArgument.position())
       .setDefaultValue(Position.SELF)
       .build();
 
@@ -41,7 +41,8 @@ public class ActionTeleport extends UsageAction {
 
   // --- TYPE ---
   public static final UsageType<ActionTeleport> TYPE = UsageType.of(ActionTeleport.class)
-      .setSuggests(ARGS::listSuggestions);
+      .setSuggests(ARGS::listSuggestions)
+      .requiresInput(false);
 
   private final Location location;
 
@@ -51,7 +52,7 @@ public class ActionTeleport extends UsageAction {
   }
 
   @Override
-  public void onUse(Player player, ActionHolder holder) {
+  public void onUse(Player player, Usable holder) {
     var user = Users.get(player);
 
     if (!user.canTeleport()) {
@@ -88,6 +89,10 @@ public class ActionTeleport extends UsageAction {
 
     var loc = source.getLocation();
     args.get(POS_ARG).apply(loc);
+
+    if (args.has(CommandTeleportExact.WORLD)) {
+      loc.setWorld(args.get(CommandTeleportExact.WORLD));
+    }
 
     loc.setYaw(args.getOrDefault(CommandTeleportExact.YAW, loc.getYaw()));
     loc.setPitch(args.getOrDefault(CommandTeleportExact.PITCH, loc.getPitch()));

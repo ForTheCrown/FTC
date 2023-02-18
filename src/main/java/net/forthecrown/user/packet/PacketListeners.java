@@ -6,7 +6,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Map;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnDisable;
 import net.forthecrown.utils.VanillaAccess;
 import net.minecraft.network.protocol.Packet;
@@ -17,9 +17,10 @@ import org.bukkit.entity.Player;
 
 public class PacketListeners {
 
-  static final Logger LOGGER = FTC.getLogger();
+  static final Logger LOGGER = Loggers.getLogger();
 
-  private static final Map<Class, PacketHandlerList> HANDLER_LISTS = new Object2ObjectOpenHashMap<>();
+  private static final Map<Class<?>, PacketHandlerList<?>> handlerLists
+      = new Object2ObjectOpenHashMap<>();
 
   /**
    * The tag of vanilla packet handler that the packet listener is placed before
@@ -53,7 +54,7 @@ public class PacketListeners {
           "Packet listeners must have 2 parameters, the packet and a PacketCall"
       );
 
-      Class[] params = m.getParameterTypes();
+      Class<?>[] params = m.getParameterTypes();
 
       // Validate parameter types
       Validate.isTrue(
@@ -68,14 +69,43 @@ public class PacketListeners {
       // Validate that the return type is void
       Validate.isTrue(m.getReturnType() == Void.TYPE, "Packet listener method must return void");
 
-      // Get the handler list for the packet type
-      PacketHandlerList list = HANDLER_LISTS.computeIfAbsent(params[0], PacketHandlerList::new);
-      PacketExecutor executor = new PacketExecutor(handler.priority(), handler.ignoreCancelled(),
-          listener, m);
+      @SuppressWarnings("unchecked") // This is very much checked
+      Class<? extends Packet<?>> packetClass
+          = (Class<? extends Packet<?>>) params[0];
 
-      // Add executor
-      list.addExecutor(executor);
+      registerListener(packetClass, handler, listener, m);
     }
+  }
+
+  private static <T extends Packet<?>> void registerListener(
+      Class<T> type,
+      PacketHandler handler,
+      PacketListener listener,
+      Method method
+  ) {
+    PacketHandlerList<T> list = getOrCreateList(type);
+
+    PacketExecutor<T> executor = new PacketExecutor<>(
+        handler.priority(),
+        handler.ignoreCancelled(),
+        listener,
+        method
+    );
+
+    // Add executor
+    list.addExecutor(executor);
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <T extends Packet<?>> PacketHandlerList<T> getOrCreateList(
+      Class<T> type
+  ) {
+    var list = handlerLists.computeIfAbsent(
+        type,
+        aClass -> new PacketHandlerList<>(type)
+    );
+
+    return (PacketHandlerList<T>) list;
   }
 
   /**
@@ -84,11 +114,11 @@ public class PacketListeners {
    * @param listener The listener to unregister
    */
   public static void unregister(PacketListener listener) {
-    for (var v : HANDLER_LISTS.values()) {
+    for (var v : handlerLists.values()) {
       v.removeAll(listener.getClass());
     }
 
-    HANDLER_LISTS.entrySet().removeIf(entry -> entry.getValue().isEmpty());
+    handlerLists.entrySet().removeIf(entry -> entry.getValue().isEmpty());
   }
 
   /**
@@ -134,8 +164,9 @@ public class PacketListeners {
    * @param player The player the packet affects
    * @return True, if the packet was cancelled, false otherwise
    */
+  @SuppressWarnings({"rawtypes", "unchecked"})
   static PacketCall call(Packet packet, Player player) {
-    PacketHandlerList list = HANDLER_LISTS.get(packet.getClass());
+    PacketHandlerList list = handlerLists.get(packet.getClass());
 
     if (list == null) {
       return null;
@@ -153,5 +184,4 @@ public class PacketListeners {
       uninject(p);
     }
   }
-
 }

@@ -117,19 +117,21 @@ public enum UnlockableSetting implements Unlockable {
                         NamedTextColor.GRAY
                     )
                 );
-              } else {
-                var guild = context.getOrThrow(GUILD);
 
-                if (!(click.getCursorItem().getItemMeta() instanceof BannerMeta)) {
-                  throw Exceptions.NOT_A_BANNER;
-                }
-
-                guild.getSettings().setBanner(click.getCursorItem());
-
-                click.getInventory().setItem(slot, (ItemStack) null);
-                click.shouldReloadMenu(true);
-                click.cancelEvent(false);
+                return;
               }
+
+              var guild = context.getOrThrow(GUILD);
+
+              if (!(cursor.getItemMeta() instanceof BannerMeta)) {
+                throw Exceptions.NOT_A_BANNER;
+              }
+
+              guild.getSettings().setBanner(cursor);
+
+              click.getInventory().setItem(slot, (ItemStack) null);
+              click.shouldReloadMenu(true);
+              click.cancelEvent(false);
             });
           })
 

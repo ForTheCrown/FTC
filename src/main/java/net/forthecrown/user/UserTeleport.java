@@ -108,7 +108,7 @@ public class UserTeleport {
    * If {@link #isDelayed()} == false, It will instantly skip to {@link #complete()}.
    */
   public void start() {
-    int tpDelay = getTpDelay();
+    int tpDelay = getTpDelay() * 20; // JULIE U FUCKING IDIOT
 
     if (!delayed || tpDelay <= 0) {
       delayed = false;
@@ -135,8 +135,7 @@ public class UserTeleport {
       return 0;
     }
 
-    return perm.getTier(false, getUser())
-        .orElse(perm.getRange().getMaximum());
+    return perm.getTier(getUser()).orElse(perm.getMaxTier());
   }
 
   /**
@@ -188,7 +187,9 @@ public class UserTeleport {
       if (GeneralConfig.useAsyncTpForPlayers && async) {
         player.teleportAsync(dest);
       } else {
-        player.teleport(dest);
+        // Ignore passengers and dismount the player if they're riding
+        // another entity
+        player.teleport(dest, true, true);
       }
       user.playSound(Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
 

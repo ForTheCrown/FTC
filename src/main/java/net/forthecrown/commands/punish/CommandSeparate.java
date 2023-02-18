@@ -15,6 +15,8 @@ public class CommandSeparate extends FtcCommand {
     super("seperate");
 
     setPermission(Permissions.PUNISH_SEPARATE);
+    setDescription("Seperates/unseparates 2 players");
+
     register();
   }
 
@@ -32,6 +34,11 @@ public class CommandSeparate extends FtcCommand {
    *
    * Main Author: Julie
    */
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("<user 1> <user 2>", "Separates/unseparates 2 players");
+  }
 
   @Override
   protected void createCommand(BrigadierCommand command) {

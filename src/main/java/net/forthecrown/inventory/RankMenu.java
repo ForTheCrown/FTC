@@ -9,6 +9,7 @@ import lombok.Getter;
 import net.forthecrown.user.User;
 import net.forthecrown.user.data.RankTier;
 import net.forthecrown.user.data.UserRank;
+import net.forthecrown.user.data.UserRanks;
 import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.context.ContextOption;
 import net.forthecrown.utils.context.ContextSet;
@@ -30,12 +31,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public final class RankMenu {
+  /** The decorated slots next to the header */
   private static final Slot[] DECORATED_SLOTS = {
       Slot.of(3, 0),
       Slot.of(5, 0),
       Slot.of(4, 5),
   };
 
+  // Context required to represent the 'extra ranks' menu's page
   private static final ContextSet SET = ContextSet.create();
   private static final ContextOption<Integer> PAGE = SET.newOption(0);
 
@@ -45,7 +48,9 @@ public final class RankMenu {
   private final RankPage[] menus = new RankPage[RankTier.values().length];
 
   private RankMenu() {
+    // Initialize menus
     for (int i = 0; i < menus.length; i++) {
+      // NONE tier doesn't get a menu lol
       if (i == RankTier.NONE.ordinal()) {
         continue;
       }
@@ -70,14 +75,15 @@ public final class RankMenu {
   }
 
   public static List<UserRank> getExtraRanks(User user, RankTier tier) {
-    return user.getTitles().getAvailable()
+    return tier.getTitles()
         .stream()
         .filter(rank -> {
-          if (rank.isDefaultTitle() || rank.getMenuSlot() != null) {
+          if (rank.getMenuSlot() != null) {
             return false;
           }
 
-          return rank.getTier() == tier;
+          boolean has = user.getTitles().hasTitle(rank);
+          return has || !rank.isHidden();
         })
         .collect(Collectors.toList());
   }
@@ -130,6 +136,8 @@ public final class RankMenu {
 
               .build()
       );
+
+      builder.add(4, 5, UserRanks.DEFAULT.getMenuNode());
     }
 
     private void fillMenu(MenuBuilder builder, RankTier tier) {

@@ -9,8 +9,8 @@ import java.util.Objects;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.Getter;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.Permissions;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.grenadier.CmdUtil;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.user.ComponentType;
@@ -22,13 +22,9 @@ import net.forthecrown.utils.text.Text;
 import net.forthecrown.waypoint.Waypoint;
 import net.forthecrown.waypoint.WaypointManager;
 import net.forthecrown.waypoint.Waypoints;
-import org.apache.logging.log4j.Logger;
 import org.bukkit.Location;
 
 public class UserHomes extends UserComponent {
-
-  private static final Logger LOGGER = FTC.getLogger();
-
   /* ----------------------------- CONSTANTS ------------------------------ */
 
   /**
@@ -131,14 +127,36 @@ public class UserHomes extends UserComponent {
    * @return Whether the user is allowed to create new homes
    */
   public boolean canMakeMore() {
-    return size() < Permissions.MAX_HOMES.getTier(true, user)
-        .orElse(Permissions.MAX_HOMES.getRange().getMaximum());
+    return size() < getMaxHomes();
+  }
+
+  public int getMaxHomes() {
+    var perm = Permissions.MAX_HOMES;
+    return perm.getTier(user).orElse(perm.getMinTier());
+  }
+
+  public void removeOverMax() {
+    if (Permissions.MAX_HOMES.hasUnlimited(user)) {
+      return;
+    }
+
+    homes.entrySet().removeIf(home -> {
+      int size = homes.size();
+
+      if (size > getMaxHomes()) {
+        Loggers.getLogger().debug("Removing home {} from {}, over max",
+            home.getKey(), user
+        );
+
+        return true;
+      }
+
+      return false;
+    });
   }
 
   /**
    * Gets whether the user has any homes at all
-   *
-   * @return Just get a hoos
    */
   public boolean isEmpty() {
     return homes.isEmpty();
@@ -203,6 +221,8 @@ public class UserHomes extends UserComponent {
 
   @Override
   public JsonObject serialize() {
+    removeOverMax();
+
     if (homes.isEmpty()) {
       return null;
     }
@@ -240,31 +260,24 @@ public class UserHomes extends UserComponent {
     for (Map.Entry<String, JsonElement> e : json.entrySet()) {
       homes.put(e.getKey(), JsonUtils.readLocation(e.getValue().getAsJsonObject()));
     }
+    removeOverMax();
   }
 
   /**
    * Suggests the homes this component holds
-   *
-   * @param builder         The builder to suggest to
-   * @param prependUsername Whether to add the user's name onto the beginning of the suggestions
+   * @param builder The builder to suggest to
    */
-  public void suggestHomeNames(SuggestionsBuilder builder, boolean prependUsername) {
+  public void suggestHomeNames(SuggestionsBuilder builder) {
     var token = builder.getRemainingLowerCase();
-    var prefix = prependUsername ? getUser().getNickOrName() + ":" : "";
 
     for (var e : homes.entrySet()) {
-      var name = prefix + e.getKey();
+      var name = e.getKey();
 
       if (CompletionProvider.startsWith(token, name)) {
         var l = e.getValue();
 
         // Suggest name with the location as the hover text
-        builder.suggest(
-            name,
-            CmdUtil.toTooltip(
-                Text.prettyLocation(l, true)
-            )
-        );
+        builder.suggest(name, CmdUtil.toTooltip(Text.prettyLocation(l, true)));
       }
     }
   }

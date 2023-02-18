@@ -76,7 +76,9 @@ public class AfkKicker {
       }
 
       if (!player.isAfk()) {
-        player.afk(Messages.autoAfkReason());
+        Tasks.runSync(() -> {
+          player.afk(Messages.autoAfkReason());
+        });
       }
 
       stage = Stage.AWAITING_KICK;

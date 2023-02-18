@@ -18,7 +18,7 @@ import net.forthecrown.guilds.Guild;
 import net.forthecrown.user.data.TimeField;
 import net.forthecrown.user.data.UserInteractions;
 import net.forthecrown.user.data.UserRanks;
-import net.forthecrown.user.data.UserTitles;
+import net.forthecrown.user.data.RanksComponent;
 import net.forthecrown.user.property.Properties;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.TextInfo;
@@ -137,7 +137,7 @@ public class UserFormat {
 
   private void writeContents(TextWriter writer) {
     UserInteractions inter = user.getInteractions();
-    UserTitles titles = user.getTitles();
+    RanksComponent titles = user.getTitles();
     var time = user.getTimeTracker();
 
     // Real name if nickname or TAB_NAME is set

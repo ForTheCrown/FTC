@@ -30,11 +30,11 @@ public interface FtcInventory extends Inventory {
     setItem(pos.getIndex(), itemStack);
   }
 
-  default void setItem(Slot pos, BaseItemBuilder builder) {
+  default void setItem(Slot pos, BaseItemBuilder<?> builder) {
     setItem(pos.getIndex(), builder.build());
   }
 
-  default void setItem(int slot, BaseItemBuilder builder) {
+  default void setItem(int slot, BaseItemBuilder<?> builder) {
     setItem(slot, builder.build());
   }
 

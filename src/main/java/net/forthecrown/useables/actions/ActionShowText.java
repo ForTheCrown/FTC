@@ -4,7 +4,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.useables.ActionHolder;
+import net.forthecrown.useables.Usable;
 import net.forthecrown.useables.ConstructType;
 import net.forthecrown.useables.UsableConstructor;
 import net.forthecrown.useables.UsageAction;
@@ -17,7 +17,8 @@ import org.bukkit.entity.Player;
 
 public class ActionShowText extends UsageAction {
 
-  public static final UsageType<ActionShowText> TYPE = UsageType.of(ActionShowText.class)
+  public static final UsageType<ActionShowText> TYPE
+      = UsageType.of(ActionShowText.class)
       .setSuggests(Arguments.CHAT::listSuggestions);
 
   private final Component text;
@@ -28,7 +29,7 @@ public class ActionShowText extends UsageAction {
   }
 
   @Override
-  public void onUse(Player player, ActionHolder holder) {
+  public void onUse(Player player, Usable holder) {
     player.sendMessage(text);
   }
 

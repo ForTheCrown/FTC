@@ -15,7 +15,8 @@ public class ItemModCommands extends CmdUtil {
       new ItemLoreNode(),
       new ItemNameNode(),
       new ItemDataNode(),
-      new ItemAttributeNode()
+      new ItemAttributeNode(),
+      new ItemCooldownNode()
   };
 
   public static void createCommands() {
@@ -29,6 +30,14 @@ public class ItemModCommands extends CmdUtil {
 
       setAliases("itemstacks", "itemstack", "item");
       setPermission(PERMISSION);
+    }
+
+    @Override
+    public void populateUsages(UsageFactory factory) {
+      for (var n: NODES) {
+        var prefixed = factory.withPrefix(n.getArgumentName());
+        n.populateUsages(prefixed);
+      }
     }
 
     @Override

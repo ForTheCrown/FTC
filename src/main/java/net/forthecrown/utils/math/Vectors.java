@@ -2,11 +2,13 @@ package net.forthecrown.utils.math;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.TypeAdapter;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector2;
 import com.sk89q.worldedit.math.Vector3;
 import lombok.experimental.UtilityClass;
+import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.DoubleTag;
@@ -123,7 +125,15 @@ public class Vectors {
    */
   public final int CHUNK_SIZE = 1 << CHUNK_BITS;
 
-  /* ----------------------------- WORLD EDIT CONVERSIONS ------------------------------ */
+  /* --------------------------- TYPE ADAPTERS ---------------------------- */
+
+  public static final TypeAdapter<Vector3i> V3I_ADAPTER
+      = JsonUtils.createAdapter(Vectors::writeJson, Vectors::read3i);
+
+  public static final TypeAdapter<Vector3d> V3D_ADAPTER
+      = JsonUtils.createAdapter(Vectors::writeJson, Vectors::read3d);
+
+  /* ----------------------- WORLD EDIT CONVERSIONS ----------------------- */
 
   public Vector3i from(BlockVector3 v) {
     return Vector3i.from(v.getX(), v.getY(), v.getZ());
@@ -145,7 +155,7 @@ public class Vectors {
     double x = v.x();
     double z = v.z();
     double atan2 = TrigMath.atan2(-x, z);
-    return Math.toDegrees((atan2 + TrigMath.TWO_PI) % +TrigMath.TWO_PI);
+    return Math.toDegrees((atan2 + TrigMath.TWO_PI) % TrigMath.TWO_PI);
   }
 
   public double getPitch(Vector3d v) {
@@ -220,9 +230,9 @@ public class Vectors {
     // ^ Short way of saying I do not understand this at all lol
     // All I know is it packs coordinates, so it uses less space
     // and works for what I need
-    return (((long) v.x() & 67108863L) << 38)
-        | (((long) v.y() & 4095L))
-        | (((long) v.z() & 67108863L) << 12);
+    return (((long) v.x() & 0x3FFFFFF) << 38)
+         | (((long) v.y() & 0xFFF))
+         | (((long) v.z() & 0x3FFFFFF) << 12);
   }
 
   public Vector3i fromLong(long l) {

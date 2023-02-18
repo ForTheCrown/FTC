@@ -76,6 +76,23 @@ public class ItemAttributeNode extends ItemModifierNode {
   }
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("clear")
+        .addInfo("Clears the item's Attribute Modifiers");
+
+    factory.usage("remove <attribute>")
+        .addInfo("Removes all modifiers which modify the")
+        .addInfo("<attribute> value");
+
+    factory.usage("remove attr <attribute>")
+        .addInfo("Same as above");
+
+    factory.usage("remove slot <equipment slot>")
+        .addInfo("Removes all modifiers which apply to the")
+        .addInfo("<equipment slot>");
+  }
+
+  @Override
   public void create(LiteralArgumentBuilder<CommandSource> command) {
     command
         .then(literal("clear")

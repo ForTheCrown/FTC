@@ -18,7 +18,8 @@ public final class FtcFlags {
 
   public static final StateFlag
       SHOP_CREATION = new StateFlag("shop-creation", true),
-      TRAPDOOR_USE = new StateFlag("trapdoor-use", true);
+      TRAPDOOR_USE = new StateFlag("trapdoor-use", true),
+      SWORD_UPGRADE_USE = new StateFlag("sword-upgrade-usage", true);
 
   static void init() {
     FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
@@ -26,6 +27,7 @@ public final class FtcFlags {
     try {
       registry.register(SHOP_CREATION);
       registry.register(TRAPDOOR_USE);
+      registry.register(SWORD_UPGRADE_USE);
     } catch (FlagConflictException e) {
       e.printStackTrace();
     }
@@ -34,7 +36,8 @@ public final class FtcFlags {
   public static <T> T query(Location pos, Flag<T> flag) {
     return WorldGuard.getInstance()
         .getPlatform()
-        .getRegionContainer().createQuery()
+        .getRegionContainer()
+        .createQuery()
         .queryValue(BukkitAdapter.adapt(pos), null, flag);
   }
 }

@@ -25,6 +25,7 @@ public class GuildCommands {
       new GuildChunkNode(),
 
       new GuildChatNode(),
+      new GuildInventoryNode(),
 
       new GuildCreateNode(),
       new GuildDeleteNode(),
@@ -50,6 +51,19 @@ public class GuildCommands {
       setAliases("g");
 
       register();
+    }
+
+    @Override
+    public void populateUsages(UsageFactory factory) {
+      for (var n: NODES) {
+        for (var name: n.getArgumentName()) {
+          var prefixed = factory.withPrefix(name)
+              .withPermission(n.getPermission());
+
+          n.populateUsages(prefixed);
+          break;
+        }
+      }
     }
 
     @Override

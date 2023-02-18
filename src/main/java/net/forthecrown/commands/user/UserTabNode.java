@@ -17,6 +17,14 @@ class UserTabNode extends UserCommandNode {
   }
 
   @Override
+  void createUsages(UsageFactory factory) {
+    var prefixed = factory.withPrefix("<prefix | suffix | tabName>");
+    prefixed.usage("", "Shows the current value");
+    prefixed.usage("-clears", "Clears the value");
+    prefixed.usage("<text>", "Sets the value");
+  }
+
+  @Override
   protected <T extends ArgumentBuilder<CommandSource, T>> void create(T command,
                                                                       UserProvider provider
   ) {

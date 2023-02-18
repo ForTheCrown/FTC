@@ -27,7 +27,21 @@ public class CommandSpecificGameMode extends FtcCommand {
     this.gameMode = mode;
 
     setPermission(permission);
+    setDescription("Sets your gamemode to " + mode.name().toLowerCase());
+
     register();
+  }
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("")
+        .addInfo("Sets your gamemode to %s", gameMode.name().toLowerCase());
+
+    factory.usage("<player>")
+        .addInfo(
+            "Sets a <player>'s gamemode to %s",
+            gameMode.name().toLowerCase()
+        );
   }
 
   @Override

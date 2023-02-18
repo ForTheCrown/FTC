@@ -17,7 +17,8 @@ public class UserCommands extends CmdUtil {
       new UserTitlesNode(),
       new UserCosmeticsNode(),
       new UserEarningsNode(),
-      new UserTabNode()
+      new UserTabNode(),
+      new UserAltNode()
   };
 
   public static void createCommands() {
@@ -31,6 +32,14 @@ public class UserCommands extends CmdUtil {
 
       setAliases("users", "user");
       setPermission(PERMISSION);
+    }
+
+    @Override
+    public void populateUsages(UsageFactory factory) {
+      var prefixed = factory.withPrefix("<user>");
+      for (var n: NODES) {
+        n.createUsages(prefixed.withPrefix(n.argumentName));
+      }
     }
 
     @Override

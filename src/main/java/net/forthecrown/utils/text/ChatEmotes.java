@@ -7,7 +7,6 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import net.forthecrown.core.module.OnEnable;
 import net.forthecrown.grenadier.CmdUtil;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.kyori.adventure.text.Component;
@@ -17,15 +16,12 @@ import net.kyori.adventure.text.TextReplacementConfig;
  * Stores, formats and provides suggestions for emotes
  */
 public final class ChatEmotes {
-
-  private ChatEmotes() {
-  }
+  private ChatEmotes() {}
 
   public static final char EMOTE_CHAR = ':';
   public static final Map<String, Component> TOKEN_2_EMOTE = new HashMap<>();
 
-  @OnEnable
-  static void init() {
+  static {
     register("shrug", "¯\\_(ツ)_/¯");
     register("ughcry", "(ಥ﹏ಥ)");
     register("hug", "༼ つ ◕_◕ ༽つ");
@@ -43,6 +39,7 @@ public final class ChatEmotes {
     register("fedup", "(¬_¬)");
     register("reallysad", "(◉︵◉ )");
     register("heart", HEART);
+    register("skull", "☠");
   }
 
   private static void register(String key, String emote) {
@@ -69,7 +66,9 @@ public final class ChatEmotes {
     return result;
   }
 
-  public static CompletableFuture<Suggestions> addSuggestions(SuggestionsBuilder builder) {
+  public static CompletableFuture<Suggestions> addSuggestions(
+      SuggestionsBuilder builder
+  ) {
     var token = builder.getRemainingLowerCase();
 
     for (var e : TOKEN_2_EMOTE.entrySet()) {

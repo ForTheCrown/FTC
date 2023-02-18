@@ -39,6 +39,12 @@ public abstract class CommandEmote extends FtcCommand {
   }
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("", "Emotes on yourself");
+    factory.usage("<player>", "Emotes on a player");
+  }
+
+  @Override
   protected void createCommand(BrigadierCommand command) {
     command
         .executes(c -> executeSelf(getUserSender(c)))

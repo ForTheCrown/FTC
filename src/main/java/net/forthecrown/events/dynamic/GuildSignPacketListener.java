@@ -2,7 +2,7 @@ package net.forthecrown.events.dynamic;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.guilds.Guild;
 import net.forthecrown.guilds.GuildMessage;
 import net.forthecrown.guilds.menu.GuildMenus;
@@ -24,11 +24,10 @@ import org.bukkit.entity.Player;
 @RequiredArgsConstructor
 public class GuildSignPacketListener implements PacketListener {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   // Literally copied and pasted from the packet listener class
-  private static final int MAX_SIGN_LINE_LENGTH = Integer.getInteger("Paper.maxSignLength",
-      80); // Paper
+  private static final int MAX_SIGN_LINE_LENGTH = Integer.getInteger("Paper.maxSignLength", 80); // Paper
 
   private final User user;
   private final Guild guild;

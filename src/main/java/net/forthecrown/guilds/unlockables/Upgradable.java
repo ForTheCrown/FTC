@@ -1,5 +1,7 @@
 package net.forthecrown.guilds.unlockables;
 
+import static net.forthecrown.guilds.GuildSettings.UNLIMITED_CHUNKS;
+import static net.forthecrown.guilds.GuildSettings.UNLIMITED_MEMBERS;
 import static net.forthecrown.guilds.menu.GuildMenus.GUILD;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -12,12 +14,14 @@ import net.forthecrown.guilds.Guild;
 import net.forthecrown.guilds.GuildManager;
 import net.forthecrown.guilds.GuildMember;
 import net.forthecrown.guilds.GuildPermission;
+import net.forthecrown.guilds.GuildSettings;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.ThrowingRunnable;
-import net.forthecrown.utils.inventory.ItemStacks;
-import net.forthecrown.utils.inventory.menu.MenuNode;
-import net.forthecrown.utils.inventory.menu.ClickContext;
 import net.forthecrown.utils.context.Context;
+import net.forthecrown.utils.inventory.ItemStacks;
+import net.forthecrown.utils.inventory.menu.ClickContext;
+import net.forthecrown.utils.inventory.menu.MenuNode;
+import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -110,7 +114,18 @@ public enum Upgradable implements Unlockable {
 
   @Override
   public boolean isUnlocked(Guild guild) {
+    if (hasAdminOverride(guild)) {
+      return true;
+    }
+
     return getExpProgress(guild) == expRequiredPerLvl.getInt(expRequiredPerLvl.size() - 1);
+  }
+
+  private boolean hasAdminOverride(Guild guild) {
+    GuildSettings settings = guild.getSettings();
+
+    return (this == MAX_MEMBERS && settings.hasFlags(UNLIMITED_MEMBERS))
+        || (this == MAX_CHUNKS && settings.hasFlags(UNLIMITED_CHUNKS));
   }
 
   @Override
@@ -156,6 +171,27 @@ public enum Upgradable implements Unlockable {
     return limitPerLvl.getInt(index);
   }
 
+  private Component currentAmountText(Guild guild) {
+    int currentAmount = getCurrentAmount.apply(guild);
+    int limit = currentLimit(guild);
+
+    if (this == GUILD_CHEST_SIZE) {
+      return Text.format("Current size: {0, number} / {1, number}",
+          currentAmount, limit
+      );
+    }
+
+    if (hasAdminOverride(guild)) {
+      return Text.format("Current amount: {0, number}",
+          currentAmount
+      );
+    }
+
+    return Text.format("Current amount: {0, number} / {1, number}",
+        currentAmount, limit
+    );
+  }
+
   @Override
   public MenuNode toInvOption() {
     return MenuNode.builder()
@@ -169,11 +205,11 @@ public enum Upgradable implements Unlockable {
 
           ItemMeta meta = item.getItemMeta();
           List<Component> lore = meta.lore();
-          lore.add(Component.text((this == GUILD_CHEST_SIZE ?
-                  "Current size: " + getCurrentAmount.apply(guild) :
-                  "Current amount: " + getCurrentAmount.apply(guild) + "/" + currentLimit(guild)))
-              .color(NamedTextColor.GRAY)
-              .decoration(TextDecoration.ITALIC, false));
+          lore.add(
+              currentAmountText(guild)
+                  .color(NamedTextColor.GRAY)
+                  .decoration(TextDecoration.ITALIC, false)
+          );
 
           if (!this.isUnlocked(guild)) {
             lore.add(2,
@@ -202,16 +238,8 @@ public enum Upgradable implements Unlockable {
                       Context c,
                       ThrowingRunnable<CommandSyntaxException> r
   ) {
-    Guild guild = c.get(GUILD);
-
-    if (guild == null) {
-      return;
-    }
-
+    Guild guild = c.getOrThrow(GUILD);
     GuildMember member = guild.getMember(user.getUniqueId());
-    if (member == null) {
-      return;
-    }
 
     context.shouldReloadMenu(true);
 
@@ -220,15 +248,21 @@ public enum Upgradable implements Unlockable {
     }
 
     int currentLimit = currentLimit(guild);
+    int current = getCurrentAmount.apply(guild);
+
     int spentAmount;
 
-    // Spend all available when shift clicking
-    if (context.getClickType().isShiftClick()) {
-      spentAmount = member.spendExp(this, member.getExpAvailable());
-    }
-    // Otherwise, spend EXP_COST
-    else {
-      spentAmount = member.spendExp(this, EXP_COST);
+    if (member != null) {
+      spentAmount = member.spendExp(
+          this,
+          context.getClickType().isShiftClick()
+              ? member.getExpAvailable()
+              : EXP_COST
+      );
+    } else {
+      spentAmount = context.getClickType().isShiftClick()
+          ? currentLimit - current
+          : EXP_COST;
     }
 
     // Send user message

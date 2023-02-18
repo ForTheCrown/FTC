@@ -15,13 +15,14 @@ import java.nio.file.Path;
 import java.util.Map;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.config.ResourceWorldConfig;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnSave;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.Time;
 import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.utils.io.SerializableObject;
+import net.forthecrown.utils.io.SerializationHelper;
 import net.forthecrown.utils.math.Vectors;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.scheduler.BukkitTask;
@@ -30,7 +31,7 @@ import org.spongepowered.math.vector.Vector3i;
 @RequiredArgsConstructor
 public class ResourceWorldTracker implements SerializableObject {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   /**
    * File format used by sections, custom
@@ -205,7 +206,7 @@ public class ResourceWorldTracker implements SerializableObject {
   }
 
   private void unloadSection(McRegionPos pos) {
-    var section = nonNaturalBySection.remove(pos);
+    var section = nonNaturalBySection.get(pos);
 
     if (section == null) {
       return;
@@ -213,12 +214,13 @@ public class ResourceWorldTracker implements SerializableObject {
 
     try {
       saveSection(pos, section);
-      LOGGER.info("Unloaded RW section {}", pos);
+      Tasks.cancel(section.unloadTask);
+      nonNaturalBySection.remove(pos);
+
+      LOGGER.debug("Unloaded RW section {}", pos);
     } catch (IOException e) {
       LOGGER.error("Couldn't save section: '{}'", pos, e);
     }
-
-    Tasks.cancel(section.unloadTask);
   }
 
   /* ----------------------------- SERIALIZATION ------------------------------ */
@@ -235,6 +237,8 @@ public class ResourceWorldTracker implements SerializableObject {
       return;
     }
 
+    SerializationHelper.ensureParentExists(sectionFile);
+
     var output = Files.newOutputStream(sectionFile);
     DataOutputStream stream = new DataOutputStream(output);
 
@@ -245,9 +249,7 @@ public class ResourceWorldTracker implements SerializableObject {
 
     region.dirty = false;
 
-    if (FTC.inDebugMode()) {
-      LOGGER.info("Saved section {}", pos);
-    }
+    LOGGER.debug("Saved section {}", pos);
   }
 
   private void loadSection(McRegionPos pos, WorldRegion region) throws IOException {

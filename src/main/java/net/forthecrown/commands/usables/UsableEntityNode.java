@@ -25,6 +25,11 @@ class UsableEntityNode extends BukkitUsableNode<UsableEntity> {
   }
 
   @Override
+  protected UsageFactory prefixWithType(UsageFactory factory) {
+    return factory.withPrefix("<entity: selector>");
+  }
+
+  @Override
   protected void createNewUsableArguments(LiteralArgumentBuilder<CommandSource> command) {
     command
         .then(argument("entity", EntityArgument.entity())

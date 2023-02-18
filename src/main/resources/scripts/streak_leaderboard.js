@@ -6,7 +6,6 @@ const Worlds = Java.type("net.forthecrown.core.Worlds");
 const EventPrio = Java.type("org.bukkit.event.EventPriority");
 const StreakCategory = Java.type("net.forthecrown.core.challenge.StreakCategory");
 const StreakIncreaseEvent = Java.type("net.forthecrown.core.challenge.StreakIncreaseEvent");
-const Challenges = Java.type("net.forthecrown.core.challenge.Challenges");
 const C_Manager = Java.type("net.forthecrown.core.challenge.ChallengeManager");
 
 // No streak constant, just 0 lol
@@ -52,7 +51,7 @@ function scanStreaks() {
     const entries = C_Manager.getInstance().getEntries();
 
     entries.forEach(entry => {
-        let streak = Challenges.queryStreak(StreakCategory.ITEMS, entry.getUser()).orElse(0);
+        let streak = entry.getStreak(StreakCategory.ITEMS).get();
 
         if (streak == NO_STREAK) {
             return;

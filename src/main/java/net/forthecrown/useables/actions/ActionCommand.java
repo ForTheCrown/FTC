@@ -7,7 +7,7 @@ import lombok.Getter;
 import net.forthecrown.commands.manager.FtcSuggestions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Suggester;
-import net.forthecrown.useables.ActionHolder;
+import net.forthecrown.useables.Usable;
 import net.forthecrown.useables.ConstructType;
 import net.forthecrown.useables.UsableConstructor;
 import net.forthecrown.useables.UsageAction;
@@ -17,6 +17,7 @@ import net.kyori.adventure.text.Component;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,6 +38,9 @@ public class ActionCommand extends UsageAction {
     return FtcSuggestions.COMMAND_SUGGESTIONS.getSuggestions(context, builder);
   };
 
+  private static final CommandSender SILENT_SENDER
+      = Bukkit.createCommandSender(component -> {});
+
   // --- TYPE ---
   public static final UsageType<ActionCommand> TYPE_PLAYER = UsageType.of(ActionCommand.class)
       .setSuggests(COMMAND_SUGGESTIONS);
@@ -55,11 +59,14 @@ public class ActionCommand extends UsageAction {
   }
 
   @Override
-  public void onUse(Player player, ActionHolder holder) {
+  public void onUse(Player player, Usable holder) {
     String command = replaceSelectors(player.getName(), this.command);
 
     Bukkit.dispatchCommand(
-        server ? Bukkit.getConsoleSender() : player,
+        server
+            ? (holder.isSilent() ? SILENT_SENDER : Bukkit.getConsoleSender())
+            : player,
+
         command
     );
   }
@@ -84,11 +91,19 @@ public class ActionCommand extends UsageAction {
   // --- TYPE CONSTRUCTORS ---
 
   @UsableConstructor(ConstructType.PARSE)
-  public static ActionCommand parse(UsageType<ActionCommand> type, StringReader reader,
+  public static ActionCommand parse(UsageType<ActionCommand> type,
+                                    StringReader reader,
                                     CommandSource source
   ) throws CommandSyntaxException {
     String result = reader.getRemaining();
     reader.setCursor(reader.getTotalLength());
+
+    if (result.startsWith("/")) {
+      source.sendMessage(
+          "Command starts with '/', this isn't required for most commands"
+              + "\n(Is this intentional?)"
+      );
+    }
 
     return new ActionCommand(type, result);
   }

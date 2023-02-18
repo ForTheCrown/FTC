@@ -1,8 +1,10 @@
 package net.forthecrown.core.challenge;
 
-import lombok.AllArgsConstructor;
+import com.google.common.base.Strings;
+import java.util.function.Consumer;
 import lombok.Getter;
-import net.forthecrown.core.FTC;
+import lombok.RequiredArgsConstructor;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.script2.Script;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.entity.Player;
@@ -16,19 +18,18 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ScriptEventListener implements Listener, EventExecutor {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   Script script;
 
+  final String[] args;
   final ChallengeHandle handle;
 
   @Override
-  public void execute(@NotNull Listener listener,
-                      @NotNull Event event
-  ) {
+  public void execute(@NotNull Listener listener, @NotNull Event event) {
     if (event instanceof Cancellable cancellable
         && cancellable.isCancelled()
     ) {
@@ -76,6 +77,7 @@ public class ScriptEventListener implements Listener, EventExecutor {
           "{}: No result returned by getPlayer in script!",
           script
       );
+
       return null;
     }
 
@@ -100,5 +102,43 @@ public class ScriptEventListener implements Listener, EventExecutor {
     );
 
     return null;
+  }
+
+  public void consumeScript(Consumer<Script> consumer) {
+    if (script == null || !script.isCompiled()) {
+      return;
+    }
+
+    consumer.accept(script);
+  }
+
+  public void reloadScript(String path) {
+    if (Strings.isNullOrEmpty(path)) {
+      return;
+    }
+
+    if (script == null) {
+      script = Script.of(path).compile();
+    } else {
+      script.compile();
+    }
+
+    if (args != null && args.length > 0) {
+      script.put("inputs", args);
+    }
+
+    script.put("_challengeHandle", handle);
+    script.put("_challenge", handle.getChallenge());
+
+    script.eval();
+  }
+
+  public void closeScript() {
+    if (script == null) {
+      return;
+    }
+
+    script.close();
+    script = null;
   }
 }

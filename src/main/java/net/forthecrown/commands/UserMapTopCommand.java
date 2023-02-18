@@ -28,6 +28,7 @@ public class UserMapTopCommand extends FtcCommand {
 
   private final UUID2IntMap map;
   private final PageFormat<UUID2IntMap.Entry> format;
+  private final Component title;
 
   public UserMapTopCommand(String name,
                            UUID2IntMap map,
@@ -51,6 +52,7 @@ public class UserMapTopCommand extends FtcCommand {
     super(name);
 
     this.map = map;
+    this.title = title;
 
     // Create format
     this.format = PageFormat.create();
@@ -72,7 +74,7 @@ public class UserMapTopCommand extends FtcCommand {
             })
         )
 
-        .setEntry((writer, entry, viewerIndex, context) -> {
+        .setEntry((writer, entry, viewerIndex, context, it) -> {
           writer.formatted("{0} - &e{1}",
               display.apply(entry.getUniqueId()),
               unitMaker.apply(entry.getValue())
@@ -85,6 +87,18 @@ public class UserMapTopCommand extends FtcCommand {
     // Set command data and register
     setAliases(aliases);
     register();
+  }
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    String sTitle = Text.plain(title);
+
+    factory.usage("")
+        .addInfo("Shows you the " + sTitle);
+
+    factory.usage("<page> [<page size: number(5..20)>]")
+        .addInfo("Shows you the " + sTitle + " on <page>")
+        .addInfo("If [page size] is not set, then it defaults to " + DEF_PAGE_SIZE);
   }
 
   @Override

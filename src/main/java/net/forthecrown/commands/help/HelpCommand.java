@@ -33,6 +33,7 @@ public abstract class HelpCommand extends FtcCommand {
     super(name);
 
     setPermission(Permissions.HELP);
+    simpleUsages();
   }
 
   @Override
@@ -377,7 +378,7 @@ public abstract class HelpCommand extends FtcCommand {
         User sender = getUserSender(c);
 
         var spawnWaypoint = WaypointManager.getInstance()
-            .get(WaypointConfig.spawnWaypoint);
+            .getExtensive(WaypointConfig.spawnWaypoint);
 
         var nearest = Waypoints.getColliding(sender.getPlayer());
 

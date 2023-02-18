@@ -5,8 +5,6 @@ import net.forthecrown.utils.context.Context;
 
 /**
  * Menu callback called when a menu is opened.
- * <p>
- * This callback is called before any options are placed into a menu
  */
 @FunctionalInterface
 public interface MenuOpenConsumer {
@@ -14,8 +12,9 @@ public interface MenuOpenConsumer {
   /**
    * Called when the inventory is opened
    *
-   * @param user    The user opening the inventory
-   * @param context The context the inventory is being opened with
+   * @param user      The user opening the inventory
+   * @param context   The context the inventory is being opened with
+   * @param inventory The inventory that was opened
    */
-  void onOpen(User user, Context context);
+  void onOpen(User user, Context context, MenuInventory inventory);
 }

@@ -14,6 +14,7 @@ import net.forthecrown.structure.StructureFillConfig;
 import net.forthecrown.utils.Time;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.SerializationHelper;
+import net.minecraft.nbt.CompoundTag;
 
 @Getter
 public class LevelDataStorage {
@@ -53,7 +54,7 @@ public class LevelDataStorage {
     return archiveDirectory.resolve(strPath);
   }
 
-  public void archiveLevel(DungeonLevel level, long creationTime) {
+  public void archiveLevelStructure(DungeonLevel level, long creationTime) {
     Path path = null;
     int i = 0;
 
@@ -71,6 +72,10 @@ public class LevelDataStorage {
 
     var header = structure.getHeader();
     header.putString("createdDate", JsonUtils.DATE_FORMAT.format(new Date(creationTime)));
+
+    CompoundTag levelData = new CompoundTag();
+    level.save(levelData);
+    header.put("level_data", levelData);
 
     SerializationHelper.writeTagFile(path, structure::save);
   }

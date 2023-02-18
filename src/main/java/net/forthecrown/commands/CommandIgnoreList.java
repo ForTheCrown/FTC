@@ -43,6 +43,16 @@ public class CommandIgnoreList extends FtcCommand {
    */
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("")
+        .addInfo("Shows your ignored players");
+
+    factory.usage("<player>")
+        .setPermission(Permissions.IGNORELIST_OTHERS)
+        .addInfo("Shows a <player>'s ignored players");
+  }
+
+  @Override
   protected void createCommand(BrigadierCommand command) {
     command
         .executes(c -> displayIgnored(c.getSource(), getUserSender(c)))

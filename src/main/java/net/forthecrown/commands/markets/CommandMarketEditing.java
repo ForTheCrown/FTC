@@ -18,7 +18,10 @@ public class CommandMarketEditing extends FtcCommand {
 
     setAliases("toggleshopediting", "togglemarketediting");
     setPermission(Permissions.MARKETS);
-    setDescription("Allows/disallows shop member to edit sign shops");
+    setDescription(
+        "Allows/disallows shop members to edit sign shops in your shop"
+    );
+    simpleUsages();
 
     register();
   }

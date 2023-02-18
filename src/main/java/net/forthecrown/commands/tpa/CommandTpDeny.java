@@ -16,6 +16,7 @@ public class CommandTpDeny extends FtcCommand {
     setPermission(Permissions.TPA);
     setDescription("Denies a tpa request");
     setAliases("tpadeny");
+    simpleUsages();
 
     register();
   }

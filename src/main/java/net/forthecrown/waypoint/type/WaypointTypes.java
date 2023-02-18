@@ -14,7 +14,7 @@ public @UtilityClass class WaypointTypes {
       ADMIN = register("admin", new AdminWaypoint());
 
   public final PlayerWaypointType
-      GUILD = register("guild", new PlayerWaypointType("Guild Waypoint", Waypoints.GUILD_COLUMN));
+      GUILD = register("guild", new PlayerWaypointType("Guild", Waypoints.GUILD_COLUMN));
 
   public final PlayerWaypointType
       PLAYER = register("player", new PlayerWaypointType("Player-Made", Waypoints.PLAYER_COLUMN));

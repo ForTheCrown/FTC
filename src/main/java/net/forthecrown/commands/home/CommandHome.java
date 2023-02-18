@@ -2,6 +2,8 @@ package net.forthecrown.commands.home;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.datafixers.util.Pair;
+import java.util.Collection;
+import java.util.Set;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.arguments.HomeParseResult;
 import net.forthecrown.commands.manager.Exceptions;
@@ -21,6 +23,7 @@ import org.bukkit.Location;
 import org.bukkit.util.BoundingBox;
 
 public class CommandHome extends FtcCommand {
+  public static final Set<String> HOME_KEYWORDS = Set.of("homes");
 
   public CommandHome() {
     super(UserHomes.DEFAULT);
@@ -29,6 +32,24 @@ public class CommandHome extends FtcCommand {
     setDescription("Takes you to one of your homes");
 
     register();
+  }
+
+  @Override
+  public Collection<String> createKeywords() {
+    return HOME_KEYWORDS;
+  }
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("")
+        .addInfo("Teleports you to your home named 'home'");
+
+    factory.usage("<home>")
+        .addInfo("Teleports you to <home>");
+
+    factory.usage("<player>:<home>")
+        .setPermission(Permissions.HOME_OTHERS)
+        .addInfo("Teleports to the <player>'s <home>");
   }
 
   @Override

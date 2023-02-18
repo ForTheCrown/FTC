@@ -27,6 +27,11 @@ class UsableBlockNode extends BukkitUsableNode<UsableBlock> {
   }
 
   @Override
+  protected UsageFactory prefixWithType(UsageFactory factory) {
+    return factory.withPrefix("<position: x,y,z>");
+  }
+
+  @Override
   protected void createNewUsableArguments(LiteralArgumentBuilder<CommandSource> command) {
     command
         .then(argument("block_pos", getArgumentType())

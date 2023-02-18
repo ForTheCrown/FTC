@@ -24,17 +24,34 @@ import org.bukkit.permissions.Permission;
 public class CommandSelfOrUser extends FtcCommand {
 
   private final CommandFunction function;
+  private final String usageText;
 
-  private CommandSelfOrUser(String name, Permission perm, CommandFunction function,
+  private CommandSelfOrUser(String name,
+                            String desc,
+                            String usageText,
+                            Permission perm,
+                            CommandFunction function,
                             String... aliases
   ) {
     super(name);
 
-    this.permission = perm;
-    this.aliases = aliases;
     this.function = function;
+    this.usageText = usageText;
+
+    setPermission(perm);
+    setAliases(aliases);
+    setDescription(desc);
 
     register();
+  }
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("")
+        .addInfo(usageText, "yourself");
+
+    factory.usage("<player>")
+        .addInfo(usageText, "a <player>");
   }
 
   @Override
@@ -62,6 +79,8 @@ public class CommandSelfOrUser extends FtcCommand {
 
   public static void createCommands() {
     new CommandSelfOrUser("feed",
+        "Feeds yourself or a player",
+        "Feeds %s",
         Permissions.FEED,
         (user, source, self) -> {
           Player player = user.getPlayer();
@@ -79,6 +98,8 @@ public class CommandSelfOrUser extends FtcCommand {
     );
 
     new CommandSelfOrUser("heal",
+        "Heals yourself or another player",
+        "Heals %s",
         Permissions.HEAL,
         (user, source, self) -> {
           var player = user.getPlayer();
@@ -95,6 +116,8 @@ public class CommandSelfOrUser extends FtcCommand {
     );
 
     new CommandSelfOrUser("disposal",
+        "Opens a menu to dispose of items for yourself or another player",
+        "Opens a menu to dispose of items for %s",
         Permissions.DISPOSAL,
         (user, source, self) -> {
           Inventory inv = Bukkit.createInventory(null, InventoryType.DISPENSER, Messages.DISPOSAL);
@@ -106,6 +129,8 @@ public class CommandSelfOrUser extends FtcCommand {
     );
 
     new CommandSelfOrUser("repair",
+        "Repairs the item you're holding",
+        "Repairs an item held by %s",
         Permissions.REPAIR,
         (user, source, self) -> {
           ItemStack item = user.getPlayer().getInventory().getItemInMainHand();
@@ -131,6 +156,8 @@ public class CommandSelfOrUser extends FtcCommand {
     );
 
     new CommandSelfOrUser("staffchattoggle",
+        "Toggles all chat messages going to staff chat",
+        "Toggles all chat messages going to staff chat for %s",
         Permissions.STAFF_CHAT,
         new CommandFunction() {
           @Override

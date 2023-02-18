@@ -2,11 +2,13 @@ package net.forthecrown.guilds.unlockables;
 
 import static net.forthecrown.guilds.menu.GuildMenus.GUILD;
 import static net.kyori.adventure.text.Component.empty;
+import static net.kyori.adventure.text.Component.text;
 
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.FTC;
 import net.forthecrown.guilds.GuildConfig;
 import net.forthecrown.guilds.GuildPermission;
+import net.forthecrown.guilds.menu.GuildMenus;
 import net.forthecrown.utils.Time;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.inventory.menu.MenuNode;
@@ -20,11 +22,10 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemFlag;
 
 public class UnlockableDiscordRole implements Unlockable {
-  public static final UnlockableDiscordRole ROLE = new UnlockableDiscordRole();
 
   private MenuNode node;
 
-  private UnlockableDiscordRole() {
+  UnlockableDiscordRole() {
   }
 
   @Override
@@ -106,19 +107,29 @@ public class UnlockableDiscordRole implements Unlockable {
             }
 
             var roleOpt = guild.getDiscord().getRole();
-            click.shouldReloadMenu(true);
+            var page = GuildMenus.MAIN_MENU
+                .getUpgradesMenu()
+                .getDiscordMenu();
 
             if (roleOpt.isEmpty()) {
-              guild.getDiscord().createRole();
+              guild.getDiscord().createRole().whenComplete((role, throwable) -> {
+                if (throwable != null) {
+                  guild.sendMessage(text(
+                      "Failed to create role, internal error!",
+                      NamedTextColor.RED
+                  ));
 
-              guild.sendMessage(
-                  Text.format(
-                      "&e{0, user}&r created Discord role for the Guild!",
-                      NamedTextColor.GOLD,
-                      user
-                  )
-              );
+                  return;
+                }
 
+                guild.sendMessage(Text.format(
+                    "&e{0, user}&r created Discord role for the Guild!",
+                    NamedTextColor.GOLD,
+                    user
+                ));
+
+                GuildMenus.open(page, user, guild);
+              });
               return;
             }
 
@@ -126,15 +137,27 @@ public class UnlockableDiscordRole implements Unlockable {
               return;
             }
 
-            guild.getDiscord().deleteRole();
+            guild.getDiscord().deleteRole().whenComplete((unused, error) -> {
+              if (error != null) {
+                guild.sendMessage(
+                    Component.text("Failed to delete role, internal error",
+                        NamedTextColor.RED
+                    )
+                );
 
-            guild.sendMessage(
-                Text.format(
-                    "&e{0, user}&r deleted the guild's Discord role",
-                    NamedTextColor.GRAY,
-                    user
-                )
-            );
+                return;
+              }
+
+              guild.sendMessage(
+                  Text.format(
+                      "&e{0, user}&r deleted the guild's Discord role",
+                      NamedTextColor.GRAY,
+                      user
+                  )
+              );
+
+              GuildMenus.open(page, user, guild);
+            });
           });
         })
 

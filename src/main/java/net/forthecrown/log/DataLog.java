@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import org.apache.logging.log4j.Logger;
 
 @Getter
@@ -19,7 +19,7 @@ public class DataLog {
   private static final Comparator<LogEntry>
       TIME_COMPARATOR = Comparator.comparingLong(LogEntry::getDate);
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   private final LogSchema schema;
   private final List<LogEntry> entries = new ObjectArrayList<>();

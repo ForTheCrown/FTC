@@ -8,34 +8,52 @@ import com.google.gson.JsonElement;
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.EmbedBuilder;
 import github.scarsz.discordsrv.dependencies.jda.api.JDA;
+import github.scarsz.discordsrv.dependencies.jda.api.MessageBuilder;
 import github.scarsz.discordsrv.dependencies.jda.api.Permission;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Category;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.Guild.BoostTier;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.Icon;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.Icon.IconType;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Member;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.Message;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.Message.MentionType;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Role;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.Webhook;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.WebhookClient;
 import github.scarsz.discordsrv.dependencies.jda.api.managers.ChannelManager;
-import github.scarsz.discordsrv.util.WebhookUtil;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.EnumSet;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import javax.imageio.ImageIO;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
+import net.forthecrown.guilds.unlockables.DiscordUnlocks;
 import net.forthecrown.user.User;
+import net.forthecrown.utils.Util;
+import net.forthecrown.utils.io.FtcJar;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.Logger;
 
 @Getter
 public class GuildDiscord {
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   public static final String
       KEY_CHANNEL = "channelId",
       KEY_ROLE = "roleId",
+      KEY_WEBHOOK = "webhookId",
       KEY_CHANNEL_UPDATE = "lastChannelUpdate",
       KEY_ROLE_UPDATE = "lastRoleUpdate",
       KEY_ANNOUNCEMENTS = "forwardAnnouncements";
@@ -56,10 +74,20 @@ public class GuildDiscord {
         - Love, Steven
       """;
 
+  public static EnumSet<MentionType> ALLOWED_MENTIONS = Util.make(() -> {
+    var all = EnumSet.allOf(MentionType.class);
+    all.remove(MentionType.USER);
+    all.remove(MentionType.EVERYONE);
+    return all;
+  });
+
+  public static final String WEBHOOK_NAME = "Steven, the Guild Commissioner";
+
   private final Guild guild;
 
   private long channelId = NULL_ID;
   private long roleId = NULL_ID;
+  private long webhookId = NULL_ID;
 
   private long lastChannelUpdate = UNSET;
   private long lastRoleUpdate = UNSET;
@@ -135,42 +163,135 @@ public class GuildDiscord {
       return;
     }
 
-    getChannel().ifPresent(channel -> {
+    // Only forward to non archived channels
+    channelIfNotArchived().ifPresent(channel -> {
       String text = Text.toDiscord(msg);
       webHookMessage(channel, text, true);
     });
   }
 
-  public void forwardGuildChat(User sender, Component message) {
-    getChannel().ifPresent(channel -> {
-      String text = Text.toDiscord(message);
-      String name = sender.getNickOrName();
+  public void sendAnnouncement(Message message) {
+    if (!forwardAnnouncements()) {
+      return;
+    }
 
-      webHookMessage(channel, name + " **>** " + text, false);
+    channelIfNotArchived().ifPresent(channel -> {
+      webHookMessage(channel, message);
     });
   }
 
-  private void webHookMessage(TextChannel channel, String message, boolean asEmbeded) {
-    WebhookUtil.deliverMessage(
-        channel,
-        "Steven, the Guild Commissioner",
+  public void forwardGuildChat(User sender, Component message) {
+    // Only forward to non archived channels
+    channelIfNotArchived().ifPresent(channel -> {
+      String text = Text.toDiscord(message);
+      String name = Text.toDiscord(sender.getTabName());
 
-        // Avatar URL
-        getJDA().getSelfUser()
-            .getEffectiveAvatarUrl(),
+      MessageBuilder builder = new MessageBuilder();
 
-        // Dumb quick thing to quickly toggle between
-        // embedded messages and normal text messages
-        asEmbeded ? null : message,
-        !asEmbeded ? null : new EmbedBuilder()
-            .setTitle(message)
-            .setColor(
-                guild.getSettings()
-                    .getPrimaryColor()
-                    .getTextColor()
-                    .value()
-            )
-            .build()
+//      Silent mentioning doesn't exist in discord :(
+//      https://support.discord.com/hc/en-us/community/posts/360039210411--Suggestion-Mentioning-without-pinging
+//      It's been asked for doe lol
+//
+//      This only works on PC, on phones the mentioned user shows up as
+//      'invalid-user' Not good enough. This would've been great for guild chat
+//      so the name in the message would actually be up-to-date
+//
+//      var discordId = sender.getDiscordId();
+//      if (!Strings.isNullOrEmpty(discordId)) {
+//        Member member = getDiscordGuild().getMemberById(discordId);
+//
+//        builder.setAllowedMentions(ALLOWED_MENTIONS)
+//            .append(member);
+//      } else {
+        builder.append(name);
+//      }
+
+      builder.append(" **>** ").append(text);
+
+      webHookMessage(channel, builder.build());
+    });
+  }
+
+  private void webHookMessage(TextChannel channel,
+                              String message,
+                              boolean asEmbeded
+  ) {
+    MessageBuilder builder = new MessageBuilder();
+
+    if (asEmbeded) {
+      EmbedBuilder embedBuilder = new EmbedBuilder();
+      embedBuilder.setDescription(message);
+      builder.setEmbeds(embedBuilder.build());
+    } else {
+      builder.setContent(message);
+    }
+
+    webHookMessage(channel, builder.build());
+  }
+
+  @SuppressWarnings("unchecked")
+  private void webHookMessage(TextChannel channel, Message message) {
+    Objects.requireNonNull(message, "Message null");
+
+    if (channel == null) {
+      channel = getChannel().orElseThrow();
+    }
+
+    getOrCreateWebhook(channel)
+        .thenAccept(webhook -> {
+          WebhookClient<Void> client = (WebhookClient<Void>) webhook;
+          client.sendMessage(message)
+              .submit()
+              .exceptionally(throwable -> {
+                return null;
+              });
+        });
+  }
+
+  /* ----------------------------- WEBHOOKS ------------------------------- */
+
+  private CompletableFuture<Webhook> getOrCreateWebhook(TextChannel channel) {
+    return getWebhook().orElseGet(() -> createWebhook(channel));
+  }
+
+  private CompletableFuture<Webhook> createWebhook(TextChannel channel) {
+    var path = FtcJar.resourcePath(GuildConfig.webhookAvatarPath);
+
+    Icon icon = null;
+    try {
+      var input = Files.newInputStream(path);
+
+      var extension = FilenameUtils.getExtension(
+          path.getFileName().toString()
+      );
+      icon = Icon.from(input, IconType.fromExtension(extension));
+    } catch (IOException exc) {
+      LOGGER.error("Couldn't read icon from path {}",
+          path.toString(), exc
+      );
+    }
+
+    return channel.createWebhook(WEBHOOK_NAME)
+        .setAvatar(icon)
+        .reason("FTC: Guild webhook")
+        .submit()
+        .whenComplete((webhook, throwable) -> {
+          if (throwable == null) {
+            return;
+          }
+
+          LOGGER.error("Error creating webhook for {}", guild, throwable);
+        });
+  }
+
+  public Optional<CompletableFuture<Webhook>> getWebhook() {
+    if (webhookId == NULL_ID || getChannel().isEmpty()) {
+      return Optional.empty();
+    }
+
+    return Optional.of(
+        getJDA().retrieveWebhookById(webhookId)
+            .submit()
     );
   }
 
@@ -184,20 +305,45 @@ public class GuildDiscord {
     return Optional.ofNullable(getJDA().getRoleById(roleId));
   }
 
-  public void deleteRole() {
-    getRole().ifPresent(role -> {
-      role.delete().submit();
-      roleId = NULL_ID;
-      lastRoleUpdate = System.currentTimeMillis();
-    });
+  public CompletableFuture<Void> deleteRole() {
+    var role = getRole().orElseThrow();
+
+    return role.delete()
+        .submit()
+        .whenComplete((unused, throwable) -> {
+          if (throwable != null) {
+            LOGGER.error("Couldn't delete role of guild {}", guild, throwable);
+            return;
+          }
+
+          roleId = NULL_ID;
+          lastRoleUpdate = System.currentTimeMillis();
+        });
   }
 
-  public void createRole() {
+  public CompletableFuture<Role> createRole() {
     if (getRole().isPresent()) {
-      return;
+      return CompletableFuture.failedFuture(new NullPointerException());
     }
 
-    getDiscordGuild()
+    Icon icon = null;
+    try {
+      icon = getIcon();
+    } catch (IOException exc) {
+      LOGGER.error("Couldn't get icon for {}", guild.getId(), exc);
+    }
+
+    var discordGuild = getDiscordGuild();
+    var boost = discordGuild.getBoostTier();
+
+    if (boost == BoostTier.NONE
+        || boost == BoostTier.TIER_1
+        || DiscordUnlocks.COLOR.isUnlocked(guild) // Check if donator
+    ) {
+      icon = null;
+    }
+
+    return discordGuild
         .createRole()
         .setName("Guild: " +  guild.getName())
         .setColor(
@@ -207,9 +353,15 @@ public class GuildDiscord {
         )
         .setMentionable(true)
         .setHoisted(true)
+        .setIcon(icon)
+        .reason("FTC: Guild role")
         .submit()
         .whenComplete((role, throwable) -> {
           if (throwable != null) {
+            LOGGER.error("Error creating role for {}",
+                guild.getId(), throwable
+            );
+
             return;
           }
 
@@ -230,6 +382,21 @@ public class GuildDiscord {
         });
   }
 
+  public Icon getIcon() throws IOException {
+    var manager = GuildManager.get();
+    var storage = manager.getStorage();
+
+    var image = manager.getRenderer()
+        .renderSquare(guild.getSettings().getBanner());
+
+    storage.saveIcon(guild, image);
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    ImageIO.write(image, "png", outputStream);
+
+    byte[] bytes = outputStream.toByteArray();
+    return Icon.from(bytes, IconType.PNG);
+  }
+
   /* ----------------------------- CHANNELS ------------------------------- */
 
   public Optional<TextChannel> getChannel() {
@@ -241,8 +408,7 @@ public class GuildDiscord {
   }
 
   public Optional<TextChannel> channelIfNotArchived() {
-    return getChannel()
-        .map(channel -> isArchived(channel) ? null : channel);
+    return getChannel().filter(channel -> !isArchived(channel));
   }
 
   public static ChannelVisibility getVisibility(TextChannel channel) {
@@ -276,12 +442,11 @@ public class GuildDiscord {
         publicRole,
         visibility.allowPermissions,
         visibility.denyPermissions
-    );
+    ).submit();
   }
 
   public static boolean isArchived(TextChannel channel) {
-    return channel.getMemberPermissionOverrides()
-        .isEmpty();
+    return channel.getMemberPermissionOverrides().isEmpty();
   }
 
   public static Category guildsTextCategory() {
@@ -299,7 +464,7 @@ public class GuildDiscord {
           memberOverridePerms()
       );
 
-      var cat = action.complete();
+      var cat = action.reason("FTC: Create guild category").complete();
       GuildConfig.guildsChannelCategory = cat.getIdLong();
 
       return cat;
@@ -326,56 +491,60 @@ public class GuildDiscord {
     );
   }
 
-  public void deleteChannel() {
-    getChannel().ifPresent(channel -> {
-      channel.delete().submit();
-      channelId = 0L;
-    });
-  }
+  public CompletableFuture<Void> archiveChannel(final String reason) {
+    var channel = channelIfNotArchived().orElseThrow();
+    String suffix = Strings.isNullOrEmpty(reason)
+        ? ""
+        : "-" + reason.replaceAll(" ", "-");
 
-  public void archiveChannel(final String reason) {
-    channelIfNotArchived().ifPresent(channel -> {
-      String suffix = Strings.isNullOrEmpty(reason)
-          ? ""
-          : "-" + reason.replaceAll(" ", "-");
+    var manager = channel.getManager()
+        .setName(guild.getName() + "-Archived" + suffix);
 
-      var manager = channel.getManager()
-          .setName(guild.getName() + "-Archived" + suffix);
+    forEachDiscordMember(manager::removePermissionOverride);
 
-      forEachDiscordMember(manager::removePermissionOverride);
+    webHookMessage(channel, CHANNEL_OPENING_MESSAGE, false);
 
-      webHookMessage(channel, CHANNEL_OPENING_MESSAGE, false);
-
-      manager.submit();
-      lastChannelUpdate = System.currentTimeMillis();
-    });
-  }
-
-  public void unarchiveChannel() {
-    getChannel().ifPresent(channel -> {
-      if (!isArchived(channel)) {
+    return manager.submit().whenComplete((unused, throwable) -> {
+      if (throwable != null) {
+        LOGGER.error("Error archiving channel for guild {}", guild, throwable);
         return;
       }
 
       lastChannelUpdate = System.currentTimeMillis();
-      var mananger = channel.getManager()
-          .setName(guild.getName());
-
-      forEachDiscordMember(member -> {
-        mananger.putPermissionOverride(
-            member,
-            memberOverridePerms(),
-            null
-        );
-      });
-
-      mananger.submit();
     });
   }
 
-  public void createChannel() {
-    if (getChannel().isPresent()) {
-      return;
+  public CompletableFuture<Void> unarchiveChannel() {
+    var channel = getChannel().orElseThrow();
+    if (!isArchived(channel)) {
+      return CompletableFuture.completedFuture(null);
+    }
+
+    var mananger = channel.getManager()
+        .setName(guild.getName());
+
+    forEachDiscordMember(member -> {
+      mananger.putPermissionOverride(
+          member,
+          memberOverridePerms(),
+          null
+      );
+    });
+
+    return mananger.submit().whenComplete((unused, throwable) -> {
+      if (throwable != null) {
+        LOGGER.error("Error archiving channel for guild {}", guild, throwable);
+        return;
+      }
+
+      lastChannelUpdate = System.currentTimeMillis();
+    });
+  }
+
+  public CompletableFuture<TextChannel> createChannel() {
+    var opt = getChannel();
+    if (opt.isPresent()) {
+      return CompletableFuture.completedFuture(opt.get());
     }
 
     var action = guildsTextCategory()
@@ -389,12 +558,22 @@ public class GuildDiscord {
       );
     });
 
-    action.submit().thenAccept(channel -> {
-      channelId = channel.getIdLong();
-      lastChannelUpdate = System.currentTimeMillis();
+    return action.reason("FTC: Create channel for guild")
+        .submit()
+        .whenComplete((channel, throwable) -> {
+          if (throwable != null) {
+            LOGGER.error(
+                "Couldn't create channel for guild {}", guild, throwable
+            );
 
-      webHookMessage(channel, CHANNEL_OPENING_MESSAGE, false);
-    });
+            return;
+          }
+
+          channelId = channel.getIdLong();
+          lastChannelUpdate = System.currentTimeMillis();
+
+          webHookMessage(channel, CHANNEL_OPENING_MESSAGE, false);
+        });
   }
 
   /* --------------------------- SERIALIZATION ---------------------------- */
@@ -412,6 +591,10 @@ public class GuildDiscord {
 
     if (channelId != NULL_ID) {
       json.add(KEY_CHANNEL, channelId);
+    }
+
+    if (webhookId != NULL_ID) {
+      json.add(KEY_WEBHOOK, webhookId);
     }
 
     if (lastChannelUpdate != UNSET) {
@@ -436,6 +619,7 @@ public class GuildDiscord {
 
     roleId = json.getLong(KEY_ROLE, NULL_ID);
     channelId = json.getLong(KEY_CHANNEL, NULL_ID);
+    webhookId = json.getLong(KEY_WEBHOOK, NULL_ID);
     lastRoleUpdate = json.getTimeStamp(KEY_ROLE_UPDATE, UNSET);
     lastChannelUpdate = json.getTimeStamp(KEY_CHANNEL_UPDATE, UNSET);
     forwardAnnouncements = json.getBool(KEY_ANNOUNCEMENTS, true);

@@ -13,6 +13,8 @@ public class CommandSmite extends FtcCommand {
     super("smite");
 
     setPermission(Permissions.ADMIN);
+    setDescription("Smites a user lol. This command will deal damage");
+
     register();
   }
 
@@ -30,6 +32,11 @@ public class CommandSmite extends FtcCommand {
    *
    * Main Author: Julie
    */
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("<user>", "Smites a <user>");
+  }
 
   @Override
   protected void createCommand(BrigadierCommand command) {

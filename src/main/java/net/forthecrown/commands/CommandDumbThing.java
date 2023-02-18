@@ -23,8 +23,10 @@ public class CommandDumbThing extends FtcCommand {
     super(name);
 
     this.func = func;
-    this.permission = permission;
-    this.description = description;
+
+    setPermission(permission);
+    setDescription(description);
+    simpleUsages();
 
     register();
   }

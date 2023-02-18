@@ -1,19 +1,18 @@
 package net.forthecrown.log;
 
+import co.aikar.timings.Timing;
 import it.unimi.dsi.fastutil.objects.ObjectLists;
 import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.Getter;
 import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnDayChange;
 import net.forthecrown.core.module.OnLoad;
 import net.forthecrown.core.module.OnSave;
 import net.forthecrown.utils.io.PathUtil;
-import org.apache.commons.lang3.Range;
 import org.apache.logging.log4j.Logger;
 
 @Getter
@@ -22,7 +21,7 @@ public class LogManager {
   @Getter
   private static final LogManager instance = new LogManager();
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   /* -------------------------- INSTANCE FIELDS --------------------------- */
 
@@ -32,13 +31,16 @@ public class LogManager {
 
   private final DataStorage storage;
 
-  private Range<ChronoLocalDate> logRange;
+  private DateRange logRange;
+
+  private final Timing queryTiming;
 
   /* ---------------------------- CONSTRUCTOR ----------------------------- */
 
   private LogManager() {
     storage = new DataStorage(PathUtil.getPluginDirectory("data"));
-    logRange = Range.is(date);
+    logRange = DateRange.exact(date);
+    queryTiming = FTC.timing("Log Query");
   }
 
   /* ------------------------------ METHODS ------------------------------- */
@@ -50,42 +52,28 @@ public class LogManager {
     date = time.toLocalDate();
     logs = new LogContainer();
 
-    logRange = Range.between(logRange.getMinimum(), date);
+    logRange = logRange.encompassing(date);
   }
 
   public List<LogEntry> queryLogs(LogQuery query) {
-    var searchRange = query.getSearchRange();
+    DateRange searchRange = query.getSearchRange();
 
-    if (!logRange.isOverlappedBy(searchRange)) {
+    if (!logRange.overlaps(searchRange)) {
       return ObjectLists.emptyList();
     }
 
-    ChronoLocalDate d = searchRange.getMaximum();
-    short safeGuard = 512;
-
     QueryResultBuilder builder = new QueryResultBuilder(query);
+    queryTiming.startTiming();
+    searchRange = logRange.overlap(searchRange);
 
     // While within search range, query logs of specific day
     // and then move the date backwards by one
-    while (searchRange.contains(d)) {
-      --safeGuard;
-
-      if (safeGuard < 0) {
-        LOGGER.error(
-            "Query operation passed safeGuard loop limit! " +
-                "date={}, queryRange={}, searchDate={}",
-            date, searchRange, d,
-            new RuntimeException()
-        );
-
-        break;
-      }
-
+    for (LocalDate d : searchRange) {
       // If current date, then don't load file,
       // File will most likely have invalid data,
       // use the loaded container
       if (d.compareTo(date) == 0) {
-        var log = this.logs.getLog(query.getSchema());
+        DataLog log = this.logs.getLog(query.getSchema());
 
         if (log != null) {
           log.performQuery(builder);
@@ -97,15 +85,15 @@ public class LogManager {
         storage.loadForQuery(d, builder);
       }
 
+
       // If we've found more than the max requested results,
       // then stop looking for more
       if (builder.hasFoundEnough()) {
         break;
       }
-
-      d = d.minus(1, ChronoUnit.DAYS);
     }
 
+    queryTiming.stopTiming();
     return builder.build();
   }
 
@@ -122,6 +110,6 @@ public class LogManager {
     storage.loadLogs(date, logs);
 
     LocalDate minDate = storage.findMinLog();
-    logRange = Range.between(minDate, date);
+    logRange = DateRange.between(minDate, date);
   }
 }

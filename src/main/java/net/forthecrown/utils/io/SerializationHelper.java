@@ -8,17 +8,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.Consumer;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import org.apache.logging.log4j.Logger;
+import org.tomlj.Toml;
+import org.tomlj.TomlTable;
 
 public final class SerializationHelper {
 
   private SerializationHelper() {
   }
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   public static final IoReader<CompoundTag>
       TAG_READER = file -> NbtIo.readCompressed(Files.newInputStream(file));
@@ -32,7 +34,11 @@ public final class SerializationHelper {
     }
 
     var parent = file.getParent();
-    PathUtil.ensureDirectoryExists(parent).orThrow();
+    var either = PathUtil.ensureDirectoryExists(parent);
+
+    if (either.right().isPresent()) {
+      throw either.right().get();
+    }
   }
 
   public static <T> DataResult<T> readFileObject(Path file, IoReader<T> reader) {
@@ -77,8 +83,38 @@ public final class SerializationHelper {
     return readFileObject(path, JSON_READER);
   }
 
+  public static DataResult<JsonObject> readTomlAsJson(Path path) {
+    return readFileObject(path, Toml::parse).flatMap(t -> {
+      if (!t.errors().isEmpty()) {
+        t.errors().forEach(LOGGER::error);
+        return DataResult.error("TOML read errors");
+      }
+
+      return DataResult.success(TomlUtil.toJson(t));
+    });
+  }
+
   public static boolean readTagFile(Path file, Consumer<CompoundTag> loadCallback) {
     return readFile(file, TAG_READER, loadCallback);
+  }
+
+  public static boolean readTomlFile(Path file, Consumer<TomlTable> consumer) {
+    return readFile(file, Toml::parse, result -> {
+      if (!result.errors().isEmpty()) {
+        result.errors().forEach(LOGGER::error);
+        return;
+      }
+
+      consumer.accept(result);
+    });
+  }
+
+  public static boolean readTomlAsJson(Path file, Consumer<JsonWrapper> callback) {
+    return readTomlFile(file, table -> {
+      JsonObject obj = TomlUtil.toJson(table);
+      JsonWrapper json = JsonWrapper.wrap(obj);
+      callback.accept(json);
+    });
   }
 
   public static boolean readJsonFile(Path file, Consumer<JsonWrapper> loadCallback) {

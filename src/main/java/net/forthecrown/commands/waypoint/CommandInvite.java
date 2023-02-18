@@ -17,7 +17,7 @@ public class CommandInvite extends FtcCommand {
   public CommandInvite() {
     super("Invite");
 
-    setDescription("Invites a user to your waypoint");
+    setDescription("Invites users to your waypoint");
     setPermission(Permissions.WAYPOINTS);
 
     register();
@@ -35,6 +35,11 @@ public class CommandInvite extends FtcCommand {
    *
    * Main Author:
    */
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("<users>", getDescription());
+  }
 
   @Override
   protected void createCommand(BrigadierCommand command) {

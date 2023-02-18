@@ -20,7 +20,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import net.forthecrown.commands.manager.Exceptions;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.utils.math.Vectors;
 import net.minecraft.SharedConstants;
 import org.apache.commons.lang3.Validate;
@@ -85,7 +85,7 @@ public final class Util {
     try {
       textures.setSkin(new URL(textureLink));
     } catch (MalformedURLException exc) {
-      FTC.getLogger().error("Couldn't set textures of profile", exc);
+      Loggers.getLogger().error("Couldn't set textures of profile", exc);
     }
 
     profile.setTextures(textures);
@@ -205,7 +205,7 @@ public final class Util {
     return new IllegalArgumentException(String.format(format, args));
   }
 
-  public static Set<Method> getAllMethods(Class c) {
+  public static Set<Method> getAllMethods(Class<?> c) {
     Set<Method> methods = new ObjectOpenHashSet<>();
     Class<?> type = c;
 

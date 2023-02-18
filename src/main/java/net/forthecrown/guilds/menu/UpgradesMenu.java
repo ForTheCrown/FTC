@@ -24,6 +24,7 @@ public class UpgradesMenu extends MenuPage {
   private final ChunkUpgradesMenu chunkMenu;
   private final CosmeticsMenu cosmeticsMenu;
   private final GuildDiscordMenu discordMenu;
+  private final MultiplierMenu multiplierMenu;
 
   public UpgradesMenu(MenuPage parent) {
     super(parent);
@@ -32,6 +33,7 @@ public class UpgradesMenu extends MenuPage {
     chunkMenu = new ChunkUpgradesMenu(this);
     cosmeticsMenu = new CosmeticsMenu(this);
     discordMenu = new GuildDiscordMenu(this);
+    multiplierMenu = new MultiplierMenu(this);
 
     initMenu(Menus.builder(Menus.MAX_INV_SIZE, "Guild Upgrades"), true);
   }
@@ -41,7 +43,8 @@ public class UpgradesMenu extends MenuPage {
     builder.add(22, ranksMenu);
     builder.add(29, chunkMenu);
     builder.add(24, cosmeticsMenu);
-    builder.add(4, 4, discordMenu);
+    builder.add(3, 4, discordMenu);
+    builder.add(5, 4, multiplierMenu);
 
     addAll(builder, UnlockableSetting.values());
     addAll(builder, Upgradable.values());

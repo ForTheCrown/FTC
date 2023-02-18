@@ -7,19 +7,15 @@ import com.google.common.base.Strings;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.Map;
 import lombok.Getter;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.registry.Keys;
 import net.forthecrown.core.registry.Registry;
-import net.forthecrown.dungeons.level.PieceStyle;
 import net.forthecrown.dungeons.level.Pieces;
-import net.forthecrown.dungeons.level.room.RoomType;
 import net.forthecrown.dungeons.level.gate.GateType;
+import net.forthecrown.dungeons.level.room.RoomType;
 import net.forthecrown.structure.BlockStructure;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.io.FtcJar;
@@ -30,11 +26,10 @@ import org.apache.logging.log4j.Logger;
 @Getter
 public class DungeonDataStorage {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   private static final String
       KEY_STRUCTURE = "structure",
-      KEY_VARIANTS = "variants",
       KEY_OPTIONS = "options",
       KEY_CAN_OPEN = "canOpen",
       KEY_PALETTES = "palettes";
@@ -96,10 +91,9 @@ public class DungeonDataStorage {
           continue;
         }
 
-        var variants = readVariants(json.get(KEY_VARIANTS));
         int flags = readRoomFlags(json.get(KEY_OPTIONS));
 
-        RoomType type = new RoomType(struct, variants, flags);
+        RoomType type = new RoomType(struct, flags);
         types.register(e.getKey(), type);
 
         ++loaded;
@@ -140,19 +134,19 @@ public class DungeonDataStorage {
           continue;
         }
 
-        var variants = readVariants(json.get(KEY_VARIANTS));
-
         String openPallette = null;
         String closedPallette = BlockStructure.DEFAULT_PALETTE_NAME;
 
         if (json.has(KEY_PALETTES)) {
           var palettes = json.getWrapped(KEY_PALETTES);
+          assert palettes != null;
+
           openPallette = palettes.getString("open");
           closedPallette = palettes.getString("closed");
         }
 
         GateType type = new GateType(
-            struct, variants,
+            struct,
             openPallette,
             closedPallette
         );
@@ -200,20 +194,5 @@ public class DungeonDataStorage {
     }
 
     return flag;
-  }
-
-  private static Map<PieceStyle, String> readVariants(JsonElement element) {
-    if (element == null || !element.isJsonObject()) {
-      return Collections.emptyMap();
-    }
-
-    Map<PieceStyle, String> map = new Object2ObjectOpenHashMap<>();
-
-    for (var e : element.getAsJsonObject().entrySet()) {
-      PieceStyle variant = PieceStyle.valueOf(e.getKey().toUpperCase());
-      map.put(variant, e.getValue().getAsString());
-    }
-
-    return map;
   }
 }

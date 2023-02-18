@@ -35,6 +35,7 @@ import net.forthecrown.waypoint.WaypointProperties;
 import net.forthecrown.waypoint.WaypointProperty;
 
 @Getter
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class RegistryArguments<T> implements ArgumentType<Holder<T>>, VanillaMappedArgument {
 
   public static final RegistryArguments<BlockStructure> STRUCTURE

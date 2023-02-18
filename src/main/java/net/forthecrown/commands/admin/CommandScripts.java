@@ -1,34 +1,58 @@
 package net.forthecrown.commands.admin;
 
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.nio.file.Path;
-import javax.script.ScriptException;
+import java.util.Collections;
+import java.util.List;
 import net.forthecrown.commands.arguments.Arguments;
+import net.forthecrown.commands.economy.CommandShopHistory;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.Permissions;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.script2.Script;
 import net.forthecrown.core.script2.ScriptLoadException;
 import net.forthecrown.core.script2.ScriptManager;
 import net.forthecrown.core.script2.ScriptResult;
-import net.forthecrown.core.script2.ScriptsBuiltIn;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.types.ArrayArgument;
+import net.forthecrown.grenadier.types.args.ArgsArgument;
+import net.forthecrown.grenadier.types.args.Argument;
+import net.forthecrown.grenadier.types.args.ParsedArgs;
 import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.writer.TextWriters;
-import org.jetbrains.annotations.Nullable;
 
 public class CommandScripts extends FtcCommand {
+
+  public static final Argument<List<String>> ARGS_ARRAY
+      = Argument.builder("args", ArrayArgument.of(StringArgumentType.string()))
+      .build();
+
+  public static final Argument<String> METHOD_NAME
+      = Argument.builder("method", StringArgumentType.string()).build();
+
+  public static final Argument<Boolean> CLOSE_AFTER
+      = Argument.builder("close_after", BoolArgumentType.bool())
+      .setDefaultValue(true)
+      .build();
+
+  public static final ArgsArgument ARGS = ArgsArgument.builder()
+      .addOptional(ARGS_ARRAY)
+      .addOptional(METHOD_NAME)
+      .addOptional(CLOSE_AFTER)
+      .build();
 
   public CommandScripts() {
     super("Scripts");
 
     setAliases("script");
     setPermission(Permissions.ADMIN);
+    setDescription("Command to use scripts");
 
     register();
   }
@@ -47,6 +71,26 @@ public class CommandScripts extends FtcCommand {
    */
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("eval <java script code>")
+        .addInfo("Runs the given JavaScript code");
+
+    factory.usage("run <script file> [args=<args array>] [close_after=<true | false>] [method=<name>]")
+        .addInfo("Runs the given script file's global function")
+        .addInfo("If the <args> argument is present, the set string array")
+        .addInfo("is added into the script.")
+
+        .addInfo("If <close_after> is set to 'true' or not set at all, the")
+        .addInfo("script is closed after execution, else, it stays loaded")
+
+        .addInfo("<method> specifies the name of the method to run after")
+        .addInfo("the global scope has been executed");
+
+    factory.usage("delete <script file>")
+        .addInfo("Deletes a <script file>");
+  }
+
+  @Override
   protected void createCommand(BrigadierCommand command) {
     command
         // /script eval <JavaScript>
@@ -59,32 +103,10 @@ public class CommandScripts extends FtcCommand {
         // /script run <script> [method]
         .then(literal("run")
             .then(argument("script", Arguments.SCRIPT)
-                .executes(c -> run(c, null, true))
+                .executes(c -> run(c, CommandShopHistory.EMPTY))
 
-                .then(literal("-doNotClose")
-                    .executes(c -> run(c, null, false))
-                )
-
-                .then(argument("func", StringArgumentType.string())
-                    .executes(c -> {
-                      String func = c.getArgument(
-                          "func",
-                          String.class
-                      );
-
-                      return run(c, func, true);
-                    })
-
-                    .then(literal("-doNotClose")
-                        .executes(c -> {
-                          String func = c.getArgument(
-                              "func",
-                              String.class
-                          );
-
-                          return run(c, null, false);
-                        })
-                    )
+                .then(argument("args", ARGS)
+                    .executes(c -> run(c, c.getArgument("args", ParsedArgs.class)))
                 )
             )
         )
@@ -128,7 +150,7 @@ public class CommandScripts extends FtcCommand {
         .getScriptFile(script);
 
     PathUtil.safeDelete(path)
-        .resultOrPartial(FTC.getLogger()::error);
+        .resultOrPartial(Loggers.getLogger()::error);
 
     c.getSource().sendAdmin(
         Text.format("Deleting script '{0}'", script)
@@ -140,49 +162,44 @@ public class CommandScripts extends FtcCommand {
       throws CommandSyntaxException
   {
     String input = c.getArgument("input", String.class);
-    Object obj;
+    Script script = Script.ofCode(input);
 
-    try {
-      var engine = ScriptManager.getInstance()
-          .createEngine("command-script", "");
-
-      ScriptsBuiltIn.populate("command-script", engine);
-
-      obj = engine.eval(input);
-    } catch (ScriptException exc) {
-      throw Exceptions.format(
-          "Error running script: {0}",
-          exc.getMessage()
-      );
-    }
-
-    c.getSource().sendAdmin(
-        Text.format("Succesfully ran script! Result: {0}",
-            obj
-        )
-    );
-
-    return 0;
+    return runScript(c.getSource(), script, true, null);
   }
 
-  private int run(CommandContext<CommandSource> c,
-                  @Nullable String method,
-                  boolean closeAfter
+  private int run(CommandContext<CommandSource> c, ParsedArgs args
   ) throws CommandSyntaxException {
     String scriptName = c.getArgument("script", String.class);
-    Script script;
+    Script script = Script.of(scriptName);
+
+    List<String> stringArgsList
+        = args.getOrDefault(ARGS_ARRAY, Collections.emptyList());
+
+    String[] stringArgs = stringArgsList.toArray(String[]::new);
+
+    boolean closeAfter = args.get(CLOSE_AFTER);
+    String method = args.get(METHOD_NAME);
+
+    return runScript(c.getSource(), script, closeAfter, method, stringArgs);
+  }
+
+  private int runScript(CommandSource source,
+                        Script script,
+                        boolean closeAfter,
+                        String method,
+                        String... args
+  ) throws CommandSyntaxException {
+    var scriptName = script.getSource().getName();
     ScriptResult result;
 
     try {
-      script = Script.of(scriptName).compile();
-      result = script.eval();
+      result = script.compile(args).eval();
     } catch (ScriptLoadException exc) {
       exc.printStackTrace();
 
       throw Exceptions.format(
           "Couldn't evaluate script '{0}', reason: {1}",
-          exc.getScript().getName(),
-          exc.getCause()
+          script, exc.getCause()
       );
     }
 
@@ -191,7 +208,7 @@ public class CommandScripts extends FtcCommand {
 
       throw Exceptions.format(
           "Couldn't evaluate script '{0}', reason: {1}",
-          script.getName(),
+          scriptName,
           exc.getCause()
       );
     }
@@ -222,7 +239,7 @@ public class CommandScripts extends FtcCommand {
     }
 
     if (method != null) {
-      c.getSource().sendAdmin(
+      source.sendAdmin(
           Text.format("Successfully ran {0} in script {1}, result={2}",
               method,
               scriptName,
@@ -230,7 +247,7 @@ public class CommandScripts extends FtcCommand {
           )
       );
     } else {
-      c.getSource().sendAdmin(
+      source.sendAdmin(
           Text.format("Successfully ran script {0}, result={1}",
               scriptName,
               result.result().orElse(null)

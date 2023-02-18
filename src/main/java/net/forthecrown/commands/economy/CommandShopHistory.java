@@ -34,7 +34,8 @@ public class CommandShopHistory extends FtcCommand {
     super("ShopHistory");
 
     setPermission(Permissions.SHOP_HISTORY);
-    setDescription("Shows a shop's history");
+    setDescription("Shows the history of the shop you're looking at");
+    simpleUsages();
 
     register();
   }
@@ -86,7 +87,7 @@ public class CommandShopHistory extends FtcCommand {
                 })
         )
 
-        .setEntry((writer, entry, viewerIndex, context) -> {
+        .setEntry((writer, entry, viewerIndex, context, it) -> {
           writer.write(Messages.formatShopHistory(
               entry,
               context.getOrThrow(SHOP).getExampleItem()

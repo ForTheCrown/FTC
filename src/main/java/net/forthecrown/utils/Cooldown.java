@@ -1,35 +1,28 @@
 package net.forthecrown.utils;
 
+import static net.forthecrown.core.Cooldowns.NO_END_COOLDOWN;
+
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.Objects;
+import java.util.UUID;
 import javax.annotation.Nonnegative;
-import net.forthecrown.commands.manager.Exceptions;
+import net.forthecrown.core.Cooldowns;
+import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.user.User;
 import net.kyori.adventure.audience.Audience;
-import org.apache.commons.lang.Validate;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * A class that helps adding cooldowns to things.
  */
 public final class Cooldown {
-
-  private Cooldown() {
-  }
+  private Cooldown() {}
 
   /**
    * The general category, literally just "general"
    */
-  public static final String GENERAL = "general";
-
-  /**
-   * A cooldown time which never ends
-   */
-  public static final int NO_END_COOLDOWN = -1;
-
-  private static final Map<String, Set<Audience>> COOLDOWN_MAP = new HashMap<>();
+  public static final String GENERAL = Cooldowns.TRANSIENT_CATEGORY;
 
   /**
    * Checks whether the sender is in the {@link Cooldown#GENERAL} category
@@ -48,19 +41,10 @@ public final class Cooldown {
    * @param category The category to check
    * @return If the sender is on cooldown for the given category
    */
-  public static boolean contains(@NotNull Audience sender, @NotNull String category) {
-    Validate.notNull(sender, "Sender was null");
-    Validate.notNull(category, "Category was null");
-
-    var set = COOLDOWN_MAP.get(category);
-
-    // The set is null, therefor the category
-    // doesn't even exist in the map
-    if (set == null) {
-      return false;
-    }
-
-    return set.contains(sender);
+  public static boolean contains(@NotNull Audience sender,
+                                 @NotNull String category
+  ) {
+    return Cooldowns.getCooldowns().isOnCooldown(getUniqueId(sender), category);
   }
 
   /**
@@ -71,7 +55,9 @@ public final class Cooldown {
    * @param ticks  The duration of the cooldown
    * @return Same as {@link Cooldown#containsOrAdd(Audience, String, int)}
    */
-  public static boolean containsOrAdd(Audience sender, @Nonnegative int ticks) {
+  public static boolean containsOrAdd(Audience sender,
+                                      @Nonnegative int ticks
+  ) {
     return containsOrAdd(sender, GENERAL, ticks);
   }
 
@@ -85,7 +71,8 @@ public final class Cooldown {
    * @return True if category contains sender, false if it doesn't, if false, adds sender to
    * category
    */
-  public static boolean containsOrAdd(Audience sender, @NotNull String category,
+  public static boolean containsOrAdd(Audience sender,
+                                      @NotNull String category,
                                       @Nonnegative int ticks
   ) {
     boolean contains = contains(sender, category);
@@ -104,7 +91,9 @@ public final class Cooldown {
    * @param sender      The sender to add
    * @param timeInTicks The time to add them for
    */
-  public static void add(@NotNull Audience sender, @Nonnegative int timeInTicks) {
+  public static void add(@NotNull Audience sender,
+                         @Nonnegative int timeInTicks
+  ) {
     add(sender, GENERAL, timeInTicks);
   }
 
@@ -123,7 +112,9 @@ public final class Cooldown {
    * @param sender   The sender to add
    * @param category The category to add them to
    */
-  public static void add(@NotNull Audience sender, @NotNull String category) {
+  public static void add(@NotNull Audience sender,
+                         @NotNull String category
+  ) {
     add(sender, category, NO_END_COOLDOWN);
   }
 
@@ -134,22 +125,20 @@ public final class Cooldown {
    * @param category    The category to add the sender to
    * @param timeInTicks The cooldown's duration
    */
-  public static void add(@NotNull Audience sender, @NotNull String category, int timeInTicks) {
-    Validate.notNull(sender, "Sender was null");
-    Validate.notNull(category, "Category was null");
+  public static void add(@NotNull Audience sender,
+                         @NotNull String category,
+                         long timeInTicks
+  ) {
+    var id = getUniqueId(sender);
+    long time = toMillis(timeInTicks);
 
-    // Don't enter cooldown if the cooldown length
-    // is 0
-    if (timeInTicks == 0) {
+    var cds = Cooldowns.getCooldowns();
+
+    if (cds.isOnCooldown(id, category)) {
       return;
     }
 
-    var set = COOLDOWN_MAP.computeIfAbsent(category, k -> new HashSet<>());
-    set.add(sender);
-
-    if (timeInTicks != NO_END_COOLDOWN) {
-      Tasks.runLaterAsync(() -> remove(sender, category), timeInTicks);
-    }
+    cds.cooldown(id, category, time);
   }
 
   /**
@@ -168,23 +157,38 @@ public final class Cooldown {
    * @param category The category to remove the sender from
    */
   public static void remove(@NotNull Audience sender, @NotNull String category) {
-    Validate.notNull(sender, "Sender was null");
-    Validate.notNull(category, "Category was null");
-
-    var set1 = COOLDOWN_MAP.computeIfAbsent(category, k -> new HashSet<>());
-    set1.remove(sender);
-
-    // Since we just removed an entry from the category's list
-    // we'll check if it's empty, if it is, remove it from the map
-    if (set1.isEmpty()) {
-      COOLDOWN_MAP.remove(category);
-    }
+    UUID uuid = getUniqueId(sender);
+    Cooldowns.getCooldowns().remove(uuid, category);
   }
 
-  public static void testAndThrow(Audience audience, String category, int ticks)
-      throws CommandSyntaxException {
-    if (containsOrAdd(audience, category, ticks)) {
-      throw Exceptions.onCooldown(Time.ticksToMillis(ticks));
+  public static void testAndThrow(Audience audience, String category, long ticks)
+      throws CommandSyntaxException
+  {
+    long time = toMillis(ticks);
+    var id = getUniqueId(audience);
+
+    Cooldowns.getCooldowns().testAndThrow(id, category, time);
+  }
+
+  private static UUID getUniqueId(Audience audience) {
+    Objects.requireNonNull(audience);
+
+    if (audience instanceof Player player) {
+      return player.getUniqueId();
+    } else if (audience instanceof User user) {
+      return user.getUniqueId();
+    } else if (audience instanceof CommandSource source && source.isPlayer()) {
+      return source.asEntityOrNull().getUniqueId();
     }
+
+    throw Util.newException("Audience '%s' is not a player, nor a user");
+  }
+
+  private static long toMillis(long ticks) {
+    if (ticks == NO_END_COOLDOWN) {
+      return NO_END_COOLDOWN;
+    }
+
+    return Time.ticksToMillis(ticks);
   }
 }

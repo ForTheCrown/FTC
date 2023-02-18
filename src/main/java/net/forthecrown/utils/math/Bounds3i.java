@@ -63,7 +63,7 @@ public class Bounds3i extends AbstractBounds3i<Bounds3i> implements Iterable<Vec
     );
   }
 
-  public static Bounds3i of(AbstractBounds3i bounds3i) {
+  public static Bounds3i of(AbstractBounds3i<?> bounds3i) {
     if (bounds3i instanceof Bounds3i b) {
       return b;
     }

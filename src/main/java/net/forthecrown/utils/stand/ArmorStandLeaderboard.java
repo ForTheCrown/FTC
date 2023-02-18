@@ -42,8 +42,8 @@ public class ArmorStandLeaderboard<T> extends AbstractDynamicStand {
   private int maxSize = 5;
 
   @Setter
-  private Comparator<Map.Entry<T, Integer>>
-      comparator = Map.Entry.<T, Integer>comparingByValue().reversed();
+  private Comparator<Map.Entry<T, Integer>> comparator
+      = Map.Entry.<T, Integer>comparingByValue().reversed();
 
   @Setter
   private LineFormatter<T> lineFormatter;
@@ -60,7 +60,7 @@ public class ArmorStandLeaderboard<T> extends AbstractDynamicStand {
   private final List<Component> footer = new ObjectArrayList<>();
 
   public ArmorStandLeaderboard(Location location) {
-    super(location);
+    super(location, STAND_KEY);
   }
 
   public void spawn() {
@@ -127,7 +127,7 @@ public class ArmorStandLeaderboard<T> extends AbstractDynamicStand {
       var next = it.next();
 
       if (!Objects.equals(next, Component.empty())) {
-        var entity = spawn(l, STAND_KEY, next);
+        var entity = spawn(l, getKey(), next);
 
         armorStands.add(new WeakReference<>(entity));
         world = new WeakReference<>(entity.getWorld());
@@ -160,14 +160,14 @@ public class ArmorStandLeaderboard<T> extends AbstractDynamicStand {
     if (world != null && bounds != null) {
       world.get().getNearbyEntities(
           bounds.clone().expand(1D),
-          entity -> entity.getPersistentDataContainer().has(STAND_KEY)
+          entity -> entity.getPersistentDataContainer().has(getKey())
       ).forEach(Entity::remove);
 
       world = null;
       bounds = null;
     }
 
-    kill(STAND_KEY);
+    kill(getKey());
   }
 
   public boolean isSpawned() {

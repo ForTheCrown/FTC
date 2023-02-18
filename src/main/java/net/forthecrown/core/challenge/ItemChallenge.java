@@ -6,10 +6,13 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.forthecrown.commands.manager.Exceptions;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.inventory.ItemStacks;
@@ -20,11 +23,13 @@ import net.forthecrown.utils.text.writer.TextWriters;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.profile.PlayerTextures;
 
 @RequiredArgsConstructor
 public class ItemChallenge implements Challenge {
@@ -102,7 +107,7 @@ public class ItemChallenge implements Challenge {
   }
 
   @Override
-  public String activate(boolean resetting) {
+  public CompletionStage<String> activate(boolean resetting) {
     var manager = ChallengeManager.getInstance();
     var storage = manager.getStorage();
 
@@ -111,29 +116,43 @@ public class ItemChallenge implements Challenge {
         .getHolderByValue(this)
         .orElseThrow();
 
-    String result = null;
     var container = storage.loadContainer(holder);
 
     if (resetting) {
-      var random = container.next(Util.RANDOM);
+      var future = container.next(Util.RANDOM);
 
-      if (ItemStacks.notEmpty(random)) {
-        container.getUsed().add(random);
-        container.setActive(random);
-        setTargetItem(random);
+      return future.whenComplete((item, exception) -> {
+        if (exception != null) {
+          Loggers.getLogger().error(
+              "Error getting random challenge item:",
+              exception
+          );
 
-        result = ItemStacks.toNbtString(random);
-      } else {
-        container.setActive(null);
-        setTargetItem(null);
-      }
+          return;
+        }
 
-      storage.saveContainer(container);
+        if (ItemStacks.notEmpty(item)) {
+          container.getUsed().add(item);
+          container.setActive(item);
+          setTargetItem(item.clone());
+        } else {
+          container.setActive(null);
+          setTargetItem(null);
+        }
+
+        storage.saveContainer(container);
+      }).thenApply(itemStack -> {
+        if (ItemStacks.isEmpty(itemStack)) {
+          return "";
+        }
+
+        return ItemStacks.toNbtString(itemStack);
+      });
     } else {
       setTargetItem(container.getActive());
     }
 
-    return result;
+    return CompletableFuture.completedFuture("");
   }
 
   @Override
@@ -174,7 +193,7 @@ public class ItemChallenge implements Challenge {
 
     Challenges.apply(this, holder -> {
       ChallengeManager.getInstance()
-          .getOrCreateEntry(player.getUniqueId())
+          .getEntry(player.getUniqueId())
           .addProgress(holder, item.getAmount());
     });
   }
@@ -188,13 +207,15 @@ public class ItemChallenge implements Challenge {
             return null;
           }
 
-          var formatter = getPlaceholderFormatter();
           var builder = ItemStacks.toBuilder(baseItem)
               .setName(getName())
               .clearLore()
               .addFlags(ItemFlag.HIDE_ENCHANTS);
 
-          if (Challenges.hasCompleted(this, user.getUniqueId())) {
+          var entry = ChallengeManager.getInstance()
+              .getEntry(user.getUniqueId());
+
+          if (entry.hasCompleted(this)) {
             builder.addEnchant(Enchantment.BINDING_CURSE, 1)
                 .addLore("&aAlready completed!");
           } else {
@@ -209,12 +230,11 @@ public class ItemChallenge implements Challenge {
             builder.addLore("");
 
             for (var c : getDescription()) {
-              builder.addLore(formatter.format(c, user));
+              builder.addLore(replacePlaceholders(c, user));
             }
           }
 
-          int streak = Challenges.queryStreak(this, user)
-              .orElse(0);
+          int streak = entry.getStreak(getStreakCategory()).get();
 
           if (!getReward().isEmpty(streak)) {
             var writer = TextWriters.loreWriter();
@@ -228,8 +248,15 @@ public class ItemChallenge implements Challenge {
                 Style.style(NamedTextColor.GRAY)
             );
 
-            getReward().write(writer, streak);
+            getReward().write(writer, streak, user.getUniqueId());
             builder.addLore(writer.getLore());
+          }
+
+          if (baseItem.getType() == Material.AXOLOTL_BUCKET
+              || baseItem.getType() == Material.TROPICAL_FISH_BUCKET
+          ) {
+            builder.addLoreRaw(Component.empty())
+                .addLore("&7Any variant");
           }
 
           return builder.build();
@@ -242,7 +269,10 @@ public class ItemChallenge implements Challenge {
             return;
           }
 
-          if (Challenges.hasCompleted(this, user.getUniqueId())) {
+          var entry = ChallengeManager.getInstance()
+              .getEntry(user.getUniqueId());
+
+          if (entry.hasCompleted(this)) {
             throw Exceptions.format("Challenge already completed");
           }
 
@@ -283,6 +313,10 @@ public class ItemChallenge implements Challenge {
   private boolean matches(ItemStack item) {
     return getTargetItem()
         .map(target -> {
+          if (target.isSimilar(item)) {
+            return true;
+          }
+
           if (target.getType() != item.getType()) {
             return false;
           }
@@ -295,20 +329,13 @@ public class ItemChallenge implements Challenge {
           // due to material being able to represent different
           // variants of the mob
           if (typeName.contains("BUCKET")
-              && !typeName.contains("AXOLOTL")
-              && !typeName.contains("TROPICAL")
+              && (typeName.contains("AXOLOTL") || typeName.contains("TROPICAL"))
           ) {
             return true;
           }
 
           var sMeta = target.getItemMeta();
           var iMeta = item.getItemMeta();
-
-          // I doubt this could happen, but
-          // better safe than sorry lol
-          if (sMeta.getClass() != iMeta.getClass()) {
-            return false;
-          }
 
           // Skull items just need to the same texture,
           // nothing else matters
@@ -318,19 +345,29 @@ public class ItemChallenge implements Challenge {
             var targetProfile = skullMeta.getPlayerProfile();
 
             if (itemProfile == null || targetProfile == null) {
-              return false;
+              // Both must be null, if either is not null, then there's an issue,
+              // Null profile heads may be heads belonging to actual players,
+              // aka, the non-custom heads
+              return itemProfile == targetProfile;
             }
 
             var itemTextures = itemProfile.getTextures();
             var targetTextures = targetProfile.getTextures();
 
-            return Objects.equals(targetTextures, itemTextures);
+            return texturesMatch(targetTextures, itemTextures);
           }
 
-          return target.isSimilar(item);
+          // isSimilar check happens above, so we can return false here
+          return false;
         })
 
         .orElse(false);
+  }
+
+  private static boolean texturesMatch(PlayerTextures t1, PlayerTextures t2) {
+    var url1 = t1.getSkin();
+    var url2 = t2.getSkin();
+    return Objects.equals(url1, url2);
   }
 
   /* -------------------------- OBJECT OVERRIDES -------------------------- */

@@ -73,8 +73,7 @@ public class CommandPlayerTime extends FtcCommand {
     return literal(name)
         .executes(c -> {
           Player player = get(c);
-          long timeAdd = player.getWorld().getFullTime() - (player.getPlayerTime()
-              % ServerLevel.TICKS_PER_DAY);
+          long timeAdd = player.getWorld().getFullTime() - (player.getPlayerTime() % ServerLevel.TICKS_PER_DAY);
           long time = timeAdd + multiplier;
 
           return setTime(c.getSource(), player, time);

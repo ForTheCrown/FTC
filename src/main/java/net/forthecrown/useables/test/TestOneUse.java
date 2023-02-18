@@ -19,7 +19,8 @@ import org.jetbrains.annotations.Nullable;
 public class TestOneUse extends UsageTest {
 
   // --- TYPE ---
-  public static final UsageType<TestOneUse> TYPE = UsageType.of(TestOneUse.class);
+  public static final UsageType<TestOneUse> TYPE = UsageType.of(TestOneUse.class)
+      .requiresInput(false);
 
   private final Set<UUID> used = new ObjectOpenHashSet<>();
 

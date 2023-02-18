@@ -14,6 +14,11 @@ public abstract class BukkitUsableNode<H extends BukkitSavedUsable> extends Inte
   }
 
   @Override
+  protected UsableSaveCallback<H> saveCallback() {
+    return BukkitSavedUsable::save;
+  }
+
+  @Override
   protected void addEditArguments(RequiredArgumentBuilder<CommandSource, ?> command,
                                   UsageHolderProvider<H> provider
   ) {
@@ -24,7 +29,7 @@ public abstract class BukkitUsableNode<H extends BukkitSavedUsable> extends Inte
 
               c.getSource().sendMessage(
                   Text.format("Usage will cancel vanilla interaction: {}",
-                      holder.isCancelVanilla()
+                      holder.cancelVanilla()
                   )
               );
               return 0;
@@ -35,7 +40,8 @@ public abstract class BukkitUsableNode<H extends BukkitSavedUsable> extends Inte
                   var holder = provider.get(c);
                   var state = c.getArgument("cancellation_state", Boolean.class);
 
-                  holder.setCancelVanilla(state);
+                  holder.cancelVanilla(state);
+                  holder.save();
 
                   c.getSource().sendAdmin(
                       Text.format("Set usage will cancel vanilla interaction: {0}",

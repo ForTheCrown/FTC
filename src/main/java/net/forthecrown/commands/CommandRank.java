@@ -30,6 +30,11 @@ public class CommandRank extends FtcCommand {
    */
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("", "Opens the rank menu");
+  }
+
+  @Override
   protected void createCommand(BrigadierCommand command) {
     command.executes(c -> {
       RankMenu.getInstance().open(getUserSender(c));

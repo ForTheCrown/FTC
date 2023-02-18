@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Getter;
-import net.forthecrown.core.FTC;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.core.registry.Keys;
 import net.forthecrown.utils.ArrayIterator;
@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class LogContainer {
 
-  private static final Logger LOGGER = FTC.getLogger();
+  private static final Logger LOGGER = Loggers.getLogger();
 
   @Getter(AccessLevel.PACKAGE)
   private DataLog[] logs = DataLogs.EMPTY_LOG_ARR;

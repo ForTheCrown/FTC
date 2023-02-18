@@ -11,6 +11,7 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.longs.LongList;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.time.chrono.ChronoZonedDateTime;
 import java.util.Date;
 import java.util.List;
@@ -25,6 +26,7 @@ import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.RomanNumeral;
+import net.forthecrown.utils.Time;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.utils.math.WorldVec3i;
@@ -513,6 +515,14 @@ public class ComponentFormat implements ComponentLike {
      *   and the time value will be calculated as the
      *   difference between the given timestamp and the
      *   current time
+     *
+     * - If the style contains the '-short' argument,
+     *   all time units will be reduced to 1 letter,
+     *   eg: '1 second' -> '1s'
+     *
+     * - If the style contains the '-ticks' argument,
+     *   the inputted argument will be treated like a tick
+     *   value instead of a millisecond value
      * </pre>
      * <p>
      * If the given argument is not a number or is null, {@link Text#valueOf(Object)} is returned
@@ -521,13 +531,20 @@ public class ComponentFormat implements ComponentLike {
     TIME {
       @Override
       public Component resolveArgument(Object arg, String style) {
-        // Not a number, we can't format so return default value
-        if (!(arg instanceof Number number)) {
+        long time;
+
+        if (arg instanceof Duration duration) {
+          time = duration.toMillis();
+        } else if (arg instanceof Number number) {
+          time = number.longValue();
+        } else {
           return Text.valueOf(arg);
         }
 
-        // Format given time
-        long time = number.longValue();
+        if (style.contains("-ticks")) {
+          time = Time.ticksToMillis(time);
+        }
+
         PeriodFormat format;
 
         if (style.contains("-timestamp")) {
@@ -538,6 +555,10 @@ public class ComponentFormat implements ComponentLike {
 
         if (style.contains("-biggest")) {
           format = format.retainBiggest();
+        }
+
+        if (style.contains("-short")) {
+          format = format.withShortNames();
         }
 
         return format.asComponent();

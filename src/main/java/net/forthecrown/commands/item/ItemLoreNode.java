@@ -1,6 +1,5 @@
 package net.forthecrown.commands.item;
 
-import com.google.common.collect.Lists;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
@@ -15,7 +14,6 @@ import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.Messages;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
-import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.Range;
 
@@ -29,12 +27,32 @@ public class ItemLoreNode extends ItemModifierNode {
   }
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("clear")
+        .addInfo("Clears your held item's lore");
+
+    ItemNameNode.namingNote(
+        factory.usage("add <text>")
+            .addInfo("Adds <text> to your held item's lore")
+    );
+
+    factory.usage("remove <index>")
+        .addInfo("Removes the lore on the given line");
+
+    factory.usage("remove at <index>")
+        .addInfo("Removes the lore on the given line");
+
+    factory.usage("remove between <start index> <end index>")
+        .addInfo("Removes all lore between the 2 lines");
+  }
+
+  @Override
   public void create(LiteralArgumentBuilder<CommandSource> command) {
     command
         .then(literal("clear")
             .executes(c -> {
               var held = getHeld(c.getSource());
-              held.lore(Lists.newArrayList());
+              held.lore(null);
 
               c.getSource().sendAdmin(Messages.CLEARED_LORE);
               return 0;
@@ -53,7 +71,7 @@ public class ItemLoreNode extends ItemModifierNode {
 
                   var message = c.getArgument("text", Component.class);
 
-                  lore.add(Text.wrapForItems(message));
+                  lore.add(optionallyWrap(message, c, "text"));
                   held.lore(lore);
 
                   c.getSource().sendAdmin(Messages.addedLore(message));

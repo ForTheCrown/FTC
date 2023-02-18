@@ -26,6 +26,19 @@ public class EnchantmentNode extends ItemModifierNode {
   }
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("<enchantment> [<level: number(1..)>]")
+        .addInfo("Applies the <enchantment> to your held item")
+        .addInfo("with [level]. If [level] is not given, then")
+        .addInfo("a level of 1 is used.")
+        .addInfo("If the item is a book, enchanting it turns it")
+        .addInfo("into an enchanted book");
+
+    factory.usage("clear")
+        .addInfo("Clears all your held item's enchantments");
+  }
+
+  @Override
   public void create(LiteralArgumentBuilder<CommandSource> command) {
     command
         .then(literal("clear")

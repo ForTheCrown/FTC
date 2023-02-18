@@ -18,23 +18,26 @@ public final class ExtendedItems {
   /**
    * Item type which represents royal swords
    */
-  public static final ExtendedItemType<RoyalSword> ROYAL_SWORD = register(new RoyalSwordType());
+  public static final ExtendedItemType<RoyalSword> ROYAL_SWORD
+      = register(new RoyalSwordType());
 
   /**
    * Item type which represents crowns
    */
-  public static final ExtendedItemType<RoyalCrown> CROWN = register(new CrownType());
+  public static final ExtendedItemType<RoyalCrown> CROWN
+      = register(new CrownType());
 
   @OnEnable
   public static void init() {
     Registries.ITEM_TYPES.freeze();
   }
 
-  private static <T extends ExtendedItemType> T register(T type) {
+  @SuppressWarnings("unchecked")
+  private static <T extends ExtendedItemType<?>> T register(T type) {
     return (T) Registries.ITEM_TYPES.register(type.getKey(), type).getValue();
   }
 
-  public static ExtendedItemType getType(ItemStack itemStack) {
+  public static ExtendedItemType<?> getType(ItemStack itemStack) {
     for (var type : Registries.ITEM_TYPES) {
       if (type.get(itemStack) != null) {
         fixInvRemain(type, itemStack);
@@ -55,7 +58,7 @@ public final class ExtendedItems {
     });
   }
 
-  public static void fixInvRemain(ExtendedItemType type, ItemStack item) {
+  public static void fixInvRemain(ExtendedItemType<?> type, ItemStack item) {
     if (type != ROYAL_SWORD && type != CROWN) {
       return;
     }

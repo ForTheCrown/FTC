@@ -1,7 +1,6 @@
 // Imports
 const Worlds = Java.type("net.forthecrown.core.Worlds");
 const StreakIncreaseEvent = Java.type("net.forthecrown.core.challenge.StreakIncreaseEvent");
-const Challenges = Java.type("net.forthecrown.core.challenge.Challenges");
 const C_Manager = Java.type("net.forthecrown.core.challenge.ChallengeManager");
 const ArmorStand = Java.type("org.bukkit.entity.ArmorStand");
 const UnitFormat = Java.type("net.forthecrown.utils.text.format.UnitFormat");
@@ -19,7 +18,7 @@ const dynamicStand = new DynamicArmorStand(
 // Fields
 const greatest = {
     id: null,
-    streak = NO_STREAK
+    streak: NO_STREAK
 };
 
 events.register("onStreakIncrease", StreakIncreaseEvent);
@@ -31,7 +30,9 @@ function onStreakIncrease(/* StreakIncreaseEvent */ event) {
         return;
     }
 
-    let highestStreak = event.getEntry().getHighestStreak();
+    let highestStreak = event.getEntry()
+        .getStreak(StreakCategory.ITEMS)
+        .getHighest();
 
     if (greatest.id != null && greatest.streak >= highestStreak) {
         return;
@@ -60,7 +61,7 @@ function scanInitial() {
     let entries = C_Manager.getInstance().getEntries();
 
     entries.forEach(e => {
-        let streak = e.getHighestStreak();
+        let streak = e.getStreak(StreakCategory.ITEMS).getHighest();
 
         if (streak <= NO_STREAK) {
             return;

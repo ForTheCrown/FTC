@@ -77,7 +77,10 @@ public class ItemSell {
    */
   private SellResult cachedResult;
 
-  ItemSell(Material material, ItemSellData itemData, UserShopData earnings, int target,
+  ItemSell(Material material,
+           ItemSellData itemData,
+           UserShopData earnings,
+           int target,
            int itemQuantity
   ) {
     this.itemData = itemData;

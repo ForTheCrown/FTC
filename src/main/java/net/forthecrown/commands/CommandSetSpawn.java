@@ -20,6 +20,22 @@ public class CommandSetSpawn extends FtcCommand {
   }
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    addUsages(factory, "world");
+    addUsages(factory, "server");
+  }
+
+  private void addUsages(UsageFactory factory, String name) {
+    factory = factory.withPrefix(name);
+
+    factory.usage("")
+        .addInfo("Sets the %s's spawn to where you are", name);
+
+    factory.usage("<pos: x,y,z>")
+        .addInfo("Sets the %s's spawn to <pos>", name);
+  }
+
+  @Override
   protected void createCommand(BrigadierCommand command) {
     command
         .then(literal("world")

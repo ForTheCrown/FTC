@@ -21,7 +21,6 @@ public class TestNotAlt extends UsageTest {
     super(TYPE);
   }
 
-
   @Override
   public Component displayInfo() {
     return null;

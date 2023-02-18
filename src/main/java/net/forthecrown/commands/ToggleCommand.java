@@ -74,8 +74,8 @@ public class ToggleCommand extends FtcCommand {
     this.displayName = displayName;
     this.property = property;
     this.messageFormat = messageFormat;
-    this.description = description;
 
+    setDescription(description);
     setPermission(permission);
     setAliases(aliases);
 
@@ -125,6 +125,15 @@ public class ToggleCommand extends FtcCommand {
    * @throws CommandSyntaxException If the user fails the test
    */
   public void test(User user, boolean newState) throws CommandSyntaxException {
+  }
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("", getDescription());
+
+    factory.usage("<player>")
+        .setPermission(Permissions.ADMIN)
+        .addInfo("Toggles %s for a <player>", getProperty().getKey());
   }
 
   @Override

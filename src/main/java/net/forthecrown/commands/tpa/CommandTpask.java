@@ -57,6 +57,12 @@ public class CommandTpask extends FtcCommand {
    */
 
   @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("<player>")
+        .addInfo("Asks to teleport to a <player>");
+  }
+
+  @Override
   protected void createCommand(BrigadierCommand command) {
     command.then(argument("player", Arguments.ONLINE_USER)
         .executes(c -> {
@@ -118,15 +124,13 @@ public class CommandTpask extends FtcCommand {
       return;
     }
 
-    if (!isInvalidWorld(world)) {
-      return;
-    }
-
     if (world.equals(Worlds.end()) && !EndConfig.open) {
       throw END_CLOSED;
     }
 
-    throw exc;
+    if (isInvalidWorld(world)) {
+      throw exc;
+    }
   }
 
   public static boolean isInvalidWorld(World world) {

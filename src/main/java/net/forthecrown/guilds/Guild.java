@@ -62,6 +62,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings("deprecation")
 public class Guild
     implements ForwardingAudience,
     InventoryHolder,
@@ -169,8 +170,7 @@ public class Guild
     }
 
     // Forward message to discord
-    getDiscord()
-        .forwardGuildChat(user, message);
+    getDiscord().forwardGuildChat(user, message);
 
     Mute finalMute = mute;
     getMembers()
@@ -205,6 +205,7 @@ public class Guild
                   )
                   .append(user.getTabName())
                   .build(),
+              false,
               false
           );
 
@@ -405,13 +406,14 @@ public class Guild
   }
 
   public void addExp(int amount) {
-    if (amount < 0) {
-      return;
-    }
+    setExp(this.totalExp + amount);
+  }
 
-    this.totalExp += amount;
+  public void setExp(long amount) {
+    this.totalExp = amount;
 
-    GuildManager.get().getExpTop()
+    GuildManager.get()
+        .getExpTop()
         .set(getId(), (int) totalExp);
   }
 
@@ -701,12 +703,11 @@ public class Guild
 
   @Override
   public String toString() {
-    return "Guild{" +
-        "id=" + id +
-        ", totalExp=" + totalExp +
-        ", members=" + members.keySet() +
-        ", outgoingInvites=" + outgoingInvites +
-        '}';
+    return "%s{id=%s, name=%s}".formatted(
+        getClass().getSimpleName(),
+        getId(),
+        settings.getName()
+    );
   }
 
   public boolean equals(Guild other) {
