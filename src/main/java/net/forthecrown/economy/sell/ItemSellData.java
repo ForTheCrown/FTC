@@ -49,6 +49,15 @@ public class ItemSellData {
    */
   private final int inventoryIndex;
 
+  /**
+   * Vars for math
+   */
+  private final double
+          B = 0.00015d,
+          C = B * maxEarnings / 2d,
+          D = price / 2d,
+          A = -price / (2* Math.atan(C));
+
   /* ----------------------------- METHODS ------------------------------ */
 
   /**
@@ -71,15 +80,48 @@ public class ItemSellData {
       return 0;
     }
 
-    int m = maxEarnings;
-    int x = earned;
-    int s = price;
-
-    double B = 0.00015d;
-    double C = B * m / 2d;
-    double D = s / 2d;
-    double A = -s / (2d * Math.atan(C));
-
-    return Math.max(0, (int) Math.ceil(A * Math.atan(B * x - C) + D));
+    return Math.max(0, (int) Math.ceil(A * Math.atan(B * earned - C) + D));
   }
+
+  // Idk what to call this, squiglyBoy()?
+  private double h(double x) {
+    return (Math.tan((x - D) / A) + C) / B;
+  }
+
+  // Inverse of calculatePrice()
+  private double calculatePriceInv(double x) {
+    return ((Math.tan(Math.atan(B*x - C) - 1/A) + C) / B ) - x;
+  }
+
+  /**
+   * Calculate in which segment of the calculatePrice(earned) function "earned" is part of.
+   * @param earned The amount of rhines that have already been earned from this data
+   * @return The number of the segment, in bounds [{s-1}..0]
+   */
+  private int calcN(double earned) {
+    int segmentNb = price-1;
+    double limit = h(segmentNb);
+
+    while (limit < earned || segmentNb == 0) {
+      segmentNb--;
+      limit = h(segmentNb);
+    }
+
+    return segmentNb;
+  }
+
+  /**
+   * Calculate how much can still be earned before the price of this data drops
+   * @param earned The amount of rhines that have already been earned from this data
+   * @return The amount of rhines to earn at current price.
+   */
+  public int calcPriceDrop(double earned) {
+    // temp vars
+    int n = calcN(earned);
+    double hn = h(n);
+    double hn1 = h(n+1);
+
+    return Math.max(0, (int) Math.ceil( (calculatePriceInv(hn1) * (earned - hn)) / (hn1 - hn) ));
+  }
+
 }
