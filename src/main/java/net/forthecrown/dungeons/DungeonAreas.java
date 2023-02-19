@@ -6,7 +6,7 @@ import net.forthecrown.utils.math.WorldBounds3i;
 public interface DungeonAreas {
 
   WorldBounds3i
-      DUNGEON_AREA  = create( -15,  16, 295, -255,  92,  26),
+      DUNGEON_AREA  = create( -15,  16, 295, -332,  92,   5),
       ZHAMBIE_ROOM  = create(-174,  92, 171, -207,  76, 142),
       SKALATAN_ROOM = create(-114,  80, 173,  -91,  62, 195),
       SPIDEY_ROOM   = create( -64,  65, 296,  -95,  52, 273),

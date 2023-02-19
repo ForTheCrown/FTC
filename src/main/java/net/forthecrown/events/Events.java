@@ -22,6 +22,7 @@ import net.forthecrown.events.player.JailListener;
 import net.forthecrown.events.player.LoginListener;
 import net.forthecrown.events.player.MarriageListener;
 import net.forthecrown.events.player.MotdListener;
+import net.forthecrown.events.player.PlayerDeathListener;
 import net.forthecrown.events.player.PlayerJoinListener;
 import net.forthecrown.events.player.PlayerLeaveListener;
 import net.forthecrown.events.player.PlayerPacketListener;
@@ -53,6 +54,7 @@ public final class Events {
     register(new EavesDropListener());
     register(new MotdListener());
     register(new PlayerTeleportListener());
+    register(new PlayerDeathListener());
     register(new TrapDoorListener());
 
     // Join / Quit listeners
