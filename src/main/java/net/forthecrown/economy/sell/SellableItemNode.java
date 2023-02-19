@@ -157,7 +157,13 @@ public class SellableItemNode implements MenuNode {
   ) {
     int earned = earnings.get(material);
     int rhinesUntilDrop = data.calcPriceDrop(earned);
-    int itemsUntilPriceDrop = rhinesUntilDrop / data.calculatePrice(earned);
+    int price = data.calculatePrice(earned);
+
+    if (price <= 0) {
+      return;
+    }
+
+    int itemsUntilPriceDrop = rhinesUntilDrop / price;
 
     itemsUntilPriceDrop = Math.max(1, itemsUntilPriceDrop);
 
