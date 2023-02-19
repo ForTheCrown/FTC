@@ -1350,16 +1350,17 @@ public class User implements ForwardingAudience.Single,
   }
 
   /**
-   * Updates the user's vanished state. If the user is vanished it removes them from the view of any
-   * other players that cannot see vanished players.
+   * Updates the user's vanished state. If the user is vanished it removes them
+   * from the view of any other players that cannot see vanished players.
    *
    * @throws UserOfflineException If the user is offline
    */
   public void updateVanished() throws UserOfflineException {
     ensureOnline();
+    boolean vanished = get(Properties.VANISHED);
 
     // Make sure vanish ticker is active
-    if (get(Properties.VANISHED)) {
+    if (vanished) {
       if (vanishTicker == null) {
         vanishTicker = new UserVanishTicker(this);
       }
@@ -1368,26 +1369,72 @@ public class User implements ForwardingAudience.Single,
       vanishTicker = null;
     }
 
+    boolean canSeeVanished = hasPermission(Permissions.VANISH_SEE);
+
+    if (vanished) {
+      UserPreference.DYNMAP_HIDE.setState(this, true);
+    }
+
     // Go through all online users to hide this
     // user from that online user
     for (var u : Users.getOnline()) {
-      // If the user in question can see vanished players, ignore
-      if (u.hasPermission(Permissions.VANISH_SEE)) {
-        continue;
-      }
-
       // If the user is this, ignore
       if (u.equals(this)) {
         continue;
       }
 
-      // Update vanished state
-      if (get(Properties.VANISHED)) {
-        u.getPlayer().hidePlayer(FTC.getPlugin(), getPlayer());
+      boolean otherVanished = u.get(Properties.VANISHED);
+
+      // Update our perspective of the other user
+      if (!canSeeVanished) {
+        if (otherVanished) {
+          hidePlayer(u);
+        } else {
+          showPlayer(u);
+        }
       } else {
-        u.getPlayer().showPlayer(FTC.getPlugin(), getPlayer());
+        showPlayer(u);
+      }
+
+      // Update other user's perspective of us
+      if (!u.hasPermission(Permissions.VANISH_SEE)) {
+        if (vanished) {
+          u.hidePlayer(this);
+        } else {
+          u.showPlayer(this);
+        }
+      } else {
+        u.showPlayer(this);
       }
     }
+  }
+
+  /**
+   * Shows the specified {@code other} user to this user. Only has an effect if
+   * the {@code other} has been hidden prior to this method call.
+   *
+   * @param other user to show (un-hide) to this user
+   * @throws UserOfflineException If either this user or {@code other} is
+   *                              offline
+   */
+  public void showPlayer(User other) throws UserOfflineException {
+    this.ensureOnline();
+    other.ensureOnline();
+
+    getPlayer().showPlayer(FTC.getPlugin(), other.getPlayer());
+  }
+
+  /**
+   * Hides the specified {@code other} user from this user.
+   * @param other user to hide from this user
+   * @throws UserOfflineException If either this user or {@code other} is
+   *                              offline
+   */
+  public void hidePlayer(User other) throws UserOfflineException {
+    this.ensureOnline();
+    other.ensureOnline();
+
+    getPlayer().hidePlayer(FTC.getPlugin(), other.getPlayer());
   }
 
   /**
