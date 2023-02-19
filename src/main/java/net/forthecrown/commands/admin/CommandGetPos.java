@@ -6,6 +6,7 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.text.Text;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 
 public class CommandGetPos extends FtcCommand {
@@ -29,14 +30,15 @@ public class CommandGetPos extends FtcCommand {
               c.getSource().sendMessage(
                   Text.format(
                       """
-                          Location of: {0, user}:
-                          x: {1}
-                          y: {2}
-                          z: {3}
-                          yaw: {4}
-                          pitch: {5}
-                          world: '{6}'
-                          """,
+                      Location of: &e{0, user}&r:
+                      x: &e{1}&r
+                      y: &e{2}&r
+                      z: &e{3}&r
+                      yaw: &e{4}&r
+                      pitch: &e{5}&r
+                      world: '&e{6}&r'""",
+
+                      NamedTextColor.GRAY,
 
                       user,
                       l.getX(), l.getY(), l.getZ(),
