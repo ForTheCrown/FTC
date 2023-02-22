@@ -3,6 +3,7 @@ package net.forthecrown.dungeons.level.gate;
 import lombok.Getter;
 import lombok.Setter;
 import net.forthecrown.dungeons.level.DungeonPiece;
+import net.forthecrown.dungeons.level.LevelBiome;
 import net.forthecrown.dungeons.level.PieceVisitor;
 import net.forthecrown.dungeons.level.room.RoomPiece;
 import net.minecraft.nbt.CompoundTag;
@@ -53,7 +54,7 @@ public class GatePiece extends DungeonPiece {
   }
 
   @Override
-  public String getPaletteName() {
+  public String getPaletteName(LevelBiome biome) {
     if (!getType().isOpenable()) {
       return getType().getClosedPalette();
     }

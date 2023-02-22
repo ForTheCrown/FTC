@@ -3,8 +3,10 @@ package net.forthecrown.structure;
 import lombok.experimental.UtilityClass;
 import net.forthecrown.utils.VanillaAccess;
 import net.forthecrown.utils.math.Transform;
+import org.apache.commons.lang3.mutable.Mutable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.math.vector.Vector3i;
 
 /**
  * Utility class for methods and constants related to {@link BlockProcessor}s
@@ -36,7 +38,8 @@ public @UtilityClass class BlockProcessors {
     @Override
     public @Nullable BlockInfo process(@NotNull BlockInfo original,
                                        @Nullable BlockInfo previous,
-                                       @NotNull StructurePlaceConfig context
+                                       @NotNull StructurePlaceConfig context,
+                                       Mutable<Vector3i> position
     ) {
       return previous == null ? original : previous;
     }
@@ -47,7 +50,8 @@ public @UtilityClass class BlockProcessors {
     @Override
     public @Nullable BlockInfo process(@NotNull BlockInfo original,
                                        @Nullable BlockInfo previous,
-                                       @NotNull StructurePlaceConfig config
+                                       @NotNull StructurePlaceConfig config,
+                                       Mutable<Vector3i> position
     ) {
       if (previous == null) {
         return null;
@@ -66,7 +70,8 @@ public @UtilityClass class BlockProcessors {
     @Override
     public @Nullable BlockInfo process(@NotNull BlockInfo original,
                                        @Nullable BlockInfo previous,
-                                       @NotNull StructurePlaceConfig context
+                                       @NotNull StructurePlaceConfig context,
+                                       Mutable<Vector3i> position
     ) {
       if (previous == null
           || context.getTransform() == null

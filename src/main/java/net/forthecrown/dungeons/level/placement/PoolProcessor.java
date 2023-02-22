@@ -5,18 +5,16 @@ import java.util.Random;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.structure.FunctionInfo;
-import net.forthecrown.structure.StructurePool;
-import org.bukkit.World;
 
 @Getter
 @RequiredArgsConstructor
 public class PoolProcessor implements PostPlacementProcessor {
-  private final StructurePool pool;
 
   @Override
-  public void processAll(World world,
-                         List<FunctionInfo> markerList,
-                         Random random
+  public void processAll(
+      LevelPlacement placement,
+      List<FunctionInfo> markerList,
+      Random random
   ) {
 
   }

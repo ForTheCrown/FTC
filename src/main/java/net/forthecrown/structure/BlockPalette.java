@@ -103,11 +103,11 @@ public class BlockPalette {
         Vector3i offset = Vectors.fromLong(l);
         var info = config.run(i.getKey(), offset);
 
-        if (info == null) {
+        if (info == null || info.left() == null) {
           continue;
         }
 
-        info.place(config, offset);
+        info.left().place(config, info.right());
       }
     }
 

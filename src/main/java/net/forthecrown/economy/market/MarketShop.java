@@ -1,6 +1,5 @@
 package net.forthecrown.economy.market;
 
-import static net.forthecrown.core.FtcDiscord.C_MARKETS;
 import static net.forthecrown.economy.market.MarketEviction.SOURCE_AUTOMATIC;
 import static net.forthecrown.economy.market.MarketReset.TEMPLATE_DEPTH;
 import static net.forthecrown.user.data.UserTimeTracker.UNSET;
@@ -20,8 +19,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.forthecrown.commands.manager.Exceptions;
-import net.forthecrown.core.FtcDiscord;
 import net.forthecrown.core.Messages;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.economy.Economy;
 import net.forthecrown.economy.TransactionType;
 import net.forthecrown.economy.Transactions;
@@ -602,7 +601,8 @@ public class MarketShop {
       m.setRead(true);
     }
 
-    FtcDiscord.staffLog(C_MARKETS,
+    Loggers.getLogger().info(
+        Loggers.STAFF_LOG,
         "{}, owner `{}`, has been marked for eviction, reason: `{}`, source: `{}`",
         getName(), user.getNickOrName(), Text.plain(reason), source
     );
@@ -629,8 +629,11 @@ public class MarketShop {
     user.sendMessage(message);
     user.getMail().add(message);
 
-    FtcDiscord.staffLog(C_MARKETS, "{}, owner '{}', eviction cancelled",
-        getName(), user.getNickOrName()
+    Loggers.getLogger().info(
+        Loggers.STAFF_LOG,
+        "{}, owner '{}', eviction cancelled",
+        getName(),
+        user.getNickOrName()
     );
   }
 

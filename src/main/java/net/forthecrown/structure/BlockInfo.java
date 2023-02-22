@@ -100,6 +100,10 @@ public class BlockInfo {
     }
   }
 
+  public BlockData getData() {
+    return data.clone();
+  }
+
   /* ----------------------------- CLONE METHODS ------------------------------ */
 
   public BlockInfo withData(BlockData data) {

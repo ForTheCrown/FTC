@@ -1,11 +1,8 @@
 package net.forthecrown.core.admin;
 
-import static net.forthecrown.core.FtcDiscord.C_PUNISH;
-
 import java.util.UUID;
 import javax.annotation.Nullable;
 import net.forthecrown.core.Announcer;
-import net.forthecrown.core.FtcDiscord;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.config.GeneralConfig;
@@ -20,6 +17,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.OfflinePlayer;
 
 /**
@@ -35,6 +33,8 @@ public final class Punishments {
    * member.
    */
   public static final long INDEFINITE_EXPIRY = -1;
+
+  private static final Logger LOGGER = Loggers.getLogger();
 
   static final Punisher inst = new Punisher();
 
@@ -133,21 +133,15 @@ public final class Punishments {
 
     announce(source, target, type, length, reason);
 
-    var lengthString = length == INDEFINITE_EXPIRY ? "Eternal" : PeriodFormat.of(length).toString();
+    var lengthString = length == INDEFINITE_EXPIRY
+        ? "Eternal"
+        : PeriodFormat.of(length).toString();
 
-    Loggers.getLogger().info("{} punished {} with {}, reason: {}, length: {}",
+    LOGGER.info(Loggers.STAFF_LOG,
+        "{} punished {} with {}, reason: {}, length: {}",
         source.textName(), target.getName(),
         type.name().toLowerCase(),
         reason,
-        lengthString
-    );
-
-    // Log punishment on Staff log
-    FtcDiscord.staffLog(C_PUNISH, "**{} {} {}**, reason: ``{}``, length: **{}**",
-        source.textName(),
-        type.nameEndingED(),
-        target.getNickOrName(),
-        reason == null ? "None" : reason,
         lengthString
     );
   }
@@ -197,8 +191,11 @@ public final class Punishments {
             .append(target.displayName().color(NamedTextColor.YELLOW))
     );
 
-    FtcDiscord.staffLog(C_PUNISH, "{} Un{} {}", source.textName(),
-        type.nameEndingED().toLowerCase(), target.getNickOrName());
+    LOGGER.info(Loggers.STAFF_LOG, "{} Un{} {}",
+        source.textName(),
+        type.nameEndingED().toLowerCase(),
+        target.getNickOrName()
+    );
   }
 
   private static void _announce(CommandSource source, Component text) {

@@ -6,17 +6,20 @@ import it.unimi.dsi.fastutil.ints.IntObjectPair;
 import java.util.stream.Stream;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.dungeons.DungeonManager;
-import net.forthecrown.dungeons.level.Pieces;
+import net.forthecrown.dungeons.level.room.RoomFlag;
 import net.forthecrown.dungeons.level.room.RoomType;
 import org.apache.commons.lang3.Range;
 
 public enum SectionType {
-  /* ----------------------------- CONNECTOR TYPE ------------------------------ */
+  /* --------------------------- CONNECTOR TYPE --------------------------- */
 
   CONNECTOR {
     @Override
     public Range<Integer> createDepth(TreeGeneratorConfig config) {
-      return Range.between(config.getMinConnectorDepth(), config.getMaxConnectorDepth());
+      return Range.between(
+          config.getMinConnectorDepth(),
+          config.getMaxConnectorDepth()
+      );
     }
 
     @Override
@@ -24,16 +27,20 @@ public enum SectionType {
       return DungeonManager.getDungeons().getRoomTypes()
           .stream()
 
-          .filter(holder -> holder.getValue().hasFlags(Pieces.FLAG_CONNECTOR))
+          .filter(holder -> holder.getValue().hasFlag(RoomFlag.CONNECTOR))
 
           .map(Holder::getValue)
           .map(type -> {
             int weight = DEFAULT_WEIGHT;
             int gateAmount = type.getGates().size();
 
-            weight += (gen.getDepth() < gen.getConfig().getMinDepth()) ? gateAmount : -gateAmount;
-            weight += (gateAmount - 1) <= gen.getConfig().getMaxConnectorExits() ?
-                gateAmount * 2 : -(gateAmount * 2);
+            weight += (gen.getDepth() < gen.getConfig().getMinDepth())
+                ? gateAmount
+                : -gateAmount;
+
+            weight += gateAmount - 1 <= gen.getConfig().getMaxConnectorExits()
+                ? gateAmount * 2
+                : -(gateAmount * 2);
 
             return IntObjectPair.of(weight, type);
           });
@@ -58,7 +65,7 @@ public enum SectionType {
       return DungeonManager.getDungeons().getRoomTypes()
           .stream()
 
-          .filter(holder -> !holder.getValue().hasFlags(Pieces.FLAG_CONNECTOR))
+          .filter(holder -> !holder.getValue().hasFlag(RoomFlag.CONNECTOR))
 
           .map(Holder::getValue)
           .map(type -> {

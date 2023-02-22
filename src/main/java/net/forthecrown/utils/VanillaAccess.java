@@ -10,6 +10,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -118,6 +119,25 @@ public final class VanillaAccess {
     var state = getState(data);
     state = state.rotate(toVanilla(rotation));
     return state.createCraftBlockData();
+  }
+
+  @SuppressWarnings({"rawtypes", "unchecked"})
+  public static BlockData merge(BlockData target, BlockData source) {
+    BlockState nmsTarget = getState(target);
+    BlockState nmsSource = getState(source);
+
+    BlockState result = nmsTarget;
+
+    var properties = nmsSource.getProperties();
+
+    for (var p: properties) {
+      Comparable value = nmsSource.getValue(p);
+      Property property = p;
+
+      result = result.setValue(property, value);
+    }
+
+    return result.createCraftBlockData();
   }
 
   /**

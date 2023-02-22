@@ -5,5 +5,6 @@ public class TestCommands {
   public static void createCommands() {
     new CommandFtcTest();
     new CommandBoundsDraw();
+    new CommandDungeonTest();
   }
 }

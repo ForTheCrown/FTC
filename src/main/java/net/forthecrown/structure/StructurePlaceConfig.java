@@ -4,10 +4,13 @@ import static net.forthecrown.structure.BlockStructure.DEFAULT_PALETTE_NAME;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import it.unimi.dsi.fastutil.Pair;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.forthecrown.utils.math.Transform;
+import org.apache.commons.lang3.mutable.Mutable;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,15 +48,24 @@ public class StructurePlaceConfig {
     return new Builder();
   }
 
-  public @Nullable BlockInfo run(@NotNull BlockInfo original, @NotNull Vector3i offset) {
+  public @Nullable Pair<BlockInfo, Vector3i> run(
+      @NotNull BlockInfo original,
+      @NotNull Vector3i offset
+  ) {
     var result = original.copy();
     original = original.copy();
+    Mutable<Vector3i> position = new MutableObject<>(offset);
 
     for (var p : processors) {
-      result = p.process(original, result == null ? null : result.copy(), this);
+      result = p.process(
+          original,
+          result == null ? null : result.copy(),
+          this,
+          position
+      );
     }
 
-    return result;
+    return Pair.of(result, position.getValue());
   }
 
   @Getter

@@ -34,10 +34,14 @@ public final class SerializationHelper {
     }
 
     var parent = file.getParent();
-    var either = PathUtil.ensureDirectoryExists(parent);
 
-    if (either.right().isPresent()) {
-      throw either.right().get();
+    // File exists in top level directory with no parent folder
+    if (parent != null) {
+      var either = PathUtil.ensureDirectoryExists(parent);
+
+      if (either.right().isPresent()) {
+        throw either.right().get();
+      }
     }
   }
 

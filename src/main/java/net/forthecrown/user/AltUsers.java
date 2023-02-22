@@ -2,10 +2,12 @@ package net.forthecrown.user;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.forthecrown.utils.io.SerializableObject;
@@ -48,7 +50,7 @@ public class AltUsers extends SerializableObject.Json {
   }
 
   public Collection<UUID> getOtherAccounts(UUID uuid) {
-    var alts = getAlts(uuid);
+    Set<UUID> alts = new ObjectOpenHashSet<>(getAlts(uuid));
     var main = getMain(uuid);
 
     if (main != null) {

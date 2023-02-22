@@ -41,7 +41,6 @@ public class DebugVisitor implements PieceVisitor {
     field("Depth", piece.getDepth());
     field("Bounds", piece.getBounds());
     field("Pivot Position", piece.getPivotPosition());
-    field("Palette", piece.getPaletteName());
     field("Structure", piece.getType().getStructureName());
     field("ID", piece.getId());
   }

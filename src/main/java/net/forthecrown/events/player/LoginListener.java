@@ -4,6 +4,7 @@ import static net.forthecrown.core.admin.Punishments.INDEFINITE_EXPIRY;
 
 import com.google.common.base.Strings;
 import java.util.Objects;
+import java.util.UUID;
 import net.forthecrown.core.admin.PunishEntry;
 import net.forthecrown.core.admin.PunishType;
 import net.forthecrown.core.admin.Punishments;
@@ -22,16 +23,10 @@ public class LoginListener implements Listener {
 
   @EventHandler(ignoreCancelled = true)
   public void onAsyncPlayerPreLogin(AsyncPlayerPreLoginEvent event) {
-    PunishEntry entry = Punishments.get().getEntry(event.getUniqueId());
+    var msg = testBanned(event.getUniqueId());
 
-    var ipBan = banMessage(entry, PunishType.IP_BAN);
-    if (ipBan != null) {
-      event.disallow(Result.KICK_BANNED, ipBan);
-    }
-
-    var ban = banMessage(entry, PunishType.BAN);
-    if (ban != null) {
-      event.disallow(Result.KICK_BANNED, ban);
+    if (msg != null) {
+      event.disallow(Result.KICK_BANNED, msg);
     }
 
     if (!GeneralConfig.enforceAltRule) {
@@ -56,6 +51,30 @@ public class LoginListener implements Listener {
             alreadyOnlineOpt.get()
         )
     );
+  }
+
+  private Component testBanned(UUID userId) {
+    var alts = UserManager.get().getAlts();
+    var accounts = alts.getOtherAccounts(userId);
+    accounts.add(userId);
+
+    var punishments = Punishments.get();
+
+    for (var accountId: accounts) {
+      var entry = punishments.getEntry(accountId);
+
+      var msg = banMessage(entry, PunishType.BAN);
+      if (msg != null) {
+        return msg;
+      }
+
+      var ipMsg = banMessage(entry, PunishType.IP_BAN);
+      if (ipMsg != null) {
+        return ipMsg;
+      }
+    }
+
+    return null;
   }
 
   private Component banMessage(PunishEntry entry, PunishType type) {

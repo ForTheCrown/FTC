@@ -12,10 +12,7 @@ import java.io.Writer;
 import java.util.Optional;
 import lombok.Getter;
 import net.forthecrown.core.FtcDiscord;
-import net.forthecrown.core.config.GeneralConfig;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.LogEvent;
-import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,21 +27,6 @@ public class DiscordAppender extends AbstractAppender {
   public DiscordAppender() {
     super(APPENDER_NAME, null, null, false, null);
     setStarted();
-  }
-
-  public static void addToLogger() {
-    var ctx = LoggerContext.getContext(false);
-    var config = ctx.getConfiguration();
-    var root = config.getRootLogger();
-
-    root.removeAppender(APPENDER_NAME);
-    root.addAppender(new DiscordAppender(), getAppenderLevel(), null);
-    ctx.updateLoggers();
-  }
-
-  private static Level getAppenderLevel() {
-    String name = GeneralConfig.discordAppenderLevel;
-    return Level.toLevel(name, Level.ERROR);
   }
 
   @Override

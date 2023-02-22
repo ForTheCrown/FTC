@@ -8,7 +8,7 @@ import lombok.Setter;
 import lombok.experimental.UtilityClass;
 import net.forthecrown.core.FTC;
 import net.forthecrown.core.Worlds;
-import net.forthecrown.core.logging.DiscordAppender;
+import net.forthecrown.core.logging.Loggers;
 import org.bukkit.Location;
 
 @ConfigData(filePath = "config.json")
@@ -104,6 +104,6 @@ public @UtilityClass class GeneralConfig {
   }
 
   private static void onLoad() {
-    DiscordAppender.addToLogger();
+    Loggers.updateLoggers();
   }
 }

@@ -1,29 +1,27 @@
 package net.forthecrown.core;
 
-import static net.forthecrown.core.FtcDiscord.C_END;
 import static net.forthecrown.core.config.EndConfig.closeMessage;
 import static net.forthecrown.core.config.EndConfig.enabled;
 import static net.forthecrown.core.config.EndConfig.leverPos;
 import static net.forthecrown.core.config.EndConfig.nextSize;
 import static net.forthecrown.core.config.EndConfig.open;
 import static net.forthecrown.core.config.EndConfig.openMessage;
+import static net.forthecrown.core.logging.Loggers.STAFF_LOG;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.time.Year;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import net.forthecrown.core.admin.StaffChat;
 import net.forthecrown.core.config.EndConfig;
 import net.forthecrown.core.config.JoinInfo;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnDayChange;
+import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.VanillaAccess;
 import net.forthecrown.utils.world.WorldLoader;
 import net.forthecrown.utils.world.WorldReCreator;
-import net.kyori.adventure.text.Component;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -33,7 +31,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.dimension.end.EndDragonFight;
 import org.apache.commons.lang3.Range;
 import org.apache.logging.log4j.Logger;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -64,7 +61,7 @@ public class EndOpener {
 
     byte day = (byte) time.getDayOfMonth();
     byte first = 1;
-    byte last = (byte) time.getMonth().length(Year.isLeap(time.getYear()));
+    byte last = (byte) time.toLocalDate().lengthOfMonth();
     byte openingDay = (byte) (last - 7);
 
     // The range representing days on which the
@@ -99,7 +96,7 @@ public class EndOpener {
    * new end world.
    */
   public CompletableFuture<World> regenerateEnd() {
-    StaffChat.send(Component.text("Starting End reset"), false);
+    LOGGER.info(STAFF_LOG, "Starting End reset");
 
     // Re-create world
     WorldReCreator reCreator = WorldReCreator.of(Worlds.end())
@@ -120,7 +117,7 @@ public class EndOpener {
     return WorldLoader.loadAsync(created)
         .whenComplete((world, throwable) -> {
           // Run sync
-          Bukkit.getScheduler().runTask(FTC.getPlugin(), () -> {
+          Tasks.runSync(() -> {
             try {
               EndDragonFight fight = VanillaAccess.getLevel(world).dragonFight();
 
@@ -133,9 +130,7 @@ public class EndOpener {
               e.printStackTrace();
             }
 
-            LOGGER.info("Placed end exit portal and gateways");
-            StaffChat.send(Component.text("End reset finished"), false);
-            FtcDiscord.staffLog(C_END, "End reset finished");
+            LOGGER.info(STAFF_LOG, "End reset finished");
           });
         });
   }
@@ -157,7 +152,16 @@ public class EndOpener {
     PortalRoad.set(leverPos.getWorld(), open);
     Announcer.get().announce(open ? openMessage : closeMessage);
 
-    FtcDiscord.staffLog(C_END, "End is now " + (open ? "open" : "closed"));
+    var world = Worlds.end();
+    var border = world.getWorldBorder();
+
+    if (open) {
+      border.setSize(nextSize);
+    } else {
+      border.setSize(1);
+    }
+
+    LOGGER.info(STAFF_LOG, "End is now {}", open ? "open" : "closed");
   }
 
   // Lever on = closed, lever off = open. AKA, flip the input
@@ -168,8 +172,11 @@ public class EndOpener {
     Block b = leverPos.getBlock();
 
     if (b.getType() != Material.LEVER) {
-      LOGGER.error("Given EndOpener lever position: {} is not a lever! Cannot close/open end",
-          leverPos);
+      LOGGER.error(
+          "Given EndOpener lever position: {} is not a lever! Cannot "
+              + "close/open end",
+          leverPos
+      );
       return false;
     }
 

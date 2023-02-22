@@ -91,7 +91,7 @@ public abstract class DungeonPiece implements BoundsHolder {
 
   /* ----------------------------- METHODS ------------------------------ */
 
-  public abstract String getPaletteName();
+  public abstract String getPaletteName(LevelBiome biome);
 
   public BlockStructure getStructure() {
     return getType().getStructure().orElse(null);

@@ -11,20 +11,14 @@ import org.apache.logging.log4j.message.ParameterizedMessage;
  * Class for interacting with the Discord server using the discord srv plugin
  */
 public final class FtcDiscord {
-
-  private FtcDiscord() {
-  }
+  private FtcDiscord() {}
 
   public static final String
       // Channel names
       STAFF_LOG = "staff-log",
 
       // Staff Log categories
-      C_STAFF = "Staff",
-      C_PUNISH = "Punishments",
-      C_END = "End",
-      C_RW = "RW",
-      C_MARKETS = "Markets";
+      C_STAFF = "Staff";
 
   public static boolean isActive() {
     if (!Util.isPluginEnabled("DiscordSRV")) {

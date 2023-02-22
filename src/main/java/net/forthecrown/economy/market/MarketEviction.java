@@ -1,12 +1,10 @@
 package net.forthecrown.economy.market;
 
-import static net.forthecrown.core.FtcDiscord.C_MARKETS;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.core.FtcDiscord;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.utils.JsonSerializable;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.Time;
@@ -81,8 +79,11 @@ public class MarketEviction implements JsonSerializable, Runnable {
     owner.sendMessage(message);
     owner.getMail().add(message);
 
-    FtcDiscord.staffLog(C_MARKETS, "Evicted owner of shop '{}': '{}', reason: `{}`",
-        market.getName(), owner.getNickOrName(),
+    Loggers.getLogger().info(
+        Loggers.STAFF_LOG,
+        "Evicted owner of shop '{}': '{}', reason: `{}`",
+        market.getName(),
+        owner.getNickOrName(),
         Text.plain(reason)
     );
 

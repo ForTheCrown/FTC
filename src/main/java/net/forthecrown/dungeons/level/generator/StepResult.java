@@ -88,4 +88,22 @@ public class StepResult {
   public boolean failed() {
     return resultCode != SUCCESS;
   }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName()
+        + "[result=" + failCodeName(resultCode)
+        + ", createdSections=" + sections.size()
+        + "]";
+  }
+
+  private static String failCodeName(byte id) {
+    return switch (id) {
+      case SUCCESS -> "SUCCESS";
+      case FAILED -> "FAILED";
+      case MAX_DEPTH -> "MAX_DEPTH";
+      case MAX_SECTION_DEPTH -> "MAX_SECTION_DEPTH";
+      default -> "UNKNOWN";
+    };
+  }
 }

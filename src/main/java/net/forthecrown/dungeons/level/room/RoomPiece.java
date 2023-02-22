@@ -6,9 +6,9 @@ import java.util.List;
 import lombok.Getter;
 import net.forthecrown.dungeons.level.DungeonLevel;
 import net.forthecrown.dungeons.level.DungeonPiece;
+import net.forthecrown.dungeons.level.LevelBiome;
 import net.forthecrown.dungeons.level.PieceVisitor;
 import net.forthecrown.dungeons.level.PieceVisitor.Result;
-import net.forthecrown.structure.BlockStructure;
 import net.forthecrown.utils.io.TagUtil;
 import net.minecraft.nbt.CompoundTag;
 import org.bukkit.World;
@@ -43,8 +43,8 @@ public class RoomPiece extends DungeonPiece {
   /* ------------------------------ METHODS ------------------------------- */
 
   @Override
-  public String getPaletteName() {
-    return BlockStructure.DEFAULT_PALETTE_NAME;
+  public String getPaletteName(LevelBiome biome) {
+    return getType().getPalette(biome);
   }
 
   @Override

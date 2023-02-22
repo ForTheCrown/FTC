@@ -8,6 +8,7 @@ import net.forthecrown.dungeons.level.PieceVisitor;
 import net.forthecrown.dungeons.level.gate.GatePiece;
 import net.forthecrown.dungeons.level.room.RoomPiece;
 import net.forthecrown.structure.BlockProcessors;
+import net.forthecrown.structure.BlockRotProcessor;
 import net.forthecrown.structure.StructurePlaceConfig;
 import net.forthecrown.structure.StructurePlaceConfig.Builder;
 import net.forthecrown.utils.math.Transform;
@@ -18,7 +19,7 @@ public class RoomPlacingVisitor implements PieceVisitor {
   private static final Logger LOGGER = Loggers.getLogger();
 
   @Getter @Setter
-  private PostProcessorManager collector;
+  private LevelPlacement placement;
 
   @Getter
   private int placementCounter = 0;
@@ -41,26 +42,36 @@ public class RoomPlacingVisitor implements PieceVisitor {
     if (struct == null) {
       LOGGER.error(
           "Cannot place piece {}, at {}, no structure with name {}",
-          piece, piece.getPivotPosition(),
+          piece,
+          piece.getPivotPosition(),
           piece.getType().getStructureName()
       );
 
       return;
     }
 
+    var source = placement.getBiomeSource();
+    var center = piece.getBounds().center();
+    var biome = source.findBiome(center);
+
+    BlockRotProcessor rotProcessor
+        = new BlockRotProcessor(placement, placement.getRandom());
+
     Builder builder = StructurePlaceConfig.builder()
         .placeEntities(true)
         .pos(piece.getPivotPosition())
+        .world(placement.getWorld())
         .transform(Transform.rotation(piece.getRotation()))
-        .paletteName(piece.getPaletteName())
+        .paletteName(piece.getPaletteName(biome))
         .addNonNullProcessor()
         .addRotationProcessor()
-        .addProcessor(BlockProcessors.IGNORE_AIR);
+        .addProcessor(BlockProcessors.IGNORE_AIR)
+        .addProcessor(rotProcessor);
 
     var config = builder.build();
     struct.place(config);
 
-    if (collector != null) {
+    if (placement != null) {
       struct.getFunctions().forEach(func -> {
         if (!func.getFunctionKey().startsWith("post/")) {
           return;
@@ -70,7 +81,7 @@ public class RoomPlacingVisitor implements PieceVisitor {
             config.getTransform().apply(func.getOffset())
         );
 
-        collector.addMarker(info);
+        placement.addMarker(info);
       });
     }
 

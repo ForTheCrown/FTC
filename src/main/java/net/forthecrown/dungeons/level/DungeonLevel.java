@@ -15,9 +15,9 @@ import lombok.Getter;
 import lombok.Setter;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.dungeons.DungeonWorld;
-import net.forthecrown.dungeons.LevelManager.LevelCell;
-import net.forthecrown.dungeons.level.placement.PostProcessorManager;
+import net.forthecrown.dungeons.level.placement.LevelPlacement;
 import net.forthecrown.dungeons.level.placement.RoomPlacingVisitor;
+import net.forthecrown.dungeons.level.room.RoomFlag;
 import net.forthecrown.dungeons.level.room.RoomPiece;
 import net.forthecrown.utils.ChunkedMap;
 import net.forthecrown.utils.Tasks;
@@ -71,9 +71,6 @@ public class DungeonLevel implements Iterable<DungeonPiece> {
 
   private final LevelListener listener = new LevelListener(this);
 
-  @Getter @Setter
-  private LevelCell cell;
-
   /* ------------------------------ METHODS ------------------------------- */
 
   /**
@@ -90,7 +87,7 @@ public class DungeonLevel implements Iterable<DungeonPiece> {
   public void addPiece(DungeonPiece piece) {
     if (this.root == null
         && piece instanceof RoomPiece room
-        && room.getType().hasFlags(Pieces.FLAG_ROOT)
+        && room.getType().hasFlag(RoomFlag.ROOT)
     ) {
       this.root = room;
     }
@@ -156,9 +153,9 @@ public class DungeonLevel implements Iterable<DungeonPiece> {
   /* ----------------------------- PLACEMENT ------------------------------ */
 
   public void place() {
-    var manager = PostProcessorManager.create(DungeonWorld.get());
+    var manager = LevelPlacement.create(DungeonWorld.get());
     RoomPlacingVisitor visitor = new RoomPlacingVisitor();
-    visitor.setCollector(manager);
+    visitor.setPlacement(manager);
 
     getRoot().visit(visitor);
 

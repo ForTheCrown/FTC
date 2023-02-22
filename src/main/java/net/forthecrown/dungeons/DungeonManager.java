@@ -1,7 +1,7 @@
 package net.forthecrown.dungeons;
 
 import lombok.Getter;
-import net.forthecrown.core.module.OnEnable;
+import net.forthecrown.core.module.OnLoad;
 import net.forthecrown.core.registry.Registries;
 import net.forthecrown.core.registry.Registry;
 import net.forthecrown.dungeons.level.PieceType;
@@ -25,16 +25,19 @@ public class DungeonManager {
   private final Registry<GateType>
       gateTypes = createTypeRegistry("gates");
 
-  private final DungeonDataStorage storage;
+  private final LevelDataStorage storage;
 
   private DungeonManager() {
-    this.storage = new DungeonDataStorage(
+    this.storage = new LevelDataStorage(
         PathUtil.getPluginDirectory("dungeons")
     );
   }
 
-  @OnEnable
-  private void init() {
+  @OnLoad
+  public void reload() {
+    roomTypes.clear();
+    gateTypes.clear();
+
     storage.loadGates(gateTypes);
     storage.loadRooms(roomTypes);
   }

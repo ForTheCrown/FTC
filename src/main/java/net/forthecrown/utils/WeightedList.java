@@ -85,6 +85,11 @@ public class WeightedList<T> {
     return new WeightedIterator(random);
   }
 
+  @Override
+  public String toString() {
+    return values.toString();
+  }
+
   /* ----------------------------- SUB CLASSES ------------------------------ */
 
   private record Entry<T>(T value, int weight) {

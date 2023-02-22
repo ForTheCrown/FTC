@@ -1,6 +1,5 @@
 package net.forthecrown.core.resource;
 
-import static net.forthecrown.core.FtcDiscord.C_RW;
 import static net.forthecrown.core.config.ResourceWorldConfig.enabled;
 import static net.forthecrown.core.config.ResourceWorldConfig.lastReset;
 import static net.forthecrown.core.config.ResourceWorldConfig.lastSeed;
@@ -13,6 +12,7 @@ import static net.forthecrown.core.config.ResourceWorldConfig.spawnStructure;
 import static net.forthecrown.core.config.ResourceWorldConfig.toHazGate;
 import static net.forthecrown.core.config.ResourceWorldConfig.toResGate;
 import static net.forthecrown.core.config.ResourceWorldConfig.worldGuardSpawn;
+import static net.forthecrown.core.logging.Loggers.STAFF_LOG;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -29,9 +29,7 @@ import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import net.forthecrown.core.Announcer;
 import net.forthecrown.core.FTC;
-import net.forthecrown.core.FtcDiscord;
 import net.forthecrown.core.Worlds;
-import net.forthecrown.core.admin.StaffChat;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnDayChange;
 import net.forthecrown.structure.BlockStructure;
@@ -50,7 +48,6 @@ import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.utils.math.WorldBounds3i;
 import net.forthecrown.utils.world.WorldLoader;
 import net.forthecrown.utils.world.WorldReCreator;
-import net.kyori.adventure.text.Component;
 import net.minecraft.core.Holder;
 import net.minecraft.core.QuartPos;
 import net.minecraft.core.registries.Registries;
@@ -196,7 +193,7 @@ public class ResourceWorld {
       return;
     }
 
-    LOGGER.info("Starting RW reset");
+    LOGGER.info(STAFF_LOG, "Starting RW reset");
 
     World original = Worlds.resource();
 
@@ -213,9 +210,10 @@ public class ResourceWorld {
 
     findSeed().whenComplete((seed, throwable) -> {
       if (throwable != null) {
-        StaffChat.send(Component.text("Error while attempting to find RW seed"), false);
-        FtcDiscord.staffLog(C_RW, "Error while attempting to find RW seed");
-        LOGGER.error("Error while attempting to find seed, cannot open RW", throwable);
+        LOGGER.error(STAFF_LOG,
+            "Error while attempting to find seed, cannot open RW",
+            throwable
+        );
 
         return;
       }
@@ -249,9 +247,11 @@ public class ResourceWorld {
 
   private void onWorldLoadedAsync(World world, Throwable throwable) {
     if (throwable != null) {
-      StaffChat.send(Component.text("Error while resetting RW, cannot finish"), false);
-      LOGGER.error("Could not regen Resource World", throwable);
-      FtcDiscord.staffLog(C_RW, "Error while resetting Resource World!");
+      LOGGER.error(STAFF_LOG,
+          "Error while regenerating Resource World",
+          throwable
+      );
+
       return;
     }
 
@@ -418,9 +418,7 @@ public class ResourceWorld {
     setGatesOpen(true);
 
     lastReset = System.currentTimeMillis();
-    LOGGER.info("RW reset finished");
-
-    FtcDiscord.staffLog(C_RW, "Resource World reset finished!");
+    LOGGER.info(STAFF_LOG, "Resource World reset finished");
   }
 
   private void setGatesOpen(boolean open) {

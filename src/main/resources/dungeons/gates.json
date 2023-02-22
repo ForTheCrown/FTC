@@ -1,3 +1,21 @@
 {
-
+  "default": {
+    "struct": "dungeons/gates/default",
+    "palettes": {
+      "closed": "closed",
+      "open": "default"
+    }
+  },
+  "decorated": {
+    "struct": "dungeons/gates/decorated",
+    "palettes": {
+      "closed": "default"
+    }
+  },
+  "collapsed": {
+    "struct": "dungeons/gates/collapsed",
+    "palettes": {
+      "closed": "default"
+    }
+  }
 }

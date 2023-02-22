@@ -57,6 +57,8 @@ public final class JsonUtils {
   private static final BigInteger B = BigInteger.ONE.shiftLeft(64); // 2^64
   private static final BigInteger L = BigInteger.valueOf(Long.MAX_VALUE);
 
+  public static final EnumTypeAdapter ENUM_TYPE_ADAPTER = new EnumTypeAdapter();
+
   public static JsonObject writeLocation(Location location) {
     JsonObject result = new JsonObject();
 

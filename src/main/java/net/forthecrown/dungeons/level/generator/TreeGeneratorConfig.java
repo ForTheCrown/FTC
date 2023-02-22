@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.forthecrown.utils.Util;
+import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.math.Vectors;
 import org.spongepowered.math.vector.Vector3i;
 
@@ -17,6 +18,7 @@ public class TreeGeneratorConfig {
   private static final Gson GSON = new GsonBuilder()
       .setPrettyPrinting()
       .registerTypeAdapter(Vector3i.class, Vectors.V3I_ADAPTER)
+      .registerTypeAdapterFactory(JsonUtils.ENUM_TYPE_ADAPTER)
       .create();
 
   /**
@@ -35,7 +37,8 @@ public class TreeGeneratorConfig {
   private final int maxRoomExits;
 
   /**
-   * The amount of 'potential' levels made by the generator, from which the best level is selected
+   * The amount of 'potential' levels made by the generator, from which the best
+   * level is selected
    */
   private final int potentialLevels;
 
@@ -45,10 +48,12 @@ public class TreeGeneratorConfig {
   private final int requiredRooms;
 
   /**
-   * Chance for a room to have open gates and thus allow for further nodes to be developed from it
+   * Chance for a room to have open gates and thus allow for further nodes to
+   * be developed from it
    */
   private final float roomOpenChance;
 
+  /** The chance of a dead-end gate to be a 'decorated' gate */
   private final float decorateGateRate;
 
   /**

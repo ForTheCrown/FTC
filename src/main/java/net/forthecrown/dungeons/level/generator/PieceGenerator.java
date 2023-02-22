@@ -10,16 +10,18 @@ import java.util.List;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.dungeons.level.DungeonPiece;
-import net.forthecrown.dungeons.level.Gates;
-import net.forthecrown.dungeons.level.Pieces;
 import net.forthecrown.dungeons.level.gate.GateData;
 import net.forthecrown.dungeons.level.gate.GatePiece;
+import net.forthecrown.dungeons.level.gate.Gates;
+import net.forthecrown.dungeons.level.room.RoomFlag;
 import net.forthecrown.dungeons.level.room.RoomPiece;
 import net.forthecrown.dungeons.level.room.RoomType;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.WeightedList;
 import org.apache.commons.lang3.Range;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
 @Getter
@@ -29,7 +31,9 @@ public class PieceGenerator {
       GATE_INDEX_ENTRANCE = 0,
       GATE_INDEX_EXIT = 1,
 
-  DEFAULT_WEIGHT = 10;
+      DEFAULT_WEIGHT = 10;
+
+  private static final Logger LOGGER = Loggers.getLogger();
 
   private final TreeGenerator gen;
   private final TreeGeneratorConfig config;
@@ -79,31 +83,37 @@ public class PieceGenerator {
       sectionDepth = DungeonPiece.STARTING_DEPTH;
     }
 
-    type.fillPotentials(this)
-        .filter(pair -> {
-          if ((pair.value().getFlags() & (Pieces.FLAG_ROOT | Pieces.FLAG_BOSS_ROOM)) != 0) {
-            return false;
-          }
+    type.fillPotentials(this).filter(pair -> {
+      var flags = pair.value().getFlags();
 
-          // Ensure connectors have matching opening sizes
-          GateData.Opening opening = getOrigin()
-              .getTargetGate()
-              .opening();
+      if (flags.contains(RoomFlag.ROOT)
+          || flags.contains(RoomFlag.BOSS_ROOM)
+      ) {
+        return false;
+      }
 
-          var gates = pair.second().getGates();
-          int matchingOpenings = 0;
+      // Ensure connectors have matching opening sizes
+      GateData.Opening opening = getOrigin()
+          .getTargetGate()
+          .opening();
 
-          for (var g : gates) {
-            if (g.opening().equals(opening)) {
-              matchingOpenings++;
-            }
-          }
+      var gates = pair.second().getGates();
+      int matchingOpenings = 0;
 
-          return !data.successful.contains(pair.second())
-              && matchingOpenings > 0;
-        })
+      for (var g: gates) {
+        if (g.opening().equals(opening)) {
+          matchingOpenings++;
+        }
+      }
 
+      return !data.successful.contains(pair.second())
+          && matchingOpenings > 0;
+    })
         .forEach(pair -> potentials.add(pair.firstInt(), pair.second()));
+
+    if (potentials.isEmpty()) {
+      LOGGER.error("NO POTENTIALS", new Throwable());
+    }
   }
 
   private StepResult sectionDepthFailure() {
@@ -174,7 +184,7 @@ public class PieceGenerator {
           // Remove gate, as it's now the entrance
           gIt.remove();
 
-          List<GatePiece> exits = Gates.createGates(
+          List<GatePiece> exits = Gates.createExitGates(
               room, gates, config.getRandom()
           );
 
