@@ -6,7 +6,7 @@ import net.forthecrown.dungeons.level.DungeonPiece;
 import net.forthecrown.dungeons.level.LevelBiome;
 import net.forthecrown.dungeons.level.PieceVisitor;
 import net.forthecrown.dungeons.level.room.RoomPiece;
-import net.minecraft.nbt.CompoundTag;
+import net.forthecrown.nbt.CompoundTag;
 
 @Getter
 @Setter

@@ -9,8 +9,8 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.Consumer;
 import net.forthecrown.core.logging.Loggers;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtIo;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
 import org.apache.logging.log4j.Logger;
 import org.tomlj.Toml;
 import org.tomlj.TomlTable;
@@ -23,7 +23,7 @@ public final class SerializationHelper {
   private static final Logger LOGGER = Loggers.getLogger();
 
   public static final IoReader<CompoundTag>
-      TAG_READER = file -> NbtIo.readCompressed(Files.newInputStream(file));
+      TAG_READER = file -> BinaryTags.readCompressed(Files.newInputStream(file));
 
   public static final IoReader<JsonObject>
       JSON_READER = JsonUtils::readFileObject;
@@ -136,15 +136,15 @@ public final class SerializationHelper {
 
   public static void writeTag(Path f, CompoundTag tag) {
     writeFile(f, file -> {
-      NbtIo.writeCompressed(tag, Files.newOutputStream(file));
+      BinaryTags.writeCompressed(Files.newOutputStream(file), tag);
     });
   }
 
   public static void writeTagFile(Path f, Consumer<CompoundTag> saveCallback) {
     writeFile(f, file -> {
-      var tag = new CompoundTag();
+      var tag = BinaryTags.compoundTag();
       saveCallback.accept(tag);
-      NbtIo.writeCompressed(tag, Files.newOutputStream(file));
+      BinaryTags.writeCompressed(Files.newOutputStream(file), tag);
     });
   }
 

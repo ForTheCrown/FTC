@@ -18,13 +18,14 @@ import net.forthecrown.core.module.OnDayChange;
 import net.forthecrown.core.module.OnEnable;
 import net.forthecrown.guilds.Guild;
 import net.forthecrown.guilds.GuildManager;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.Time;
 import net.forthecrown.utils.WorldChunkMap;
 import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.utils.io.SerializableObject;
 import net.forthecrown.waypoint.WaypointScan.Result;
-import net.minecraft.nbt.CompoundTag;
 import org.apache.logging.log4j.Logger;
 
 public class WaypointManager extends SerializableObject.NbtDat {
@@ -270,9 +271,9 @@ public class WaypointManager extends SerializableObject.NbtDat {
   protected void load(CompoundTag tag) {
     clear();
 
-    for (var e : tag.tags.entrySet()) {
+    for (var e : tag.entrySet()) {
       Waypoint waypoint = new Waypoint(UUID.fromString(e.getKey()));
-      waypoint.load((CompoundTag) e.getValue());
+      waypoint.load(e.getValue().asCompound());
 
       addWaypoint(waypoint);
     }
@@ -281,7 +282,7 @@ public class WaypointManager extends SerializableObject.NbtDat {
   @Override
   protected void save(CompoundTag tag) {
     for (var w : byId.values()) {
-      var cTag = new CompoundTag();
+      var cTag = BinaryTags.compoundTag();
       w.save(cTag);
 
       tag.put(w.getId().toString(), cTag);

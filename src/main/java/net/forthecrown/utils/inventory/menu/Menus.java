@@ -5,9 +5,9 @@ import static net.forthecrown.utils.inventory.menu.Slot.ROW_SIZE;
 
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
+import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.kyori.adventure.text.Component;
-import net.minecraft.nbt.LongTag;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
@@ -263,7 +263,7 @@ public final class Menus {
       ItemStacks.setTagElement(
           meta,
           "NO_STACKING",
-          LongTag.valueOf(stackPreventionId)
+          BinaryTags.longTag(stackPreventionId)
       );
     });
   }

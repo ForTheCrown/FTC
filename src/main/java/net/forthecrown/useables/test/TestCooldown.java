@@ -8,6 +8,10 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.types.TimeArgument;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
+import net.forthecrown.nbt.LongTag;
 import net.forthecrown.useables.CheckHolder;
 import net.forthecrown.useables.ConstructType;
 import net.forthecrown.useables.UsableConstructor;
@@ -17,9 +21,6 @@ import net.forthecrown.utils.Time;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.LongTag;
-import net.minecraft.nbt.Tag;
 import org.bukkit.entity.Player;
 
 public class TestCooldown extends UsageTest {
@@ -54,14 +55,14 @@ public class TestCooldown extends UsageTest {
   }
 
   @Override
-  public Tag save() {
-    CompoundTag tag = new CompoundTag();
+  public BinaryTag save() {
+    CompoundTag tag = BinaryTags.compoundTag();
     tag.putLong(TAG_DURATION, millisDuration);
 
     // Serialize cooldown entry map only if
     // there are entries in it
     if (!entries.isEmpty()) {
-      CompoundTag entries = new CompoundTag();
+      CompoundTag entries = BinaryTags.compoundTag();
 
       for (var e : this.entries.object2LongEntrySet()) {
         // Cooldown has already expired, don't save
@@ -114,7 +115,7 @@ public class TestCooldown extends UsageTest {
   }
 
   @UsableConstructor(ConstructType.TAG)
-  public static TestCooldown load(Tag tag) {
+  public static TestCooldown load(BinaryTag tag) {
     CompoundTag cTag = (CompoundTag) tag;
 
     long millis = cTag.getLong(TAG_DURATION);
@@ -123,9 +124,9 @@ public class TestCooldown extends UsageTest {
     CompoundTag entryTag = cTag.getCompound(TAG_ENTRIES);
 
     if (!entryTag.isEmpty()) {
-      for (var e : entryTag.tags.entrySet()) {
+      for (var e : entryTag.entrySet()) {
         UUID uuid = UUID.fromString(e.getKey());
-        long ends = ((LongTag) e.getValue()).getAsLong();
+        long ends = ((LongTag) e.getValue()).longValue();
 
         // Don't load already expired entries
         if (Time.isPast(ends)) {

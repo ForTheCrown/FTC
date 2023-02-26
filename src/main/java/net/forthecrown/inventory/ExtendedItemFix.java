@@ -10,9 +10,10 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.inventory.weapon.RoyalSword;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
+import net.forthecrown.nbt.IntTag;
 import net.forthecrown.utils.inventory.ItemStacks;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.IntTag;
 import org.bukkit.inventory.meta.ItemMeta;
 
 class ExtendedItemFix {
@@ -20,8 +21,8 @@ class ExtendedItemFix {
   private static final String SWORD_TAG = ExtendedItems.ROYAL_SWORD.getKey();
 
   private static final String
-      OLD_TAG_GOALS = "goals",
-      OLD_TAG_RANK = "rank",
+      OLD_TAG_GOALS  = "goals",
+      OLD_TAG_RANK   = "rank",
       OLD_TAG_FLAVOR = "lastFluffChange";
 
   private static final ImmutableMap<String, String> GOAL_RENAMES = ImmutableMap.<String, String>builder()
@@ -74,17 +75,20 @@ class ExtendedItemFix {
       .build();
 
   public static void fixSword(ItemMeta meta) {
-    CompoundTag oldTag = ItemStacks.getTagElement(meta, SWORD_TAG).copy();
+    CompoundTag oldTag
+        = BinaryTags.compoundTag(ItemStacks.getTagElement(meta, SWORD_TAG));
+
     ItemStacks.removeTagElement(meta, SWORD_TAG);
 
-    CompoundTag resultTag = new CompoundTag();
+    CompoundTag resultTag = BinaryTags.compoundTag();
 
-    if (oldTag.contains(OLD_TAG_GOALS)) {
-      CompoundTag newGoals = new CompoundTag();
+    if (oldTag.containsKey(OLD_TAG_GOALS)) {
+      CompoundTag newGoals = BinaryTags.compoundTag();
+      CompoundTag oldGoals = oldTag.get(OLD_TAG_GOALS).asCompound();
 
-      for (var e : oldTag.getCompound(OLD_TAG_GOALS).tags.entrySet()) {
+      for (var e : oldGoals.entrySet()) {
         String key = e.getKey().replaceAll("ftccore:", "forthecrown:");
-        int value = ((IntTag) e.getValue()).getAsInt();
+        int value = ((IntTag) e.getValue()).intValue();
 
         if (key.contains("r9")) {
           value = 10;
@@ -113,7 +117,7 @@ class ExtendedItemFix {
 
     resultTag.putInt(RoyalSword.TAG_LAST_FLAVOR, oldTag.getInt(OLD_TAG_FLAVOR) - 1);
     resultTag.putInt(RoyalSword.TAG_RANK, oldTag.getInt(OLD_TAG_RANK) - 1);
-    resultTag.putUUID(TAG_OWNER, oldTag.getUUID(TAG_OWNER));
+    resultTag.put(TAG_OWNER, oldTag.get(TAG_OWNER));
 
     moveToContainer(meta, SWORD_TAG, resultTag);
   }
@@ -123,7 +127,7 @@ class ExtendedItemFix {
   }
 
   private static void moveToContainer(ItemMeta meta, String key, CompoundTag tag) {
-    CompoundTag topTag = new CompoundTag();
+    CompoundTag topTag = BinaryTags.compoundTag();
     topTag.putString(TAG_TYPE, key);
     topTag.put(TAG_DATA, tag);
 

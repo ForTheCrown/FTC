@@ -19,13 +19,14 @@ import net.forthecrown.dungeons.level.placement.LevelPlacement;
 import net.forthecrown.dungeons.level.placement.RoomPlacingVisitor;
 import net.forthecrown.dungeons.level.room.RoomFlag;
 import net.forthecrown.dungeons.level.room.RoomPiece;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
+import net.forthecrown.nbt.ListTag;
+import net.forthecrown.nbt.TagTypes;
 import net.forthecrown.utils.ChunkedMap;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.math.Bounds3i;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
@@ -181,7 +182,10 @@ public class DungeonLevel implements Iterable<DungeonPiece> {
     pieceLookup.clear();
     root = null;
 
-    loadPieces(tag.getList(TAG_PIECES, Tag.TAG_COMPOUND), tag.getUUID(TAG_ROOT));
+    loadPieces(
+        tag.getList(TAG_PIECES, TagTypes.compoundType()),
+        tag.getUUID(TAG_ROOT)
+    );
 
     if (tag.contains(TAG_BOSS_ROOM)) {
       setBossRoom((RoomPiece) pieceLookup.get(tag.getUUID(TAG_BOSS_ROOM)));
@@ -204,9 +208,9 @@ public class DungeonLevel implements Iterable<DungeonPiece> {
   //    -- Jules
 
   private ListTag savePieces() {
-    ListTag pieces = new ListTag();
+    ListTag pieces = BinaryTags.listTag();
     for (var p : this) {
-      CompoundTag pTag = new CompoundTag();
+      CompoundTag pTag = BinaryTags.compoundTag();
 
       p.save(pTag);
       pTag.put(TAG_TYPE, Pieces.save(p.getType()));
@@ -214,7 +218,7 @@ public class DungeonLevel implements Iterable<DungeonPiece> {
       var children = p.getChildren();
 
       if (!children.isEmpty()) {
-        ListTag childTag = new ListTag();
+        ListTag childTag = BinaryTags.listTag();
 
         for (var c : children.keySet()) {
           childTag.add(TagUtil.writeUUID(c));
@@ -243,9 +247,9 @@ public class DungeonLevel implements Iterable<DungeonPiece> {
       DungeonPiece piece = type.load(pTag);
       Set<UUID> children = new ObjectOpenHashSet<>();
 
-      if (pTag.contains(TAG_CHILDREN, Tag.TAG_LIST)) {
+      if (pTag.contains(TAG_CHILDREN, TagTypes.listType())) {
         children.addAll(
-            TagUtil.readCollection(
+            TagUtil.readList(
                 pTag.get(TAG_CHILDREN),
                 TagUtil::readUUID
             )

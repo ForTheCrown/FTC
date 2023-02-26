@@ -3,8 +3,9 @@ package net.forthecrown.useables;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.utils.io.TagUtil;
-import net.minecraft.nbt.CompoundTag;
 import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -34,7 +35,7 @@ public abstract class BukkitSavedUsable extends Usable {
   }
 
   public void save(PersistentDataContainer container) {
-    CompoundTag tag = new CompoundTag();
+    CompoundTag tag = BinaryTags.compoundTag();
     save(tag);
 
     container.set(

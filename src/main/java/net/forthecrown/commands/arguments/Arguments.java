@@ -6,6 +6,9 @@ import java.util.List;
 import net.forthecrown.commands.arguments.chat.ChatArgument;
 import net.forthecrown.commands.arguments.chat.MessageArgument;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.CompoundTag;
+import net.forthecrown.nbt.string.Snbt;
 import net.forthecrown.useables.Usables;
 import net.forthecrown.useables.command.Kit;
 import net.forthecrown.useables.command.Warp;
@@ -46,6 +49,11 @@ public interface Arguments {
   WaypointArgument WAYPOINT = new WaypointArgument();
 
   ScriptArgument SCRIPT = new ScriptArgument();
+
+  TagArgument<BinaryTag> TAG = new TagArgument<>(Snbt::parse);
+  TagArgument<CompoundTag> COMPOUND = new TagArgument<>(Snbt::parseCompound);
+
+  TagPathArgument TAG_PATH = new TagPathArgument();
 
   static List<User> getUsers(CommandContext<CommandSource> c, String argument)
       throws CommandSyntaxException {

@@ -1,5 +1,6 @@
 package net.forthecrown.dungeons;
 
+import com.fastasyncworldedit.core.util.NbtUtils;
 import it.unimi.dsi.fastutil.floats.FloatArrayList;
 import it.unimi.dsi.fastutil.floats.FloatList;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -11,9 +12,16 @@ import lombok.Data;
 import lombok.Getter;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.config.GeneralConfig;
-import net.forthecrown.utils.RewardRange;
 import net.forthecrown.dungeons.boss.BossContext;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
+import net.forthecrown.nbt.IntArrayTag;
+import net.forthecrown.nbt.IntTag;
+import net.forthecrown.nbt.ListTag;
+import net.forthecrown.nbt.TagTypes;
 import net.forthecrown.user.User;
+import net.forthecrown.utils.RewardRange;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.text.Text;
@@ -24,12 +32,6 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.core.UUIDUtil;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.IntArrayTag;
-import net.minecraft.nbt.IntTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NbtUtils;
-import net.minecraft.nbt.Tag;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
@@ -161,22 +163,22 @@ public class BossLootBox {
   }
 
   public void save(CompoundTag tag) {
-    CompoundTag rewardTag = new CompoundTag();
+    CompoundTag rewardTag = BinaryTags.compoundTag();
     reward.save(rewardTag);
 
     tag.put("rewards", rewardTag);
 
-    ListTag listTag = new ListTag();
+    ListTag listTag = BinaryTags.listTag();
 
     for (var e : claimChances.entrySet()) {
-      IntArrayTag arrTag = NbtUtils.createUUID(e.getKey());
+      IntArrayTag arrTag = BinaryTags.saveUuid(e.getKey());
 
       if (e.getValue().isEmpty()) {
         continue;
       }
 
       for (var f : e.getValue()) {
-        arrTag.add(IntTag.valueOf(Float.floatToIntBits(f)));
+        arrTag.add(Float.floatToIntBits(f));
       }
 
       listTag.add(arrTag);
@@ -190,11 +192,11 @@ public class BossLootBox {
     reward.load(rewardTag);
 
     claimChances.clear();
-    ListTag userData = tag.getList("userData", Tag.TAG_INT_ARRAY);
+    ListTag userData = tag.getList("userData", TagTypes.intArrayType());
 
     for (var e : userData) {
       IntArrayTag intArr = (IntArrayTag) e;
-      int[] arr = intArr.getAsIntArray();
+      int[] arr = intArr.toIntArray();
 
       UUID id = UUIDUtil.uuidFromIntArray(arr);
       FloatList list = new FloatArrayList();

@@ -5,8 +5,9 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.Getter;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.useables.Usable;
+import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.useables.ConstructType;
+import net.forthecrown.useables.Usable;
 import net.forthecrown.useables.UsableConstructor;
 import net.forthecrown.useables.UsageAction;
 import net.forthecrown.useables.UsageType;
@@ -16,7 +17,6 @@ import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.TextJoiner;
 import net.kyori.adventure.text.Component;
-import net.minecraft.nbt.Tag;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -73,7 +73,7 @@ public class ActionItem extends UsageAction {
   }
 
   @Override
-  public @Nullable Tag save() {
+  public @Nullable BinaryTag save() {
     return UsageUtil.saveItems(items);
   }
 
@@ -90,7 +90,7 @@ public class ActionItem extends UsageAction {
   }
 
   @UsableConstructor(ConstructType.TAG)
-  public static ActionItem load(UsageType<ActionItem> type, Tag tag) {
+  public static ActionItem load(UsageType<ActionItem> type, BinaryTag tag) {
     return new ActionItem(type, UsageUtil.loadItems(tag));
   }
 }

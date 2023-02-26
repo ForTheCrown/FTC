@@ -2,8 +2,8 @@ package net.forthecrown.useables;
 
 import java.util.Objects;
 import lombok.Getter;
+import net.forthecrown.nbt.BinaryTag;
 import net.kyori.adventure.text.Component;
-import net.minecraft.nbt.Tag;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,5 +29,5 @@ public abstract class UsageInstance {
   public abstract Component displayInfo();
 
   @Nullable
-  public abstract Tag save();
+  public abstract BinaryTag save();
 }

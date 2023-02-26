@@ -4,15 +4,15 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.useables.Usable;
+import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.useables.ConstructType;
+import net.forthecrown.useables.Usable;
 import net.forthecrown.useables.UsableConstructor;
 import net.forthecrown.useables.UsageAction;
 import net.forthecrown.useables.UsageType;
 import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
-import net.minecraft.nbt.Tag;
 import org.bukkit.entity.Player;
 
 public class ActionShowText extends UsageAction {
@@ -39,7 +39,7 @@ public class ActionShowText extends UsageAction {
   }
 
   @Override
-  public Tag save() {
+  public BinaryTag save() {
     return TagUtil.writeText(text);
   }
 
@@ -50,7 +50,7 @@ public class ActionShowText extends UsageAction {
   }
 
   @UsableConstructor(ConstructType.TAG)
-  public static ActionShowText readTag(Tag tag) {
+  public static ActionShowText readTag(BinaryTag tag) {
     return new ActionShowText(TagUtil.readText(tag));
   }
 }

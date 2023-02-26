@@ -79,7 +79,7 @@ public final class Gates {
     }
 
     if (!gates.isEmpty()) {
-      LOGGER.error("Gate {} has more than 2 connection points",
+      LOGGER.warn("Gate {} has more than 2 connection points",
           match.type().getKey()
       );
     }

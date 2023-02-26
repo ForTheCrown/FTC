@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.useables.CheckHolder;
 import net.forthecrown.useables.ConstructType;
 import net.forthecrown.useables.UsableConstructor;
@@ -15,7 +16,6 @@ import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.TextJoiner;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.nbt.Tag;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -53,7 +53,7 @@ public class TestItems extends UsageTest {
   }
 
   @Override
-  public @Nullable Tag save() {
+  public @Nullable BinaryTag save() {
     return UsageUtil.saveItems(items);
   }
 
@@ -93,15 +93,15 @@ public class TestItems extends UsageTest {
   // --- TYPE CONSTRUCTORS ---
 
   @UsableConstructor(ConstructType.PARSE)
-  public static TestItems parse(UsageType<TestItems> type, StringReader reader,
+  public static TestItems parse(UsageType<TestItems> type,
+                                StringReader reader,
                                 CommandSource source
-  )
-      throws CommandSyntaxException {
+  ) throws CommandSyntaxException {
     return new TestItems(type, UsageUtil.parseItems(reader, source));
   }
 
   @UsableConstructor(ConstructType.TAG)
-  public static TestItems load(UsageType<TestItems> type, Tag tag) {
+  public static TestItems load(UsageType<TestItems> type, BinaryTag tag) {
     return new TestItems(type, UsageUtil.loadItems(tag));
   }
 }

@@ -4,20 +4,20 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.Pair;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.useables.CheckHolder;
 import net.forthecrown.useables.ConstructType;
 import net.forthecrown.useables.UsableConstructor;
 import net.forthecrown.useables.UsageTest;
 import net.forthecrown.useables.UsageType;
 import net.forthecrown.useables.util.UsageUtil;
-import net.forthecrown.utils.UUID2IntMap;
 import net.forthecrown.user.UserManager;
+import net.forthecrown.utils.UUID2IntMap;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.format.UnitFormat;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.advancements.critereon.MinMaxBounds;
-import net.minecraft.nbt.Tag;
 import org.bukkit.entity.Player;
 
 public class TestUserMapValue extends UsageTest {
@@ -61,7 +61,7 @@ public class TestUserMapValue extends UsageTest {
   }
 
   @Override
-  public Tag save() {
+  public BinaryTag save() {
     return UsageUtil.writeBounds(bounds);
   }
 
@@ -81,13 +81,15 @@ public class TestUserMapValue extends UsageTest {
   // --- TYPE CONSTRUCTORS ---
 
   @UsableConstructor
-  public static TestUserMapValue parse(UsageType type, StringReader reader, CommandSource source)
-      throws CommandSyntaxException {
+  public static TestUserMapValue parse(UsageType type,
+                                       StringReader reader,
+                                       CommandSource source
+  ) throws CommandSyntaxException {
     return new TestUserMapValue(type, MinMaxBounds.Ints.fromReader(reader));
   }
 
   @UsableConstructor(ConstructType.TAG)
-  public static TestUserMapValue load(UsageType type, Tag tag) {
+  public static TestUserMapValue load(UsageType type, BinaryTag tag) {
     return new TestUserMapValue(type, UsageUtil.readBounds(tag));
   }
 }

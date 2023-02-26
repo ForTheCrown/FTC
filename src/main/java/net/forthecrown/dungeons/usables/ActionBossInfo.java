@@ -5,15 +5,15 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.arguments.RegistryArguments;
 import net.forthecrown.core.registry.Registries;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.useables.Usable;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.useables.ConstructType;
+import net.forthecrown.useables.Usable;
 import net.forthecrown.useables.UsableConstructor;
 import net.forthecrown.useables.UsageAction;
 import net.forthecrown.useables.UsageType;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,8 +47,8 @@ public class ActionBossInfo extends UsageAction {
   }
 
   @Override
-  public @Nullable Tag save() {
-    return StringTag.valueOf(bossKey);
+  public @Nullable BinaryTag save() {
+    return BinaryTags.stringTag(bossKey);
   }
 
   // --- TYPE CONSTRUCTORS ---
@@ -60,7 +60,7 @@ public class ActionBossInfo extends UsageAction {
   }
 
   @UsableConstructor(ConstructType.TAG)
-  public static ActionBossInfo load(Tag tag) {
-    return new ActionBossInfo(tag.getAsString());
+  public static ActionBossInfo load(BinaryTag tag) {
+    return new ActionBossInfo(tag.toString());
   }
 }

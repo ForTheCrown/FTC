@@ -36,10 +36,6 @@ public class ChallengeDataStorage {
 
   private static final Logger LOGGER = Loggers.getLogger();
 
-  private static final String
-      KEY_HIGHEST_STREAK = "highest::streak";
-
-
   private final Path directory;
   private final Path itemDataDirectory;
 

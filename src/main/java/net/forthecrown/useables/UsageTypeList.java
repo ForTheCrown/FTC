@@ -11,13 +11,14 @@ import lombok.RequiredArgsConstructor;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.registry.Registries;
 import net.forthecrown.core.registry.Registry;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
+import net.forthecrown.nbt.ListTag;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
@@ -159,8 +160,8 @@ public class UsageTypeList<V extends UsageInstance> implements Iterable<V> {
     return instances.subList(startInclusive, endExclusive);
   }
 
-  public Tag save() {
-    ListTag result = new ListTag();
+  public BinaryTag save() {
+    ListTag result = BinaryTags.listTag();
 
     for (var v : instances) {
       Optional<String> key = registry.getKey(v.getType());
@@ -170,10 +171,10 @@ public class UsageTypeList<V extends UsageInstance> implements Iterable<V> {
         continue;
       }
 
-      CompoundTag instTag = new CompoundTag();
+      CompoundTag instTag = BinaryTags.compoundTag();
       instTag.putString(TAG_TYPE, key.get());
 
-      var saved = v.save();
+      BinaryTag saved = v.save();
 
       if (saved != null) {
         instTag.put(TAG_VALUE, saved);
@@ -185,7 +186,7 @@ public class UsageTypeList<V extends UsageInstance> implements Iterable<V> {
     return result;
   }
 
-  public void load(Tag t) throws CommandSyntaxException {
+  public void load(BinaryTag t) throws CommandSyntaxException {
     ListTag lTag = (ListTag) t;
 
     for (var tL : lTag) {

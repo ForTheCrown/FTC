@@ -7,6 +7,9 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.types.args.ArgsArgument;
 import net.forthecrown.grenadier.types.args.Argument;
 import net.forthecrown.grenadier.types.scoreboard.ObjectiveArgument;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.useables.CheckHolder;
 import net.forthecrown.useables.ConstructType;
 import net.forthecrown.useables.UsableConstructor;
@@ -18,8 +21,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.commands.arguments.RangeArgument;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Objective;
@@ -63,8 +64,8 @@ public class TestHasScore extends UsageTest {
   }
 
   @Override
-  public Tag save() {
-    CompoundTag tag = new CompoundTag();
+  public BinaryTag save() {
+    CompoundTag tag = BinaryTags.compoundTag();
 
     tag.putString("objective", objective);
     tag.put("bounds", UsageUtil.writeBounds(bounds));
@@ -110,11 +111,14 @@ public class TestHasScore extends UsageTest {
   }
 
   @UsableConstructor(ConstructType.TAG)
-  public static TestHasScore load(Tag element) throws CommandSyntaxException {
-    var wrapper = ((CompoundTag) element);
+  public static TestHasScore load(BinaryTag element) throws CommandSyntaxException {
+    var wrapper = element.asCompound();
     Objective objective = ObjectiveArgument.objective()
         .parse(new StringReader(wrapper.getString("objective")));
 
-    return new TestHasScore(objective.getName(), UsageUtil.readBounds(wrapper.get("bounds")));
+    return new TestHasScore(
+        objective.getName(),
+        UsageUtil.readBounds(wrapper.get("bounds"))
+    );
   }
 }

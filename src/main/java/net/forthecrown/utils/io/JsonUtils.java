@@ -14,7 +14,6 @@ import com.google.gson.internal.bind.TypeAdapters;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.JsonOps;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -36,7 +35,6 @@ import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.minecraft.nbt.TagParser;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -113,13 +111,7 @@ public final class JsonUtils {
   }
 
   public static ItemStack readItem(JsonElement json) {
-    try {
-      return ItemStacks.load(
-          TagParser.parseTag(json.getAsString())
-      );
-    } catch (CommandSyntaxException e) {
-      throw new IllegalStateException(e);
-    }
+    return ItemStacks.fromNbtString(json.getAsString());
   }
 
   public static JsonPrimitive writeItem(ItemStack itemStack) {

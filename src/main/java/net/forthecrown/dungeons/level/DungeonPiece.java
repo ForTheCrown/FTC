@@ -9,13 +9,13 @@ import java.util.UUID;
 import lombok.Getter;
 import net.forthecrown.dungeons.level.gate.GatePiece;
 import net.forthecrown.dungeons.level.generator.NodeAlign;
+import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.structure.BlockStructure;
 import net.forthecrown.structure.Rotation;
 import net.forthecrown.utils.BoundsHolder;
 import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.math.Bounds3i;
 import net.forthecrown.utils.math.Transform;
-import net.minecraft.nbt.CompoundTag;
 import org.spongepowered.math.vector.Vector3i;
 
 public abstract class DungeonPiece implements BoundsHolder {

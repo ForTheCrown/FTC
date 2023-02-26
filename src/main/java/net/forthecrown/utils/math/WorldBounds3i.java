@@ -12,8 +12,9 @@ import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -221,8 +222,8 @@ public class WorldBounds3i extends AbstractBounds3i<WorldBounds3i> implements It
   }
 
   @Override
-  public Tag save() {
-    CompoundTag tag = new CompoundTag();
+  public BinaryTag save() {
+    CompoundTag tag = BinaryTags.compoundTag();
     tag.putString("world", getWorld().getName());
     tag.put("cords", super.save());
 

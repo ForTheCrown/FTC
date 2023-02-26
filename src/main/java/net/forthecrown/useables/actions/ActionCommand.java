@@ -7,15 +7,15 @@ import lombok.Getter;
 import net.forthecrown.commands.manager.FtcSuggestions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Suggester;
-import net.forthecrown.useables.Usable;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.useables.ConstructType;
+import net.forthecrown.useables.Usable;
 import net.forthecrown.useables.UsableConstructor;
 import net.forthecrown.useables.UsageAction;
 import net.forthecrown.useables.UsageType;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -84,8 +84,8 @@ public class ActionCommand extends UsageAction {
   }
 
   @Override
-  public @Nullable Tag save() {
-    return StringTag.valueOf(command);
+  public @Nullable BinaryTag save() {
+    return BinaryTags.stringTag(command);
   }
 
   // --- TYPE CONSTRUCTORS ---
@@ -109,7 +109,7 @@ public class ActionCommand extends UsageAction {
   }
 
   @UsableConstructor(ConstructType.TAG)
-  public static ActionCommand load(UsageType<ActionCommand> type, Tag tag) {
-    return new ActionCommand(type, tag.getAsString());
+  public static ActionCommand load(UsageType<ActionCommand> type, BinaryTag tag) {
+    return new ActionCommand(type, tag.toString());
   }
 }

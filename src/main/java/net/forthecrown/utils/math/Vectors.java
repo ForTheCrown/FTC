@@ -8,15 +8,16 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector2;
 import com.sk89q.worldedit.math.Vector3;
 import lombok.experimental.UtilityClass;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.IntArrayTag;
+import net.forthecrown.nbt.ListTag;
+import net.forthecrown.nbt.LongArrayTag;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.DoubleTag;
 import net.minecraft.nbt.FloatTag;
-import net.minecraft.nbt.IntArrayTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.LongArrayTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
@@ -271,9 +272,9 @@ public class Vectors {
     return json.getSource();
   }
 
-  public Tag writeTag(Vectori vec) {
+  public BinaryTag writeTag(Vectori vec) {
     int[] arr = vec.toArray();
-    return new IntArrayTag(arr);
+    return BinaryTags.intArrayTag(arr);
   }
 
   public Vector2i read2i(JsonElement element) {
@@ -285,8 +286,8 @@ public class Vectors {
     );
   }
 
-  public Vector2i read2i(Tag tag) {
-    int[] arr = ((IntArrayTag) tag).getAsIntArray();
+  public Vector2i read2i(BinaryTag tag) {
+    int[] arr = ((IntArrayTag) tag).toIntArray();
     return Vector2i.from(
         arr[AXIS_ID_X],
         arr[AXIS_ID_Y]
@@ -313,8 +314,8 @@ public class Vectors {
     );
   }
 
-  public Vector3i read3i(Tag tag) {
-    int[] arr = ((IntArrayTag) tag).getAsIntArray();
+  public Vector3i read3i(BinaryTag tag) {
+    int[] arr = ((IntArrayTag) tag).toIntArray();
     return Vector3i.from(
         arr[AXIS_ID_X],
         arr[AXIS_ID_Y],
@@ -333,8 +334,8 @@ public class Vectors {
     );
   }
 
-  public Vector4i read4i(Tag tag) {
-    int[] arr = ((IntArrayTag) tag).getAsIntArray();
+  public Vector4i read4i(BinaryTag tag) {
+    int[] arr = ((IntArrayTag) tag).toIntArray();
     return Vector4i.from(
         arr[AXIS_ID_X],
         arr[AXIS_ID_Y],
@@ -355,8 +356,8 @@ public class Vectors {
     return new VectorNi(resultArr);
   }
 
-  public VectorNi readNi(Tag tag) {
-    int[] arr = ((IntArrayTag) tag).getAsIntArray();
+  public VectorNi readNi(BinaryTag tag) {
+    int[] arr = ((IntArrayTag) tag).toIntArray();
     return new VectorNi(arr);
   }
 
@@ -383,9 +384,9 @@ public class Vectors {
     return json.getSource();
   }
 
-  public Tag writeTag(Vectorl vec) {
+  public BinaryTag writeTag(Vectorl vec) {
     long[] arr = vec.toArray();
-    return new LongArrayTag(arr);
+    return BinaryTags.longArrayTag(arr);
   }
 
   public Vector2l read2l(JsonElement element) {
@@ -397,8 +398,8 @@ public class Vectors {
     );
   }
 
-  public Vector2l read2l(Tag tag) {
-    long[] arr = ((LongArrayTag) tag).getAsLongArray();
+  public Vector2l read2l(BinaryTag tag) {
+    long[] arr = ((LongArrayTag) tag).toLongArray();
     return Vector2l.from(
         arr[AXIS_ID_X],
         arr[AXIS_ID_Y]
@@ -415,8 +416,8 @@ public class Vectors {
     );
   }
 
-  public Vector3l read3l(Tag tag) {
-    long[] arr = ((LongArrayTag) tag).getAsLongArray();
+  public Vector3l read3l(BinaryTag tag) {
+    long[] arr = ((LongArrayTag) tag).toLongArray();
     return Vector3l.from(
         arr[AXIS_ID_X],
         arr[AXIS_ID_Y],
@@ -435,8 +436,8 @@ public class Vectors {
     );
   }
 
-  public Vector4l read4l(Tag tag) {
-    long[] arr = ((LongArrayTag) tag).getAsLongArray();
+  public Vector4l read4l(BinaryTag tag) {
+    long[] arr = ((LongArrayTag) tag).toLongArray();
     return Vector4l.from(
         arr[AXIS_ID_X],
         arr[AXIS_ID_Y],
@@ -457,8 +458,8 @@ public class Vectors {
     return new VectorNl(resultArr);
   }
 
-  public VectorNl readNl(Tag tag) {
-    long[] arr = ((LongArrayTag) tag).getAsLongArray();
+  public VectorNl readNl(BinaryTag tag) {
+    long[] arr = ((LongArrayTag) tag).toLongArray();
     return new VectorNl(arr);
   }
 
@@ -485,15 +486,8 @@ public class Vectors {
     return json.getSource();
   }
 
-  public Tag writeTag(Vectorf vec) {
-    float[] arr = vec.toArray();
-    ListTag list = new ListTag();
-
-    for (float val : arr) {
-      list.add(FloatTag.valueOf(val));
-    }
-
-    return list;
+  public BinaryTag writeTag(Vectorf vec) {
+    return BinaryTags.floatList(vec.toArray());
   }
 
   public Vector2f read2f(JsonElement element) {
@@ -505,7 +499,7 @@ public class Vectors {
     );
   }
 
-  public Vector2f read2f(Tag tag) {
+  public Vector2f read2f(BinaryTag tag) {
     ListTag listTag = (ListTag) tag;
     float[] arr = new float[listTag.size()];
 
@@ -528,7 +522,7 @@ public class Vectors {
     );
   }
 
-  public Vector3f read3f(Tag tag) {
+  public Vector3f read3f(BinaryTag tag) {
     ListTag listTag = (ListTag) tag;
     float[] arr = new float[listTag.size()];
 
@@ -553,7 +547,7 @@ public class Vectors {
     );
   }
 
-  public Vector4f read4f(Tag tag) {
+  public Vector4f read4f(BinaryTag tag) {
     ListTag listTag = (ListTag) tag;
     float[] arr = new float[listTag.size()];
 
@@ -580,7 +574,7 @@ public class Vectors {
     return new VectorNf(resultArr);
   }
 
-  public VectorNf readNf(Tag tag) {
+  public VectorNf readNf(BinaryTag tag) {
     ListTag listTag = (ListTag) tag;
     float[] arr = new float[listTag.size()];
 
@@ -613,15 +607,8 @@ public class Vectors {
     return json.getSource();
   }
 
-  public Tag writeTag(Vectord vec) {
-    double[] arr = vec.toArray();
-    ListTag list = new ListTag();
-
-    for (double val : arr) {
-      list.add(DoubleTag.valueOf(val));
-    }
-
-    return list;
+  public BinaryTag writeTag(Vectord vec) {
+    return BinaryTags.doubleList(vec.toArray());
   }
 
   public Vector2d read2d(JsonElement element) {
@@ -633,7 +620,7 @@ public class Vectors {
     );
   }
 
-  public Vector2d read2d(Tag tag) {
+  public Vector2d read2d(BinaryTag tag) {
     ListTag listTag = (ListTag) tag;
     double[] arr = new double[listTag.size()];
 
@@ -666,7 +653,7 @@ public class Vectors {
     );
   }
 
-  public Vector3d read3d(Tag tag) {
+  public Vector3d read3d(BinaryTag tag) {
     ListTag listTag = (ListTag) tag;
     double[] arr = new double[listTag.size()];
 
@@ -691,7 +678,7 @@ public class Vectors {
     );
   }
 
-  public Vector4d read4d(Tag tag) {
+  public Vector4d read4d(BinaryTag tag) {
     ListTag listTag = (ListTag) tag;
     double[] arr = new double[listTag.size()];
 
@@ -718,7 +705,7 @@ public class Vectors {
     return new VectorNd(resultArr);
   }
 
-  public VectorNd readNd(Tag tag) {
+  public VectorNd readNd(BinaryTag tag) {
     ListTag listTag = (ListTag) tag;
     double[] arr = new double[listTag.size()];
 

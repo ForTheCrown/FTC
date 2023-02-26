@@ -60,7 +60,7 @@ public interface Exceptions {
    * @param message The message to create an exception with
    * @return The created exception
    */
-  private static RoyalCommandException create(String message) {
+  static RoyalCommandException create(String message) {
     return INSTANCE.create(Text.renderString(message));
   }
 
@@ -98,7 +98,7 @@ public interface Exceptions {
    * @return The created exception
    * @see Text#format(Component, Object...)
    */
-  private static CommandSyntaxException formatWithContext(String format,
+  static CommandSyntaxException formatWithContext(String format,
                                                           ImmutableStringReader reader,
                                                           Object... args
   ) {

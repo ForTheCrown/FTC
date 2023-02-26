@@ -10,8 +10,9 @@ import net.forthecrown.grenadier.types.args.Argument;
 import net.forthecrown.grenadier.types.args.ParsedArgs;
 import net.forthecrown.grenadier.types.pos.Position;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
-import net.forthecrown.useables.Usable;
+import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.useables.ConstructType;
+import net.forthecrown.useables.Usable;
 import net.forthecrown.useables.UsableConstructor;
 import net.forthecrown.useables.UsageAction;
 import net.forthecrown.useables.UsageType;
@@ -20,7 +21,6 @@ import net.forthecrown.user.Users;
 import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
-import net.minecraft.nbt.Tag;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -72,7 +72,7 @@ public class  ActionTeleport extends UsageAction {
   }
 
   @Override
-  public @Nullable Tag save() {
+  public @Nullable BinaryTag save() {
     return TagUtil.writeLocation(location);
   }
 
@@ -101,7 +101,7 @@ public class  ActionTeleport extends UsageAction {
   }
 
   @UsableConstructor(ConstructType.TAG)
-  public static ActionTeleport load(Tag tag) {
+  public static ActionTeleport load(BinaryTag tag) {
     return new ActionTeleport(TagUtil.readLocation(tag));
   }
 }

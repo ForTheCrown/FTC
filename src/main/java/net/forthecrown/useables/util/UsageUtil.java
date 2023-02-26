@@ -12,12 +12,13 @@ import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.types.ArrayArgument;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
+import net.forthecrown.nbt.IntTag;
+import net.forthecrown.nbt.ListTag;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.minecraft.advancements.critereon.MinMaxBounds;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.IntTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import org.bukkit.inventory.ItemStack;
 
 public final class UsageUtil {
@@ -75,12 +76,12 @@ public final class UsageUtil {
     return ITEM_ARRAY_PARSER.listSuggestions(context, builder);
   }
 
-  public static Tag saveItems(ImmutableList<ItemStack> items) {
+  public static BinaryTag saveItems(ImmutableList<ItemStack> items) {
     if (items.size() == 1) {
       return ItemStacks.save(items.get(0));
     }
 
-    ListTag list = new ListTag();
+    ListTag list = BinaryTags.listTag();
 
     for (var i : items) {
       if (ItemStacks.isEmpty(i)) {
@@ -93,7 +94,7 @@ public final class UsageUtil {
     return list;
   }
 
-  public static ImmutableList<ItemStack> loadItems(Tag tag) {
+  public static ImmutableList<ItemStack> loadItems(BinaryTag tag) {
     if (tag instanceof CompoundTag cTag) {
       return ImmutableList.of(ItemStacks.load(cTag));
     }
@@ -112,9 +113,9 @@ public final class UsageUtil {
 
   /* ----------------------------- MIN MAX BOUNDS ------------------------------ */
 
-  public static MinMaxBounds.Ints readBounds(Tag tag) {
+  public static MinMaxBounds.Ints readBounds(BinaryTag tag) {
     if (tag instanceof IntTag integer) {
-      return MinMaxBounds.Ints.exactly(integer.getAsInt());
+      return MinMaxBounds.Ints.exactly(integer.intValue());
     }
 
     CompoundTag cTag = (CompoundTag) tag;
@@ -132,16 +133,16 @@ public final class UsageUtil {
     return MinMaxBounds.Ints.between(min, max);
   }
 
-  public static Tag writeBounds(MinMaxBounds.Ints ints) {
+  public static BinaryTag writeBounds(MinMaxBounds.Ints ints) {
     if (ints.isAny()) {
-      return new CompoundTag();
+      return BinaryTags.compoundTag();
     }
 
     if (isExact(ints)) {
-      return IntTag.valueOf(ints.getMin());
+      return BinaryTags.intTag(ints.getMin());
     }
 
-    CompoundTag tag = new CompoundTag();
+    CompoundTag tag = BinaryTags.compoundTag();
 
     if (ints.getMax() != null) {
       tag.putInt("max", ints.getMax());

@@ -3,12 +3,14 @@ package net.forthecrown.structure;
 import com.mojang.serialization.Dynamic;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
+import net.forthecrown.nbt.paper.PaperNbt;
 import net.forthecrown.utils.VanillaAccess;
-import net.forthecrown.utils.io.TagUtil;
+import net.forthecrown.utils.io.TagOps;
+import net.forthecrown.utils.io.TagTranslators;
 import net.forthecrown.utils.math.Vectors;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
 import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -18,7 +20,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.TileState;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.craftbukkit.v1_19_R2.block.CraftBlockEntityState;
 import org.bukkit.craftbukkit.v1_19_R2.block.CraftBlockStates;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.math.vector.Vector3i;
@@ -68,7 +69,7 @@ public class BlockInfo {
     return CraftBlockStates.getBlockState(
         Vectors.toMinecraft(pos),
         VanillaAccess.getState(getData()),
-        tag
+        tag == null ? null : TagTranslators.COMPOUND.toMinecraft(tag)
     );
   }
 
@@ -81,7 +82,7 @@ public class BlockInfo {
         (CompoundTag) DataFixers.getDataFixer()
             .update(
                 References.BLOCK_ENTITY,
-                new Dynamic<>(NbtOps.INSTANCE, tag),
+                new Dynamic<>(TagOps.OPS, tag),
                 oldVersion, newVersion
             )
             .getValue()
@@ -96,7 +97,7 @@ public class BlockInfo {
 
     if (tag != null && !tag.isEmpty()) {
       BlockEntity entity = VanillaAccess.getBlockEntity((TileState) block.getState());
-      entity.load(tag.copy());
+      entity.load(TagTranslators.COMPOUND.toMinecraft(tag));
     }
   }
 
@@ -104,21 +105,29 @@ public class BlockInfo {
     return data.clone();
   }
 
+  static CompoundTag copyTag(CompoundTag tag) {
+    if (tag == null) {
+      return null;
+    }
+
+    return BinaryTags.compoundTag(tag);
+  }
+
   /* ----------------------------- CLONE METHODS ------------------------------ */
 
   public BlockInfo withData(BlockData data) {
-    return new BlockInfo(data.clone(), tag == null ? null : tag.copy());
+    return new BlockInfo(data.clone(), copyTag(tag));
   }
 
   public BlockInfo withTag(CompoundTag tag) {
-    return new BlockInfo(data.clone(), tag == null ? null : tag.copy());
+    return new BlockInfo(data.clone(), copyTag(tag));
   }
 
   public BlockInfo withState(BlockState state) {
     CompoundTag tag = null;
 
-    if (state instanceof CraftBlockEntityState<?> entityState) {
-      tag = entityState.getTileEntity().saveWithoutMetadata();
+    if (state instanceof TileState entityState) {
+      tag = PaperNbt.saveBlockEntity(entityState);
     }
 
     return withTag(tag)
@@ -126,27 +135,27 @@ public class BlockInfo {
   }
 
   public BlockInfo copy() {
-    return new BlockInfo(data.clone(), tag == null ? null : tag.copy());
+    return new BlockInfo(data.clone(), copyTag(tag));
   }
 
   /* ----------------------------- SERIALIZATION ------------------------------ */
 
-  public static BlockInfo load(Tag t) {
+  public static BlockInfo load(BinaryTag t) {
     CompoundTag tag = (CompoundTag) t;
     CompoundTag blockTag = null;
 
-    if (tag.contains(TAG_NBT)) {
-      blockTag = tag.getCompound(TAG_NBT);
+    if (tag.containsKey(TAG_NBT)) {
+      blockTag = tag.get(TAG_NBT).asCompound();
     }
 
     return new BlockInfo(
-        TagUtil.readBlockData(tag.get(TAG_STATE)),
+        PaperNbt.loadBlockData(tag.get(TAG_STATE).asCompound()),
         blockTag
     );
   }
 
   public void save(CompoundTag tag) {
-    tag.put(TAG_STATE, TagUtil.writeBlockData(data));
+    tag.put(TAG_STATE, PaperNbt.saveBlockData(data));
 
     if (this.tag != null && !this.tag.isEmpty()) {
       tag.put(TAG_NBT, this.tag);
@@ -159,7 +168,7 @@ public class BlockInfo {
     CompoundTag tag = null;
 
     if (block.getState() instanceof TileState tile) {
-      tag = VanillaAccess.getBlockEntity(tile).saveWithoutMetadata();
+      tag = PaperNbt.saveBlockEntity(tile);
     }
 
     return new BlockInfo(block.getBlockData(), tag);

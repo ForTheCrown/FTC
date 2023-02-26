@@ -6,16 +6,16 @@ import lombok.Getter;
 import lombok.Setter;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.useables.ConstructType;
 import net.forthecrown.useables.Usable;
 import net.forthecrown.useables.UsableConstructor;
+import net.forthecrown.useables.UsableScriptHolder;
 import net.forthecrown.useables.UsageAction;
 import net.forthecrown.useables.UsageType;
 import net.forthecrown.useables.util.UsablesScripts;
-import net.forthecrown.useables.UsableScriptHolder;
 import net.forthecrown.user.Users;
 import net.kyori.adventure.text.Component;
-import net.minecraft.nbt.Tag;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -55,7 +55,7 @@ public class ActionScript extends UsageAction implements UsableScriptHolder {
   }
 
   @Override
-  public @Nullable Tag save() {
+  public @Nullable BinaryTag save() {
     return UsablesScripts.saveScript(this);
   }
 
@@ -66,7 +66,7 @@ public class ActionScript extends UsageAction implements UsableScriptHolder {
   }
 
   @UsableConstructor(ConstructType.TAG)
-  public static ActionScript readTag(Tag tag) {
+  public static ActionScript readTag(BinaryTag tag) {
     return UsablesScripts.loadScript(tag, ActionScript::new);
   }
 }

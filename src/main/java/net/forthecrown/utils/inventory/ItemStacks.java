@@ -1,22 +1,21 @@
 package net.forthecrown.utils.inventory;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Dynamic;
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
+import net.forthecrown.nbt.TagTypes;
+import net.forthecrown.nbt.paper.ItemNbtProvider;
+import net.forthecrown.nbt.paper.PaperNbt;
+import net.forthecrown.nbt.string.Snbt;
 import net.forthecrown.utils.AbstractListIterator;
 import net.forthecrown.utils.Util;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
-import net.minecraft.nbt.TagParser;
+import net.forthecrown.utils.io.TagOps;
 import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.util.datafix.fixes.References;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -67,12 +66,6 @@ public final class ItemStacks {
    */
   public static final String TAG_DATA_VERSION = "dataVersion";
 
-  /**
-   * The name of the package-private item meta implementation class
-   */
-  public static final String META_CLASS_NAME =
-      CraftItemStack.class.getPackageName() + ".CraftMetaItem";
-
   /* ----------------------------- TAGS ------------------------------ */
 
   /**
@@ -82,15 +75,7 @@ public final class ItemStacks {
    * @param tag  The tags to set
    */
   public static void setUnhandledTags(ItemMeta meta, CompoundTag tag) {
-    try {
-      Field f = getTagField();
-      f.setAccessible(true);
-
-      Map<String, Tag> metaTags = new HashMap<>(tag.tags);
-      f.set(meta, metaTags);
-    } catch (IllegalAccessException e) {
-      throw new IllegalStateException("Couldn't set internalTag in ItemMeta", e);
-    }
+    ItemNbtProvider.provider().setUnhandledTags(meta, tag);
   }
 
   /**
@@ -100,23 +85,7 @@ public final class ItemStacks {
    * @return The item's unhandledTags
    */
   public static @NotNull CompoundTag getUnhandledTags(ItemMeta meta) {
-    try {
-      // Get the tag field and make
-      // sure it's accessible
-      Field f = getTagField();
-      f.setAccessible(true);
-
-      // Get the unhandledTags
-      Map<String, Tag> metaTags = (Map<String, Tag>) f.get(meta);
-
-      // Turn the unhandled tags into a compound tag
-      CompoundTag result = new CompoundTag();
-      result.tags.putAll(metaTags);
-
-      return result;
-    } catch (IllegalAccessException e) {
-      throw new IllegalStateException("Couldn't get internalTag in ItemMeta", e);
-    }
+    return ItemNbtProvider.provider().getUnhandledTags(meta);
   }
 
   /**
@@ -127,7 +96,9 @@ public final class ItemStacks {
    * @return The element
    */
   public static @NotNull CompoundTag getTagElement(ItemMeta meta, String key) {
-    return getUnhandledTags(meta).getCompound(key);
+    return getUnhandledTags(meta)
+        .getOptional(key, TagTypes.compoundType())
+        .orElseGet(BinaryTags::compoundTag);
   }
 
   /**
@@ -137,7 +108,7 @@ public final class ItemStacks {
    * @param key  The element's name
    * @param tag  The element's value
    */
-  public static void setTagElement(ItemMeta meta, String key, Tag tag) {
+  public static void setTagElement(ItemMeta meta, String key, BinaryTag tag) {
     CompoundTag internalTag = getUnhandledTags(meta);
     internalTag.put(key, tag);
 
@@ -165,34 +136,7 @@ public final class ItemStacks {
    * @return True, if the meta has a tag element by the given name
    */
   public static boolean hasTagElement(ItemMeta meta, String key) {
-    return getUnhandledTags(meta).contains(key);
-  }
-
-  /**
-   * Gets the unhandledTags field in the ItemMeta class
-   *
-   * @return The unhandledTags field in the ItemMeta class
-   */
-  private static Field getTagField() {
-    Class meta = metaClass();
-    try {
-      return meta.getDeclaredField("unhandledTags");
-    } catch (NoSuchFieldException e) {
-      throw new IllegalStateException("couldn't find unhandledTags field", e);
-    }
-  }
-
-  /**
-   * Gets the CraftMetaItem class
-   *
-   * @return The craft item meta class
-   */
-  private static Class metaClass() {
-    try {
-      return Class.forName(META_CLASS_NAME);
-    } catch (ClassNotFoundException e) {
-      throw new IllegalStateException("Couldn't find class for item meta??????", e);
-    }
+    return getUnhandledTags(meta).containsKey(key);
   }
 
   /**
@@ -202,10 +146,9 @@ public final class ItemStacks {
    * @return The saved representation of the object
    */
   public static CompoundTag save(ItemStack item) {
-    CompoundTag tag = new CompoundTag();
+    CompoundTag tag = PaperNbt.saveItem(item);
     tag.putInt(TAG_DATA_VERSION, Util.getDataVersion());
-
-    return CraftItemStack.asNMSCopy(item).save(tag);
+    return tag;
   }
 
   /**
@@ -215,7 +158,7 @@ public final class ItemStacks {
    * @return The loaded item stack
    */
   public static ItemStack load(CompoundTag tag) {
-    if (tag.contains(TAG_DATA_VERSION)) {
+    if (tag.containsKey(TAG_DATA_VERSION)) {
       int version = tag.getInt(TAG_DATA_VERSION);
       int current = Util.getDataVersion();
 
@@ -223,7 +166,7 @@ public final class ItemStacks {
         tag = (CompoundTag) DataFixers.getDataFixer()
             .update(
                 References.ITEM_STACK,
-                new Dynamic<>(NbtOps.INSTANCE, tag),
+                new Dynamic<>(TagOps.OPS, tag),
                 version,
                 current
             )
@@ -231,7 +174,7 @@ public final class ItemStacks {
       }
     }
 
-    return CraftItemStack.asCraftMirror(net.minecraft.world.item.ItemStack.of(tag));
+    return PaperNbt.loadItem(tag);
   }
 
   /**
@@ -258,11 +201,7 @@ public final class ItemStacks {
   public static ItemStack fromNbtString(String nbt)
       throws IllegalStateException
   {
-    try {
-      return load(TagParser.parseTag(nbt));
-    } catch (CommandSyntaxException s) {
-      throw new IllegalStateException(s);
-    }
+    return load(Snbt.parseCompound(nbt));
   }
 
   /* ----------------------------- UTILITY ------------------------------ */

@@ -24,6 +24,8 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.AbstractCommand;
 import net.forthecrown.grenadier.types.args.ArgsArgument;
 import net.forthecrown.grenadier.types.args.Argument;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.paper.PaperNbt;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.text.format.ComponentFormat;
@@ -42,8 +44,6 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.translation.Translatable;
 import net.kyori.adventure.util.HSVLike;
-import net.minecraft.nbt.Tag;
-import net.minecraft.nbt.TextComponentTagVisitor;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -200,14 +200,12 @@ public final class Text {
    *                         this makes the resulting tag more readable
    * @return The formatted tag
    */
-  public static Component displayTag(Tag tag, boolean allowIndentation) {
+  public static Component displayTag(BinaryTag tag, boolean allowIndentation) {
     String indent = allowIndentation ? "  " : "";
 
-    var visitor = new TextComponentTagVisitor(indent, 0);
-    var text = visitor.visit(tag);
+    var text = PaperNbt.asComponent(tag, indent, true);
 
-    return PaperAdventure.asAdventure(text)
-        .clickEvent(ClickEvent.copyToClipboard(tag.getAsString()))
+    return text.clickEvent(ClickEvent.copyToClipboard(tag.toNbtString()))
         .hoverEvent(text("Click to copy raw NBT!"));
   }
 

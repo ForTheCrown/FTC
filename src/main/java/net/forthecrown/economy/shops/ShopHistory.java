@@ -4,11 +4,12 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.List;
 import lombok.Getter;
 import net.forthecrown.core.config.GeneralConfig;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.ListTag;
+import net.forthecrown.nbt.TypeIds;
 import net.forthecrown.utils.Time;
 import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.text.format.page.PageEntryIterator;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import org.jetbrains.annotations.Nullable;
 
 public class ShopHistory {
@@ -71,7 +72,7 @@ public class ShopHistory {
   }
 
   @Nullable
-  public Tag save() {
+  public BinaryTag save() {
     if (isEmpty()) {
       return null;
     }
@@ -80,10 +81,10 @@ public class ShopHistory {
     return TagUtil.writeList(entries, HistoryEntry::save);
   }
 
-  public void load(@Nullable Tag tag) {
+  public void load(@Nullable BinaryTag tag) {
     entries.clear();
 
-    if (tag == null || tag.getId() != Tag.TAG_LIST) {
+    if (tag == null || tag.getId() != TypeIds.LIST) {
       return;
     }
 

@@ -9,8 +9,8 @@ import net.forthecrown.dungeons.level.DungeonPiece;
 import net.forthecrown.dungeons.level.LevelBiome;
 import net.forthecrown.dungeons.level.PieceVisitor;
 import net.forthecrown.dungeons.level.PieceVisitor.Result;
+import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.utils.io.TagUtil;
-import net.minecraft.nbt.CompoundTag;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -35,7 +35,7 @@ public class RoomPiece extends DungeonPiece {
 
     if (tag.contains(TAG_SPAWNERS)) {
       spawners.addAll(
-          TagUtil.readCollection(tag.get(TAG_SPAWNERS), DungeonSpawner::load)
+          TagUtil.readList(tag.get(TAG_SPAWNERS), DungeonSpawner::load)
       );
     }
   }
@@ -76,7 +76,7 @@ public class RoomPiece extends DungeonPiece {
   protected void saveAdditional(CompoundTag tag) {
     if (!spawners.isEmpty()) {
       tag.put(TAG_SPAWNERS,
-          TagUtil.writeCollection(spawners, DungeonSpawner::save)
+          TagUtil.writeList(spawners, DungeonSpawner::save)
       );
     }
   }

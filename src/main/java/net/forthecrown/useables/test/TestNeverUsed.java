@@ -1,5 +1,8 @@
 package net.forthecrown.useables.test;
 
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.ByteTag;
 import net.forthecrown.useables.CheckHolder;
 import net.forthecrown.useables.ConstructType;
 import net.forthecrown.useables.UsableConstructor;
@@ -7,8 +10,6 @@ import net.forthecrown.useables.UsageTest;
 import net.forthecrown.useables.UsageType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.nbt.ByteTag;
-import net.minecraft.nbt.Tag;
 import org.bukkit.entity.Player;
 
 public class TestNeverUsed extends UsageTest {
@@ -29,8 +30,8 @@ public class TestNeverUsed extends UsageTest {
   }
 
   @Override
-  public Tag save() {
-    return ByteTag.valueOf(used);
+  public BinaryTag save() {
+    return BinaryTags.byteTag(used ? 1 : 0);
   }
 
   @Override
@@ -56,7 +57,7 @@ public class TestNeverUsed extends UsageTest {
   }
 
   @UsableConstructor(ConstructType.TAG)
-  public static TestNeverUsed load(Tag tag) {
-    return new TestNeverUsed(((ByteTag) tag).getAsByte() != 0);
+  public static TestNeverUsed load(BinaryTag tag) {
+    return new TestNeverUsed(((ByteTag) tag).byteValue() != 0);
   }
 }

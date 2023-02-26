@@ -1,5 +1,6 @@
 package net.forthecrown.useables.test;
 
+import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.useables.CheckHolder;
 import net.forthecrown.useables.ConstructType;
 import net.forthecrown.useables.UsableConstructor;
@@ -7,7 +8,6 @@ import net.forthecrown.useables.UsageTest;
 import net.forthecrown.useables.UsageType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.nbt.Tag;
 import org.bukkit.entity.Player;
 
 public class TestNoPassangers extends UsageTest {
@@ -26,7 +26,7 @@ public class TestNoPassangers extends UsageTest {
   }
 
   @Override
-  public Tag save() {
+  public BinaryTag save() {
     return null;
   }
 

@@ -38,6 +38,7 @@ import net.forthecrown.grenadier.types.args.ParsedArgs;
 import net.forthecrown.grenadier.types.block.BlockPredicateArgument;
 import net.forthecrown.grenadier.types.pos.Position;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
+import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.royalgrenadier.VanillaMappedArgument;
 import net.forthecrown.structure.BlockProcessors;
 import net.forthecrown.structure.BlockStructure;
@@ -50,7 +51,6 @@ import net.forthecrown.utils.math.Transform;
 import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.utils.math.WorldBounds3i;
 import net.forthecrown.utils.text.Text;
-import net.minecraft.nbt.CompoundTag;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -139,7 +139,9 @@ public class CommandFtcStruct extends FtcCommand {
       Holder<BlockStructure> holder
           = context.getArgument("structure", Holder.class);
 
-      return holder.getValue().getHeader().copy();
+      return holder.getValue().getHeader()
+          .copy()
+          .asCompound();
     }
 
     @Override
@@ -148,7 +150,7 @@ public class CommandFtcStruct extends FtcCommand {
           = context.getArgument("structure", Holder.class);
 
       var header = holder.getValue().getHeader();
-      header.tags.clear();
+      header.clear();
       header.merge(tag);
     }
   };

@@ -14,11 +14,12 @@ import lombok.Getter;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnLoad;
 import net.forthecrown.core.module.OnSave;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
+import net.forthecrown.nbt.ListTag;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.utils.io.SerializationHelper;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -262,7 +263,7 @@ public class InventoryStorage {
           return;
         }
 
-        CompoundTag invTag = new CompoundTag();
+        CompoundTag invTag = BinaryTags.compoundTag();
         inventoryMap.save(invTag);
 
         tag.put(uuid.toString(), invTag);
@@ -280,7 +281,7 @@ public class InventoryStorage {
         return;
       }
 
-      tag.tags.forEach((s, tag1) -> {
+      tag.forEach((s, tag1) -> {
         UUID uuid = UUID.fromString(s);
         InventoryMap map = new InventoryMap();
         map.load((CompoundTag) tag1);
@@ -297,7 +298,7 @@ public class InventoryStorage {
 
     public void save(CompoundTag tag) {
       forEach((name, items) -> {
-        ListTag listTag = new ListTag();
+        ListTag listTag = BinaryTags.listTag();
 
         items.forEach((slot, item) -> {
           var itemTag = ItemStacks.save(item);
@@ -311,7 +312,7 @@ public class InventoryStorage {
     }
 
     public void load(CompoundTag tag) {
-      tag.tags.forEach((name, itemTag) -> {
+      tag.forEach((name, itemTag) -> {
         ListTag itemList = (ListTag) itemTag;
         Int2ObjectMap<ItemStack> items = new Int2ObjectOpenHashMap<>();
 

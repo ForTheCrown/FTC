@@ -6,15 +6,15 @@ import net.forthecrown.core.registry.RegistryKey;
 import net.forthecrown.dungeons.DungeonManager;
 import net.forthecrown.dungeons.level.room.RoomFlag;
 import net.forthecrown.dungeons.level.room.RoomType;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.StringTag;
 import org.jetbrains.annotations.Nullable;
 
 public final class Pieces {
   private Pieces() {}
 
   @SuppressWarnings("rawtypes")
-  public static @Nullable PieceType load(Tag t) {
+  public static @Nullable PieceType load(BinaryTag t) {
     RegistryKey key = RegistryKey.load(t);
 
     if (key == null) {

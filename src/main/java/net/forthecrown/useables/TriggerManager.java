@@ -9,9 +9,10 @@ import java.util.Set;
 import lombok.Getter;
 import net.forthecrown.events.Events;
 import net.forthecrown.events.TriggerListener;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.utils.WorldChunkMap;
 import net.forthecrown.utils.math.Bounds3i;
-import net.minecraft.nbt.CompoundTag;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -194,7 +195,7 @@ public class TriggerManager {
    */
   public void save(CompoundTag tag) {
     for (var v : triggers.values()) {
-      var triggerTag = new CompoundTag();
+      var triggerTag = BinaryTags.compoundTag();
       v.save(triggerTag);
 
       tag.put(v.getName(), triggerTag);
@@ -209,7 +210,7 @@ public class TriggerManager {
   public void load(CompoundTag lTag) {
     clear();
 
-    for (var t : lTag.tags.entrySet()) {
+    for (var t : lTag.entrySet()) {
       var name = t.getKey();
       var tag = (CompoundTag) t.getValue();
 

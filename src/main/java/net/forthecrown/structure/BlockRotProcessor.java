@@ -3,10 +3,7 @@ package net.forthecrown.structure;
 import java.util.Objects;
 import java.util.Random;
 import lombok.Getter;
-import net.forthecrown.utils.VanillaAccess;
 import org.apache.commons.lang3.mutable.Mutable;
-import org.bukkit.Material;
-import org.bukkit.block.data.BlockData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.math.vector.Vector3i;
@@ -41,46 +38,14 @@ public class BlockRotProcessor implements BlockProcessor {
       return previous;
     }
 
-    var originalType = previous.getData().getMaterial();
-    var rotted = lookupRot(originalType);
+    var data = previous.getData();
+    var rottedData = RotLookup.rot(data, random);
 
-    if (rotted == null) {
+    if (rottedData == null) {
       return previous;
     }
 
-    var data = previous.getData();
-    var newData = cloneWithMaterial(data, rotted);
-
-    return previous.withData(newData);
-  }
-
-  private Material lookupRot(Material material) {
-    var name = material.name();
-
-    if (material == Material.STONE_BRICK_WALL) {
-      return Material.ANDESITE_WALL;
-    }
-
-    if (name.contains("STONE")) {
-      return Material.matchMaterial(name.replaceAll("STONE", "ANDESITE"));
-    }
-
-    if (name.contains("ANDESITE")) {
-      return Material.matchMaterial(name.replaceAll("ANDESITE", "COBBLESTONE"));
-    }
-
-    if (name.contains("STONE_BRICK")) {
-      return Material.matchMaterial(
-          name.replaceAll("STONE_BRICKS?", "CRACKED_STONE_BRICK")
-      );
-    }
-
-    return null;
-  }
-
-  private BlockData cloneWithMaterial(BlockData data, Material material) {
-    BlockData result = material.createBlockData();
-    return VanillaAccess.merge(result, data);
+    return previous.withData(rottedData);
   }
 
   public interface IntegrityProvider {

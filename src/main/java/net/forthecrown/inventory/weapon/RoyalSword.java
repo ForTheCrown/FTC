@@ -14,14 +14,15 @@ import net.forthecrown.inventory.weapon.ability.SwordAbilityManager;
 import net.forthecrown.inventory.weapon.ability.WeaponAbility;
 import net.forthecrown.inventory.weapon.ability.WeaponAbilityType;
 import net.forthecrown.inventory.weapon.goals.WeaponGoal;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
+import net.forthecrown.nbt.IntTag;
 import net.forthecrown.user.data.RankTier;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.IntTag;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -384,7 +385,7 @@ public class RoyalSword extends ExtendedItem {
     if (tag.contains(TAG_ABILITY_USES)) {
       CompoundTag usesTag = tag.getCompound(TAG_ABILITY_USES);
       abilityUses.clear();
-      usesTag.getAllKeys().forEach(s -> {
+      usesTag.keySet().forEach(s -> {
         abilityUses.put(s, usesTag.getInt(s));
       });
     }
@@ -396,7 +397,7 @@ public class RoyalSword extends ExtendedItem {
     this.rank = SwordRanks.RANKS[tag.getInt(TAG_RANK)];
 
     if (tag.contains(TAG_GOALS)) {
-      for (var e : tag.getCompound(TAG_GOALS).tags.entrySet()) {
+      for (var e : tag.getCompound(TAG_GOALS).entrySet()) {
         WeaponGoal g = rank.getGoals().get(e.getKey());
 
         if (g == null) {
@@ -406,7 +407,7 @@ public class RoyalSword extends ExtendedItem {
           continue;
         }
 
-        int value = ((IntTag) e.getValue()).getAsInt();
+        int value = ((IntTag) e.getValue()).intValue();
 
         if (value == 0) {
           continue;
@@ -425,7 +426,7 @@ public class RoyalSword extends ExtendedItem {
       var goals = rank.getGoals();
 
       if (!goals.isEmpty()) {
-        CompoundTag goalTag = new CompoundTag();
+        CompoundTag goalTag = BinaryTags.compoundTag();
 
         for (var g : goals.values()) {
           goalTag.putInt(g.getName(), progress.getInt(g.getName()));
@@ -440,7 +441,7 @@ public class RoyalSword extends ExtendedItem {
     }
 
     if (!abilityUses.isEmpty()) {
-      CompoundTag usesTag = new CompoundTag();
+      CompoundTag usesTag = BinaryTags.compoundTag();
       abilityUses.forEach(usesTag::putInt);
       tag.put(TAG_ABILITY_USES, usesTag);
     }
@@ -451,7 +452,7 @@ public class RoyalSword extends ExtendedItem {
           .writeTag(ability.getType())
 
           .ifPresentOrElse(keyTag -> {
-            CompoundTag abilityTag = new CompoundTag();
+            CompoundTag abilityTag = BinaryTags.compoundTag();
             ability.save(abilityTag);
 
             tag.put(TAG_ABILITY, abilityTag);

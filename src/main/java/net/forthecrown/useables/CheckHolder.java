@@ -4,7 +4,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.Getter;
 import lombok.Setter;
 import net.forthecrown.core.logging.Loggers;
-import net.minecraft.nbt.CompoundTag;
+import net.forthecrown.nbt.CompoundTag;
 import org.bukkit.entity.Player;
 
 /**

@@ -18,6 +18,8 @@ import net.forthecrown.economy.shops.SignShop;
 import net.forthecrown.economy.shops.SignShops;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.text.Text;
@@ -25,8 +27,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.Container;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
@@ -53,7 +53,7 @@ public class CommandEditShop extends FtcCommand {
     public CompoundTag getTag(CommandContext<CommandSource> context)
         throws CommandSyntaxException {
       var shop = getShop(context.getSource().asPlayer());
-      CompoundTag tag = new CompoundTag();
+      CompoundTag tag = BinaryTags.compoundTag();
       shop.save(tag);
       return tag;
     }
@@ -165,7 +165,7 @@ public class CommandEditShop extends FtcCommand {
             )
         )
         .then(literal("amount")
-            .then(argument("amount_actual", IntegerArgumentType.integer(1, Container.MAX_STACK))
+            .then(argument("amount_actual", IntegerArgumentType.integer(1, 64))
                 .executes(c -> {
                   Player player = c.getSource().asPlayer();
                   SignShop shop = getShop(player);

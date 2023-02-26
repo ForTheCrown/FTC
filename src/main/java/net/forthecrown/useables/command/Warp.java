@@ -5,13 +5,13 @@ import static net.kyori.adventure.text.Component.text;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.function.UnaryOperator;
+import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.user.UserTeleport;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
-import net.minecraft.nbt.CompoundTag;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

@@ -1,8 +1,9 @@
 package net.forthecrown.economy.shops;
 
 import java.util.UUID;
-import net.minecraft.nbt.LongArrayTag;
-import net.minecraft.nbt.Tag;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.LongArrayTag;
 import org.apache.commons.lang3.Validate;
 
 /**
@@ -61,8 +62,8 @@ public record HistoryEntry(long date, UUID customer, int amount, int earned, boo
    * @param t The NBT tag to load from
    * @return The loaded entry
    */
-  public static HistoryEntry of(Tag t) {
-    return of(((LongArrayTag) t).getAsLongArray());
+  public static HistoryEntry of(BinaryTag t) {
+    return of(((LongArrayTag) t).toLongArray());
   }
 
   /**
@@ -129,6 +130,6 @@ public record HistoryEntry(long date, UUID customer, int amount, int earned, boo
    * @return The saved NBT tag
    */
   public LongArrayTag save() {
-    return new LongArrayTag(toArray());
+    return BinaryTags.longArrayTag(toArray());
   }
 }

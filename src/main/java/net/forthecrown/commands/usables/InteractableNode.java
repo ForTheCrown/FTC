@@ -11,9 +11,10 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.useables.Usable;
 import net.forthecrown.utils.text.writer.TextWriters;
-import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.NotNull;
 
 abstract class InteractableNode<H extends Usable> extends FtcCommand {
@@ -79,7 +80,7 @@ abstract class InteractableNode<H extends Usable> extends FtcCommand {
           throws CommandSyntaxException {
         var holder = provider.get(context);
 
-        CompoundTag tag = new CompoundTag();
+        CompoundTag tag = BinaryTags.compoundTag();
         holder.save(tag);
         return tag;
       }

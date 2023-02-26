@@ -3,11 +3,11 @@ package net.forthecrown.useables;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
+import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.utils.BoundsHolder;
 import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.math.WorldBounds3i;
 import net.forthecrown.utils.text.writer.TextWriter;
-import net.minecraft.nbt.CompoundTag;
 
 /**
  * A trigger which holds actions and triggers that is activated when a user enters its area of

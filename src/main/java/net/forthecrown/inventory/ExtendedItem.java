@@ -8,14 +8,15 @@ import com.google.common.base.Preconditions;
 import java.util.UUID;
 import lombok.Getter;
 import net.forthecrown.dungeons.enchantments.FtcEnchant;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.forthecrown.utils.text.writer.TextWriters;
+import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.Util;
-import net.minecraft.nbt.CompoundTag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -78,7 +79,7 @@ public abstract class ExtendedItem {
     writeLore(loreWriter);
 
     //Save tags to item's NBT
-    CompoundTag tag = new CompoundTag();
+    CompoundTag tag = BinaryTags.compoundTag();
 
     if (owner != null) {
       tag.putUUID(TAG_OWNER, owner);
@@ -86,7 +87,7 @@ public abstract class ExtendedItem {
 
     save(tag);
 
-    CompoundTag topTag = new CompoundTag();
+    CompoundTag topTag = BinaryTags.compoundTag();
     topTag.putString(TAG_TYPE, type.getKey());
     topTag.put(TAG_DATA, tag);
 
@@ -108,6 +109,6 @@ public abstract class ExtendedItem {
   }
 
   public boolean hasPlayerOwner() {
-    return owner != null && owner != Util.NIL_UUID;
+    return owner != null && owner.equals(Identity.nil().uuid());
   }
 }

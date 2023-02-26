@@ -1,9 +1,10 @@
 package net.forthecrown.dungeons.level.gate;
 
 import net.forthecrown.dungeons.level.DungeonPiece;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.structure.Direction;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import org.spongepowered.math.vector.Vector3i;
 
 public record GateData(Direction direction,
@@ -35,13 +36,13 @@ public record GateData(Direction direction,
   public record Opening(int width, int height) {
 
     public CompoundTag save() {
-      CompoundTag tag = new CompoundTag();
+      CompoundTag tag = BinaryTags.compoundTag();
       tag.putInt(TAG_WIDTH, width);
       tag.putInt(TAG_HEIGHT, height);
       return tag;
     }
 
-    public static Opening load(Tag t) {
+    public static Opening load(BinaryTag t) {
       if (!(t instanceof CompoundTag tag)) {
         return DEFAULT_OPENING;
       }

@@ -1,9 +1,9 @@
 package net.forthecrown.structure;
 
 import java.util.concurrent.CompletableFuture;
+import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.utils.math.Bounds3i;
 import net.forthecrown.utils.math.Transform;
-import net.minecraft.nbt.CompoundTag;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.jetbrains.annotations.Nullable;

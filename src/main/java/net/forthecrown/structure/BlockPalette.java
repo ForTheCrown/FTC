@@ -11,11 +11,12 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.core.logging.Loggers;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
+import net.forthecrown.nbt.ListTag;
+import net.forthecrown.nbt.TagTypes;
 import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.math.Vectors;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import org.bukkit.block.CommandBlock;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
@@ -134,10 +135,10 @@ public class BlockPalette {
     tag.put(TAG_SIZE, Vectors.writeTag(size));
 
     if (!block2Positions.isEmpty()) {
-      var blockTag = new ListTag();
+      var blockTag = BinaryTags.listTag();
 
       for (var e : block2Positions.entrySet()) {
-        CompoundTag bTag = new CompoundTag();
+        CompoundTag bTag = BinaryTags.compoundTag();
         e.getKey().save(bTag);
 
         bTag.putLongArray(TAG_POS_LIST, e.getValue());
@@ -148,7 +149,7 @@ public class BlockPalette {
     }
 
     if (!entities.isEmpty()) {
-      ListTag eTag = TagUtil.writeCollection(entities, EntityInfo::save);
+      ListTag eTag = TagUtil.writeList(entities, EntityInfo::save);
       tag.put(TAG_ENTITIES, eTag);
     }
   }
@@ -156,8 +157,8 @@ public class BlockPalette {
   public void load(CompoundTag tag, int dataVersion, int oldVersion) {
     clear();
 
-    if (tag.contains(TAG_BLOCKS)) {
-      var list = tag.getList(TAG_BLOCKS, Tag.TAG_COMPOUND);
+    if (tag.containsKey(TAG_BLOCKS)) {
+      ListTag list = tag.getList(TAG_BLOCKS, TagTypes.compoundType());
 
       for (var t : list) {
         CompoundTag bTag = (CompoundTag) t;
@@ -172,9 +173,9 @@ public class BlockPalette {
       }
     }
 
-    if (tag.contains(TAG_ENTITIES)) {
-      entities.addAll(TagUtil.readCollection(
-          tag.get(TAG_ENTITIES),
+    if (tag.containsKey(TAG_ENTITIES)) {
+      entities.addAll(TagUtil.readList(
+          tag.get(TAG_ENTITIES).asList(),
           tag1 -> {
             var info = EntityInfo.load(tag1);
 
@@ -187,7 +188,7 @@ public class BlockPalette {
       ));
     }
 
-    if (tag.contains(TAG_SIZE)) {
+    if (tag.containsKey(TAG_SIZE)) {
       this.size = Vectors.read3i(tag.get(TAG_SIZE));
     } else {
       scanSize();

@@ -3,9 +3,9 @@ package net.forthecrown.utils.math;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.sk89q.worldedit.regions.Region;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.IntArrayTag;
 import net.forthecrown.utils.io.JsonUtils;
-import net.minecraft.nbt.IntArrayTag;
-import net.minecraft.nbt.Tag;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.util.BoundingBox;
@@ -37,8 +37,8 @@ public class Bounds3i extends AbstractBounds3i<Bounds3i> implements Iterable<Vec
     );
   }
 
-  public static Bounds3i of(Tag t) {
-    return new Bounds3i(((IntArrayTag) t).getAsIntArray());
+  public static Bounds3i of(BinaryTag t) {
+    return new Bounds3i(((IntArrayTag) t).toIntArray());
   }
 
   public static Bounds3i of(Vector3i vec1, Vector3i vec2) {

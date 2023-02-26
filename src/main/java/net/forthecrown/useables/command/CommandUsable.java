@@ -2,10 +2,11 @@ package net.forthecrown.useables.command;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.Getter;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.useables.CheckHolder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEventSource;
-import net.minecraft.nbt.CompoundTag;
 import org.bukkit.entity.Player;
 
 @Getter
@@ -36,7 +37,7 @@ public abstract class CommandUsable
   }
 
   public CompoundTag save() {
-    var tag = new CompoundTag();
+    var tag = BinaryTags.compoundTag();
     saveChecks(tag);
     save(tag);
 

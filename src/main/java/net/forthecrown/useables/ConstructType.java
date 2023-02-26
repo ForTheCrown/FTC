@@ -3,7 +3,7 @@ package net.forthecrown.useables;
 import com.mojang.brigadier.StringReader;
 import lombok.Getter;
 import net.forthecrown.grenadier.CommandSource;
-import net.minecraft.nbt.Tag;
+import net.forthecrown.nbt.BinaryTag;
 import org.apache.commons.lang3.ArrayUtils;
 
 @Getter
@@ -20,7 +20,7 @@ public enum ConstructType {
     }
   },
 
-  TAG(Tag.class) {
+  TAG(BinaryTag.class) {
     @Override
     public void set(UsageType type, UsageType.ReflectionExecutable executable) {
       type.tagLoader = executable;

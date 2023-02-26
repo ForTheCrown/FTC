@@ -10,10 +10,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.Getter;
 import net.forthecrown.dungeons.level.gate.GateData;
+import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.structure.BlockStructure;
 import net.forthecrown.structure.FunctionInfo;
 import net.forthecrown.structure.Structures;
-import net.minecraft.nbt.CompoundTag;
 import org.spongepowered.math.vector.Vector3i;
 
 @Getter

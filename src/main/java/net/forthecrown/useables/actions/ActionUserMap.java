@@ -7,17 +7,18 @@ import java.util.EnumMap;
 import java.util.UUID;
 import net.forthecrown.core.registry.Registries;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.useables.Usable;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.IntTag;
 import net.forthecrown.useables.ConstructType;
+import net.forthecrown.useables.Usable;
 import net.forthecrown.useables.UsableConstructor;
 import net.forthecrown.useables.UsageAction;
 import net.forthecrown.useables.UsageType;
-import net.forthecrown.utils.UUID2IntMap;
 import net.forthecrown.user.UserManager;
+import net.forthecrown.utils.UUID2IntMap;
 import net.forthecrown.utils.Util;
 import net.kyori.adventure.text.Component;
-import net.minecraft.nbt.IntTag;
-import net.minecraft.nbt.Tag;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,8 +50,8 @@ public class ActionUserMap extends UsageAction {
   }
 
   @Override
-  public @Nullable Tag save() {
-    return IntTag.valueOf(amount);
+  public @Nullable BinaryTag save() {
+    return BinaryTags.intTag(amount);
   }
 
   // --- TYPE CONSTRUCTORS ---
@@ -64,8 +65,8 @@ public class ActionUserMap extends UsageAction {
   }
 
   @UsableConstructor(ConstructType.TAG)
-  public static ActionUserMap load(UsageType<ActionUserMap> type, Tag tag) {
-    return new ActionUserMap(type, ((IntTag) tag).getAsInt());
+  public static ActionUserMap load(UsageType<ActionUserMap> type, BinaryTag tag) {
+    return new ActionUserMap(type, ((IntTag) tag).intValue());
   }
 
   // --- SUB CLASSES ---

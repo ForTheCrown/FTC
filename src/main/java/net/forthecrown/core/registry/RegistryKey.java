@@ -1,8 +1,9 @@
 package net.forthecrown.core.registry;
 
 import lombok.Getter;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.StringTag;
 import org.apache.commons.lang3.Validate;
 
 @Getter
@@ -33,16 +34,16 @@ public class RegistryKey {
     return registry + DELIMITER + value;
   }
 
-  public static RegistryKey load(Tag t) {
+  public static RegistryKey load(BinaryTag t) {
     if (!(t instanceof StringTag stringTag)) {
       return null;
     }
 
-    return of(stringTag.getAsString());
+    return of(stringTag.toString());
   }
 
   public StringTag save() {
-    return StringTag.valueOf(toString());
+    return BinaryTags.stringTag(toString());
   }
 
   @Override

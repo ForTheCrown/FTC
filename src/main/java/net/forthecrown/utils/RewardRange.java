@@ -2,9 +2,11 @@ package net.forthecrown.utils;
 
 import java.util.Random;
 import lombok.Data;
-import net.minecraft.nbt.IntArrayTag;
-import net.minecraft.nbt.IntTag;
-import net.minecraft.nbt.Tag;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.IntArrayTag;
+import net.forthecrown.nbt.IntTag;
+import net.forthecrown.nbt.TypeIds;
 
 /**
  * A range of rewards for a currency type item
@@ -58,17 +60,17 @@ public class RewardRange {
    * @param tag Tag to load from, {@link RewardRange#NONE}, if the tag is null
    * @return The loaded range
    */
-  public static RewardRange load(Tag tag) {
+  public static RewardRange load(BinaryTag tag) {
     if (tag == null) {
       return NONE;
     }
 
-    if (tag.getId() == Tag.TAG_INT) {
-      return exact(((IntTag) tag).getAsInt());
+    if (tag.getId() == TypeIds.INT) {
+      return exact(((IntTag) tag).intValue());
     }
 
     IntArrayTag arr = (IntArrayTag) tag;
-    return between(arr.get(0).getAsInt(), arr.get(1).getAsInt());
+    return between(arr.getInt(0), arr.getInt(1));
   }
 
   /**
@@ -135,8 +137,10 @@ public class RewardRange {
    *
    * @return The saved tag, will be an int tag if this range is exact, otherwise IntArrayTag
    */
-  public Tag save() {
-    return isExact() ? IntTag.valueOf(min) : new IntArrayTag(new int[]{min, max});
+  public BinaryTag save() {
+    return isExact()
+        ? BinaryTags.intTag(min)
+        : BinaryTags.intArrayTag(min, max);
   }
 
   public String toString() {

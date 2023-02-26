@@ -3,13 +3,14 @@ package net.forthecrown.dungeons.level.gate;
 import static net.forthecrown.dungeons.level.gate.GateData.TAG_OPENING;
 import static net.forthecrown.dungeons.level.gate.GateData.TAG_STAIR;
 
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.structure.Direction;
 import net.forthecrown.structure.Rotation;
 import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.math.Transform;
 import net.forthecrown.utils.math.Vectors;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import org.spongepowered.math.vector.Vector3i;
 
 public record AbsoluteGateData(Direction direction,
@@ -41,14 +42,14 @@ public record AbsoluteGateData(Direction direction,
   }
 
   public CompoundTag save() {
-    CompoundTag result = new CompoundTag();
+    CompoundTag result = BinaryTags.compoundTag();
     result.put(TAG_DIRECTION, TagUtil.writeEnum(direction));
     result.put(TAG_CENTER, Vectors.writeTag(center));
     result.put(TAG_OPENING, opening.save());
     return result;
   }
 
-  public static AbsoluteGateData load(Tag t) {
+  public static AbsoluteGateData load(BinaryTag t) {
     if (!(t instanceof CompoundTag tag)) {
       return null;
     }

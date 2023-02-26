@@ -7,9 +7,10 @@ import java.lang.ref.WeakReference;
 import java.util.UUID;
 import lombok.Data;
 import net.forthecrown.grenadier.types.UUIDArgument;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
+import net.forthecrown.nbt.TypeIds;
 import net.minecraft.world.level.ChunkPos;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -76,9 +77,9 @@ public class EntityIdentifier {
     return identifier;
   }
 
-  public static EntityIdentifier load(Tag t) {
-    if (t.getId() == Tag.TAG_STRING) {
-      return parse(t.getAsString());
+  public static EntityIdentifier load(BinaryTag t) {
+    if (t.getId() == TypeIds.STRING) {
+      return parse(t.toString());
     }
 
     CompoundTag tag = (CompoundTag) t;
@@ -122,7 +123,7 @@ public class EntityIdentifier {
         + FIELD_SEPARATOR + uniqueId;
   }
 
-  public Tag save() {
-    return StringTag.valueOf(toString());
+  public BinaryTag save() {
+    return BinaryTags.stringTag(toString());
   }
 }

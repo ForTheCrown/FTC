@@ -20,10 +20,15 @@ import net.forthecrown.core.Worlds;
 import net.forthecrown.core.config.GeneralConfig;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.guilds.GuildManager;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
+import net.forthecrown.nbt.LongTag;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.ArrayIterator;
 import net.forthecrown.utils.BoundsHolder;
 import net.forthecrown.utils.Time;
+import net.forthecrown.utils.io.TagOps;
 import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.math.Bounds3i;
 import net.forthecrown.utils.math.Vectors;
@@ -38,10 +43,6 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.LongTag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
@@ -494,7 +495,7 @@ public class Waypoint implements BoundsHolder {
     }
 
     if (hasProperties()) {
-      CompoundTag propTag = new CompoundTag();
+      CompoundTag propTag = BinaryTags.compoundTag();
       ArrayIterator<Object> it = ArrayIterator.unmodifiable(properties);
 
       while (it.hasNext()) {
@@ -510,8 +511,8 @@ public class Waypoint implements BoundsHolder {
               }
 
               @SuppressWarnings("unchecked")
-              Tag pTag = (Tag) property.getSerializer()
-                  .serialize(NbtOps.INSTANCE, next);
+              BinaryTag pTag = (BinaryTag) property.getSerializer()
+                  .serialize(TagOps.OPS, next);
 
               propTag.put(property.getName(), pTag);
             }, () -> {
@@ -523,7 +524,7 @@ public class Waypoint implements BoundsHolder {
     }
 
     if (!residents.isEmpty()) {
-      CompoundTag rTag = new CompoundTag();
+      CompoundTag rTag = BinaryTags.compoundTag();
       residents.forEach((uuid, aLong) -> {
         rTag.putLong(uuid.toString(), aLong);
       });
@@ -539,7 +540,7 @@ public class Waypoint implements BoundsHolder {
 
     this.position = Vectors.read3i(tag.get(TAG_POS));
 
-    if (tag.contains(TAG_WORLD)) {
+    if (tag.containsKey(TAG_WORLD)) {
       var key = TagUtil.readKey(tag.get(TAG_WORLD));
 
       var world = Bukkit.getWorld(key);
@@ -549,22 +550,22 @@ public class Waypoint implements BoundsHolder {
     this.bounds = type.createBounds()
         .move(position);
 
-    if (tag.contains(TAG_LAST_VALID)) {
+    if (tag.containsKey(TAG_LAST_VALID)) {
       lastValidTime = tag.getLong(TAG_LAST_VALID);
     } else {
       lastValidTime = UNSET;
     }
 
-    if (tag.contains(TAG_PROPERTIES)) {
+    if (tag.containsKey(TAG_PROPERTIES)) {
       CompoundTag propertyTag = tag.getCompound(TAG_PROPERTIES);
 
-      for (var e : propertyTag.tags.entrySet()) {
+      for (var e : propertyTag.entrySet()) {
         WaypointProperties.REGISTRY
             .get(e.getKey())
 
             .ifPresentOrElse(property -> {
               property.getSerializer()
-                  .deserialize(NbtOps.INSTANCE, e.getValue())
+                  .deserialize(TagOps.OPS, e.getValue())
                   .resultOrPartial(LOGGER::warn)
                   .ifPresent(o -> set(property, o));
 
@@ -576,11 +577,11 @@ public class Waypoint implements BoundsHolder {
       properties = ArrayUtils.EMPTY_OBJECT_ARRAY;
     }
 
-    if (tag.contains(TAG_RESIDENTS)) {
-      var rTag = tag.getCompound(TAG_RESIDENTS);
-      rTag.tags.forEach((s, tag1) -> {
+    if (tag.containsKey(TAG_RESIDENTS)) {
+      CompoundTag rTag = tag.getCompound(TAG_RESIDENTS);
+      rTag.forEach((s, tag1) -> {
         UUID uuid = UUID.fromString(s);
-        long time = ((LongTag) tag1).getAsLong();
+        long time = ((LongTag) tag1).longValue();
 
         setResident(uuid, time);
       });

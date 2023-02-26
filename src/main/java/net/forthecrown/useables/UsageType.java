@@ -16,8 +16,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.utils.ArrayIterator;
-import net.minecraft.nbt.Tag;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.Validate;
 
@@ -69,7 +69,7 @@ public class UsageType<T extends UsageInstance> {
     return orEmpty(parser, reader, source);
   }
 
-  public T load(Tag tag) throws CommandSyntaxException {
+  public T load(BinaryTag tag) throws CommandSyntaxException {
     return orEmpty(tagLoader, tag);
   }
 

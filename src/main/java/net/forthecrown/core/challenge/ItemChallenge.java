@@ -328,9 +328,7 @@ public class ItemChallenge implements Challenge {
           // Axolotl and fish buckets need to be singled out
           // due to material being able to represent different
           // variants of the mob
-          if (typeName.contains("BUCKET")
-              && (typeName.contains("AXOLOTL") || typeName.contains("TROPICAL"))
-          ) {
+          if (validBucket(typeName)) {
             return true;
           }
 
@@ -362,6 +360,16 @@ public class ItemChallenge implements Challenge {
         })
 
         .orElse(false);
+  }
+
+  private static boolean validBucket(String typeName) {
+    if (!typeName.contains("BUCKET")) {
+      return false;
+    }
+
+    return typeName.contains("AXOLOTL")
+        || typeName.contains("TROPICAL")
+        || typeName.contains("TADPOLE");
   }
 
   private static boolean texturesMatch(PlayerTextures t1, PlayerTextures t2) {

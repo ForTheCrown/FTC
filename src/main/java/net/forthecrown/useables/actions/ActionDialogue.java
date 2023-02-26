@@ -15,6 +15,9 @@ import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.useables.ConstructType;
 import net.forthecrown.useables.Usable;
 import net.forthecrown.useables.UsableConstructor;
@@ -25,8 +28,6 @@ import net.forthecrown.utils.dialogue.Dialogue;
 import net.forthecrown.utils.dialogue.DialogueManager;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -77,8 +78,8 @@ public class ActionDialogue extends UsageAction {
   }
 
   @Override
-  public @Nullable Tag save() {
-    CompoundTag tag = new CompoundTag();
+  public @Nullable BinaryTag save() {
+    CompoundTag tag = BinaryTags.compoundTag();
     tag.putString("entry", entryName);
 
     if (!Strings.isNullOrEmpty(nodeName)) {
@@ -89,7 +90,7 @@ public class ActionDialogue extends UsageAction {
   }
 
   @UsableConstructor(ConstructType.TAG)
-  public static ActionDialogue load(Tag nbt) {
+  public static ActionDialogue load(BinaryTag nbt) {
     CompoundTag tag = (CompoundTag) nbt;
     String entryName = tag.getString("entry");
     String nodeName;

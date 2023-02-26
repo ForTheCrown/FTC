@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.core.module.OnLoad;
 import net.forthecrown.core.module.OnSave;
-import net.minecraft.nbt.CompoundTag;
+import net.forthecrown.nbt.CompoundTag;
 
 /**
  * An abstract class to make file serialization and deserialization easier

@@ -14,6 +14,8 @@ import net.forthecrown.core.registry.Holder;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.waypoint.Waypoint;
@@ -21,7 +23,6 @@ import net.forthecrown.waypoint.WaypointManager;
 import net.forthecrown.waypoint.WaypointProperties;
 import net.forthecrown.waypoint.WaypointProperty;
 import net.forthecrown.waypoint.Waypoints;
-import net.minecraft.nbt.CompoundTag;
 import org.bukkit.World;
 import org.spongepowered.math.vector.Vector3i;
 
@@ -107,7 +108,7 @@ public class CommandWaypoints extends FtcCommand {
             .then(literal("data")
                 .executes(c -> {
                   var waypoint = get(c);
-                  CompoundTag tag = new CompoundTag();
+                  CompoundTag tag = BinaryTags.compoundTag();
                   waypoint.save(tag);
 
                   c.getSource().sendMessage(Text.displayTag(tag, true));

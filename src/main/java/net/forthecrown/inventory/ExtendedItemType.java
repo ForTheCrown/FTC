@@ -5,9 +5,9 @@ import static net.forthecrown.inventory.ExtendedItems.TAG_TYPE;
 
 import java.util.UUID;
 import net.forthecrown.core.registry.FtcKeyed;
+import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.utils.inventory.BaseItemBuilder;
 import net.forthecrown.utils.inventory.ItemStacks;
-import net.minecraft.nbt.CompoundTag;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

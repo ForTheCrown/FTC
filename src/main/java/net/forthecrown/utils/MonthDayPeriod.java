@@ -13,8 +13,9 @@ import java.time.format.SignStyle;
 import java.time.temporal.ChronoField;
 import java.util.Objects;
 import lombok.Data;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
 
 /**
  * Represents the period of time in which a holiday is active, or just the date its active
@@ -207,8 +208,8 @@ public class MonthDayPeriod {
 
   /* --------------------------- SERIALIZATION ---------------------------- */
 
-  public Tag save() {
-    CompoundTag tag = new CompoundTag();
+  public BinaryTag save() {
+    CompoundTag tag = BinaryTags.compoundTag();
 
     if (isExact()) {
       tag.putString("date", PARSER.format(start));
@@ -226,8 +227,8 @@ public class MonthDayPeriod {
    * @param t The tag to load from
    * @return The loaded tag
    */
-  public static MonthDayPeriod load(Tag t) {
-    CompoundTag tag = (CompoundTag) t;
+  public static MonthDayPeriod load(BinaryTag t) {
+    CompoundTag tag = t.asCompound();
 
     if (tag.contains("date")) {
       return exact(

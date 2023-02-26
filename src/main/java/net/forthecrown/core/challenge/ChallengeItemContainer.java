@@ -10,10 +10,10 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.forthecrown.core.logging.Loggers;
+import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.math.Vectors;
-import net.minecraft.nbt.CompoundTag;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
@@ -210,7 +210,7 @@ public class ChallengeItemContainer {
 
     if (!used.isEmpty()) {
       tag.put(TAG_PREVIOUS,
-          TagUtil.writeCollection(used, ItemStacks::save)
+          TagUtil.writeList(used, ItemStacks::save)
       );
     }
 
@@ -220,7 +220,7 @@ public class ChallengeItemContainer {
     }
 
     if (!chests.isEmpty()) {
-      tag.put(TAG_CHESTS, TagUtil.writeCollection(chests, Vectors::writeTag));
+      tag.put(TAG_CHESTS, TagUtil.writeList(chests, Vectors::writeTag));
     }
   }
 
@@ -233,7 +233,7 @@ public class ChallengeItemContainer {
 
     if (tag.contains(TAG_PREVIOUS)) {
       used.addAll(
-          TagUtil.readCollection(
+          TagUtil.readList(
               tag.get(TAG_PREVIOUS),
               tag1 -> ItemStacks.load((CompoundTag) tag1)
           )
@@ -247,7 +247,7 @@ public class ChallengeItemContainer {
 
     if (tag.contains(TAG_CHESTS)) {
       chests.addAll(
-          TagUtil.readCollection(tag.get(TAG_CHESTS), Vectors::read3i)
+          TagUtil.readList(tag.get(TAG_CHESTS), Vectors::read3i)
       );
     }
   }

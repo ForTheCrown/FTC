@@ -2,8 +2,8 @@ package net.forthecrown.useables;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.Getter;
+import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.utils.text.writer.TextWriter;
-import net.minecraft.nbt.CompoundTag;
 import org.bukkit.entity.Player;
 
 /**

@@ -6,10 +6,10 @@ import static net.forthecrown.utils.text.Text.nonItalic;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
+import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.nbt.CompoundTag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 

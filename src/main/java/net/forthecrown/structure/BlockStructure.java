@@ -9,8 +9,9 @@ import java.util.List;
 import java.util.Map;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.utils.io.TagUtil;
-import net.minecraft.nbt.CompoundTag;
 import org.spongepowered.math.vector.Vector3i;
 
 @RequiredArgsConstructor
@@ -31,7 +32,7 @@ public class BlockStructure {
    * A broad header for storing any data
    */
   @Getter
-  private final CompoundTag header = new CompoundTag();
+  private final CompoundTag header = BinaryTags.compoundTag();
 
   /**
    * A map of palette name to palette, a palette is essentially a variation of the structure, most
@@ -58,7 +59,7 @@ public class BlockStructure {
   public void clear() {
     palettes.clear();
     functions.clear();
-    header.tags.clear();
+    header.clear();
     defaultSize = Vector3i.ZERO;
   }
 
@@ -121,10 +122,10 @@ public class BlockStructure {
     }
 
     if (!palettes.isEmpty()) {
-      CompoundTag paletteTag = new CompoundTag();
+      CompoundTag paletteTag = BinaryTags.compoundTag();
 
       for (var e : palettes.entrySet()) {
-        CompoundTag pTag = new CompoundTag();
+        CompoundTag pTag = BinaryTags.compoundTag();
         e.getValue().save(pTag);
 
         paletteTag.put(e.getKey(), pTag);
@@ -136,7 +137,7 @@ public class BlockStructure {
     if (!functions.isEmpty()) {
       tag.put(
           TAG_FUNCTIONS,
-          TagUtil.writeCollection(functions, FunctionInfo::save)
+          TagUtil.writeList(functions, FunctionInfo::save)
       );
     }
   }
@@ -147,14 +148,14 @@ public class BlockStructure {
     int loadedVersion = tag.getInt(TAG_DATA_VERSION);
     int currentVersion = getDataVersion();
 
-    if (tag.contains(TAG_HEADER)) {
-      this.header.merge(tag.getCompound(TAG_HEADER));
+    if (tag.containsKey(TAG_HEADER)) {
+      this.header.merge(tag.get(TAG_HEADER).asCompound());
     }
 
-    if (tag.contains(TAG_PALETTES)) {
-      for (var e : tag.getCompound(TAG_PALETTES).tags.entrySet()) {
+    if (tag.containsKey(TAG_PALETTES)) {
+      for (var e : tag.getCompound(TAG_PALETTES).entrySet()) {
         String name = e.getKey();
-        CompoundTag pTag = (CompoundTag) e.getValue();
+        CompoundTag pTag = e.getValue().asCompound();
 
         BlockPalette palette = new BlockPalette(this);
         palette.load(pTag, currentVersion, loadedVersion);
@@ -167,9 +168,9 @@ public class BlockStructure {
       }
     }
 
-    if (tag.contains(TAG_FUNCTIONS)) {
-      functions.addAll(TagUtil.readCollection(
-          tag.get(TAG_FUNCTIONS),
+    if (tag.containsKey(TAG_FUNCTIONS)) {
+      functions.addAll(TagUtil.readList(
+          tag.get(TAG_FUNCTIONS).asList(),
           FunctionInfo::load
       ));
     }

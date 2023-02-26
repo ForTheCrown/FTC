@@ -10,12 +10,12 @@ import java.util.Objects;
 import lombok.Getter;
 import net.forthecrown.dungeons.level.LevelBiome;
 import net.forthecrown.dungeons.level.PieceType;
+import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.structure.BlockStructure;
 import net.forthecrown.structure.Structures;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.forthecrown.utils.io.Results;
-import net.minecraft.nbt.CompoundTag;
 
 @Getter
 public class RoomType extends PieceType<RoomPiece> {

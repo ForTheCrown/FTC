@@ -25,14 +25,14 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 import lombok.Getter;
 import net.forthecrown.core.logging.Loggers;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.StringTag;
 import net.forthecrown.user.property.PropertyMap;
 import net.forthecrown.user.property.UserProperty;
 import net.forthecrown.utils.AbstractListIterator;
 import net.forthecrown.utils.ArrayIterator;
 import net.forthecrown.utils.Util;
-import net.minecraft.nbt.IntTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
 import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.intellij.lang.annotations.Pattern;
@@ -874,7 +874,7 @@ public class Registry<V> implements Iterable<V> {
    * Reads a value from the give tag.
    * <p>
    * This method will primary just return the key-associated value of the tag, if the tag is a
-   * {@link StringTag}. But this method can also test if the tag is an {@link IntTag}, if it is,
+   * {@link StringTag}. But this method can also test if the tag is an {@link net.forthecrown.nbt.IntTag}, if it is,
    * then it presumes the tag acts as an ID tag and attempts to return the value associated with
    * that ID
    *
@@ -882,9 +882,9 @@ public class Registry<V> implements Iterable<V> {
    * @return The tag's associated value in this registry, or an empty optional if a valid value
    * wasn't found
    */
-  public @NotNull Optional<V> readTag(@NotNull Tag tag) {
+  public @NotNull Optional<V> readTag(@NotNull BinaryTag tag) {
     return cast(tag, StringTag.class)
-        .flatMap(tag1 -> get(tag1.getAsString()));
+        .flatMap(tag1 -> get(tag1.toString()));
   }
 
   /**
@@ -895,8 +895,8 @@ public class Registry<V> implements Iterable<V> {
    * @return The value
    * @throws IllegalArgumentException If a valid value for the given tag couldn't be found
    */
-  public @NotNull V readTagOrThrow(@NotNull Tag tag) throws IllegalArgumentException {
-    return readTag(tag).orElseThrow(() -> unknownKey(tag.getAsString()));
+  public @NotNull V readTagOrThrow(@NotNull BinaryTag tag) throws IllegalArgumentException {
+    return readTag(tag).orElseThrow(() -> unknownKey(tag.toString()));
   }
 
   /**
@@ -906,7 +906,7 @@ public class Registry<V> implements Iterable<V> {
    * @return The NBT of the value, if the value is contained in this registry
    */
   public @NotNull Optional<StringTag> writeTag(@NotNull V value) {
-    return getKey(value).map(StringTag::valueOf);
+    return getKey(value).map(BinaryTags::stringTag);
   }
 
   /* ----------------------------- OBJECT OVERRIDES ------------------------------ */

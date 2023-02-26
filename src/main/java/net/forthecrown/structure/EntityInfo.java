@@ -1,14 +1,19 @@
 package net.forthecrown.structure;
 
+import static net.forthecrown.structure.BlockInfo.copyTag;
+
 import com.mojang.serialization.Dynamic;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
+import net.forthecrown.nbt.paper.PaperNbt;
 import net.forthecrown.utils.VanillaAccess;
+import net.forthecrown.utils.io.TagOps;
+import net.forthecrown.utils.io.TagTranslators;
 import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.math.Vectors;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
 import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.util.datafix.fixes.References;
 import org.bukkit.NamespacedKey;
@@ -54,7 +59,7 @@ public class EntityInfo {
         (CompoundTag) DataFixers.getDataFixer()
             .update(
                 References.ENTITY_TREE,
-                new Dynamic<>(NbtOps.INSTANCE, tag),
+                new Dynamic<>(TagOps.OPS, tag),
                 oldVersion, newVersion
             )
             .getValue()
@@ -65,52 +70,56 @@ public class EntityInfo {
     World world = config.getWorld();
     Vector3d dest = config.getTransform().apply(position);
 
-    CompoundTag tag = this.tag.copy();
+    CompoundTag tag = (CompoundTag) this.tag.copy();
     tag.putString(net.minecraft.world.entity.Entity.ID_TAG, type.asString());
 
     var level = VanillaAccess.getLevel(world);
 
-    net.minecraft.world.entity.EntityType.create(tag, level)
-        .ifPresent(entity -> {
-          entity.moveTo(dest.x(), dest.y(), dest.z());
+    var optional = net.minecraft.world.entity.EntityType.create(
+        TagTranslators.COMPOUND.toMinecraft(tag),
+        level
+    );
 
-          Rotation rotation = config.getTransform().getRotation();
+    optional.ifPresent(entity -> {
+      entity.moveTo(dest.x(), dest.y(), dest.z());
 
-          if (rotation != Rotation.NONE) {
-            float yRot = entity.rotate(VanillaAccess.toVanilla(rotation));
-            entity.setYRot(yRot);
-          }
+      Rotation rotation = config.getTransform().getRotation();
 
-          level.addFreshEntity(entity);
-        });
+      if (rotation != Rotation.NONE) {
+        float yRot = entity.rotate(VanillaAccess.toVanilla(rotation));
+        entity.setYRot(yRot);
+      }
+
+      level.addFreshEntity(entity);
+    });
   }
 
   /* ----------------------------- CLONE BUILDERS ------------------------------ */
 
   public EntityInfo copy() {
-    return new EntityInfo(position, type, tag.copy());
+    return new EntityInfo(position, type, copyTag(tag));
   }
 
   public EntityInfo withTag(CompoundTag tag) {
-    return new EntityInfo(position, type, tag.copy());
+    return new EntityInfo(position, type, copyTag(tag));
   }
 
   public EntityInfo withPosition(Vector3d position) {
-    return new EntityInfo(position, type, tag.copy());
+    return new EntityInfo(position, type, copyTag(tag));
   }
 
   public EntityInfo withType(EntityType type) {
-    return new EntityInfo(position, type.getKey(), tag.copy());
+    return new EntityInfo(position, type.getKey(), copyTag(tag));
   }
 
   public EntityInfo withType(NamespacedKey type) {
-    return new EntityInfo(position, type, tag.copy());
+    return new EntityInfo(position, type, copyTag(tag));
   }
 
   /* ----------------------------- SERIALIZATION ------------------------------ */
 
-  public Tag save() {
-    CompoundTag tag = new CompoundTag();
+  public BinaryTag save() {
+    CompoundTag tag = BinaryTags.compoundTag();
     tag.put(TAG_POSITION, Vectors.writeTag(position));
     tag.put(TAG_TYPE, TagUtil.writeKey(type));
     tag.put(TAG_DATA, this.tag);
@@ -118,13 +127,13 @@ public class EntityInfo {
     return tag;
   }
 
-  public static EntityInfo load(Tag t) {
+  public static EntityInfo load(BinaryTag t) {
     CompoundTag tag = (CompoundTag) t;
 
     return new EntityInfo(
         Vectors.read3d(tag.get(TAG_POSITION)),
         TagUtil.readKey(tag.get(TAG_TYPE)),
-        tag.getCompound(TAG_DATA)
+        tag.get(TAG_DATA).asCompound()
     );
   }
 
@@ -137,8 +146,7 @@ public class EntityInfo {
 
     NamespacedKey typeKey = entity.getType().getKey();
 
-    CompoundTag tag = new CompoundTag();
-    VanillaAccess.getEntity(entity).saveWithoutId(tag);
+    CompoundTag tag = PaperNbt.saveEntity(entity);
 
     tag.remove(net.minecraft.world.entity.Entity.UUID_TAG);
     tag.remove(net.minecraft.world.entity.Entity.ID_TAG);

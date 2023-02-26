@@ -12,6 +12,11 @@ import lombok.Setter;
 import net.forthecrown.core.config.GeneralConfig;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.economy.Economy;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
+import net.forthecrown.nbt.IntArrayTag;
+import net.forthecrown.nbt.TagTypes;
 import net.forthecrown.utils.LocationFileName;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.Time;
@@ -19,9 +24,6 @@ import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.inventory.menu.Menus;
 import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.math.WorldVec3i;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.IntArrayTag;
-import net.minecraft.nbt.Tag;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Particle;
@@ -465,7 +467,7 @@ public class SignShop implements InventoryHolder {
   private void save(Sign sign) {
     // Create tag and then call our own
     // save() methwod
-    CompoundTag tag = new CompoundTag();
+    CompoundTag tag = BinaryTags.compoundTag();
     save(tag);
 
     // Then take that same tag and turn it
@@ -561,7 +563,7 @@ public class SignShop implements InventoryHolder {
       getInventory().clear();
 
       if (inventory.contains("items")) {
-        var itemList = inventory.getList("items", Tag.TAG_COMPOUND);
+        var itemList = inventory.getList("items", TagTypes.compoundType());
 
         for (var t : itemList) {
           getInventory().addItem(TagUtil.readItem(t));
@@ -613,7 +615,7 @@ public class SignShop implements InventoryHolder {
    *
    * @param tag The tag to read
    */
-  private void readLegacyOwner(Tag tag) {
+  private void readLegacyOwner(BinaryTag tag) {
     // Owner was only 1 person
     if (tag instanceof IntArrayTag) {
       setOwner(TagUtil.readUUID(tag));

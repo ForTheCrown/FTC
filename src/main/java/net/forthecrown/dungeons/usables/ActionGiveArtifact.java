@@ -5,6 +5,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.dungeons.boss.DrawnedBoss;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.types.EnumArgument;
+import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.useables.Usable;
 import net.forthecrown.useables.ConstructType;
 import net.forthecrown.useables.UsableConstructor;
@@ -15,7 +16,6 @@ import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.nbt.Tag;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,7 +54,7 @@ public class ActionGiveArtifact extends UsageAction {
   }
 
   @Override
-  public @Nullable Tag save() {
+  public @Nullable BinaryTag save() {
     return TagUtil.writeEnum(artifacts);
   }
 
@@ -67,7 +67,7 @@ public class ActionGiveArtifact extends UsageAction {
   }
 
   @UsableConstructor(ConstructType.TAG)
-  public static ActionGiveArtifact load(Tag tag) {
+  public static ActionGiveArtifact load(BinaryTag tag) {
     return new ActionGiveArtifact(TagUtil.readEnum(DrawnedBoss.Artifacts.class, tag));
   }
 }

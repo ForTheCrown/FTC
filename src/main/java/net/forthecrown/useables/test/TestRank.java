@@ -4,6 +4,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.arguments.RegistryArguments;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.useables.CheckHolder;
 import net.forthecrown.useables.ConstructType;
 import net.forthecrown.useables.UsableConstructor;
@@ -15,7 +16,6 @@ import net.forthecrown.user.data.UserRanks;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.nbt.Tag;
 import org.bukkit.entity.Player;
 
 public class TestRank extends UsageTest {
@@ -36,9 +36,8 @@ public class TestRank extends UsageTest {
   }
 
   @Override
-  public Tag save() {
-    return UserRanks.REGISTRY.writeTag(title)
-        .orElseThrow();
+  public BinaryTag save() {
+    return UserRanks.REGISTRY.writeTag(title).orElseThrow();
   }
 
   @Override
@@ -55,14 +54,13 @@ public class TestRank extends UsageTest {
 
   @UsableConstructor
   public static TestRank parse(StringReader reader, CommandSource source)
-      throws CommandSyntaxException {
+      throws CommandSyntaxException
+  {
     return new TestRank(RegistryArguments.RANKS.parse(reader).getValue());
   }
 
   @UsableConstructor(ConstructType.TAG)
-  public static TestRank load(Tag tag) {
-    return new TestRank(
-        UserRanks.REGISTRY.readTagOrThrow(tag)
-    );
+  public static TestRank load(BinaryTag tag) {
+    return new TestRank(UserRanks.REGISTRY.readTagOrThrow(tag));
   }
 }

@@ -6,17 +6,17 @@ import lombok.Getter;
 import lombok.Setter;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.useables.CheckHolder;
 import net.forthecrown.useables.ConstructType;
 import net.forthecrown.useables.UsableConstructor;
+import net.forthecrown.useables.UsableScriptHolder;
 import net.forthecrown.useables.UsageTest;
 import net.forthecrown.useables.UsageType;
 import net.forthecrown.useables.util.UsablesScripts;
-import net.forthecrown.useables.UsableScriptHolder;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
-import net.minecraft.nbt.Tag;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,7 +48,7 @@ public class TestScript extends UsageTest implements UsableScriptHolder {
   }
 
   @Override
-  public @Nullable Tag save() {
+  public @Nullable BinaryTag save() {
     return UsablesScripts.saveScript(this);
   }
 
@@ -100,12 +100,13 @@ public class TestScript extends UsageTest implements UsableScriptHolder {
 
   @UsableConstructor(ConstructType.PARSE)
   public static TestScript parse(StringReader reader, CommandSource source)
-      throws CommandSyntaxException {
+      throws CommandSyntaxException
+  {
     return UsablesScripts.parseScript(reader, TestScript::new);
   }
 
   @UsableConstructor(ConstructType.TAG)
-  public static TestScript readTag(Tag tag) {
+  public static TestScript readTag(BinaryTag tag) {
     return UsablesScripts.loadScript(tag, TestScript::new);
   }
 }

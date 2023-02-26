@@ -21,6 +21,8 @@ import net.forthecrown.dungeons.level.DungeonLevel;
 import net.forthecrown.dungeons.level.PieceType;
 import net.forthecrown.dungeons.level.gate.GateType;
 import net.forthecrown.dungeons.level.room.RoomType;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.structure.BlockStructure;
 import net.forthecrown.structure.StructureFillConfig;
 import net.forthecrown.utils.Time;
@@ -28,7 +30,6 @@ import net.forthecrown.utils.io.FtcJar;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.forthecrown.utils.io.SerializationHelper;
-import net.minecraft.nbt.CompoundTag;
 import org.apache.logging.log4j.Logger;
 
 @Getter
@@ -110,7 +111,7 @@ public class LevelDataStorage {
     var header = structure.getHeader();
     header.putString("createdDate", JsonUtils.DATE_FORMAT.format(new Date(creationTime)));
 
-    CompoundTag levelData = new CompoundTag();
+    CompoundTag levelData = BinaryTags.compoundTag();
     level.save(levelData);
     header.put("level_data", levelData);
 

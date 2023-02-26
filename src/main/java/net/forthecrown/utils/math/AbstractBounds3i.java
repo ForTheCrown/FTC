@@ -5,9 +5,9 @@ import static org.spongepowered.math.GenericMath.clamp;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.utils.JsonSerializable;
-import net.minecraft.nbt.IntArrayTag;
-import net.minecraft.nbt.Tag;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -351,7 +351,7 @@ public abstract class AbstractBounds3i<T extends AbstractBounds3i<T>> implements
     return obj;
   }
 
-  public Tag save() {
-    return new IntArrayTag(toIntArray());
+  public BinaryTag save() {
+    return BinaryTags.intArrayTag(toIntArray());
   }
 }

@@ -5,6 +5,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.Messages;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.useables.CheckHolder;
 import net.forthecrown.useables.ConstructType;
 import net.forthecrown.useables.UsableConstructor;
@@ -12,8 +14,6 @@ import net.forthecrown.useables.UsageTest;
 import net.forthecrown.useables.UsageType;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
@@ -47,8 +47,8 @@ public class TestPermission extends UsageTest {
   }
 
   @Override
-  public Tag save() {
-    return StringTag.valueOf(permission);
+  public BinaryTag save() {
+    return BinaryTags.stringTag(permission);
   }
 
   @Override
@@ -65,12 +65,13 @@ public class TestPermission extends UsageTest {
 
   @UsableConstructor
   public static TestPermission parse(StringReader reader, CommandSource source)
-      throws CommandSyntaxException {
+      throws CommandSyntaxException
+  {
     return new TestPermission(reader.readString());
   }
 
   @UsableConstructor(ConstructType.TAG)
-  public static TestPermission load(Tag element) {
-    return new TestPermission(element.getAsString());
+  public static TestPermission load(BinaryTag element) {
+    return new TestPermission(element.toString());
   }
 }

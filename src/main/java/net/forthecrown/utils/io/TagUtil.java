@@ -1,28 +1,31 @@
 package net.forthecrown.utils.io;
 
+import static net.forthecrown.nbt.BinaryTags.compoundTag;
+import static net.forthecrown.nbt.BinaryTags.doubleTag;
+import static net.forthecrown.nbt.BinaryTags.floatTag;
+import static net.forthecrown.nbt.BinaryTags.listTag;
+import static net.forthecrown.nbt.BinaryTags.stringTag;
+
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.IntFunction;
-import net.forthecrown.core.Worlds;
 import net.forthecrown.core.registry.Keys;
-import net.forthecrown.utils.VanillaAccess;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
+import net.forthecrown.nbt.IntArrayTag;
+import net.forthecrown.nbt.ListTag;
+import net.forthecrown.nbt.StringTag;
+import net.forthecrown.nbt.TagTypes;
+import net.forthecrown.nbt.TypeIds;
+import net.forthecrown.nbt.paper.PaperNbt;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.DoubleTag;
-import net.minecraft.nbt.FloatTag;
-import net.minecraft.nbt.IntArrayTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NbtUtils;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -45,48 +48,44 @@ public final class TagUtil {
   }
 
   public static IntArrayTag writeUUID(UUID uuid) {
-    return NbtUtils.createUUID(uuid);
+    return BinaryTags.saveUuid(uuid);
   }
 
-  public static UUID readUUID(Tag tag) {
-    return NbtUtils.loadUUID(tag);
+  public static UUID readUUID(BinaryTag tag) {
+    return BinaryTags.loadUuid((IntArrayTag) tag);
   }
 
   public static StringTag writeKey(Key key) {
-    return StringTag.valueOf(key.asString());
+    return stringTag(key.asString());
   }
 
-  public static NamespacedKey readKey(Tag tag) {
-    Validate.isTrue(tag.getId() == Tag.TAG_STRING, "Tag is not string");
-    return Keys.parse(tag.getAsString());
+  public static NamespacedKey readKey(BinaryTag tag) {
+    Validate.isTrue(tag.getId() == TypeIds.STRING, "BinaryTag is not string");
+    return Keys.parse(tag.toString());
   }
 
-  public static Tag writeItem(ItemStack item) {
+  public static BinaryTag writeItem(ItemStack item) {
     return ItemStacks.save(item);
   }
 
-  public static ItemStack readItem(Tag t) {
+  public static ItemStack readItem(BinaryTag t) {
     return ItemStacks.load((CompoundTag) t);
   }
 
   public static CompoundTag ofContainer(PersistentDataContainer container) {
-    CraftPersistentDataContainer dataContainer = (CraftPersistentDataContainer) container;
-    return dataContainer.toTagCompound();
+    return PaperNbt.fromDataContainer(container);
   }
 
   public static PersistentDataContainer ofCompound(CompoundTag tag) {
-    CraftPersistentDataContainer container = newContainer();
-    container.putAll(tag);
-
-    return container;
+    return PaperNbt.toDataContainer(tag, TagUtil::newContainer);
   }
 
   public static CraftPersistentDataContainer newContainer() {
     return new CraftPersistentDataContainer(REGISTRY);
   }
 
-  public static <T> ListTag writeList(Collection<T> list, Function<T, Tag> serializer) {
-    ListTag tag = new ListTag();
+  public static <T> ListTag writeList(Collection<T> list, Function<T, BinaryTag> serializer) {
+    ListTag tag = BinaryTags.listTag();
 
     for (T t : list) {
       tag.add(serializer.apply(t));
@@ -95,42 +94,42 @@ public final class TagUtil {
     return tag;
   }
 
-  public static <T> List<T> readList(ListTag tag, Function<Tag, T> deserializer) {
+  public static <T> List<T> readList(BinaryTag tag, Function<BinaryTag, T> deserializer) {
     List<T> l = new ObjectArrayList<>();
 
-    for (Tag t : tag) {
+    for (BinaryTag t : tag.asList()) {
       l.add(deserializer.apply(t));
     }
 
     return l;
   }
 
-  public static <E extends Enum<E>> Tag writeEnum(E anum) {
-    return StringTag.valueOf(anum.name().toLowerCase());
+  public static <E extends Enum<E>> BinaryTag writeEnum(E anum) {
+    return stringTag(anum.name().toLowerCase());
   }
 
-  public static <E extends Enum<E>> E readEnum(Class<E> clazz, Tag t) {
-    return Enum.valueOf(clazz, t.getAsString().toUpperCase());
+  public static <E extends Enum<E>> E readEnum(Class<E> clazz, BinaryTag t) {
+    return Enum.valueOf(clazz, t.toString().toUpperCase());
   }
 
-  public static Tag writeText(Component component) {
-    return StringTag.valueOf(GsonComponentSerializer.gson().serialize(component));
+  public static BinaryTag writeText(Component component) {
+    return stringTag((GsonComponentSerializer.gson().serialize(component)));
   }
 
-  public static Component readText(Tag tag) {
-    return GsonComponentSerializer.gson().deserialize(tag.getAsString());
+  public static Component readText(BinaryTag tag) {
+    return GsonComponentSerializer.gson().deserialize(tag.toString());
   }
 
-  public static Tag writeLocation(Location location) {
-    CompoundTag tag = new CompoundTag();
-    ListTag pos = new ListTag();
-    pos.add(DoubleTag.valueOf(location.getX()));
-    pos.add(DoubleTag.valueOf(location.getY()));
-    pos.add(DoubleTag.valueOf(location.getZ()));
+  public static BinaryTag writeLocation(Location location) {
+    CompoundTag tag = compoundTag();
+    ListTag pos = listTag();
+    pos.add(doubleTag(location.getX()));
+    pos.add(doubleTag(location.getY()));
+    pos.add(doubleTag(location.getZ()));
 
-    ListTag rot = new ListTag();
-    rot.add(FloatTag.valueOf(location.getYaw()));
-    rot.add(FloatTag.valueOf(location.getPitch()));
+    ListTag rot = listTag();
+    rot.add(floatTag(location.getYaw()));
+    rot.add(floatTag(location.getPitch()));
 
     tag.put("pos", pos);
     tag.put("rot", rot);
@@ -142,16 +141,16 @@ public final class TagUtil {
     return tag;
   }
 
-  public static Location readLocation(Tag tagg) {
+  public static Location readLocation(BinaryTag tagg) {
     CompoundTag tag = (CompoundTag) tagg;
-    ListTag pos = tag.getList("pos", Tag.TAG_DOUBLE);
-    ListTag rot = tag.getList("rot", Tag.TAG_FLOAT);
+    ListTag pos = tag.getList("pos", TagTypes.doubleType());
+    ListTag rot = tag.getList("rot", TagTypes.floatType());
 
-    double x = pos.getDouble(0);
-    double y = pos.getDouble(1);
-    double z = pos.getDouble(2);
-    float yaw = rot.getFloat(0);
-    float pitch = rot.getFloat(1);
+    double x    = pos.get(0).asNumber().doubleValue();
+    double y    = pos.get(1).asNumber().doubleValue();
+    double z    = pos.get(2).asNumber().doubleValue();
+    float yaw   = rot.get(0).asNumber().floatValue();
+    float pitch = rot.get(1).asNumber().floatValue();
 
     String worldName = tag.getString("world");
     World world = worldName.isBlank() ? null : Bukkit.getWorld(worldName);
@@ -159,8 +158,8 @@ public final class TagUtil {
     return new Location(world, x, y, z, yaw, pitch);
   }
 
-  public static <V> V[] readArray(Tag tag,
-                                  Function<Tag, V> deserializer,
+  public static <V> V[] readArray(BinaryTag tag,
+                                  Function<BinaryTag, V> deserializer,
                                   IntFunction<V[]> factory
   ) {
     ListTag list = (ListTag) tag;
@@ -173,45 +172,19 @@ public final class TagUtil {
     return arr;
   }
 
-  public static <V> ListTag writeArray(V[] arr, Function<V, Tag> serializer) {
-    ListTag tag = new ListTag();
+  public static <V> ListTag writeArray(V[] arr, Function<V, BinaryTag> serializer) {
+    ListTag tag = listTag();
     for (V v : arr) {
       tag.add(serializer.apply(v));
     }
     return tag;
   }
 
-  public static <V> ListTag writeCollection(Collection<V> c, Function<V, Tag> serializer) {
-    ListTag listTag = new ListTag();
-
-    for (var v : c) {
-      listTag.add(serializer.apply(v));
-    }
-
-    return listTag;
-  }
-
-  public static <V> List<V> readCollection(Tag tag, Function<Tag, V> deserializer) {
-    List<V> list = new ArrayList<>();
-
-    if (tag instanceof ListTag listTag) {
-      for (var t : listTag) {
-        list.add(deserializer.apply(t));
-      }
-    }
-
-    return list;
-  }
-
-  public static BlockData readBlockData(Tag t) {
-    var lookup = VanillaAccess.getLevel(Worlds.overworld())
-        .holderLookup(BuiltInRegistries.BLOCK.key());
-
-    return NbtUtils.readBlockState(lookup, (CompoundTag) t)
-        .createCraftBlockData();
+  public static BlockData readBlockData(BinaryTag t) {
+    return PaperNbt.loadBlockData(t.asCompound());
   }
 
   public static CompoundTag writeBlockData(BlockData data) {
-    return NbtUtils.writeBlockState(VanillaAccess.getState(data));
+    return PaperNbt.saveBlockData(data);
   }
 }

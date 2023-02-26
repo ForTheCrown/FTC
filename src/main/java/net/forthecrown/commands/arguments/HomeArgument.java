@@ -71,7 +71,7 @@ public class HomeArgument implements ArgumentType<HomeParseResult> {
           builder = builder.createOffset(reader.getCursor());
           builder.suggest(":");
 
-          var newBuilder = builder.createOffset(reader.getCursor() + 1);
+          var newBuilder = builder.createOffset(reader.getCursor());
           newBuilder.add(builder);
 
           builder = newBuilder;

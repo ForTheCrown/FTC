@@ -1,28 +1,25 @@
 package net.forthecrown.commands;
 
-import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.List;
 import java.util.function.Consumer;
+import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.Commands;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand.Usage;
 import net.forthecrown.commands.manager.FtcCommand.UsageFactory;
 import net.forthecrown.grenadier.CmdUtil;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.CompoundTag;
+import net.forthecrown.nbt.path.TagPath;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.TextJoiner;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.commands.arguments.CompoundTagArgument;
-import net.minecraft.commands.arguments.NbtPathArgument;
-import net.minecraft.commands.arguments.NbtPathArgument.NbtPath;
-import net.minecraft.commands.arguments.NbtTagArgument;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -50,13 +47,7 @@ public class DataCommands extends CmdUtil {
   public static DataAccessor offsetAccessor(DataAccessor accessor, String path)
       throws RuntimeException
   {
-    NbtPath tagPath;
-
-    try {
-      tagPath = NbtPathArgument.nbtPath().parse(new StringReader(path));
-    } catch (CommandSyntaxException exc) {
-      throw new RuntimeException(exc);
-    }
+    TagPath tagPath = TagPath.parse(path);
 
     return new DataAccessor() {
       @Override
@@ -64,7 +55,7 @@ public class DataCommands extends CmdUtil {
           throws CommandSyntaxException
       {
         CompoundTag tag = accessor.getTag(context);
-        List<Tag> tags = tagPath.get(tag);
+        List<BinaryTag> tags = tagPath.get(tag);
 
         if (tags.size() > 1) {
           throw Exceptions.format(
@@ -73,7 +64,7 @@ public class DataCommands extends CmdUtil {
           );
         }
 
-        Tag t = tags.get(0);
+        BinaryTag t = tags.get(0);
 
         if (!(t instanceof CompoundTag compound)) {
           throw Exceptions.format("Element at {0} is not a CompoundTag", path);
@@ -142,16 +133,16 @@ public class DataCommands extends CmdUtil {
         .then(literal("view")
             .executes(c -> viewData(c, accessor, name, null))
 
-            .then(argument("path", NbtPathArgument.nbtPath())
+            .then(argument("path", Arguments.TAG_PATH)
                 .executes(c -> {
-                  NbtPath path = c.getArgument("path", NbtPath.class);
+                  TagPath path = c.getArgument("path", TagPath.class);
                   return viewData(c, accessor, name, path);
                 })
             )
         )
 
         .then(literal("set")
-            .then(argument("nbt_tag", CompoundTagArgument.compoundTag())
+            .then(argument("nbt_tag", Arguments.COMPOUND)
                 .executes(c -> {
                   CompoundTag tag = c.getArgument("nbt_tag", CompoundTag.class);
                   accessor.setTag(c, tag);
@@ -168,12 +159,12 @@ public class DataCommands extends CmdUtil {
         )
 
         .then(literal("insert")
-            .then(argument("path", NbtPathArgument.nbtPath())
-                .then(argument("nbt", NbtTagArgument.nbtTag())
+            .then(argument("path", Arguments.TAG_PATH)
+                .then(argument("nbt", Arguments.TAG)
                     .executes(c -> {
                       CompoundTag tag = accessor.getTag(c);
-                      NbtPath path = c.getArgument("path", NbtPath.class);
-                      Tag insertTag = c.getArgument("nbt", Tag.class);
+                      TagPath path = c.getArgument("path", TagPath.class);
+                      BinaryTag insertTag = c.getArgument("nbt", BinaryTag.class);
 
                       int changed = path.set(tag, insertTag);
 
@@ -187,7 +178,7 @@ public class DataCommands extends CmdUtil {
                           Text.format(
                               "Placed data into &e{0}&r tag at &e{1}&r",
                               NamedTextColor.GRAY,
-                              name, path
+                              name, path.getInput()
                           )
                       );
                       return 0;
@@ -197,7 +188,7 @@ public class DataCommands extends CmdUtil {
         )
 
         .then(literal("merge")
-            .then(argument("nbt", CompoundTagArgument.compoundTag())
+            .then(argument("nbt", Arguments.COMPOUND)
                 .executes(c -> {
                   CompoundTag tag = accessor.getTag(c);
                   CompoundTag mergeSource
@@ -213,9 +204,9 @@ public class DataCommands extends CmdUtil {
         )
 
         .then(literal("remove")
-            .then(argument("path", NbtPathArgument.nbtPath())
+            .then(argument("path", Arguments.TAG_PATH)
                 .executes(c -> {
-                  NbtPath path = c.getArgument("path", NbtPath.class);
+                  TagPath path = c.getArgument("path", TagPath.class);
                   CompoundTag tag = accessor.getTag(c);
 
                   int removed = path.remove(tag);
@@ -230,7 +221,7 @@ public class DataCommands extends CmdUtil {
 
                   c.getSource().sendAdmin(
                       Text.format("Removed {0, number} tags at '{1}'",
-                          removed, path
+                          removed, path.getInput()
                       )
                   );
                   return 0;
@@ -242,21 +233,23 @@ public class DataCommands extends CmdUtil {
   private static int viewData(CommandContext<CommandSource> context,
                               DataAccessor accessor,
                               String name,
-                              @Nullable NbtPath path
+                              @Nullable TagPath path
   ) throws CommandSyntaxException {
-    Tag tag = accessor.getTag(context);
+    BinaryTag tag = accessor.getTag(context);
 
     Component component;
 
     if (path != null) {
-      List<Tag> tags = path.get(tag);
+      List<BinaryTag> tags = path.get(tag);
 
       if (tags.size() == 1) {
         component = Text.displayTag(tags.get(0), true);
+      } else if (tags.isEmpty()) {
+        throw Exceptions.format("Nothing at path '{0}'", path.getInput());
       } else {
         component = TextJoiner.on(",\n")
             .setPrefix(Component.text("["))
-            .setPrefix(Component.text("]"))
+            .setSuffix(Component.text("]"))
             .add(tags.stream().map(tag1 -> Text.displayTag(tag1, true)))
             .asComponent();
       }

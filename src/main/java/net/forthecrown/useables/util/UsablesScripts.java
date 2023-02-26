@@ -9,15 +9,16 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.core.script2.Script;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
+import net.forthecrown.nbt.TagTypes;
 import net.forthecrown.useables.UsableBlock;
 import net.forthecrown.useables.UsableEntity;
 import net.forthecrown.useables.UsableScriptHolder;
 import net.forthecrown.useables.UsableTrigger;
 import net.forthecrown.useables.UsageTypeHolder;
 import net.forthecrown.utils.io.TagUtil;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
 import org.apache.commons.lang.ArrayUtils;
 
 public class UsablesScripts {
@@ -59,9 +60,9 @@ public class UsablesScripts {
   }
 
   public static CompoundTag saveScript(UsableScriptHolder holder) {
-    CompoundTag tag = new CompoundTag();
+    CompoundTag tag = BinaryTags.compoundTag();
     tag.putString("script", holder.getScriptName());
-    tag.put("args", TagUtil.writeArray(holder.getArgs(), StringTag::valueOf));
+    tag.put("args", TagUtil.writeArray(holder.getArgs(), BinaryTags::stringTag));
 
     if (!Strings.isNullOrEmpty(holder.getDataString())) {
       tag.putString("dataJson", holder.getDataString());
@@ -89,12 +90,12 @@ public class UsablesScripts {
   }
 
   public static <T extends UsableScriptHolder> T loadScript(
-      Tag tag,
+      BinaryTag tag,
       ScriptFactory<T> factory
   ) {
     if (tag.getId() == TAG_STRING) {
       return factory.newInstance(
-          tag.getAsString(),
+          tag.toString(),
           ArrayUtils.EMPTY_STRING_ARRAY
       );
     }
@@ -102,9 +103,9 @@ public class UsablesScripts {
     CompoundTag compound = (CompoundTag) tag;
     String script = compound.getString("script");
 
-    String[] args = compound.getList("args", TAG_STRING)
+    String[] args = compound.getList("args", TagTypes.stringType())
         .stream()
-        .map(Tag::getAsString)
+        .map(BinaryTag::toString)
         .toArray(String[]::new);
 
     var instance = factory.newInstance(script, args);

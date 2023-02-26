@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.Set;
 import lombok.Getter;
 import net.forthecrown.core.Permissions;
+import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.utils.io.SerializableObject;
-import net.minecraft.nbt.CompoundTag;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -47,7 +47,7 @@ public class CmdUsables<T extends CommandUsable>
   public void load(CompoundTag tag) {
     clear();
 
-    for (var e : tag.tags.entrySet()) {
+    for (var e : tag.entrySet()) {
       var name = e.getKey();
       var entryTag = (CompoundTag) e.getValue();
 

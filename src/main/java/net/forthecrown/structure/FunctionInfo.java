@@ -15,12 +15,12 @@ import net.forthecrown.grenadier.types.args.Argument;
 import net.forthecrown.grenadier.types.args.ParsedArgs;
 import net.forthecrown.grenadier.types.block.BlockArgument;
 import net.forthecrown.grenadier.types.block.ParsedBlock;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.utils.VanillaAccess;
 import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.math.Vectors;
-import net.minecraft.commands.arguments.CompoundTagArgument;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.block.CommandBlock;
 import org.bukkit.block.data.BlockData;
@@ -40,16 +40,16 @@ public class FunctionInfo {
   public static final String
       FUNCTION_CMD_PREFIX = "function_build";
 
-  private static final Argument<String> FUNC_ARG = Argument.builder(FUNCTION_CMD_PREFIX,
-          Arguments.FTC_KEY)
+  private static final Argument<String> FUNC_ARG
+      = Argument.builder(FUNCTION_CMD_PREFIX, Arguments.FTC_KEY)
       .build();
 
-  private static final Argument<CompoundTag> TAG_ARG = Argument.builder("data",
-          CompoundTagArgument.compoundTag())
+  private static final Argument<CompoundTag> TAG_ARG
+      = Argument.builder("data", Arguments.COMPOUND)
       .build();
 
-  private static final Argument<ParsedBlock> TURNS_INTO_ARG = Argument.builder("turns_into",
-          BlockArgument.block())
+  private static final Argument<ParsedBlock> TURNS_INTO_ARG
+      = Argument.builder("turns_into", BlockArgument.block())
       .build();
 
   public static final ArgsArgument PARSER = ArgsArgument.builder()
@@ -147,8 +147,8 @@ public class FunctionInfo {
 
   /* ----------------------------- SERIALIZATION ------------------------------ */
 
-  public Tag save() {
-    CompoundTag tag = new CompoundTag();
+  public BinaryTag save() {
+    CompoundTag tag = BinaryTags.compoundTag();
 
     tag.putString(TAG_FUNCTION, functionKey);
     tag.put(TAG_FACING, TagUtil.writeEnum(facing));
@@ -168,11 +168,11 @@ public class FunctionInfo {
     return tag;
   }
 
-  public static FunctionInfo load(Tag t) {
-    CompoundTag tag = (CompoundTag) t;
+  public static FunctionInfo load(BinaryTag t) {
+    CompoundTag tag = t.asCompound();
     BlockData data = null;
 
-    if (tag.contains(TAG_TURNS_INTO)) {
+    if (tag.containsKey(TAG_TURNS_INTO)) {
       data = TagUtil.readBlockData(tag.get(TAG_TURNS_INTO));
     }
 
@@ -181,7 +181,9 @@ public class FunctionInfo {
         TagUtil.readEnum(Direction.class, tag.get(TAG_FACING)),
         data,
         Vectors.read3i(tag.get(TAG_POSITION)),
-        tag.contains(TAG_INFO) ? tag.getCompound(TAG_INFO) : null
+        tag.containsKey(TAG_INFO)
+            ? tag.get(TAG_INFO).asCompound()
+            : null
     );
   }
 }

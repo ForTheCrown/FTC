@@ -5,14 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.UnaryOperator;
 import lombok.Getter;
+import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.CompoundTag;
+import net.forthecrown.nbt.TagTypes;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -39,7 +39,7 @@ public class Kit extends CommandUsable {
   public Kit(String name, CompoundTag tag) throws CommandSyntaxException {
     super(name, tag);
 
-    var itemArray = tag.getList(TAG_ITEMS, Tag.TAG_COMPOUND);
+    var itemArray = tag.getList(TAG_ITEMS, TagTypes.compoundType());
     for (var e : itemArray) {
       items.add(TagUtil.readItem(e));
     }
@@ -47,7 +47,7 @@ public class Kit extends CommandUsable {
 
   @Override
   protected void save(CompoundTag tag) {
-    var list = new ListTag();
+    var list = BinaryTags.listTag();
 
     for (var i : items) {
       list.add(TagUtil.writeItem(i));

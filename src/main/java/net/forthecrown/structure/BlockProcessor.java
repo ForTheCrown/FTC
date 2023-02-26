@@ -26,6 +26,8 @@ public interface BlockProcessor {
    * @param previous The result of the previous processor, will be original if
    *                 there was no processor before this one
    * @param config   The placement config
+   * @param position Position of the block being processed, relative to the
+   *                 structure origin
    * @return The processed block info, null, for no block placement
    */
   @Nullable BlockInfo process(@NotNull BlockInfo original,

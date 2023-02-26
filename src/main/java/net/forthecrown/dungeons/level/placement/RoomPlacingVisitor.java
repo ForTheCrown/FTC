@@ -50,12 +50,11 @@ public class RoomPlacingVisitor implements PieceVisitor {
       return;
     }
 
-    var source = placement.getBiomeSource();
     var center = piece.getBounds().center();
-    var biome = source.findBiome(center);
+    var random = placement.getRandom();
 
-    BlockRotProcessor rotProcessor
-        = new BlockRotProcessor(placement, placement.getRandom());
+    var source = placement.getBiomeSource();
+    var biome  = source.findBiome(center);
 
     Builder builder = StructurePlaceConfig.builder()
         .placeEntities(true)
@@ -66,7 +65,7 @@ public class RoomPlacingVisitor implements PieceVisitor {
         .addNonNullProcessor()
         .addRotationProcessor()
         .addProcessor(BlockProcessors.IGNORE_AIR)
-        .addProcessor(rotProcessor);
+        .addProcessor(new BlockRotProcessor(placement, random));
 
     var config = builder.build();
     struct.place(config);

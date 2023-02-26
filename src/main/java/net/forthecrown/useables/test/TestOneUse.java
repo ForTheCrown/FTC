@@ -3,6 +3,7 @@ package net.forthecrown.useables.test;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.Set;
 import java.util.UUID;
+import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.useables.CheckHolder;
 import net.forthecrown.useables.ConstructType;
 import net.forthecrown.useables.UsableConstructor;
@@ -12,7 +13,6 @@ import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.nbt.Tag;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,8 +34,8 @@ public class TestOneUse extends UsageTest {
   }
 
   @Override
-  public @Nullable Tag save() {
-    return TagUtil.writeCollection(used, TagUtil::writeUUID);
+  public @Nullable BinaryTag save() {
+    return TagUtil.writeList(used, TagUtil::writeUUID);
   }
 
   @Override
@@ -61,9 +61,9 @@ public class TestOneUse extends UsageTest {
   }
 
   @UsableConstructor(ConstructType.TAG)
-  public static TestOneUse load(Tag tag) {
+  public static TestOneUse load(BinaryTag tag) {
     var result = create();
-    result.used.addAll(TagUtil.readCollection(tag, TagUtil::readUUID));
+    result.used.addAll(TagUtil.readList(tag, TagUtil::readUUID));
 
     return result;
   }
