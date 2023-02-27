@@ -24,8 +24,7 @@ public class Transform {
   public static final Transform IDENTITY = new Transform(
       Rotation.NONE,
       Vector3d.ZERO,
-      Vector3d.ZERO,
-      Vector3d.ONE
+      Vector3d.ZERO
   );
 
   /* ----------------------------- INSTANCE FIELDS ------------------------------ */
@@ -45,11 +44,6 @@ public class Transform {
    */
   private final Vector3d offset;
 
-  /**
-   * Value to multiply the result by, before pivot and offset application
-   */
-  private final Vector3d scalar;
-
   /* ----------------------------- STATIC CONSTRUCTORS ------------------------------ */
 
   public static Transform offset(Vector3d v) {
@@ -64,10 +58,6 @@ public class Transform {
     return IDENTITY.withRotation(rotation);
   }
 
-  public static Transform scale(Vector3d scalar) {
-    return IDENTITY.withScalar(scalar);
-  }
-
   /* ----------------------------- TRANSFORMATION ------------------------------ */
 
   public Vector3i apply(Vector3i v) {
@@ -80,15 +70,13 @@ public class Transform {
     }
 
     return rotation.rotate(v.sub(pivot))
-        .mul(scalar)
         .add(pivot)
         .add(offset);
   }
 
   public boolean isIdentity() {
     return rotation == Rotation.NONE
-        && offset.equals(Vector3d.ZERO)
-        && scalar.equals(Vector3d.ZERO);
+        && offset.equals(Vector3d.ZERO);
   }
 
   /* ----------------------------- MODIFICATION ------------------------------ */

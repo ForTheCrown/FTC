@@ -1,4 +1,4 @@
-package net.forthecrown.structure;
+package net.forthecrown.structure.buffer;
 
 import java.util.concurrent.CompletableFuture;
 import net.forthecrown.nbt.CompoundTag;
@@ -9,31 +9,43 @@ import org.bukkit.block.data.BlockData;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.math.vector.Vector3i;
 
+/**
+ * Intermediary between
+ */
 public interface BlockBuffer {
 
   default CompletableFuture<Void> place(World world) {
     return place(world, Transform.IDENTITY);
   }
 
-  CompletableFuture<Void> place(World world, Transform transform);
+  default CompletableFuture<Void> place(World world, Transform transform) {
+    return place(world, transform, false);
+  }
 
-  default BufferedBlock getBlock(Vector3i pos) {
+  CompletableFuture<Void> place(World world,
+                                Transform transform,
+                                boolean updatePhysics
+  );
+
+  default BufferBlock getBlock(Vector3i pos) {
     return getBlock(pos.x(), pos.y(), pos.z());
   }
 
-  BufferedBlock getBlock(int x, int y, int z);
+  BufferBlock getBlock(int x, int y, int z);
 
   default void setBlock(Vector3i pos, BlockData data, CompoundTag tag) {
     setBlock(pos.x(), pos.y(), pos.z(), data, tag);
   }
 
-  void setBlock(int x, int y, int z, BlockData data, CompoundTag tag);
+  default void setBlock(int x, int y, int z, BlockData data, CompoundTag tag) {
+    setBlock(x, y, z, new BufferBlock(data, tag));
+  }
 
-  default void setBlock(Vector3i pos, BufferedBlock block) {
+  default void setBlock(Vector3i pos, BufferBlock block) {
     setBlock(pos.x(), pos.y(), pos.z(), block);
   }
 
-  void setBlock(int x, int y, int z, BufferedBlock block);
+  void setBlock(int x, int y, int z, BufferBlock block);
 
   @Nullable Bounds3i getBounds();
 
@@ -41,7 +53,4 @@ public interface BlockBuffer {
     return getBounds() == null;
   }
 
-  record BufferedBlock(BlockData data, CompoundTag tag) {
-
-  }
 }

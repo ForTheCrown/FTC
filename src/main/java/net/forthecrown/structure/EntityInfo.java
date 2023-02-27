@@ -9,15 +9,14 @@ import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.nbt.paper.PaperNbt;
-import net.forthecrown.utils.VanillaAccess;
 import net.forthecrown.utils.io.TagOps;
-import net.forthecrown.utils.io.TagTranslators;
 import net.forthecrown.utils.io.TagUtil;
+import net.forthecrown.utils.math.Transform;
 import net.forthecrown.utils.math.Vectors;
 import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.util.datafix.fixes.References;
 import org.bukkit.NamespacedKey;
-import org.bukkit.World;
+import org.bukkit.Registry;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.spongepowered.math.vector.Vector3d;
@@ -67,31 +66,15 @@ public class EntityInfo {
   }
 
   void place(StructurePlaceConfig config) {
-    World world = config.getWorld();
-    Vector3d dest = config.getTransform().apply(position);
+    Transform transform = config.getTransform();
+    Vector3d dest = transform.apply(position);
 
-    CompoundTag tag = (CompoundTag) this.tag.copy();
-    tag.putString(net.minecraft.world.entity.Entity.ID_TAG, type.asString());
-
-    var level = VanillaAccess.getLevel(world);
-
-    var optional = net.minecraft.world.entity.EntityType.create(
-        TagTranslators.COMPOUND.toMinecraft(tag),
-        level
+    config.getEntitySpawner().addEntity(
+        dest,
+        transform.getRotation(),
+        Registry.ENTITY_TYPE.get(type),
+        copyTag(tag)
     );
-
-    optional.ifPresent(entity -> {
-      entity.moveTo(dest.x(), dest.y(), dest.z());
-
-      Rotation rotation = config.getTransform().getRotation();
-
-      if (rotation != Rotation.NONE) {
-        float yRot = entity.rotate(VanillaAccess.toVanilla(rotation));
-        entity.setYRot(yRot);
-      }
-
-      level.addFreshEntity(entity);
-    });
   }
 
   /* ----------------------------- CLONE BUILDERS ------------------------------ */

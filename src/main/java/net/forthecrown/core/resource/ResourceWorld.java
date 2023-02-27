@@ -281,7 +281,6 @@ public class ResourceWorld {
         .withY(y);
 
     StructurePlaceConfig config = StructurePlaceConfig.builder()
-        .placeEntities(true)
         .addNonNullProcessor()
         .addRotationProcessor()
         .world(world)

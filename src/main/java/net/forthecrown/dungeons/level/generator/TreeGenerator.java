@@ -75,10 +75,11 @@ public class TreeGenerator {
   public static CompletableFuture<DungeonLevel> generateAsync(
       TreeGeneratorConfig config
   ) {
+    var exc = DungeonManager.getDungeons().getExecutorService();
+
     return CompletableFuture.supplyAsync(() -> {
-      TreeGenerator generator = new TreeGenerator(config);
-      return generator.generate();
-    })
+      return new TreeGenerator(config).generate();
+    }, exc)
         .whenComplete((level1, throwable) -> {
           if (throwable != null) {
             LOGGER.error("Error generating level", throwable);

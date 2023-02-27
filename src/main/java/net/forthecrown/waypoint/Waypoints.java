@@ -26,6 +26,7 @@ import net.forthecrown.structure.BlockStructure;
 import net.forthecrown.structure.FunctionInfo;
 import net.forthecrown.structure.StructurePlaceConfig;
 import net.forthecrown.structure.Structures;
+import net.forthecrown.structure.buffer.ImmediateBlockBuffer;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.Users;
@@ -123,7 +124,6 @@ public final class Waypoints {
     }
 
     var config = StructurePlaceConfig.builder()
-        .placeEntities(true)
         .addNonNullProcessor()
         .addRotationProcessor()
         .world(region.getWorld())
@@ -151,7 +151,7 @@ public final class Waypoints {
                                      StructurePlaceConfig config
   ) {
     var pos = config.getTransform().apply(info.getOffset());
-    var world = config.getWorld();
+    var world = ((ImmediateBlockBuffer) config.getBuffer()).getWorld();
 
     var block = Vectors.getBlock(pos, world);
 
@@ -181,7 +181,7 @@ public final class Waypoints {
     }
 
     var pos = config.getTransform().apply(info.getOffset());
-    var world = config.getWorld();
+    var world = ((ImmediateBlockBuffer) config.getBuffer()).getWorld();
     var block = Vectors.getBlock(pos, world);
 
     WallSign signData = (WallSign) Material.OAK_WALL_SIGN.createBlockData();

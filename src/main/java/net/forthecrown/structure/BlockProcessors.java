@@ -1,6 +1,8 @@
 package net.forthecrown.structure;
 
+import java.util.Random;
 import lombok.experimental.UtilityClass;
+import net.forthecrown.structure.BlockRotProcessor.IntegrityProvider;
 import net.forthecrown.utils.VanillaAccess;
 import net.forthecrown.utils.math.Transform;
 import org.apache.commons.lang3.mutable.Mutable;
@@ -31,7 +33,15 @@ public @UtilityClass class BlockProcessors {
    */
   public final BlockProcessor IGNORE_AIR = new IgnoreAirProcessor();
 
-  /* ----------------------------- SUB CLASSES ------------------------------ */
+  /* ----------------------------- FACTORIES ------------------------------ */
+
+  public static BlockRotProcessor rot(IntegrityProvider provider,
+                                      Random random
+  ) {
+    return new BlockRotProcessor(provider, random);
+  }
+
+  /* ---------------------------- SUB CLASSES ----------------------------- */
 
   private class NonNullProcessor implements BlockProcessor {
 

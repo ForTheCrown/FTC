@@ -72,8 +72,15 @@ public class CommandDungeonTest extends FtcCommand {
                 DungeonWorld.reset();
               }
 
-              level.place();
-              c.getSource().sendAdmin("Placed dungeon");
+              level.place().whenComplete((unused, throwable) -> {
+                if (throwable != null) {
+                  LOGGER.error("Error placing level!", throwable);
+                  c.getSource().sendAdmin("Error placing level");
+                  return;
+                }
+
+                c.getSource().sendAdmin("Placed dungeon");
+              });
             });
           });
 

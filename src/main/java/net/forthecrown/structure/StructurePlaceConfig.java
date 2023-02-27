@@ -8,6 +8,8 @@ import it.unimi.dsi.fastutil.Pair;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import net.forthecrown.structure.buffer.BlockBuffer;
+import net.forthecrown.structure.buffer.BlockBuffers;
 import net.forthecrown.utils.math.Transform;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
@@ -19,24 +21,24 @@ import org.spongepowered.math.vector.Vector3i;
 @Getter
 public class StructurePlaceConfig {
 
-  private final World world;
+  private final BlockBuffer buffer;
   private final Vector3i destination;
 
   private final ImmutableList<BlockProcessor> processors;
   private final ImmutableMap<String, FunctionProcessor> functions;
 
-  private final boolean placeEntities;
+  private final StructureEntitySpawner entitySpawner;
 
   private final Transform transform;
 
   private final String paletteName;
 
   private StructurePlaceConfig(Builder builder) {
-    this.world = builder.world;
+    this.buffer = builder.buffer;
     this.destination = builder.pos;
     this.processors = builder.processors.build();
     this.functions = builder.functions.build();
-    this.placeEntities = builder.placeEntities;
+    this.entitySpawner = builder.entitySpawner;
 
     this.paletteName = builder.paletteName();
 
@@ -73,13 +75,13 @@ public class StructurePlaceConfig {
   @Accessors(chain = true, fluent = true)
   public static class Builder {
 
-    private World world;
+    private BlockBuffer buffer;
     private Vector3i pos;
 
     private final ImmutableList.Builder<BlockProcessor> processors = ImmutableList.builder();
     private final ImmutableMap.Builder<String, FunctionProcessor> functions = ImmutableMap.builder();
 
-    private boolean placeEntities = true;
+    private StructureEntitySpawner entitySpawner;
 
     private Transform transform = Transform.IDENTITY;
 
@@ -87,6 +89,12 @@ public class StructurePlaceConfig {
 
     public Builder addProcessor(BlockProcessor processor) {
       processors.add(processor);
+      return this;
+    }
+
+    public Builder world(World world) {
+      this.buffer = BlockBuffers.immediate(world);
+      this.entitySpawner = StructureEntitySpawner.world(world);
       return this;
     }
 

@@ -11,12 +11,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import lombok.Getter;
 import lombok.Setter;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.dungeons.DungeonWorld;
 import net.forthecrown.dungeons.level.placement.LevelPlacement;
-import net.forthecrown.dungeons.level.placement.RoomPlacingVisitor;
 import net.forthecrown.dungeons.level.room.RoomFlag;
 import net.forthecrown.dungeons.level.room.RoomPiece;
 import net.forthecrown.nbt.BinaryTags;
@@ -153,16 +153,8 @@ public class DungeonLevel implements Iterable<DungeonPiece> {
 
   /* ----------------------------- PLACEMENT ------------------------------ */
 
-  public void place() {
-    var manager = LevelPlacement.create(DungeonWorld.get());
-    RoomPlacingVisitor visitor = new RoomPlacingVisitor();
-    visitor.setPlacement(manager);
-
-    getRoot().visit(visitor);
-
-    LOGGER.debug("Placed {} rooms for level", visitor.getPlacementCounter());
-
-    manager.runPostProcessors();
+  public CompletableFuture<Void> place() {
+    return LevelPlacement.create(DungeonWorld.get(), this).run();
   }
 
   /* --------------------------- SERIALIZATION ---------------------------- */

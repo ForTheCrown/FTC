@@ -95,7 +95,9 @@ public class BlockPalette {
       this.entities.add(info);
     }
 
-    Loggers.getLogger().info("Scanned {} blocks and {} entities", blocks, entities.size());
+    Loggers.getLogger().info("Scanned {} blocks and {} entities",
+        blocks, entities.size()
+    );
   }
 
   public void place(StructurePlaceConfig config) {
@@ -112,7 +114,7 @@ public class BlockPalette {
       }
     }
 
-    if (config.isPlaceEntities()) {
+    if (config.getEntitySpawner() != null) {
       for (var e : entities) {
         e.place(config);
       }

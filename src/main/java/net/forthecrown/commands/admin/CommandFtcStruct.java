@@ -336,8 +336,7 @@ public class CommandFtcStruct extends FtcCommand {
 
     StructurePlaceConfig.Builder builder = StructurePlaceConfig.builder()
         .addRotationProcessor()
-        .addNonNullProcessor()
-        .placeEntities(args.get(PLACE_ENTITIES));
+        .addNonNullProcessor();
 
     if (args.has(IGNORE_AIR)) {
       builder.addProcessor(BlockProcessors.IGNORE_AIR);
@@ -364,6 +363,10 @@ public class CommandFtcStruct extends FtcCommand {
         .world(location.getWorld())
         .pos(Vectors.intFrom(location))
         .paletteName(args.get(PALETTE_ARG));
+
+    if (!args.get(PLACE_ENTITIES)) {
+      builder.entitySpawner(null);
+    }
 
     StructurePlaceConfig config = builder.build();
     structure.place(config);

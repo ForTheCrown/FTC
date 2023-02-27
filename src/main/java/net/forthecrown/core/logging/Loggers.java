@@ -19,7 +19,7 @@ public final class Loggers {
   public static final String PLUGIN_LOGGER_NAME = "FTC";
 
   public static final Marker STAFF_LOG
-      = MarkerManager.getMarker(StaffLogAppender.NAME);
+      = MarkerManager.getMarker(StaffLogAppender.MARKER_NAME);
 
   public static Logger getLogger() {
     var walker = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE);

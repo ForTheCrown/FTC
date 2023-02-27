@@ -9,6 +9,7 @@ import it.unimi.dsi.fastutil.objects.ObjectLists;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSets;
 import java.util.AbstractCollection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -364,6 +365,10 @@ public class ChunkedMap<T extends BoundsHolder> {
    */
   public boolean isEmpty() {
     return entries.isEmpty() || totalArea == null;
+  }
+
+  public Set<T> values() {
+    return Collections.unmodifiableSet(entries.keySet());
   }
 
   /* ---------------------------- SUB CLASSES ----------------------------- */

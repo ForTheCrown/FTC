@@ -4,7 +4,6 @@ import com.mojang.serialization.Dynamic;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.nbt.BinaryTag;
-import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.nbt.paper.PaperNbt;
 import net.forthecrown.utils.VanillaAccess;
@@ -13,7 +12,6 @@ import net.forthecrown.utils.io.TagTranslators;
 import net.forthecrown.utils.math.Vectors;
 import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.util.datafix.fixes.References;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.bukkit.block.Block;
@@ -91,14 +89,8 @@ public class BlockInfo {
 
   void place(StructurePlaceConfig config, Vector3i position) {
     Vector3i pos = config.getTransform().apply(position);
-
-    var block = Vectors.getBlock(pos, config.getWorld());
-    block.setBlockData(getData().clone(), false);
-
-    if (tag != null && !tag.isEmpty()) {
-      BlockEntity entity = VanillaAccess.getBlockEntity((TileState) block.getState());
-      entity.load(TagTranslators.COMPOUND.toMinecraft(tag));
-    }
+    var buf = config.getBuffer();
+    buf.setBlock(pos, getData(), getTag());
   }
 
   public BlockData getData() {
@@ -106,11 +98,7 @@ public class BlockInfo {
   }
 
   static CompoundTag copyTag(CompoundTag tag) {
-    if (tag == null) {
-      return null;
-    }
-
-    return BinaryTags.compoundTag(tag);
+    return tag == null ? null : tag.copy();
   }
 
   /* ----------------------------- CLONE METHODS ------------------------------ */

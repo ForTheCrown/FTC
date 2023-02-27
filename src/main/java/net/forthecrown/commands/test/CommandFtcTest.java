@@ -70,6 +70,13 @@ public class CommandFtcTest extends FtcCommand {
   @Override
   protected void createCommand(BrigadierCommand command) {
     command
+        .then(literal("test_staff_log_marker")
+            .executes(c -> {
+              LOGGER.info(Loggers.STAFF_LOG, "Hello! Hello? Hello.. Anyone?");
+              return 0;
+            })
+        )
+
         .then(literal("render_held_banner")
             .executes(c -> {
               var player = c.getSource().asPlayer();

@@ -1,39 +1,69 @@
 package net.forthecrown.dungeons.level.placement;
 
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.dungeons.level.DungeonPiece;
 import net.forthecrown.dungeons.level.PieceVisitor;
 import net.forthecrown.dungeons.level.gate.GatePiece;
 import net.forthecrown.dungeons.level.room.RoomPiece;
 import net.forthecrown.structure.BlockProcessors;
-import net.forthecrown.structure.BlockRotProcessor;
 import net.forthecrown.structure.StructurePlaceConfig;
 import net.forthecrown.structure.StructurePlaceConfig.Builder;
 import net.forthecrown.utils.math.Transform;
 import org.apache.logging.log4j.Logger;
 
+@RequiredArgsConstructor
 public class RoomPlacingVisitor implements PieceVisitor {
 
   private static final Logger LOGGER = Loggers.getLogger();
 
-  @Getter @Setter
-  private LevelPlacement placement;
+  @Getter
+  private final LevelPlacement placement;
+  private final Lock lock = new ReentrantLock();
 
   @Getter
-  private int placementCounter = 0;
+  private AtomicInteger placementCounter = new AtomicInteger(0);
+  private int roomCount = 0;
+  private boolean finishCalled = false;
 
   @Override
   public Result onGate(GatePiece gate) {
-    place(gate);
+    addPlaceTask(gate);
     return Result.CONTINUE;
   }
 
   @Override
   public Result onRoom(RoomPiece room) {
-    place(room);
+    addPlaceTask(room);
     return Result.CONTINUE;
+  }
+
+  private void addPlaceTask(DungeonPiece piece) {
+    placement.getExecutorService().execute(() -> place(piece));
+  }
+
+  public synchronized boolean isFinished() {
+    return placementCounter.get() >= roomCount;
+  }
+
+  private void onPlaced() {
+    lock.lock();
+
+    placementCounter.incrementAndGet();
+    LOGGER.debug("Placed room, placementCount={}", placementCounter);
+
+    if (isFinished() && !finishCalled) {
+      LOGGER.debug("isFinished() == true");
+
+      finishCalled = true;
+      placement.onPlacementsFinished();
+    }
+
+    lock.unlock();
   }
 
   private void place(DungeonPiece piece) {
@@ -50,6 +80,7 @@ public class RoomPlacingVisitor implements PieceVisitor {
       return;
     }
 
+    roomCount++;
     var center = piece.getBounds().center();
     var random = placement.getRandom();
 
@@ -57,33 +88,34 @@ public class RoomPlacingVisitor implements PieceVisitor {
     var biome  = source.findBiome(center);
 
     Builder builder = StructurePlaceConfig.builder()
-        .placeEntities(true)
         .pos(piece.getPivotPosition())
-        .world(placement.getWorld())
         .transform(Transform.rotation(piece.getRotation()))
+
+        .buffer(placement.getBuffer())
+        .entitySpawner(placement.getEntityPlacement())
+
         .paletteName(piece.getPaletteName(biome))
+
         .addNonNullProcessor()
         .addRotationProcessor()
         .addProcessor(BlockProcessors.IGNORE_AIR)
-        .addProcessor(new BlockRotProcessor(placement, random));
+        .addProcessor(BlockProcessors.rot(placement, random));
 
     var config = builder.build();
     struct.place(config);
 
-    if (placement != null) {
-      struct.getFunctions().forEach(func -> {
-        if (!func.getFunctionKey().startsWith("post/")) {
-          return;
-        }
+    struct.getFunctions().forEach(func -> {
+      if (!func.getFunctionKey().startsWith("post/")) {
+        return;
+      }
 
-        var info = func.withOffset(
-            config.getTransform().apply(func.getOffset())
-        );
+      var info = func.withOffset(
+          config.getTransform().apply(func.getOffset())
+      );
 
-        placement.addMarker(info);
-      });
-    }
+      placement.addMarker(info);
+    });
 
-    placementCounter++;
+    onPlaced();
   }
 }

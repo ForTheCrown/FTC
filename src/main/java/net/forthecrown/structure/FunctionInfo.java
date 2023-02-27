@@ -110,8 +110,7 @@ public class FunctionInfo {
     BlockData data = turnsInto.clone();
     data = VanillaAccess.rotate(data, config.getTransform().getRotation());
 
-    Vectors.getBlock(pos, config.getWorld())
-        .setBlockData(data);
+    config.getBuffer().setBlock(pos, data, null);
   }
 
   /* ----------------------------- PARSE ------------------------------ */
