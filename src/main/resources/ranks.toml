@@ -87,7 +87,7 @@
 
 [booster]
 tier = "free"
-prefix = "&7[<gradient=#f5a4cf,#ff654d:Booster>&7]"
+prefix = "&7[<gradient=#BE91FD,#E1A5CA:Booster>&7]"
 description = [
    "Earned by boosting the Discord server."
 ]

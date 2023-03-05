@@ -170,6 +170,8 @@ public interface Exceptions {
 
   CommandSyntaxException NOTHING_CHANGED = create("Nothing changed");
 
+  CommandSyntaxException NOT_UNLOCKED = create("You haven't unlocked this yet.");
+
   /**
    * Creates an exception which says the given user is not online
    *
