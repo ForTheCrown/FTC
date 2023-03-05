@@ -84,3 +84,17 @@
 # ]
 # slot = { column = 1, row = 2 }
 # ------------------------------------------------------------------------------
+
+[booster]
+tier = "free"
+prefix = "&7[<gradient=#f5a4cf,#ff654d:Booster>&7]"
+description = [
+   "Earned by boosting the Discord server."
+]
+
+[streaming]
+tier = "free"
+prefix = "&f[<gradient=#AA64FF,#C882FF:Streaming>&f]"
+description = [
+   "Given to verified content creators."
+]
