@@ -15,7 +15,7 @@ function onQuit(event) {
 
 function onActivate(handle) {
     getTracker().clear();
-    events.register("onQuit", PlayerQuitEvent);
+    events.register(PlayerQuitEvent.class, onQuit);
 
     Bukkit.getOnlinePlayers().forEach(player => {
         getTracker().startTask(player);

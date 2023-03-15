@@ -1,14 +1,19 @@
 package net.forthecrown.core.logging;
 
+import static net.kyori.adventure.text.Component.text;
+
 import net.forthecrown.core.FtcDiscord;
 import net.forthecrown.core.admin.StaffChat;
-import net.kyori.adventure.text.Component;
+import net.forthecrown.utils.text.Text;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Filter.Result;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
 import org.apache.logging.log4j.core.filter.MarkerFilter;
 
-public class StaffLogAppender extends AbstractAppender {
+class StaffLogAppender extends AbstractAppender {
   static final String NAME = StaffLogAppender.class.getSimpleName();
   static final String MARKER_NAME = "staff_log";
 
@@ -28,6 +33,25 @@ public class StaffLogAppender extends AbstractAppender {
     var formatted = event.getMessage().getFormattedMessage();
     FtcDiscord.staffLog(event.getLoggerName(), formatted);
 
-    StaffChat.send(Component.text(formatted), false);
+    var color = fromLevel(event.getLevel());
+
+    StaffChat.newMessage()
+        .setPrefix(Text.format("[{0}] ", color, event.getLevel().name()))
+        .setMessage(text(formatted))
+        .setSource(event.getLoggerName())
+        .setDiscordForwarded(false)
+        .send();
+  }
+
+  TextColor fromLevel(Level level) {
+    if (level == Level.WARN) {
+      return NamedTextColor.YELLOW;
+    }
+
+    if (level == Level.ERROR) {
+      return NamedTextColor.RED;
+    }
+
+    return NamedTextColor.GRAY;
   }
 }

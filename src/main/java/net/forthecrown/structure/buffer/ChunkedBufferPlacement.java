@@ -16,7 +16,7 @@ class ChunkedBufferPlacement implements Runnable {
 
   private static final Logger LOGGER = Loggers.getLogger();
 
-  private static final long SECTIONS_PER_TICK = 15;
+  private static final long SECTIONS_PER_TICK = 10;
 
   private final ChunkedBlockBuffer buffer;
   private final World world;

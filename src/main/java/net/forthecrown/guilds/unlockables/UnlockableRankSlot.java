@@ -1,5 +1,7 @@
 package net.forthecrown.guilds.unlockables;
 
+import static net.forthecrown.guilds.GuildRank.ID_LEADER;
+import static net.forthecrown.guilds.GuildRank.NOT_SET;
 import static net.forthecrown.guilds.menu.GuildMenus.GUILD;
 import static net.kyori.adventure.text.Component.empty;
 import static net.kyori.adventure.text.Component.text;
@@ -13,9 +15,11 @@ import net.forthecrown.user.User;
 import net.forthecrown.utils.inventory.DefaultItemBuilder;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.inventory.menu.MenuNode;
+import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
+import org.jetbrains.annotations.Nullable;
 
 @RequiredArgsConstructor
 @Getter
@@ -51,42 +55,88 @@ public enum UnlockableRankSlot implements Unlockable {
 
   @Override
   public MenuNode toInvOption() {
+    return rankNode(getId(), this);
+  }
+
+  public static MenuNode rankNode(int rankId,
+                                  @Nullable UnlockableRankSlot unlockable
+  ) {
     return MenuNode.builder()
         .setItem((user, context) -> {
           var guild = context.getOrThrow(GUILD);
-          var rank = guild.getSettings().getRank(id);
+          var rank = guild.getSettings().getRank(rankId);
 
           DefaultItemBuilder builder;
 
-          if (isUnlocked(guild) && rank != null) {
+          if ((unlockable == null || unlockable.isUnlocked(guild))
+              && rank != null
+          ) {
             builder = ItemStacks.builder(Material.NAME_TAG)
                 .setName(rank.getName())
+                .addLore(rank.getDescription());
 
-                .addLore(rank.getDescription())
-                .addLore("&7Click to rename")
-                .addLore("&7Shift-click to edit permissions")
-                .addLore("&7Rank ID: " + rank.getId());
+            if (rankId != ID_LEADER) {
+              builder
+                  .addLoreRaw(empty())
+                  .addLore("&7Shift-left-click to edit permissions")
+                  .addLore("&7Shift-right-click to edit auto level-up value");
+            }
+
+            builder.addLore("&7Left-click to rename");
+
+            if (rankId != ID_LEADER) {
+              builder.addLore("&7Right-click to change max chunk claims")
+                  .addLoreRaw(empty());
+            }
+
+            builder.addLore("&7Rank ID: " + rank.getId());
+
+            if (rank.getTotalExpLevelUp() != NOT_SET) {
+              builder.addLore(
+                  Text.format(
+                      "Level up Exp: {0, number}",
+                      NamedTextColor.GRAY,
+                      rank.getTotalExpLevelUp()
+                  )
+              );
+            }
+
+            if (rank.getMaxChunkClaims() != NOT_SET) {
+              builder.addLore(
+                  Text.format(
+                      "Max chunk claims: {0, number}",
+                      NamedTextColor.GRAY,
+                      rank.getMaxChunkClaims()
+                  )
+              );
+            }
           } else {
+            assert unlockable != null : "Unlockable is null";
+
             builder = ItemStacks.builder(Material.GUNPOWDER)
                 .setName("Rank Slot")
 
                 .addLore("Not yet unlocked")
-                .addLore(getProgressComponent(guild))
+                .addLore(unlockable.getProgressComponent(guild))
 
                 .addLore(empty())
-                .addLore(getClickComponent())
-                .addLore(getShiftClickComponent());
+                .addLore(unlockable.getClickComponent())
+                .addLore(unlockable.getShiftClickComponent());
           }
 
           return builder.build();
         })
 
         .setRunnable((user, context, click) -> {
-          onClick(user, click, context, () -> {
-            var guild = context.getOrThrow(GUILD);
-            var rank = guild.getSettings()
-                .getRank(getId());
+          var guild = context.getOrThrow(GUILD);
+          var rank = guild.getSettings().getRank(rankId);
 
+          if (unlockable == null) {
+            GuildRanksMenu.onDefaultRanksClick(user, click, rank, guild);
+            return;
+          }
+
+          unlockable.onClick(user, click, context, () -> {
             GuildRanksMenu.onRankClick(user, guild, click, rank);
           });
         })

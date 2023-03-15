@@ -3,25 +3,34 @@ package net.forthecrown.utils.io;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
+import java.nio.ByteBuffer;
 import java.util.stream.Collector;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.ByteArrayTag;
+import net.forthecrown.nbt.ByteTag;
 import net.forthecrown.nbt.CollectionTag;
 import net.forthecrown.nbt.CompoundTag;
+import net.forthecrown.nbt.DoubleTag;
+import net.forthecrown.nbt.FloatTag;
+import net.forthecrown.nbt.IntArrayTag;
+import net.forthecrown.nbt.IntTag;
+import net.forthecrown.nbt.ListTag;
+import net.forthecrown.nbt.LongArrayTag;
+import net.forthecrown.nbt.LongTag;
 import net.forthecrown.nbt.NumberTag;
+import net.forthecrown.nbt.ShortTag;
+import net.forthecrown.nbt.StringTag;
 
 public class TagOps implements DynamicOps<BinaryTag> {
   private static final Collector<Pair<String, BinaryTag>, CompoundTag, CompoundTag> MAP_COLLECTOR
       = Collector.of(
           BinaryTags::compoundTag,
           (tag, p) -> tag.put(p.getFirst(), p.getSecond()),
-          (tag, tag2) -> {
-            tag.merge(tag2);
-            return tag;
-          }
+          CompoundTag::merge
       );
 
   public static final TagOps OPS = new TagOps();
@@ -36,7 +45,58 @@ public class TagOps implements DynamicOps<BinaryTag> {
 
   @Override
   public <U> U convertTo(DynamicOps<U> outOps, BinaryTag input) {
-    return null;
+    if (input instanceof ListTag list) {
+      return outOps.createList(
+          list.stream().map(tag -> convertTo(outOps, tag))
+      );
+    }
+
+    if (input instanceof ByteArrayTag arr) {
+      ByteBuffer buf = ByteBuffer.wrap(arr.toByteArray());
+      return outOps.createByteList(buf);
+    }
+
+    if (input instanceof IntArrayTag arr) {
+      return outOps.createIntList(arr.intStream());
+    }
+
+    if (input instanceof LongArrayTag arr) {
+      return outOps.createLongList(arr.longStream());
+    }
+
+    if (input instanceof CompoundTag tag) {
+      return convertMap(outOps, tag);
+    }
+
+    if (input instanceof StringTag str) {
+      return outOps.createString(str.value());
+    }
+
+    if (input instanceof ByteTag t) {
+      return outOps.createByte(t.byteValue());
+    }
+
+    if (input instanceof ShortTag t) {
+      return outOps.createShort(t.shortValue());
+    }
+
+    if (input instanceof IntTag t) {
+      return outOps.createInt(t.intValue());
+    }
+
+    if (input instanceof LongTag t) {
+      return outOps.createLong(t.longValue());
+    }
+
+    if (input instanceof FloatTag t) {
+      return outOps.createFloat(t.floatValue());
+    }
+
+    if (input instanceof DoubleTag t) {
+      return outOps.createDouble(t.doubleValue());
+    }
+
+    return outOps.empty();
   }
 
   @Override
@@ -113,14 +173,15 @@ public class TagOps implements DynamicOps<BinaryTag> {
       return DataResult.error("Not a list: " + list);
     }
 
-    if (!t.addTag(value)) {
+    var listTag = t.copy();
+    if (!listTag.addTag(value)) {
       return Results.errorResult(
           "Element %s is not a matching type for %s list",
           value, list
       );
     }
 
-    return DataResult.success(list);
+    return DataResult.success(listTag);
   }
 
   @Override
@@ -139,7 +200,7 @@ public class TagOps implements DynamicOps<BinaryTag> {
     CompoundTag t1 = map.asCompound();
     String keyString = key.toString();
 
-    CompoundTag result = BinaryTags.compoundTag(t1);
+    CompoundTag result = t1.copy();
     result.put(keyString, value);
     return DataResult.success(result);
   }
@@ -185,7 +246,7 @@ public class TagOps implements DynamicOps<BinaryTag> {
   @Override
   public BinaryTag remove(BinaryTag input, String key) {
     if (input instanceof CompoundTag compoundTag) {
-      var copy = BinaryTags.compoundTag(compoundTag);
+      var copy = compoundTag.copy();
       copy.remove(key);
       return copy;
     }

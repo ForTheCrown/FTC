@@ -10,6 +10,7 @@ import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongList;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.Duration;
 import net.forthecrown.core.module.OnEnable;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonUtils.EnumTypeAdapter;
@@ -58,6 +59,25 @@ public final class Configs {
             Key.class,
             JsonUtils.createAdapter(JsonUtils::writeKey, JsonUtils::readKey)
         )
+
+        .registerTypeAdapter(Duration.class, new TypeAdapter<Duration>() {
+          @Override
+          public void write(JsonWriter out, Duration value) throws IOException {
+            out.value(value.toString());
+          }
+
+          @Override
+          public Duration read(JsonReader in) throws IOException {
+            var peek = in.peek();
+
+            if (peek == JsonToken.NUMBER) {
+              long millis = in.nextLong();
+              return Duration.ofMillis(millis);
+            }
+
+            return Duration.parse(in.nextString());
+          }
+        })
 
         .registerTypeAdapter(
             Location.class,

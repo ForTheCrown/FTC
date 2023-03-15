@@ -39,8 +39,8 @@
 # - args = [ "foo" ]
 #
 # Script examples:
-# - 'let value = inputs[0];'
-# - 'if (inputs.length < 2) throw "Expected 2 arguments";'
+# - 'let value = args[0];'
+# - 'if (args.length < 2) throw "Expected 2 arguments";'
 # ------------------------------------------------------------------------------
 
 ["challenges/top_streak_stand"]

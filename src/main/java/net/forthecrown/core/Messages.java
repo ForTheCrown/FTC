@@ -246,8 +246,10 @@ public interface Messages {
   /**
    * Unknown command message that's used as a permission denied message
    */
-  TextComponent UNKNOWN_COMMAND = text("Unknown command. Type\"/help\" for help",
-      NamedTextColor.WHITE);
+  TextComponent UNKNOWN_COMMAND
+      = text("Unknown command. Type\"/help\" for help", NamedTextColor.WHITE);
+
+  TextComponent NOTHING_CHANGED = text("Nothing changed", NamedTextColor.GRAY);
 
   TextColor CHAT_NAME_COLOR = TextColor.fromHexString("#e6e6e6");
 
@@ -1490,7 +1492,7 @@ public interface Messages {
    *
    * @see Properties#PROFILE_PRIVATE
    */
-  String TOGGLE_PROFILE_PRIVATE = "Others can n{1} see your profile.";
+  String TOGGLE_PROFILE_PRIVATE = "Others can n{2} see your profile.";
 
   /**
    * Message format for {@link net.forthecrown.commands.ToggleCommand} for toggling if the user
@@ -1630,6 +1632,7 @@ public interface Messages {
    * on the <code>state</code> parameter:<pre>
    * Argument 0: "Enabled" or "Disabled"
    * Argument 1: "ow" or "o longer"
+   * Argument 2: "o longer" or "ow", same as above basically, but inverse
    * </pre>
    * The second argument doesn't have a starting 'n', this is so you can decide if that letter
    * should be capitalized yourself.
@@ -1645,7 +1648,8 @@ public interface Messages {
     return format(format,
         state ? NamedTextColor.YELLOW : NamedTextColor.GRAY,
         /* Arg 0 */ state ? "Enabled" : "Disabled",
-        /* Arg 1 */ state ? "ow" : "o longer"
+        /* Arg 1 */ state ? "ow" : "o longer",
+        /* Arg 2 */ state ? "o longer" : "ow"
     );
   }
 
@@ -2875,7 +2879,11 @@ public interface Messages {
     );
   }
 
-  static Component changedRank(boolean wasPromoted, User promoted, GuildRank rank, Guild guild) {
+  static Component changedRank(boolean wasPromoted,
+                               User promoted,
+                               GuildRank rank,
+                               Guild guild
+  ) {
     return format("&f{0}&r {3} &e{1, user}&r to &f{2}&r",
         NamedTextColor.GRAY,
 
@@ -2886,7 +2894,9 @@ public interface Messages {
     );
   }
 
-  static Component rankChangeAnnouncement(boolean wasPromoted, User promoter, User promoted,
+  static Component rankChangeAnnouncement(boolean wasPromoted,
+                                          User promoter,
+                                          User promoted,
                                           GuildRank rank
   ) {
     return format("&e{0, user}&r {3} &6{1, user}&r to {2}",
@@ -3033,6 +3043,13 @@ public interface Messages {
         "There's a &6{0, number}x multiplier&r on all earned Guild Exp!",
         NamedTextColor.YELLOW,
         mod
+    );
+  }
+
+  static Component guildAutoLevelUp(User user, GuildRank rank) {
+    return format("&e{0, user}&r was automatically leveled up to rank &f{1}&r",
+        NamedTextColor.GRAY,
+        user, rank.getFormattedName()
     );
   }
 

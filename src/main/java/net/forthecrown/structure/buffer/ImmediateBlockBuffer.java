@@ -5,6 +5,7 @@ import java.util.concurrent.CompletableFuture;
 import lombok.Getter;
 import net.forthecrown.utils.math.Bounds3i;
 import net.forthecrown.utils.math.Transform;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,9 +32,14 @@ public class ImmediateBlockBuffer implements BlockBuffer {
   }
 
   @Override
-  public void setBlock(int x, int y, int z, BufferBlock block) {
+  public void setBlock(int x, int y, int z, @Nullable BufferBlock block) {
     var b = world.getBlockAt(x, y, z);
-    block.apply(b, false);
+
+    if (block == null) {
+      b.setType(Material.AIR, false);
+    } else {
+      block.apply(b, false);
+    }
   }
 
   @Override

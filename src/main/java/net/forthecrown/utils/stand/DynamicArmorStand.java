@@ -17,7 +17,11 @@ public class DynamicArmorStand extends AbstractDynamicStand {
   private Reference<ArmorStand> armorStand;
 
   public DynamicArmorStand(Location location) {
-    super(location, STAND_KEY);
+    this(location, STAND_KEY);
+  }
+
+  public DynamicArmorStand(Location location, NamespacedKey key) {
+    super(location, key);
   }
 
   public void update(Component displayName) {

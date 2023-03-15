@@ -8,39 +8,57 @@ import java.util.List;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import net.forthecrown.core.logging.Loggers;
-import net.forthecrown.user.User;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 
 @AllArgsConstructor
 public class GuildRank {
 
-  public static final int
-      ID_MEMBER = 0,
-      ID_LEADER = 6,
+  public static final int ID_MEMBER = 0;
+  public static final int ID_LEADER = 6;
 
-  RANK_COUNT = ID_LEADER + 1;
+  public static final int RANK_COUNT = ID_LEADER + 1;
+
+  public static final int NOT_SET = -1;
 
   private static final String
       FORMATTED_NAME_KEY = "formattedName",
       DESCRIPTION_KEY = "description",
       PERMS_KEY = "permissions",
+      MAX_CHUNKS_KEY = "maxChunkClaims",
+      AUTO_LEVELUP_KEY = "autoLevelUp",
       ALL_PERMS = "all";
 
   @Getter
   private final int id;
 
-  @Getter
+  @Getter @Setter
   private String name;
+
   private final String description;
 
   // Jules: Use EnumSet
-  private final EnumSet<GuildPermission> permissions = EnumSet.noneOf(GuildPermission.class);
+  private final EnumSet<GuildPermission> permissions
+      = EnumSet.noneOf(GuildPermission.class);
 
-  /* ----------------------------- STATIC METHODS ------------------------------ */
+  @Getter @Setter
+  private int maxChunkClaims = NOT_SET;
+
+  @Getter @Setter
+  private int totalExpLevelUp = NOT_SET;
+
+  /* ---------------------------- CONSTRUCTOR ----------------------------- */
+
+  public GuildRank(int id, String name, String description) {
+    this.id = id;
+    this.name = name;
+    this.description = description;
+  }
+
+  /* --------------------------- STATIC METHODS --------------------------- */
 
   public static GuildRank createLeader() {
     var rank = new GuildRank(ID_LEADER, "&fLeader", "Guild leader");
@@ -66,21 +84,6 @@ public class GuildRank {
     return Text.renderString(name);
   }
 
-  public void setName(User setter, String newName) {
-    String oldName = getName();
-    this.name = newName;
-
-    if (oldName.equals(getName())) {
-      setter.sendMessage(Component.text("Nothing changed", NamedTextColor.GRAY));
-    } else {
-      setter.getGuild().sendMessage(
-          Text.format("{0, user} has renamed rank '{1}' to '{2}'",
-              setter, Text.renderString(oldName), getName()
-          )
-      );
-    }
-  }
-
   public boolean hasPermission(GuildPermission perm) {
     if (perm == null) {
       return true;
@@ -102,13 +105,26 @@ public class GuildRank {
   // Get GuildRank from Json
   public static GuildRank deserialize(JsonObject json, int id) {
     // Formatted name
-    String formattedName = json.has(FORMATTED_NAME_KEY) ?
-        json.get(FORMATTED_NAME_KEY).getAsString() : null;
+    String formattedName = json.has(FORMATTED_NAME_KEY)
+        ? json.get(FORMATTED_NAME_KEY).getAsString()
+        : null;
 
-    String description = json.has(DESCRIPTION_KEY) ?
-        json.get(DESCRIPTION_KEY).getAsString() : null;
+    String description = json.has(DESCRIPTION_KEY)
+        ? json.get(DESCRIPTION_KEY).getAsString()
+        : null;
 
     var rank = new GuildRank(id, formattedName, description);
+
+    int autoLevelUp = json.has(AUTO_LEVELUP_KEY)
+        ? json.get(AUTO_LEVELUP_KEY).getAsInt()
+        : NOT_SET;
+
+    int maxChunkClaims = json.has(MAX_CHUNKS_KEY)
+        ? json.get(MAX_CHUNKS_KEY).getAsInt()
+        : NOT_SET;
+
+    rank.setMaxChunkClaims(maxChunkClaims);
+    rank.setTotalExpLevelUp(autoLevelUp);
 
     var perms = json.get(PERMS_KEY);
 
@@ -136,7 +152,8 @@ public class GuildRank {
       }
       // Invalid element, warn the console
       else {
-        Loggers.getLogger().warn("Invalid JSON element found for guild rank permissions: {}",
+        Loggers.getLogger().error(
+            "Invalid JSON element found for guild rank permissions: {}",
             perms
         );
       }
@@ -156,6 +173,14 @@ public class GuildRank {
 
     if (description != null) {
       result.addProperty(DESCRIPTION_KEY, this.description);
+    }
+
+    if (getMaxChunkClaims() != NOT_SET) {
+      result.addProperty(MAX_CHUNKS_KEY, getMaxChunkClaims());
+    }
+
+    if (getTotalExpLevelUp() != NOT_SET) {
+      result.addProperty(AUTO_LEVELUP_KEY, getTotalExpLevelUp());
     }
 
     // Permissions

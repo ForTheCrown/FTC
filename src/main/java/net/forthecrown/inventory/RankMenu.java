@@ -75,6 +75,8 @@ public final class RankMenu {
   }
 
   public static List<UserRank> getExtraRanks(User user, RankTier tier) {
+    var titles = user.getTitles();
+
     return tier.getTitles()
         .stream()
         .filter(rank -> {
@@ -82,7 +84,7 @@ public final class RankMenu {
             return false;
           }
 
-          boolean has = user.getTitles().hasTitle(rank);
+          boolean has = titles.hasTitle(rank);
           return has || !rank.isHidden();
         })
         .collect(Collectors.toList());

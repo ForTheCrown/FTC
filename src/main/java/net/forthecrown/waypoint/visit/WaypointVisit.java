@@ -4,6 +4,7 @@ import static net.forthecrown.events.dynamic.HulkSmashListener.GAME_TICKS_PER_CO
 import static net.kyori.adventure.util.Ticks.TICKS_PER_SECOND;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import io.papermc.paper.entity.TeleportFlag.EntityState;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -266,7 +267,11 @@ public class WaypointVisit implements Runnable {
       }
 
       // Just TP them to pole... boring
-      user.getPlayer().teleport(getTeleportLocation(), true, true);
+      user.getPlayer().teleport(
+          getTeleportLocation(),
+          EntityState.RETAIN_PASSENGERS
+      );
+
       user.playSound(Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
 
       runTpHandlers();
@@ -302,7 +307,11 @@ public class WaypointVisit implements Runnable {
         if (--tick < 0) {
           task.cancel();
 
-          user.getPlayer().teleport(getTeleportLocation(), true, true);
+          user.getPlayer().teleport(
+              getTeleportLocation(),
+              EntityState.RETAIN_PASSENGERS
+          );
+
           user.playSound(Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
 
           runTpHandlers();

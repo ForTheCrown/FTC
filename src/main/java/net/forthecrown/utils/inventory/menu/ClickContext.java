@@ -1,5 +1,7 @@
 package net.forthecrown.utils.inventory.menu;
 
+import static net.forthecrown.core.Cooldowns.NO_END_COOLDOWN;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -105,6 +107,6 @@ public class ClickContext {
    * @return True, if {@link #getCooldownTime()} is larger than 0, false otherwise
    */
   public boolean shouldCooldown() {
-    return cooldownTime > 0;
+    return cooldownTime > 0 || cooldownTime == NO_END_COOLDOWN;
   }
 }

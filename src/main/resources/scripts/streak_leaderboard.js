@@ -36,7 +36,7 @@ leaderboard.setMaxSize(3);
 scanStreaks();
 leaderboard.spawn();
 
-events.register("onStreakIncrease", StreakIncreaseEvent)
+events.register(StreakIncreaseEvent.class, onStreakIncrease);
 
 function onStreakIncrease(/* StreakIncreaseEvent */ event) {
     if (event.getCategory() != StreakCategory.ITEMS) {

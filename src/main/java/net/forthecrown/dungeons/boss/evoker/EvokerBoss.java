@@ -105,7 +105,7 @@ public class EvokerBoss extends KeyedBossImpl implements SingleEntityBoss {
 
   public EvokerBoss() {
     super("Emo",
-        new Location(Worlds.voidWorld(), -277.5, 37, 44.5),
+        new Location(Worlds.voidWorld(), -277.5 + 202, 37 - 48, 44.5 - 49),
         DungeonAreas.EVOKER_ROOM,
 
         SpawnTest.items(

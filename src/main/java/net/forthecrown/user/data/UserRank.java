@@ -53,6 +53,12 @@ public class UserRank implements ComponentLike {
    */
   private final boolean hidden;
 
+  /**
+   * Determines if this rank can be reloaded, aka, if the user ranks are
+   * reloaded, then this rank will be unregistered
+   */
+  private final boolean reloadable;
+
   /** This rank's menu node, lazily initialized */
   private MenuNode menuNode;
 
@@ -64,6 +70,7 @@ public class UserRank implements ComponentLike {
     this.description = builder.description.build();
     this.defaultTitle = builder.defaultTitle;
     this.hidden = builder.hidden;
+    this.reloadable = builder.reloadable;
 
     if (!Strings.isNullOrEmpty(genderEquivalentKey)) {
       Keys.ensureValid(genderEquivalentKey);
@@ -216,6 +223,8 @@ public class UserRank implements ComponentLike {
 
     private boolean defaultTitle = false;
     private boolean hidden = false;
+
+    private boolean reloadable = false;
 
     private ImmutableList.Builder<Component> description
         = ImmutableList.builder();

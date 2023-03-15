@@ -10,7 +10,10 @@ plugins {
 
 String minecraftVersion = "1.19.3"
 boolean devBuild = isDebugBuild()
+
 String nashornDependency = 'org.openjdk.nashorn:nashorn-core:15.4'
+String nbtDepend = "net.forthecrown:nbt:1.2.1"
+String paperNbtDepend = "net.forthecrown:paper-nbt:1.2.1"
 
 group = 'net.forthecrown'
 version = minecraftVersion + "-" + buildID()
@@ -89,9 +92,9 @@ dependencies {
     compileOnly 'org.tomlj:tomlj:1.1.0'
     compileOnly 'org.apache.commons:commons-text:1.10.0'
 
-    compileOnly 'net.forthecrown:PaperNBT:1.1.1'
-    compileOnly 'net.forthecrown:NBT:1.1.1'
-    testImplementation 'net.forthecrown:NBT:1.1.1'
+    compileOnly nbtDepend
+    testImplementation nbtDepend
+    compileOnly paperNbtDepend
 }
 
 void libJar(String s) {
@@ -114,7 +117,9 @@ processResources {
             buildID : buildID() + "",
             buildDate : new Date().toString(),
             debug_build : devBuild,
-            nashorn : nashornDependency
+            nashorn : nashornDependency,
+            paper_nbt: paperNbtDepend,
+            nbt: nbtDepend
     ]
 
     inputs.properties props

@@ -39,7 +39,7 @@ class TriggerNode extends InteractableNode<UsableTrigger> {
   protected void addCreateUsage(UsageFactory factory) {
     factory.usage("<name>")
         .addInfo("Creates a trigger from your currently selected WorldEdit")
-        .addInfo("selection");
+        .addInfo("selection (made with //wand, or with //pos1 and //pos2");
 
     factory.usage("<name> <pos1: x,y,z> <pos2: x,y,z>")
         .addInfo("Creates a trigger from the area between <pos1> and <pos2>");
@@ -133,6 +133,24 @@ class TriggerNode extends InteractableNode<UsableTrigger> {
                                   UsageHolderProvider<UsableTrigger> provider
   ) {
     command
+        .then(literal("set_area")
+            .executes(c -> {
+              UsableTrigger trigger = provider.get(c);
+              var newArea = Util.getSelectionSafe(c.getSource());
+
+              WorldBounds3i area = WorldBounds3i.of(newArea);
+              trigger.setBounds(area);
+
+              c.getSource().sendSuccess(
+                  Text.format("Redefined trigger {1} to area {2}",
+                      trigger.getName(),
+                      area
+                  )
+              );
+              return 0;
+            })
+        )
+
         .then(literal("type")
             .executes(c -> {
               var trigger = provider.get(c);

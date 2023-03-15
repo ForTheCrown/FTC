@@ -116,7 +116,7 @@ public class EntityInfo {
     return new EntityInfo(
         Vectors.read3d(tag.get(TAG_POSITION)),
         TagUtil.readKey(tag.get(TAG_TYPE)),
-        tag.get(TAG_DATA).asCompound()
+        tag.getCompound(TAG_DATA)
     );
   }
 

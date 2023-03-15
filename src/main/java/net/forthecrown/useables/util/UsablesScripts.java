@@ -1,7 +1,5 @@
 package net.forthecrown.useables.util;
 
-import static net.minecraft.nbt.Tag.TAG_STRING;
-
 import com.google.common.base.Strings;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -13,6 +11,7 @@ import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.nbt.TagTypes;
+import net.forthecrown.nbt.TypeIds;
 import net.forthecrown.useables.UsableBlock;
 import net.forthecrown.useables.UsableEntity;
 import net.forthecrown.useables.UsableScriptHolder;
@@ -93,7 +92,7 @@ public class UsablesScripts {
       BinaryTag tag,
       ScriptFactory<T> factory
   ) {
-    if (tag.getId() == TAG_STRING) {
+    if (tag.getId() == TypeIds.STRING) {
       return factory.newInstance(
           tag.toString(),
           ArrayUtils.EMPTY_STRING_ARRAY

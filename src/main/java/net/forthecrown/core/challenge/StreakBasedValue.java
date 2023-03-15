@@ -5,7 +5,24 @@ import net.forthecrown.utils.io.JsonWrapper;
 import org.spongepowered.math.GenericMath;
 
 /**
- * A container for a value that's generated based on a player's challenge completion streak.
+ * A container for a value that's generated based on a player's challenge
+ * completion streak.
+ * <p>
+ * There curretly exist 3 types of streak based values, they are as follows:
+ *
+ * <h3>Fixed</h3>
+ * Simple fixed values that always return the same value regardless of a
+ * player's streak.
+ *
+ * <h3>Scalar</h3>
+ * Returns a {@code baseValue} scaled by a {@code scalar} and the player's
+ * streak. The formula scalars use such:
+ * {@code result = baseValue * (Math.max(1, streak) * scalar)}
+ *
+ * <h3>Daph scalar</h3>
+ * Named after daphlipan. Modified version of scalar type values. Instead of the
+ * above shown formula for calculation, they use the following:
+ * {@code result = base * (1 + streak * 0.01)}
  */
 @FunctionalInterface
 public interface StreakBasedValue {

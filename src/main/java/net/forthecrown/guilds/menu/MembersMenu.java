@@ -1,5 +1,6 @@
 package net.forthecrown.guilds.menu;
 
+import static net.forthecrown.guilds.GuildRank.NOT_SET;
 import static net.forthecrown.guilds.menu.GuildMenus.GUILD;
 import static net.forthecrown.guilds.menu.GuildMenus.PAGE;
 
@@ -31,9 +32,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class MembersMenu extends ListPage<GuildMember> {
-
-  private static final Style MEMBER_INFO_STYLE = Style.style(NamedTextColor.WHITE)
-      .decoration(TextDecoration.ITALIC, false);
 
   public MembersMenu(MenuPage parent) {
     super(parent, PAGE);
@@ -89,6 +87,30 @@ public class MembersMenu extends ListPage<GuildMember> {
         "Exp available",
         Text.formatNumber(member.getExpAvailable())
     );
+
+    var guild = context.getOrThrow(GUILD);
+    var rankId = member.getRankId();
+    var rank = guild.getSettings().getRank(rankId);
+
+    if (rank.getMaxChunkClaims() != NOT_SET) {
+      writer.field(
+          "Max claimed chunks",
+          Text.format(
+              "{0, number}/{1, number}",
+              member.getClaimedChunks(), rank.getMaxChunkClaims()
+          )
+      );
+    }
+
+    if (rank.getTotalExpLevelUp() != NOT_SET) {
+      writer.field(
+          "Level up exp",
+          Text.format(
+              "{0, number}/{1, number}",
+              member.getTotalExpEarned(), rank.getTotalExpLevelUp()
+          )
+      );
+    }
 
     return builder
         .addLoreRaw(writer.getLore())

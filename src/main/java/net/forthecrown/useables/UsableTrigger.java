@@ -29,7 +29,7 @@ public class UsableTrigger extends Usable implements BoundsHolder {
    * The area of effect of this trigger
    */
   @Getter
-  private final WorldBounds3i bounds;
+  private WorldBounds3i bounds;
 
   /**
    * The trigger's type, specifies when the trigger is activated
@@ -37,6 +37,8 @@ public class UsableTrigger extends Usable implements BoundsHolder {
   @Getter
   @Setter
   private TriggerType type = TriggerType.ENTER;
+
+  TriggerManager manager;
 
   public UsableTrigger(String name, WorldBounds3i bounds) {
     this.name = name;
@@ -51,6 +53,21 @@ public class UsableTrigger extends Usable implements BoundsHolder {
 
     if (tag.contains(TAG_TYPE)) {
       this.type = TagUtil.readEnum(TriggerType.class, tag.get(TAG_TYPE));
+    }
+  }
+
+  public void setBounds(WorldBounds3i bounds) {
+    Objects.requireNonNull(bounds);
+
+    var manager = this.manager;
+    if (manager != null) {
+      manager.remove(this);
+    }
+
+    this.bounds = bounds;
+
+    if (manager != null) {
+      manager.add(this);
     }
   }
 

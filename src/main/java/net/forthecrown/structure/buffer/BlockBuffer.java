@@ -9,9 +9,6 @@ import org.bukkit.block.data.BlockData;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.math.vector.Vector3i;
 
-/**
- * Intermediary between
- */
 public interface BlockBuffer {
 
   default CompletableFuture<Void> place(World world) {
@@ -31,7 +28,7 @@ public interface BlockBuffer {
     return getBlock(pos.x(), pos.y(), pos.z());
   }
 
-  BufferBlock getBlock(int x, int y, int z);
+  @Nullable BufferBlock getBlock(int x, int y, int z);
 
   default void setBlock(Vector3i pos, BlockData data, CompoundTag tag) {
     setBlock(pos.x(), pos.y(), pos.z(), data, tag);
@@ -45,7 +42,7 @@ public interface BlockBuffer {
     setBlock(pos.x(), pos.y(), pos.z(), block);
   }
 
-  void setBlock(int x, int y, int z, BufferBlock block);
+  void setBlock(int x, int y, int z, @Nullable BufferBlock block);
 
   @Nullable Bounds3i getBounds();
 

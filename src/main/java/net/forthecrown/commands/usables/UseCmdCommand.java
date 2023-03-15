@@ -26,6 +26,7 @@ import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.useables.command.CommandUsable;
 import net.forthecrown.useables.command.Kit;
 import net.forthecrown.useables.command.Warp;
+import net.forthecrown.useables.test.TestPermission;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.TextJoiner;
@@ -73,6 +74,7 @@ public abstract class UseCmdCommand<T extends CommandUsable> extends FtcCommand 
         .addInfo("Uses a <%s>", getName());
 
     prefixed = prefixed.withPermission(adminPermission);
+
     prefixed.usage("<user>")
         .addInfo("Makes a <user> use a <%s>", getName());
 
@@ -380,12 +382,17 @@ public abstract class UseCmdCommand<T extends CommandUsable> extends FtcCommand 
 
   private static class WarpCommand extends UseCmdCommand<Warp> {
 
-    static final Argument<Position> position = Argument.of("pos", PositionArgument.position());
-    static final Argument<Float> yaw = Argument.of("yaw", FloatArgumentType.floatArg(-180, 180),
-        0f);
-    static final Argument<Float> pitch = Argument.of("pitch", FloatArgumentType.floatArg(-90, 90),
-        0f);
-    static final Argument<World> world = Argument.of("world", WorldArgument.world());
+    static final Argument<Position> position
+        = Argument.of("pos", PositionArgument.position());
+
+    static final Argument<Float> yaw
+        = Argument.of("yaw", FloatArgumentType.floatArg(-180, 180), 0f);
+
+    static final Argument<Float> pitch
+        = Argument.of("pitch", FloatArgumentType.floatArg(-90, 90), 0f);
+
+    static final Argument<World> world
+        = Argument.of("world", WorldArgument.world());
 
     static final ArgsArgument args = ArgsArgument.builder()
         .addOptional(position)
@@ -467,7 +474,12 @@ public abstract class UseCmdCommand<T extends CommandUsable> extends FtcCommand 
     @Override
     protected Warp create(Player player, String name, CommandContext<CommandSource> context)
         throws CommandSyntaxException {
-      return new Warp(name, player.getLocation());
+      Warp warp = new Warp(name, player.getLocation());
+
+      Permission p = Permissions.register("ftc.warps." + name);
+      warp.getChecks().add(new TestPermission(p.getName()));
+
+      return warp;
     }
   }
 }

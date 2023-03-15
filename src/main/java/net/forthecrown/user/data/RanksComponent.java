@@ -4,7 +4,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import java.time.OffsetDateTime;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import lombok.Getter;
@@ -92,11 +94,12 @@ public class RanksComponent extends UserComponent {
       return true;
     }
 
-    if (title.getGenderEquivalent() == null) {
+    var genderEquivalent = title.getGenderEquivalent();
+    if (genderEquivalent == null) {
       return false;
     }
 
-    return available.contains(title.getGenderEquivalent());
+    return available.contains(genderEquivalent);
   }
 
   /**
@@ -173,6 +176,8 @@ public class RanksComponent extends UserComponent {
     if (title.getGenderEquivalent() != null) {
       available.remove(title.getGenderEquivalent());
     }
+
+    recalculateLoginEffect();
   }
 
   /**
@@ -210,15 +215,19 @@ public class RanksComponent extends UserComponent {
       setTitle(UserRanks.DEFAULT);
     }
 
-    var cosmetics = user.getCosmeticData();
-    var login = cosmetics.get(Cosmetics.LOGIN);
-
-    if (login != null && login.getTier().ordinal() > to.ordinal()) {
-      cosmetics.set(Cosmetics.LOGIN, null);
-    }
+    recalculateLoginEffect();
 
     var homes = user.getHomes();
     homes.removeOverMax();
+  }
+
+  private void recalculateLoginEffect() {
+    var cosmetics = user.getCosmeticData();
+    var login = cosmetics.get(Cosmetics.LOGIN);
+
+    if (login != null && !login.getHasUnlocked().test(user)) {
+      cosmetics.set(Cosmetics.LOGIN, null);
+    }
   }
 
   /**
@@ -308,6 +317,21 @@ public class RanksComponent extends UserComponent {
    */
   public void ensureSynced() throws UserOfflineException {
     user.ensureOnline();
+
+    user.getDiscordMember().ifPresent(member -> {
+      OffsetDateTime boostStart = member.getTimeBoosted();
+      Optional<UserRank> boostTitle = UserRanks.REGISTRY.get("booster");
+
+      if (boostTitle.isEmpty()) {
+        return;
+      }
+
+      if (boostStart == null) {
+        removeTitle(boostTitle.get());
+      } else {
+        addTitle(boostTitle.get());
+      }
+    });
 
     var values = RankTier.values();
     ArrayUtils.reverse(values);

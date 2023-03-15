@@ -176,7 +176,7 @@ public enum UnlockableSetting implements Unlockable {
           .setRunnable((user, context, click) -> {
             onClick(user, click, context, () -> {
               // Actual toggling of setting
-              var guild = context.get(GUILD);
+              var guild = context.getOrThrow(GUILD);
 
               boolean toggle = !guild.getSettings().isPublic();
               guild.getSettings().setPublic(toggle);

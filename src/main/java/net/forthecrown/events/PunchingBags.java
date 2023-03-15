@@ -21,6 +21,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitTask;
@@ -28,7 +29,8 @@ import org.spigotmc.SpigotConfig;
 
 public class PunchingBags implements Listener {
 
-  private static final Map<UUID, PunchingBagInstance> PUNCHING_BAGS = new HashMap<>();
+  private static final Map<UUID, PunchingBagInstance> punchingBags
+      = new HashMap<>();
 
   public static boolean isPunchingBag(Entity entity) {
     if (entity.getScoreboardTags().contains(DungeonUtils.PUNCHING_BAG_TAG)) {
@@ -47,7 +49,14 @@ public class PunchingBags implements Listener {
     }
 
     LivingEntity dummy = (LivingEntity) event.getEntity();
-    PunchingBagInstance punchingBag = PUNCHING_BAGS.computeIfAbsent(
+
+    if (event.getCause() == DamageCause.VOID
+        || event.getFinalDamage() >= dummy.getHealth(
+    )) {
+      return;
+    }
+
+    PunchingBagInstance punchingBag = punchingBags.computeIfAbsent(
         dummy.getUniqueId(),
         uuid -> new PunchingBagInstance()
     );

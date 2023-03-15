@@ -34,7 +34,7 @@ updateFromUserMap();
 leaderboard.spawn();
 
 // Listen to vote events to know when to update map
-events.register("onVote", PlayerPostVoteEvent, EventPriority.MONITOR);
+events.register(PlayerPostVoteEvent.class, onVote, EventPriority.MONITOR);
 
 // Update leaderboard values by copying values from vote map
 function updateFromUserMap() {

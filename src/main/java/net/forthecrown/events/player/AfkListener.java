@@ -33,7 +33,7 @@ public class AfkListener implements Listener {
 
   @EventHandler(ignoreCancelled = true)
   public void onPlayerMove(PlayerMoveEvent event) {
-    if (!event.hasChangedBlock()) {
+    if (!event.hasChangedOrientation()) {
       return;
     }
 

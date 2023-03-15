@@ -1,5 +1,8 @@
 package net.forthecrown.user;
 
+import static net.forthecrown.utils.io.FtcJar.ALLOW_OVERWRITE;
+import static net.forthecrown.utils.io.FtcJar.OVERWRITE_IF_NEWER;
+
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.io.IOException;
@@ -109,8 +112,6 @@ public final class UserManager implements SerializableObject {
     playTime  = createMap("playtime.json", null);
     votes     = createMap("votes.json", null);
     gems      = createMap("gems.json", null);
-
-    readExtraRanks();
   }
 
   private UUID2IntMap createMap(String file, @Nullable IntSupplier supplier) {
@@ -123,42 +124,6 @@ public final class UserManager implements SerializableObject {
 
     return new UUID2IntMap(path, supplier)
         .setValidator(KeyValidator.IS_USER);
-  }
-
-  private void readExtraRanks() {
-    Path rankJson = directory.resolve("ranks.toml");
-
-    try {
-      FtcJar.saveResources("ranks.toml", rankJson);
-    } catch (IOException exc) {
-      LOGGER.error("Couldn't save {} defaults!", rankJson, exc);
-    }
-
-    SerializationHelper.readTomlAsJson(rankJson, wrapper -> {
-      for (var e : wrapper.entrySet()) {
-        if (!Keys.isValidKey(e.getKey())) {
-          LOGGER.warn("{} is an invalid registry key", e.getKey());
-          continue;
-        }
-
-        if (!(e.getValue().isJsonObject())) {
-          LOGGER.warn("Expected {} to be JSON object, was {}",
-              e.getKey(), e.getValue()
-          );
-          continue;
-        }
-
-        // IDK if it matters, but even though there's an init call in
-        // Bootstrap, this is at the moment, the first call to this class
-        // during startup, meaning this call loads the class
-        UserRanks.deserialize(e.getValue())
-            .resultOrPartial(s -> {
-              LOGGER.warn("Couldn't parse rank at {}: {}", e.getKey(), s);
-            })
-
-            .ifPresent(rank -> UserRanks.REGISTRY.register(e.getKey(), rank));
-      }
-    });
   }
 
   public static UserManager get() {
@@ -209,6 +174,49 @@ public final class UserManager implements SerializableObject {
     loadMaps();
 
     reloadUsers();
+  }
+
+  @OnLoad
+  public void loadRanks() {
+    Path rankJson = directory.resolve("ranks.toml");
+
+    UserRanks.REGISTRY.removeIf(holder -> holder.getValue().isReloadable());
+
+    try {
+      FtcJar.saveResources(
+          "ranks.toml",
+          rankJson,
+          ALLOW_OVERWRITE | OVERWRITE_IF_NEWER
+      );
+    } catch (IOException exc) {
+      LOGGER.error("Couldn't save {} defaults!", rankJson, exc);
+    }
+
+    SerializationHelper.readTomlAsJson(rankJson, wrapper -> {
+      for (var e : wrapper.entrySet()) {
+        if (!Keys.isValidKey(e.getKey())) {
+          LOGGER.warn("{} is an invalid registry key", e.getKey());
+          continue;
+        }
+
+        if (!(e.getValue().isJsonObject())) {
+          LOGGER.warn("Expected {} to be JSON object, was {}",
+              e.getKey(), e.getValue()
+          );
+          continue;
+        }
+
+        // IDK if it matters, but even though there's an init call in
+        // Bootstrap, this is at the moment, the first call to this class
+        // during startup, meaning this call loads the class
+        UserRanks.deserialize(e.getValue())
+            .resultOrPartial(s -> {
+              LOGGER.warn("Couldn't parse rank at {}: {}", e.getKey(), s);
+            })
+
+            .ifPresent(rank -> UserRanks.REGISTRY.register(e.getKey(), rank));
+      }
+    });
   }
 
   @OnDisable

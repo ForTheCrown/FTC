@@ -76,6 +76,8 @@ public class TriggerManager {
     triggers.put(trigger.getName(), trigger);
     worldMap.add(trigger.getBounds().getWorld(), trigger);
 
+    trigger.manager = this;
+
     return true;
   }
 
@@ -111,6 +113,8 @@ public class TriggerManager {
     }
 
     worldMap.remove(trigger.getBounds().getWorld(), trigger);
+    trigger.manager = null;
+
     return true;
   }
 

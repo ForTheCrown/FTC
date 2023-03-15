@@ -66,7 +66,7 @@ public final class ItemStacks {
    */
   public static final String TAG_DATA_VERSION = "dataVersion";
 
-  /* ----------------------------- TAGS ------------------------------ */
+  /* ------------------------------- TAGS --------------------------------- */
 
   /**
    * Sets the item's unhandled tags
@@ -204,7 +204,7 @@ public final class ItemStacks {
     return load(Snbt.parseCompound(nbt));
   }
 
-  /* ----------------------------- UTILITY ------------------------------ */
+  /* ------------------------------ UTILITY ------------------------------- */
 
   /**
    * Tests if the item is 'empty'
@@ -234,7 +234,7 @@ public final class ItemStacks {
     return !isEmpty(stack);
   }
 
-  /* ----------------------------- INVENTORY ITERATION ------------------------------ */
+  /* ------------------------ INVENTORY ITERATION ------------------------- */
 
   /**
    * Runs a consumer on each non-empty item in the given inventory. What 'non-empty' means is

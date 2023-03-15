@@ -25,11 +25,7 @@ record LoadedScript(MonthDayPeriod period, Script script, String[] args) {
   }
 
   public void _load() {
-    script.compile();
-
-    if (args != null) {
-      script.put("inputs", args);
-    }
+    script.compile(args);
 
     if (script.eval().error().isEmpty()) {
       LOGGER.debug("Activated script {}", script);

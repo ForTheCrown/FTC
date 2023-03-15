@@ -34,7 +34,9 @@ public class DateRange implements Iterable<LocalDate> {
   }
 
   public static DateRange between(ChronoLocalDate d1, ChronoLocalDate d2) {
-    return new DateRange(d1.toEpochDay(), d2.toEpochDay());
+    return d1.compareTo(d2) == 0
+        ? exact(d1)
+        : new DateRange(d1.toEpochDay(), d2.toEpochDay());
   }
 
   public static DateRange exact(ChronoLocalDate d) {

@@ -1,7 +1,6 @@
 package net.forthecrown.commands.guild;
 
 import static net.forthecrown.guilds.GuildRank.ID_LEADER;
-import static net.forthecrown.guilds.GuildRank.ID_MEMBER;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -12,7 +11,6 @@ import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.guilds.GuildPermission;
-import net.forthecrown.guilds.GuildRank;
 
 class GuildChangeRankNode extends GuildCommandNode {
 
@@ -57,41 +55,33 @@ class GuildChangeRankNode extends GuildCommandNode {
     }
 
     if (member.getRankId() == ID_LEADER) {
-      throw promotes ? Exceptions.PROMOTE_LEADER : Exceptions.DEMOTE_LEADER;
+      throw promotes
+          ? Exceptions.PROMOTE_LEADER
+          : Exceptions.DEMOTE_LEADER;
     }
 
     if (self) {
-      throw promotes ? Exceptions.PROMOTE_SELF : Exceptions.DEMOTE_SELF;
+      throw promotes
+          ? Exceptions.PROMOTE_SELF
+          : Exceptions.DEMOTE_SELF;
     }
 
-    int nextId = member.getRankId();
-    GuildRank rank = null;
+    var opt = promotes ? member.promote() : member.demote();
 
-    // While the Next rank's ID is in the valid bounds, shift
-    // the ID either up or down, depending on if we're promoting
-    // or demoting
-    while ((nextId += (promotes ? 1 : -1)) >= ID_MEMBER
-        && nextId < ID_LEADER
-    ) {
-      if (guild.getSettings().hasRank(nextId)) {
-        rank = guild.getSettings().getRank(nextId);
-        break;
-      }
+    if (opt.isPresent()) {
+      throw opt.get();
     }
 
-    if (rank == null) {
-      throw promotes ? Exceptions.cannotPromote(user) : Exceptions.cannotDemote(user);
-    }
-
-    member.setRankId(rank.getId());
-
-    if (!guild.isMember(user.getUniqueId())) {
-      sender.sendMessage(Messages.changedRank(promotes, user, rank, guild));
-    }
+    var rankId = member.getRankId();
+    var rank = guild.getSettings().getRank(rankId);
 
     guild.announce(
         Messages.rankChangeAnnouncement(promotes, sender, user, rank)
     );
+
+    if (!guild.isMember(user.getUniqueId())) {
+      sender.sendMessage(Messages.changedRank(promotes, user, rank, guild));
+    }
 
     return 0;
   }

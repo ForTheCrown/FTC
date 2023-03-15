@@ -3,6 +3,7 @@ package net.forthecrown.user;
 import static net.forthecrown.core.Messages.TELEPORT_CANCELLED;
 import static net.forthecrown.core.Messages.TELEPORT_ERROR;
 
+import io.papermc.paper.entity.TeleportFlag.EntityState;
 import java.util.Objects;
 import java.util.function.Supplier;
 import lombok.Getter;
@@ -189,7 +190,7 @@ public class UserTeleport {
       } else {
         // Ignore passengers and dismount the player if they're riding
         // another entity
-        player.teleport(dest, true, true);
+        player.teleport(dest, EntityState.RETAIN_PASSENGERS);
       }
       user.playSound(Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
 

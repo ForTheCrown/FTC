@@ -1,6 +1,7 @@
 package net.forthecrown.useables;
 
 import java.util.Optional;
+import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -18,5 +19,21 @@ public interface UsageTypeHolder {
     }
 
     return Optional.of((T) this);
+  }
+
+  default World getWorld() {
+    if (is(UsableBlock.class)) {
+      return as(UsableBlock.class).orElseThrow().getWorld();
+    }
+
+    if (is(UsableEntity.class)) {
+      return as(UsableEntity.class).orElseThrow().getEntity().getWorld();
+    }
+
+    if (is(UsableTrigger.class)) {
+      return as((UsableTrigger.class)).orElseThrow().getBounds().getWorld();
+    }
+
+    return null;
   }
 }

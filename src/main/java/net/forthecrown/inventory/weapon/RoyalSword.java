@@ -331,7 +331,7 @@ public class RoyalSword extends ExtendedItem {
           .iterator()
           .next();
 
-      writer.formattedLine("Goal: {0}/{1} {2}",
+      writer.formattedLine("Goal: {0, number}/{1, number} {2}",
           NamedTextColor.AQUA,
 
           progress.getOrDefault(goal.getName(), 0),
@@ -375,6 +375,7 @@ public class RoyalSword extends ExtendedItem {
           .ifPresentOrElse(type -> {
             CompoundTag abilityTag = tag.getCompound(TAG_ABILITY);
             setAbility(type.load(abilityTag));
+            LOGGER.debug("Loaded ability");
           }, () -> {
             LOGGER.warn("Unknown ability type {} found in {}'s sword",
                 tag.get(TAG_ABILITY_TYPE), getOwner()
@@ -388,6 +389,8 @@ public class RoyalSword extends ExtendedItem {
       usesTag.keySet().forEach(s -> {
         abilityUses.put(s, usesTag.getInt(s));
       });
+
+      LOGGER.debug("Loaded total uses");
     }
 
     if (!tag.contains(TAG_RANK)) {
@@ -447,20 +450,21 @@ public class RoyalSword extends ExtendedItem {
     }
 
     if (ability != null) {
-      SwordAbilityManager.getInstance()
-          .getRegistry()
-          .writeTag(ability.getType())
-
-          .ifPresentOrElse(keyTag -> {
+      ability.getType()
+          .getHolder()
+          .ifPresentOrElse(holder -> {
             CompoundTag abilityTag = BinaryTags.compoundTag();
             ability.save(abilityTag);
 
             tag.put(TAG_ABILITY, abilityTag);
-            tag.put(TAG_ABILITY_TYPE, keyTag);
+            tag.putString(TAG_ABILITY_TYPE, holder.getKey());
           }, () -> {
             LOGGER.warn(
-                "Unregistered weapon ability found in {} sword",
-                getOwner()
+                "Unregistered weapon ability found in {} sword, "
+                    + "displayName='{}'",
+
+                getOwnerUser(),
+                Text.plain(ability.getType().getDisplayName())
             );
           });
     }

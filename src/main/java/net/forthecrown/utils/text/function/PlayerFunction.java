@@ -1,6 +1,7 @@
 package net.forthecrown.utils.text.function;
 
 import static net.forthecrown.utils.text.ChatParser.FLAG_PLAYER_TAGGING;
+import static net.kyori.adventure.text.Component.text;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.regex.MatchResult;
@@ -10,6 +11,7 @@ import net.forthecrown.user.UserManager;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.text.TextFunction;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.Nullable;
 
 public class PlayerFunction extends TextFunction {
@@ -35,6 +37,12 @@ public class PlayerFunction extends TextFunction {
     Component displayName = user.displayName();
     user.unloadIfOffline();
 
-    return displayName;
+    return text()
+        .append(text("@"))
+        .append(displayName)
+        .hoverEvent(displayName.hoverEvent())
+        .clickEvent(displayName.clickEvent())
+        .color(NamedTextColor.AQUA)
+        .build();
   }
 }

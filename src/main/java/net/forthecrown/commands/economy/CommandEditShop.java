@@ -23,6 +23,7 @@ import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.text.Text;
+import net.forthecrown.utils.text.writer.TextWriters;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
@@ -126,6 +127,10 @@ public class CommandEditShop extends FtcCommand {
     factory.usage("transfer <player>")
         .addInfo("Transfers the shop you're looking at to another <player>");
 
+    factory.usage("info")
+        .addInfo("Displays info about the shop you're looking at")
+        .setPermission(Permissions.ADMIN);
+
     var data = factory.withPermission(Permissions.ADMIN)
         .withPrefix("data");
 
@@ -142,6 +147,35 @@ public class CommandEditShop extends FtcCommand {
 
         .then(DataCommands.dataAccess("Shop", dataAccess)
             .requires(source -> source.hasPermission(Permissions.ADMIN))
+        )
+
+        .then(literal("info")
+            .requires(source -> source.hasPermission(Permissions.ADMIN))
+
+            .executes(c -> {
+              Player player = c.getSource().asPlayer();
+              var shop = getShop(player);
+
+              var writer = TextWriters.newWriter();
+              writer.setFieldStyle(Style.style(NamedTextColor.GRAY));
+
+              writer.field("Type", shop.getType().name().toLowerCase());
+
+              writer.field(
+                  "Price",
+                  Text.format("{0, rhines}", shop.getPrice())
+              );
+
+              if (shop.getOwner() != null) {
+                writer.field(
+                    "Owner",
+                    Text.format("{0, user}", shop.getOwner())
+                );
+              }
+
+              player.sendMessage(writer.asComponent());
+              return 0;
+            })
         )
 
         .then(literal("buy").executes(c -> setType(c, false)))

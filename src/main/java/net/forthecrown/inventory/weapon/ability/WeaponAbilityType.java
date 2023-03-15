@@ -10,12 +10,14 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import java.util.Objects;
 import java.util.Optional;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.forthecrown.core.InventoryStorage;
 import net.forthecrown.core.logging.Loggers;
+import net.forthecrown.core.registry.Holder;
 import net.forthecrown.core.script2.Script;
 import net.forthecrown.core.script2.ScriptSource;
 import net.forthecrown.inventory.ExtendedItems;
@@ -63,6 +65,9 @@ public class WeaponAbilityType {
 
   private final IntList levelRequirements;
 
+  @Setter(AccessLevel.PACKAGE)
+  private Holder<WeaponAbilityType> holder;
+
   public WeaponAbilityType(Builder builder) {
     this.recipe = builder.items.build();
     this.item = builder.item;
@@ -89,6 +94,10 @@ public class WeaponAbilityType {
 
   public static Builder builder() {
     return new Builder();
+  }
+
+  public Optional<Holder<WeaponAbilityType>> getHolder() {
+    return Optional.ofNullable(holder);
   }
 
   public Optional<String> enterTrialArea(User user) {
@@ -275,33 +284,6 @@ public class WeaponAbilityType {
     return advancementKey == null
         ? null
         : Bukkit.getAdvancement(advancementKey);
-  }
-
-  /* ------------------------- OBJECT OVERRIDES --------------------------- */
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof WeaponAbilityType that)) {
-      return false;
-    }
-
-    return getMaxLevel() == that.getMaxLevel()
-        && getRecipe().equals(that.getRecipe())
-        && getItem().equals(that.getItem())
-        && Objects.equals(getAdvancementKey(), that.getAdvancementKey());
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(
-        getRecipe(),
-        getItem(),
-        getMaxLevel(),
-        getAdvancementKey()
-    );
   }
 
   /* ------------------------------ BUILDER ------------------------------- */

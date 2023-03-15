@@ -19,7 +19,7 @@ public final class Worlds {
 
   // World names
   public static final String
-      VOID_NAME = "world_void",
+      VOID_NAME = "void",
       RESOURCE_NAME = "world_resource";
 
   // World keys

@@ -172,6 +172,11 @@ public class Guild
     // Forward message to discord
     getDiscord().forwardGuildChat(user, message);
 
+    GuildMember senderMember = getMember(user.getUniqueId());
+    GuildRank senderRank = senderMember == null || senderMember.hasLeft()
+        ? null
+        : getSettings().getRank(senderMember.getRankId());
+
     Mute finalMute = mute;
     getMembers()
         .values()
@@ -193,14 +198,14 @@ public class Guild
 
         .forEach(member -> {
           var viewer = member.getUser();
-          boolean showRank = viewer.get(Properties.GUILD_RANKED_TAGS);
-          var rank = getSettings().getRank(member.getRankId());
+          boolean showRank = viewer.get(Properties.GUILD_RANKED_TAGS)
+              && senderRank != null;
 
           Component displayName = Users.createListName(
               user,
               text()
                   .append(showRank ?
-                      rank.getFormattedName().append(space())
+                      senderRank.getFormattedName().append(space())
                       : Component.empty()
                   )
                   .append(user.getTabName())

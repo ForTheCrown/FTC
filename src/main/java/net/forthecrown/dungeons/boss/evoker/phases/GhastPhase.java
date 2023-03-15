@@ -19,8 +19,8 @@ public class GhastPhase implements AttackPhase {
   public static final byte EXPLOSION_POWER = 3;
 
   public static final double[][] SPAWNS = {
-      {-277.5, 37, 38.5},
-      {-277.5, 37, 50.5}
+      {-277.5 + 202, 37 - 48, 38.5 - 49},
+      {-277.5 + 202, 37 - 48, 50.5 - 49}
   };
 
   static final List<Ghast> SPAWNED = new LinkedList<>();

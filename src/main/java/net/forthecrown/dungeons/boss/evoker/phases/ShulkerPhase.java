@@ -26,10 +26,10 @@ public class ShulkerPhase implements AttackPhase {
       STATUS_TRAITOR = 1;
 
   public static final int[][] SPAWNS = {
-      {-286, 34, 36},
-      {-286, 34, 52},
-      {-270, 34, 52},
-      {-270, 34, 36}
+      {-286 + 202, 34 - 48, 36 - 49},
+      {-286 + 202, 34 - 48, 52 - 49},
+      {-270 + 202, 34 - 48, 52 - 49},
+      {-270 + 202, 34 - 48, 36 - 49}
   };
 
   public static final BossMessage

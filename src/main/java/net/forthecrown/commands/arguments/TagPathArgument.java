@@ -3,6 +3,7 @@ package net.forthecrown.commands.arguments;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.io.IOException;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.nbt.path.PathParseException;
@@ -26,7 +27,9 @@ public class TagPathArgument
       exc.setPosition(0);
       exc.setContext(null);
 
-      if (exc.getCause() != null) {
+      if (exc.getCause() != null
+          && !(exc.getCause() instanceof IOException)
+      ) {
         Loggers.getLogger().error("Error running path parse", exc.getCause());
       }
 

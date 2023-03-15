@@ -31,7 +31,7 @@ import org.spongepowered.math.vector.Vector3d;
 
 public class HideySpideyBoss extends SimpleBoss {
 
-  public static Vector3d SPAWN_VEC = Vector3d.from(-78.5, 55, 284.5);
+  public static Vector3d SPAWN_VEC = Vector3d.from(-78.5 + 202, 55 - 48, 284.5 - 49);
 
   public HideySpideyBoss() {
     super("Hidey Spidey",
@@ -74,8 +74,8 @@ public class HideySpideyBoss extends SimpleBoss {
             },
             200, 10,
             new double[][]{
-                {-68.5, 57, 284.5},
-                {-88.5, 57, 284.5}
+                {-68.5 + 202, 57 - 48, 284.5 - 49},
+                {-88.5 + 202, 57 - 48, 284.5 - 49}
             }
         )
     );

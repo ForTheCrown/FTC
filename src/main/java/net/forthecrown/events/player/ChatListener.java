@@ -98,7 +98,10 @@ public class ChatListener implements Listener {
     // If staff chat toggle is enabled for this player
     // then don't send message to chat, just to staff
     if (StaffChat.toggledPlayers.contains(player.getUniqueId())) {
-      StaffChat.send(user.getCommandSource(null), event.message(), false);
+      StaffChat.newMessage()
+          .setSource(user.getCommandSource(null))
+          .setMessage(event.message())
+          .send();
 
       event.setCancelled(true);
       return;

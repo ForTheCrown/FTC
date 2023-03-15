@@ -23,12 +23,14 @@ import net.forthecrown.events.player.LoginListener;
 import net.forthecrown.events.player.MarriageListener;
 import net.forthecrown.events.player.MotdListener;
 import net.forthecrown.events.player.PlayerDeathListener;
+import net.forthecrown.events.player.PlayerDiscordBoostListener;
 import net.forthecrown.events.player.PlayerJoinListener;
 import net.forthecrown.events.player.PlayerLeaveListener;
 import net.forthecrown.events.player.PlayerPacketListener;
 import net.forthecrown.events.player.PlayerTeleportListener;
 import net.forthecrown.events.player.WeaponListener;
 import net.forthecrown.user.packet.PacketListeners;
+import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.Util;
 import net.kyori.adventure.audience.Audience;
 import org.bukkit.Bukkit;
@@ -110,6 +112,21 @@ public final class Events {
     var api = DiscordSRV.api;
     api.subscribe(new GuildDiscordListener());
     api.subscribe(new AnnouncementForwardingListener());
+    api.subscribe(new DiscordStaffChatListener());
+
+    Tasks.runLater(() -> {
+      var jda = DiscordSRV.getPlugin().getJda();
+
+      if (jda == null) {
+        Loggers.getLogger()
+            .warn("No JDA found, cannot register boost listeners");
+
+        return;
+      }
+
+      jda.addEventListener(new PlayerDiscordBoostListener());
+      Loggers.getLogger().info("Registered boost listener");
+    }, 40);
   }
 
   /**

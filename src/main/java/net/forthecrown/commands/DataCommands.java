@@ -213,7 +213,7 @@ public class DataCommands extends CmdUtil {
                   if (removed <= 0) {
                     throw Exceptions.format(
                         "Nothing to remove at path '{0}'",
-                        path
+                        path.getInput()
                     );
                   }
 

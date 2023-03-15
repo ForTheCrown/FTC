@@ -74,8 +74,10 @@ public class SwordAbilityManager {
     registry.setListener(new RegistryListener<>() {
       @Override
       public void onRegister(Holder<WeaponAbilityType> value) {
-        var trialArea = value.getValue().getTrialArea();
+        var type = value.getValue();
+        type.setHolder(value);
 
+        var trialArea = type.getTrialArea();
         if (trialArea != null) {
           trialArea.start();
         }
@@ -83,8 +85,10 @@ public class SwordAbilityManager {
 
       @Override
       public void onUnregister(Holder<WeaponAbilityType> value) {
-        var trialArea = value.getValue().getTrialArea();
+        var type = value.getValue();
+        type.setHolder(null);
 
+        var trialArea = type.getTrialArea();
         if (trialArea != null) {
           trialArea.close();
         }

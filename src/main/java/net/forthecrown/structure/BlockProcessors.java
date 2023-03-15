@@ -35,6 +35,10 @@ public @UtilityClass class BlockProcessors {
 
   /* ----------------------------- FACTORIES ------------------------------ */
 
+  public static BlockRotProcessor rot(float integrity, Random random) {
+    return rot(IntegrityProvider.fixed(integrity), random);
+  }
+
   public static BlockRotProcessor rot(IntegrityProvider provider,
                                       Random random
   ) {

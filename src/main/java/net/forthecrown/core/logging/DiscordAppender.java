@@ -1,22 +1,20 @@
 package net.forthecrown.core.logging;
 
 import static github.scarsz.discordsrv.dependencies.jda.api.entities.Message.MAX_CONTENT_LENGTH;
+import static net.forthecrown.core.FtcDiscord.findChannel;
 
-import github.scarsz.discordsrv.DiscordSRV;
-import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import github.scarsz.discordsrv.util.DiscordUtil;
 import io.papermc.paper.util.StacktraceDeobfuscator;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.util.Optional;
 import lombok.Getter;
 import net.forthecrown.core.FtcDiscord;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
 import org.jetbrains.annotations.NotNull;
 
-public class DiscordAppender extends AbstractAppender {
+class DiscordAppender extends AbstractAppender {
   static final String APPENDER_NAME = DiscordAppender.class.getSimpleName();
 
   static final String BLOCK_PREFIX = "\n```\n";
@@ -87,14 +85,6 @@ public class DiscordAppender extends AbstractAppender {
     if (t.getCause() != null) {
       printStackTrace(t.getCause(), out);
     }
-  }
-
-  private static Optional<TextChannel> findChannel(String name) {
-    // I will never get over that function's name
-    return Optional.ofNullable(
-        DiscordSRV.getPlugin()
-            .getDestinationTextChannelForGameChannelName(name)
-    );
   }
 
   private static class MessagePrint extends PrintWriter {

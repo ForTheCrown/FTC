@@ -8,7 +8,6 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.guilds.Guild;
 import net.forthecrown.guilds.GuildMember;
 import net.forthecrown.guilds.GuildPermission;
-import net.forthecrown.guilds.GuildRank;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.ThrowingRunnable;
 import net.forthecrown.utils.context.Context;
@@ -30,21 +29,23 @@ public interface Unlockable {
   }
 
   default boolean testPermission(Guild guild, User user) {
-    var member = guild.getMember(user.getUniqueId());
-
-    if (member != null) {
-      GuildRank rank = guild.getSettings().getRank(member.getRankId());
-
-      if (!rank.hasPermission(getPerm())) {
-        return false;
-      }
+    if (user.hasPermission(Permissions.GUILD_ADMIN)) {
+      return true;
     }
 
-    return user.hasPermission(Permissions.GUILD_ADMIN);
+    var member = guild.getMember(user.getUniqueId());
+
+    if (member == null || member.hasLeft()) {
+      return false;
+    }
+
+    var rank = guild.getSettings().getRank(member.getRankId());
+    return rank.hasPermission(getPerm());
   }
 
   default void ensureHasPermission(Guild guild, User user)
-      throws CommandSyntaxException {
+      throws CommandSyntaxException
+  {
     if (testPermission(guild, user)) {
       return;
     }

@@ -3,12 +3,11 @@ package net.forthecrown.core.script2;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.List;
 import java.util.Objects;
-import jdk.dynalink.beans.StaticClass;
+import java.util.function.Consumer;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.core.FTC;
 import net.forthecrown.core.logging.Loggers;
-import net.forthecrown.utils.Util;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Cancellable;
@@ -19,8 +18,6 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.EventExecutor;
 import org.jetbrains.annotations.NotNull;
-import org.openjdk.nashorn.api.scripting.ScriptObjectMirror;
-import org.openjdk.nashorn.internal.runtime.Context;
 
 @Getter
 @RequiredArgsConstructor
@@ -32,174 +29,99 @@ public class ScriptEvents {
 
   /* ---------------------------- REGISTRATION ---------------------------- */
 
-  public void register(String function,
-                       Object eventClass
+  public <E extends Event> void register(Class<E> eventClass,
+                                         Consumer<E> mirror
   ) {
-    register(function, eventClass, EventPriority.NORMAL);
+     register(eventClass, mirror, true, EventPriority.NORMAL);
   }
 
-  public void register(String function,
-                       Object eventClass,
-                       EventPriority priority
+  public <E extends Event> void register(Class<E> eventClass,
+                                         Consumer<E> mirror,
+                                         EventPriority priority
   ) {
-    register(function, eventClass, priority, false);
+    register(eventClass, mirror, true, priority);
   }
 
-  public void register(String function,
-                       Object eventClass,
-                       EventPriority priority,
-                       boolean ignoreCancelled
+  public <E extends Event> void register(Class<E> eventClass,
+                                         Consumer<E> mirror,
+                                         boolean ignoreCancelled
   ) {
-    register(null, function, eventClass, priority, ignoreCancelled);
+    register(eventClass, mirror, ignoreCancelled, EventPriority.NORMAL);
   }
 
-  public void register(Object listener,
-                       String function,
-                       Object eventClass
+  public <E extends Event> void register(Class<E> eventClass,
+                                         Consumer<E> mirror,
+                                         boolean ignoreCancelled,
+                                         EventPriority priority
   ) {
-    register(listener, function, eventClass, EventPriority.NORMAL);
-  }
+    Objects.requireNonNull(eventClass, "Null event class");
+    Objects.requireNonNull(mirror, "Null function");
+    Objects.requireNonNull(priority, "Null priority");
 
-  public void register(Object listener,
-                       String function,
-                       Object eventClass,
-                       EventPriority priority
-  ) {
-    register(listener, function, eventClass, priority, false);
-  }
+    ExecutorWrapper<E> wrapper
+        = new ExecutorWrapper<>(eventClass, mirror, ignoreCancelled);
 
-  public void register(Object listener,
-                       String function,
-                       Object eventClass,
-                       EventPriority priority,
-                       boolean ignoreCancelled
-  ) {
-    if (listener == null) {
-      listener = script.getMirror();
-    }
-
-    var rawMirror = ScriptObjectMirror.wrap(
-        listener, Context.getGlobal()
+    var manager = Bukkit.getPluginManager();
+    manager.registerEvent(
+        eventClass,
+        wrapper,
+        priority,
+        wrapper,
+        FTC.getPlugin(),
+        ignoreCancelled
     );
 
-    if (!(rawMirror instanceof ScriptObjectMirror m)) {
-      throw Util.newException("Invalid listener: %s", listener);
-    }
-
-    var eventType = getEventClass(eventClass);
-
-    ScriptListenerHandle handle = new ScriptListenerHandle(m, function);
-    ExecutorWrapper wrapper = new ExecutorWrapper(handle, eventType, this);
     wrappers.add(wrapper);
-
-    Bukkit.getPluginManager()
-        .registerEvent(
-            eventType,
-            wrapper,
-            priority,
-            wrapper,
-            FTC.getPlugin()
-        );
   }
 
   /* --------------------------- UNREGISTRATION --------------------------- */
 
-  public void unregister(String functionName) {
-    Objects.requireNonNull(functionName);
-
-    wrappers.removeIf(wrapper -> {
-      if (wrapper.handle.member.equalsIgnoreCase(functionName)) {
-        HandlerList.unregisterAll(wrapper);
-        return true;
-      }
-
-      return false;
-    });
-  }
-
-  public void unregisterFrom(Object eventClass) {
-    var clazz = getEventClass(eventClass);
-
-    wrappers.removeIf(wrapper -> {
-      if (wrapper.type == clazz) {
-        HandlerList.unregisterAll(wrapper);
-        return true;
-      }
-
-      return false;
-    });
-  }
-
-  private Class<? extends Event> getEventClass(Object input) {
-    Objects.requireNonNull(input, "Event class is null");
-
-    if (input instanceof String s) {
-      try {
-        input = Class.forName(
-            s, true, getClass().getClassLoader()
-        );
-      } catch (ReflectiveOperationException exc) {
-        throw new IllegalStateException(exc);
-      }
-    } else if (input instanceof StaticClass staticClass) {
-      input = staticClass.getRepresentedClass();
-    }
-
-    Class type = (Class) input;
-
-    if (!Event.class.isAssignableFrom(type)) {
-      throw Util.newException("Class %s is not an event class!",
-          type.getName()
-      );
-    }
-
-    return type;
-  }
-
-  void close() {
+  public void unregisterAll() {
     wrappers.forEach(HandlerList::unregisterAll);
     wrappers.clear();
   }
 
+  public void unregisterFrom(Class<? extends Event> eventClass) {
+    Objects.requireNonNull(eventClass);
+
+    wrappers.removeIf(wrapper -> {
+      if (wrapper.type == eventClass) {
+        HandlerList.unregisterAll(wrapper);
+        return true;
+      }
+
+      return false;
+    });
+  }
+
+  void close() {
+    unregisterAll();
+  }
+
   @Getter
   @RequiredArgsConstructor
-  static class ExecutorWrapper implements EventExecutor, Listener {
+  class ExecutorWrapper<E extends Event> implements EventExecutor, Listener {
 
-    private final ScriptListenerHandle handle;
-    private final Class<? extends Event> type;
-    private final ScriptEvents events;
+    private final Class<E> type;
+    private final Consumer<E> mirror;
+    private final boolean ignoreCancelled;
 
     @Override
     public void execute(@NotNull Listener listener, @NotNull Event event)
-        throws EventException {
-      if (listener instanceof Cancellable c
+        throws EventException
+    {
+      if (!type.isInstance(event)) {
+        return;
+      }
+
+      if (event instanceof Cancellable c
           && c.isCancelled()
+          && ignoreCancelled
       ) {
         return;
       }
 
-      if (!type.isAssignableFrom(event.getClass())) {
-        return;
-      }
-
-      try {
-        handle.invoke(events.getScript(), event);
-      } catch (Exception e) {
-        LOGGER.error("Couldn't invoke script handle for event: {}, script={}",
-            event.getEventName(),
-            events.getScript().getName(),
-            e
-        );
-      }
-    }
-  }
-
-  public record ScriptListenerHandle(ScriptObjectMirror scriptObject,
-                                     String member
-  ) {
-
-    public void invoke(Script script, Event event) {
-      Script.invokeSafe(script, scriptObject, member, event);
+      mirror.accept((E) event);
     }
   }
 }

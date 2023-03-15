@@ -183,8 +183,15 @@ public class GuildManager {
     Guilds.yeetWaypoint(guild);
 
     var discord = guild.getDiscord();
-    discord.deleteRole();
-    discord.archiveChannel("Guild-Deleted");
+
+    discord.getRole().ifPresent(role -> {
+      discord.deleteRole();
+    });
+
+
+    discord.channelIfNotArchived().ifPresent(channel -> {
+      discord.archiveChannel("Guild-Deleted");
+    });
   }
 
   public void addGuild(Guild guild, LongSet packedChunks) {

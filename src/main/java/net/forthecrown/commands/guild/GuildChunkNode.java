@@ -1,5 +1,7 @@
 package net.forthecrown.commands.guild;
 
+import static net.forthecrown.guilds.GuildRank.NOT_SET;
+
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -146,6 +148,25 @@ class GuildChunkNode extends GuildCommandNode {
       throw Exceptions.chunkAlreadyClaimed(owner);
     }
 
+    var member = guild.getMember(user.getUniqueId());
+
+    if (member != null) {
+      var rankId = member.getRankId();
+      var rank = guild.getSettings().getRank(rankId);
+      int maxChunkClaims = rank.getMaxChunkClaims();
+
+      if (maxChunkClaims != NOT_SET
+          && maxChunkClaims >= member.getClaimedChunks()
+      ) {
+        throw Exceptions.format(
+            "Cannot claim more chunks! (Over rank limit of {0, number})",
+            maxChunkClaims
+        );
+      }
+
+      member.setClaimedChunks(member.getClaimedChunks() + 1);
+    }
+
     manager.setChunkOwner(guild, pos);
     user.sendMessage(Messages.guildChunkClaimed(guild));
 
@@ -175,6 +196,9 @@ class GuildChunkNode extends GuildCommandNode {
 
     if (!guild.isMember(user.getUniqueId())) {
       user.sendMessage(Messages.CHUNK_UNCLAIMED);
+
+      var member = guild.getMember(user.getUniqueId());
+      member.setClaimedChunks(member.getClaimedChunks() - 1);
     }
 
     guild.announce(

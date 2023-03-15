@@ -31,7 +31,7 @@ public class DrawnedBoss extends SimpleBoss {
   private final Set<Guardian> guardians = new ObjectOpenHashSet<>();
 
   public DrawnedBoss() {
-    super("Drawned", new Location(Worlds.voidWorld(), -123.5, 25.5, 38.5),
+    super("Drawned", new Location(Worlds.voidWorld(), -123.5 + 202, 25.5 - 48, 38.5 - 49),
         DungeonAreas.DRAWNED_ROOM,
         Artifacts.ELDER.item(),
         Artifacts.HIDDEN.item(),

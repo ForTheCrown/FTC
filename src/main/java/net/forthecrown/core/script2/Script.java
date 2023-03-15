@@ -19,6 +19,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.script2.ScriptSource.FileSource;
+import net.forthecrown.core.script2.preprocessor.JsPreProcessor;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import org.openjdk.nashorn.api.scripting.NashornScriptEngine;
@@ -27,10 +28,7 @@ import org.openjdk.nashorn.api.scripting.ScriptObjectMirror;
 @Getter
 public class Script implements Closeable {
 
-  public static final String
-      METHOD_ON_CLOSE = "__onClose";
-
-  private static final Logger LOGGER = Loggers.getLogger();
+  public static final String METHOD_ON_CLOSE = "__onClose";
 
   /**
    * The source where the script originates, could be raw JS code, or a file's
@@ -59,13 +57,18 @@ public class Script implements Closeable {
   /** Script's self instance */
   private ScriptObjectMirror mirror;
 
+  /** Scripts loaded by this script */
   @Getter(AccessLevel.PACKAGE)
   private final Set<WrappedScript> loadedSubScripts = new ObjectOpenHashSet<>();
+
+  /** Script's logger */
+  private final Logger logger;
 
   /* ---------------------------- CONSTRUCTORS ---------------------------- */
 
   private Script(ScriptSource source) {
     this.source = Objects.requireNonNull(source);
+    this.logger = Loggers.getLogger(source.getName());
   }
 
   /* ------------------------ STATIC CONSTRUCTORS ------------------------- */
@@ -362,20 +365,21 @@ public class Script implements Closeable {
       );
 
       // Add default values
-      ScriptsBuiltIn.populate(source.getName(), engine);
       engine.put("scheduler", tasks);
       engine.put("events", events);
       engine.put("args", args);
       engine.put("_script", this);
       engine.put("workingDirectory", getWorkingDirectory());
-
-      engine.put("compile", ScriptsBuiltIn.compileFunction(this));
+      engine.put("logger", getLogger());
 
       this.engine = engine;
       this.mirror = (ScriptObjectMirror)
           engine.getBindings(ScriptContext.ENGINE_SCOPE);
 
-      compiledScript = engine.compile(reader);
+      this.compiledScript = engine.compile(reader);
+
+      putCallback("compile", ScriptsBuiltIn.COMPILE_FUNCTION);
+      ScriptsBuiltIn.populate(this);
     } catch (IOException | ScriptException exc) {
       close();
       throw new ScriptLoadException(this, exc);
@@ -468,6 +472,11 @@ public class Script implements Closeable {
   public void put(String key, Object o) throws NullPointerException {
     ensureCompiled();
     mirror.put(key, o);
+  }
+
+  public void putCallback(String key, JsCallback callback) {
+    CallbackWrapper wrapper = new CallbackWrapper(this, callback);
+    put(key, wrapper);
   }
 
   /**

@@ -60,7 +60,11 @@ public class ArmorStandLeaderboard<T> extends AbstractDynamicStand {
   private final List<Component> footer = new ObjectArrayList<>();
 
   public ArmorStandLeaderboard(Location location) {
-    super(location, STAND_KEY);
+    this(location, STAND_KEY);
+  }
+
+  public ArmorStandLeaderboard(Location location, NamespacedKey key) {
+    super(location, key);
   }
 
   public void spawn() {

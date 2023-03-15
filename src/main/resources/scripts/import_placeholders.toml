@@ -14,12 +14,16 @@
 #  Imports the net.forthecrown.core.Worlds class
 # ------------------------------------------------------------------------------
 
-ftc = "net.forthecrown"
-fastutil = "it.unimi.dsi.fastutil"
-bukkit = "org.bukkit"
-nio = "java.nio"
-jutil = "java.util"
-jlang = "java.lang"
-worldguard = "com.sk89q.worldguard"
-worldedit = "com.sk89q.worldedit"
-kyori = "net.kyori.adventure"
+# Determines if imports are processed to `const` values or to `var` values
+imports_are_const = true
+
+# Placeholders
+ftc         = "net.forthecrown"
+fastutil    = "it.unimi.dsi.fastutil"
+bukkit      = "org.bukkit"
+nio         = "java.nio"
+jutil       = "java.util"
+jlang       = "java.lang"
+worldguard  = "com.sk89q.worldguard"
+worldedit   = "com.sk89q.worldedit"
+kyori       = "net.kyori.adventure"

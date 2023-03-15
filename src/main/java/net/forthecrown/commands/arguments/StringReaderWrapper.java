@@ -1,7 +1,6 @@
 package net.forthecrown.commands.arguments;
 
 import com.mojang.brigadier.StringReader;
-import java.io.IOException;
 import java.io.Reader;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +46,7 @@ class StringReaderWrapper extends Reader {
   }
 
   @Override
-  public void mark(int readAheadLimit) throws IOException {
+  public void mark(int readAheadLimit) {
     this.mark = reader.getCursor();
   }
 

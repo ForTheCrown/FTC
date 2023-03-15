@@ -1586,10 +1586,17 @@ public class User implements ForwardingAudience.Single,
     setAfk(true, reason);
 
     var mute = Punishments.muteStatus(this);
-    boolean containsBannedWords = reason != null && BannedWords.checkAndWarn(getPlayer(), reason);
+    boolean containsBannedWords
+        = reason != null && BannedWords.checkAndWarn(getPlayer(), reason);
 
-    Component selfReason = containsBannedWords || !mute.isVisibleToSender() ? null : reason;
-    Component otherReason = containsBannedWords || !mute.isVisibleToOthers() ? null : reason;
+    boolean showMessageSelf
+        = containsBannedWords || !mute.isVisibleToSender();
+
+    boolean showMessageOthers
+        = containsBannedWords || !mute.isVisibleToOthers();
+
+    Component selfReason = showMessageSelf ? null : reason;
+    Component otherReason = showMessageOthers ? null : reason;
 
     Users.getOnline()
         .stream()

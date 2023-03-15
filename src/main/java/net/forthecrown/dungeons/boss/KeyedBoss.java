@@ -6,8 +6,6 @@ import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.registry.FtcKeyed;
 import net.forthecrown.core.registry.Keys;
 import net.forthecrown.utils.JsonSerializable;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.advancement.Advancement;
@@ -19,10 +17,6 @@ public interface KeyedBoss extends DungeonBoss, FtcKeyed, JsonSerializable {
   @Override
   default JsonElement serialize() {
     return new JsonPrimitive(getKey());
-  }
-
-  default Tag saveAsTag() {
-    return StringTag.valueOf(getKey());
   }
 
   /**

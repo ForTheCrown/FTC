@@ -8,10 +8,19 @@ import java.util.Objects;
 import java.util.Random;
 import lombok.Getter;
 
+/**
+ * A list with weighted entries to provide for randomized lookups where the
+ * chance of an entry appearing is dependent on the weight of the entry.
+ *
+ * @param <T> List's type
+ */
 public class WeightedList<T> {
 
   private final List<Entry<T>> values = new ObjectArrayList<>();
 
+  /**
+   * Total weight of all items in the list
+   */
   @Getter
   private int totalWeight = 0;
 

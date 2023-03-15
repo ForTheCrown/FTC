@@ -3,6 +3,7 @@ package net.forthecrown.economy.sell;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.user.User;
 import net.forthecrown.user.data.UserShopData;
@@ -18,7 +19,6 @@ import net.forthecrown.utils.text.writer.TextWriters;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -40,20 +40,8 @@ public class SellableItemNode implements MenuNode {
     var material = compacted ? data.getCompactMaterial() : data.getMaterial();
 
     // If toggling auto sell
-    if (context.getClickType() == ClickType.SHIFT_LEFT
-        || context.getClickType() == ClickType.SHIFT_RIGHT
-        && user.hasPermission(Permissions.AUTO_SELL)
-    ) {
-      var autoSelling = user.getComponent(UserShopData.class)
-          .getAutoSelling();
-
-      if (autoSelling.contains(material)) {
-        autoSelling.remove(material);
-      } else {
-        autoSelling.add(material);
-      }
-
-      context.shouldReloadMenu(true);
+    if (context.getClickType().isShiftClick()) {
+      toggleAutoSell(user, material, context);
       return;
     }
 
@@ -63,6 +51,26 @@ public class SellableItemNode implements MenuNode {
     if (result.getFailure() == null) {
       context.shouldReloadMenu(true);
     }
+  }
+
+  private void toggleAutoSell(User user,
+                              Material material,
+                              ClickContext context
+  ) throws CommandSyntaxException {
+    if (!user.hasPermission(Permissions.AUTO_SELL)) {
+      throw Exceptions.format("Cannot toggle auto sell! Donators only");
+    }
+
+    var autoSelling = user.getComponent(UserShopData.class)
+        .getAutoSelling();
+
+    if (autoSelling.contains(material)) {
+      autoSelling.remove(material);
+    } else {
+      autoSelling.add(material);
+    }
+
+    context.shouldReloadMenu(true);
   }
 
   @Override

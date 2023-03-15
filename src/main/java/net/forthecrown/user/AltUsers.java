@@ -92,34 +92,9 @@ public class AltUsers extends SerializableObject.Json {
 
   public void addEntry(UUID alt, UUID main) {
     alt2Main.put(alt, main);
-
-    /*var user = Users.getLoadedUser(alt);
-
-    // If user is offline or not loaded... for some reason
-    // Don't do stuff
-    if (user == null || !user.isOnline()) {
-      return;
-    }
-
-    // Unload user and replace entry with alt
-    // (getUser automatically returns an alt user
-    //  if the user is an alt)
-    manager.unload(user);
-    Users.get(alt);*/
   }
 
   public void removeEntry(UUID alt) {
     alt2Main.remove(alt);
-
-    /*
-    // Same logic as addEntry(UUID, UUID),
-    // except with LOADED_ALTS this time
-    var user = Users.getLoadedUser(alt);
-    if (user == null || !user.isOnline()) {
-      return;
-    }
-
-    manager.unload(user);
-    Users.get(alt);*/
   }
 }

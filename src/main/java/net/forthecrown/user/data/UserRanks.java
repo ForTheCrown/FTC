@@ -9,9 +9,10 @@ import static net.kyori.adventure.text.Component.text;
 
 import com.google.gson.JsonElement;
 import com.mojang.serialization.DataResult;
-import net.forthecrown.core.module.OnEnable;
+import net.forthecrown.core.registry.Holder;
 import net.forthecrown.core.registry.Registries;
 import net.forthecrown.core.registry.Registry;
+import net.forthecrown.core.registry.RegistryListener;
 import net.forthecrown.economy.sell.MenuReader;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
@@ -25,6 +26,24 @@ public final class UserRanks {
   private UserRanks() {}
 
   public static final Registry<UserRank> REGISTRY = Registries.newRegistry();
+
+  static {
+    REGISTRY.setListener(new RegistryListener<>() {
+      @Override
+      public void onRegister(Holder<UserRank> value) {
+        UserRank title = value.getValue();
+        RankTier tier = title.getTier();
+        tier.titles.add(title);
+      }
+
+      @Override
+      public void onUnregister(Holder<UserRank> value) {
+        UserRank title = value.getValue();
+        RankTier tier = title.getTier();
+        tier.titles.remove(title);
+      }
+    });
+  }
 
   public static final UserRank DEFAULT = UserRank.builder()
       .slot(1, 1)
@@ -264,14 +283,6 @@ public final class UserRanks {
       .hidden(true)
       .registered("legend");
 
-  @OnEnable
-  private static void init() {
-    // Cache all ranks in their tiers
-    for (var r: REGISTRY) {
-      r.getTier().titles.add(r);
-    }
-  }
-
   private static Component getTier3Prefix(String s) {
     return text()
         .color(NamedTextColor.WHITE)
@@ -296,6 +307,7 @@ public final class UserRanks {
     }
 
     var builder = UserRank.builder()
+        .reloadable(true)
         .truncatedPrefix(prefix)
         .genderEquivalentKey(json.getString("genderEquivalent"))
         .hidden(json.getBool("hidden", false))

@@ -4,7 +4,6 @@ import java.util.Optional;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.core.logging.Loggers;
 
 @Builder(builderClassName = "Builder")
 @RequiredArgsConstructor(staticName = "of")
@@ -48,7 +47,7 @@ public class ScriptResult {
   public ScriptResult logIfError() {
     error().ifPresent(e -> {
       if (method().isEmpty()) {
-        Loggers.getLogger().error(
+        script.getLogger().error(
             "Couldn't evaluate script {}", script.getName(),
             e
         );
@@ -56,7 +55,7 @@ public class ScriptResult {
         return;
       }
 
-      Loggers.getLogger().error(
+      script.getLogger().error(
           "Couldn't invoke method '{}' in '{}'",
           method,
           script.getName(),

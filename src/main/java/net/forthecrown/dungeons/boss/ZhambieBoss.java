@@ -31,7 +31,10 @@ import org.bukkit.potion.PotionEffectType;
 public class ZhambieBoss extends SimpleBoss {
 
   public ZhambieBoss() {
-    super("Zhambie", new Location(Worlds.voidWorld(), -191.5, 80, 157.5), DungeonAreas.ZHAMBIE_ROOM,
+    super(
+        "Zhambie",
+        new Location(Worlds.voidWorld(), -191.5 + 202, 80 - 48, 157.5 - 49),
+        DungeonAreas.ZHAMBIE_ROOM,
         DungeonUtils.makeDungeonItem(Material.DRIED_KELP, 45, (Component) null),
         DungeonUtils.makeDungeonItem(Material.GOLD_NUGGET, 30, (Component) null),
         DungeonUtils.makeDungeonItem(Material.ROTTEN_FLESH, 15, "Knight's Flesh"),
@@ -68,8 +71,7 @@ public class ZhambieBoss extends SimpleBoss {
                 // No babies >:(
                 husk.setAdult();
 
-                husk.getWorld()
-                    .playSound(husk.getLocation(), Sound.ENTITY_ZOMBIE_INFECT, 0.7f, 1.0f);
+                husk.getWorld().playSound(husk.getLocation(), Sound.ENTITY_ZOMBIE_INFECT, 0.7f, 1.0f);
                 husk.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(0.8f);
                 husk.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(15.0);
                 husk.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.32F);
@@ -80,12 +82,18 @@ public class ZhambieBoss extends SimpleBoss {
               }
           );
         },
-        60, 10,
+        60, 5,
         // Spawn positions
         new double[][]{
-            {-185.5, 78, 166.5}, {-197.5, 78, 165.2}, {-196.5, 78, 149.5},
-            {-184.5, 78, 149.5}, {-183.5, 78, 154.4}, {-202.5, 78, 158.5},
-            {-191.5, 79, 160.5}, {-190.5, 79, 154.5}, {-202.5, 78, 157.5}
+            {-185.5 + 202,  78 - 48,  166.5 - 49},
+            {-197.5 + 202,  78 - 48,  165.2 - 49},
+            {-196.5 + 202,  78 - 48,  149.5 - 49},
+            {-184.5 + 202,  78 - 48,  149.5 - 49},
+            {-183.5 + 202,  78 - 48,  154.4 - 49},
+            {-202.5 + 202,  78 - 48,  158.5 - 49},
+            {-191.5 + 202,  79 - 48,  160.5 - 49},
+            {-190.5 + 202,  79 - 48,  154.5 - 49},
+            {-202.5 + 202,  78 - 48,  157.5 - 49}
         }
     );
 

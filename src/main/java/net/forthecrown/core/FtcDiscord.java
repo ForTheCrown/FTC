@@ -1,8 +1,11 @@
 package net.forthecrown.core;
 
 import github.scarsz.discordsrv.DiscordSRV;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.Member;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
-import github.scarsz.discordsrv.util.DiscordUtil;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 import net.forthecrown.core.config.GeneralConfig;
 import net.forthecrown.utils.Util;
 import org.apache.logging.log4j.message.ParameterizedMessage;
@@ -16,9 +19,7 @@ public final class FtcDiscord {
   public static final String
       // Channel names
       STAFF_LOG = "staff-log",
-
-      // Staff Log categories
-      C_STAFF = "Staff";
+      COOL_CLUB = "cool-club";
 
   public static boolean isActive() {
     if (!Util.isPluginEnabled("DiscordSRV")) {
@@ -27,6 +28,41 @@ public final class FtcDiscord {
 
     return DiscordSRV.getPlugin()
         .getJda() != null;
+  }
+
+  public static UUID getPlayerId(String discordId) {
+    Objects.requireNonNull(discordId);
+
+    return DiscordSRV.getPlugin()
+        .getAccountLinkManager()
+        .getUuid(discordId);
+  }
+
+  public static Optional<TextChannel> findChannel(String name) {
+    return Optional.ofNullable(
+        DiscordSRV.getPlugin()
+            .getDestinationTextChannelForGameChannelName(name)
+    );
+        // Only use text channels set in the DiscordSRV config
+        /*.or(() -> {
+          var jda = DiscordSRV.getPlugin().getJda();
+
+          if (jda == null) {
+            return Optional.empty();
+          }
+
+          var found = jda.getTextChannelsByName(name, true);
+
+          if (found.isEmpty()) {
+            return Optional.empty();
+          }
+
+          return Optional.of(found.get(0));
+        });*/
+  }
+
+  public static UUID getPlayerId(Member member) {
+    return getPlayerId(member.getId());
   }
 
   /**
@@ -42,15 +78,12 @@ public final class FtcDiscord {
     }
 
     // Bro this fucking method name lmao
-    TextChannel channel = DiscordSRV.getPlugin()
-        .getDestinationTextChannelForGameChannelName(STAFF_LOG);
+    findChannel(STAFF_LOG).ifPresent(channel -> {
+      String formatted
+          = new ParameterizedMessage(msg, args)
+          .getFormattedMessage();
 
-    DiscordUtil.queueMessage(channel,
-        String.format("**[%s]** %s",
-            cat,
-            new ParameterizedMessage(msg, args)
-                .getFormattedMessage()
-        )
-    );
+      channel.sendMessageFormat("**[%s]** %s", cat, formatted).submit();
+    });
   }
 }

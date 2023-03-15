@@ -5,13 +5,17 @@ import net.forthecrown.core.registry.Registry;
 
 public class ModuleServices {
 
-  public static final Registry<ModuleService>
-      SERVICES = Registries.newRegistry();
+  public static final Registry<ModuleService> SERVICES
+      = Registries.newRegistry();
 
-  public static final ModuleService
-      RELOAD     = ModuleService.of(OnLoad.class),
-      ON_ENABLE  = ModuleService.of(OnEnable.class),
-      ON_DISABLE = ModuleService.of(OnDisable.class);
+  public static final ModuleService RELOAD
+      = ModuleService.of(OnLoad.class);
+
+  public static final ModuleService ON_ENABLE
+      = ModuleService.of(OnEnable.class);
+
+  public static final ModuleService ON_DISABLE
+      = ModuleService.of(OnDisable.class);
 
   public static final DayChange
       DAY_CHANGE = new DayChange();

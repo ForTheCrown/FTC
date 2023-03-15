@@ -5,6 +5,7 @@ import com.google.errorprone.annotations.FormatMethod;
 import com.google.errorprone.annotations.FormatString;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.sk89q.worldedit.IncompleteRegionException;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.regions.Region;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.lang.reflect.Method;
@@ -21,6 +22,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.logging.Loggers;
+import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.utils.math.Vectors;
 import net.minecraft.SharedConstants;
 import org.apache.commons.lang3.Validate;
@@ -105,6 +107,14 @@ public final class Util {
     }
 
     return true;
+  }
+
+  public static Region getSelectionSafe(CommandSource source)
+      throws CommandSyntaxException
+  {
+    var player = source.asPlayer();
+    var wePlayer = BukkitAdapter.adapt(player);
+    return getSelectionSafe(wePlayer);
   }
 
   public static Region getSelectionSafe(com.sk89q.worldedit.entity.Player wePlayer)

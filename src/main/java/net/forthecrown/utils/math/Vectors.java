@@ -10,14 +10,14 @@ import com.sk89q.worldedit.math.Vector3;
 import lombok.experimental.UtilityClass;
 import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.DoubleTag;
+import net.forthecrown.nbt.FloatTag;
 import net.forthecrown.nbt.IntArrayTag;
 import net.forthecrown.nbt.ListTag;
 import net.forthecrown.nbt.LongArrayTag;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.DoubleTag;
-import net.minecraft.nbt.FloatTag;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
@@ -504,7 +504,7 @@ public class Vectors {
     float[] arr = new float[listTag.size()];
 
     for (int i = 0; i < arr.length; i++) {
-      arr[i] = ((FloatTag) listTag.get(i)).getAsFloat();
+      arr[i] = ((FloatTag) listTag.get(i)).floatValue();
     }
     return Vector2f.from(
         arr[AXIS_ID_X],
@@ -527,7 +527,7 @@ public class Vectors {
     float[] arr = new float[listTag.size()];
 
     for (int i = 0; i < arr.length; i++) {
-      arr[i] = ((FloatTag) listTag.get(i)).getAsFloat();
+      arr[i] = ((FloatTag) listTag.get(i)).floatValue();
     }
     return Vector3f.from(
         arr[AXIS_ID_X],
@@ -552,7 +552,7 @@ public class Vectors {
     float[] arr = new float[listTag.size()];
 
     for (int i = 0; i < arr.length; i++) {
-      arr[i] = ((FloatTag) listTag.get(i)).getAsFloat();
+      arr[i] = ((FloatTag) listTag.get(i)).floatValue();
     }
     return Vector4f.from(
         arr[AXIS_ID_X],
@@ -579,7 +579,7 @@ public class Vectors {
     float[] arr = new float[listTag.size()];
 
     for (int i = 0; i < arr.length; i++) {
-      arr[i] = ((FloatTag) listTag.get(i)).getAsFloat();
+      arr[i] = ((FloatTag) listTag.get(i)).floatValue();
     }
     return new VectorNf(arr);
   }
@@ -625,7 +625,7 @@ public class Vectors {
     double[] arr = new double[listTag.size()];
 
     for (int i = 0; i < arr.length; i++) {
-      arr[i] = ((DoubleTag) listTag.get(i)).getAsDouble();
+      arr[i] = ((DoubleTag) listTag.get(i)).doubleValue();
     }
     return Vector2d.from(
         arr[AXIS_ID_X],
@@ -658,7 +658,7 @@ public class Vectors {
     double[] arr = new double[listTag.size()];
 
     for (int i = 0; i < arr.length; i++) {
-      arr[i] = ((DoubleTag) listTag.get(i)).getAsDouble();
+      arr[i] = ((DoubleTag) listTag.get(i)).doubleValue();
     }
     return Vector3d.from(
         arr[AXIS_ID_X],
@@ -683,7 +683,7 @@ public class Vectors {
     double[] arr = new double[listTag.size()];
 
     for (int i = 0; i < arr.length; i++) {
-      arr[i] = ((DoubleTag) listTag.get(i)).getAsDouble();
+      arr[i] = ((DoubleTag) listTag.get(i)).doubleValue();
     }
     return Vector4d.from(
         arr[AXIS_ID_X],
@@ -710,7 +710,7 @@ public class Vectors {
     double[] arr = new double[listTag.size()];
 
     for (int i = 0; i < arr.length; i++) {
-      arr[i] = ((DoubleTag) listTag.get(i)).getAsDouble();
+      arr[i] = ((DoubleTag) listTag.get(i)).doubleValue();
     }
     return new VectorNd(arr);
   }

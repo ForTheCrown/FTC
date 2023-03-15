@@ -1,5 +1,6 @@
 package net.forthecrown.cosmetics.login;
 
+import java.util.function.Predicate;
 import lombok.Getter;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.Messages;
@@ -7,17 +8,14 @@ import net.forthecrown.cosmetics.Cosmetic;
 import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.user.User;
 import net.forthecrown.user.data.RankTier;
-import net.forthecrown.user.data.UserRank;
+import net.forthecrown.user.data.UserRanks;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.inventory.menu.MenuNode;
 import net.forthecrown.utils.inventory.menu.Slot;
-import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
-
-import java.util.function.Predicate;
 
 @Getter
 public class LoginEffect extends Cosmetic {
@@ -26,8 +24,16 @@ public class LoginEffect extends Cosmetic {
 
   private final Predicate<User> hasUnlocked;
 
-  public LoginEffect(String name, Slot slot, UserRank title, Component prefix, Component suffix) {
-      this(name, slot, user -> user.getTitles().hasTitle(title), prefix, suffix);
+  public LoginEffect(String name, Slot slot, String titleKey, Component prefix, Component suffix) {
+      this(name, slot, user -> {
+        var title = UserRanks.REGISTRY.get(titleKey);
+
+        if (title.isEmpty()) {
+          return false;
+        }
+
+        return user.getTitles().hasTitle(title.get());
+      }, prefix, suffix);
   }
 
   public LoginEffect(String name, Slot slot, RankTier tier, Component prefix, Component suffix) {

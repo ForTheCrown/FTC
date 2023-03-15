@@ -104,9 +104,10 @@ public class ModuleService implements Runnable {
         ++ran;
 
         LOGGER.debug(
-            "Ran {} on {}",
+            "Ran {} on {}.{}",
             annotationType.getSimpleName(),
-            name
+            name,
+            callback.getName()
         );
       } catch (Throwable t) {
         if (t instanceof InvocationTargetException exc) {

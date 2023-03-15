@@ -142,7 +142,7 @@ public final class TagUtil {
   }
 
   public static Location readLocation(BinaryTag tagg) {
-    CompoundTag tag = (CompoundTag) tagg;
+    CompoundTag tag = tagg.asCompound();
     ListTag pos = tag.getList("pos", TagTypes.doubleType());
     ListTag rot = tag.getList("rot", TagTypes.floatType());
 

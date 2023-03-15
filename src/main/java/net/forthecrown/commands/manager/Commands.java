@@ -39,6 +39,7 @@ import net.forthecrown.commands.admin.CommandCooldown;
 import net.forthecrown.commands.admin.CommandDungeons;
 import net.forthecrown.commands.admin.CommandEndOpener;
 import net.forthecrown.commands.admin.CommandFtcStruct;
+import net.forthecrown.commands.admin.CommandFtcVersion;
 import net.forthecrown.commands.admin.CommandGameMode;
 import net.forthecrown.commands.admin.CommandGetOffset;
 import net.forthecrown.commands.admin.CommandGetPos;
@@ -190,6 +191,7 @@ public final class Commands {
     new CommandScripts();
     new CommandInvStore();
     new CommandCooldown();
+    new CommandFtcVersion();
 
     InteractableCommands.createCommands();
     CommandSpecificGameMode.createCommands();

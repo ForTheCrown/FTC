@@ -21,8 +21,9 @@ import org.bukkit.potion.PotionEffectType;
 
 public class SkalatanBoss extends SimpleBoss {
 
-  private static final ItemStack WITHER_GOO = DungeonUtils.makeDungeonItem(Material.BLACK_DYE, 30,
-      "Wither Goo");
+  private static final ItemStack WITHER_GOO
+      = DungeonUtils.makeDungeonItem(Material.BLACK_DYE, 30, "Wither Goo");
+
   public static final int STATE_SWITCH_INTERVAL = 100;
 
   private State state;
@@ -30,7 +31,7 @@ public class SkalatanBoss extends SimpleBoss {
 
   public SkalatanBoss() {
     super("Skalatan",
-        new Location(Worlds.voidWorld(), -103.5, 67, 184.5),
+        new Location(Worlds.voidWorld(), -103.5 + 202, 67 - 48, 184.5 - 49),
         DungeonAreas.SKALATAN_ROOM,
         WITHER_GOO,
         DungeonUtils.makeDungeonItem(Material.BONE, 30, "Floaty Bones"),

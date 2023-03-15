@@ -1,8 +1,8 @@
 [item_head]
 description = [
-  "Willhelm perished in an attack on Questmoor.",
-  "However, the business of selling heads is",
-  "still alive and well"
+  "&7Willhelm perished in an attack on Questmoor.",
+  "&7However, the business of selling heads is",
+  "&7still alive and well"
 ]
 slot = 20
 reward = { rhines = 100 }

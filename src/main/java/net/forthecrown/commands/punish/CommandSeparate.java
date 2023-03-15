@@ -1,15 +1,20 @@
 package net.forthecrown.commands.punish;
 
+import static net.forthecrown.core.logging.Loggers.STAFF_LOG;
+
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.core.admin.StaffChat;
+import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.User;
 import net.forthecrown.user.data.UserInteractions;
+import org.apache.logging.log4j.Logger;
 
 public class CommandSeparate extends FtcCommand {
+
+  private static final Logger LOGGER = Loggers.getLogger("Separation");
 
   public CommandSeparate() {
     super("seperate");
@@ -60,17 +65,19 @@ public class CommandSeparate extends FtcCommand {
                     firstInter.removeSeparated(second.getUniqueId());
                     secondInter.removeSeparated(first.getUniqueId());
 
-                    StaffChat.sendCommand(
-                        c.getSource(),
-                        Messages.unseparating(first, second)
+                    c.getSource().sendAdmin(Messages.unseparating(first, second));
+
+                    LOGGER.info(STAFF_LOG, "{} un-separated {} and {}",
+                        c.getSource().textName(), first, second
                     );
                   } else {
                     firstInter.addSeparated(second.getUniqueId());
                     secondInter.addSeparated(first.getUniqueId());
 
-                    StaffChat.sendCommand(
-                        c.getSource(),
-                        Messages.separating(first, second)
+                    c.getSource().sendAdmin(Messages.separating(first, second));
+
+                    LOGGER.info(STAFF_LOG, "{} separated {} and {}",
+                        c.getSource().textName(), first, second
                     );
                   }
 

@@ -146,6 +146,11 @@ public class SaveReloadCommands extends FtcCommand {
         UserManager.get()::reload
     ),
 
+    TITLES(
+        null,
+        UserManager.get()::loadRanks
+    ),
+
     KITS(
         Usables.getInstance().getKits()::save,
         Usables.getInstance().getKits()::reload

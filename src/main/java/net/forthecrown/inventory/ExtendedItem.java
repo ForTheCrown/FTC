@@ -109,6 +109,6 @@ public abstract class ExtendedItem {
   }
 
   public boolean hasPlayerOwner() {
-    return owner != null && owner.equals(Identity.nil().uuid());
+    return owner != null && !owner.equals(Identity.nil().uuid());
   }
 }

@@ -22,6 +22,7 @@ import net.forthecrown.core.module.OnLoad;
 import net.forthecrown.core.registry.Keys;
 import net.forthecrown.core.registry.Registries;
 import net.forthecrown.core.registry.Registry;
+import net.forthecrown.core.script2.preprocessor.JsPreProcessor;
 import net.forthecrown.events.Events;
 import net.forthecrown.utils.MonthDayPeriod;
 import net.forthecrown.utils.Tasks;
@@ -93,7 +94,7 @@ public class ScriptManager {
 
   @OnLoad
   public void load() {
-    JsPreProcessor.placeHolders = null;
+    JsPreProcessor.onScriptsReload();
 
     loadedScripts.forEach(script -> {
       // Prevent script closing errors from
@@ -148,8 +149,8 @@ public class ScriptManager {
           loadedScript = new LoadedScript(period, script, args);
         }
 
-        LOGGER.debug("Loaded active script {}", e.getKey());
         loadedScripts.register(e.getKey(), loadedScript);
+        LOGGER.debug("Loaded active script {}", e.getKey());
       }
     });
 

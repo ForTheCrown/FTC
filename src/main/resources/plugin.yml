@@ -27,8 +27,8 @@ libraries: [
   '${nashorn}',
   'org.apache.commons:commons-text:1.10.0',
   'org.tomlj:tomlj:1.1.0',
-  'net.forthecrown:NBT:1.1.1',
-  'net.forthecrown:PaperNBT:1.1.1',
+  '${nbt}',
+  '${paper_nbt}',
 ]
 
 buildTime: '${buildDate}'

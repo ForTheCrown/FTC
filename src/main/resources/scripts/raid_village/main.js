@@ -54,7 +54,7 @@ ticking();
 
 // Registers the raid trigger listener to spawn loot and then later despawn the
 // same loot
-events.register("onRaidStart", RaidTriggerEvent);
+events.register(RaidTriggerEvent.class, onRaidStart);
 
 function onRaidStart(event) {
   let region = getWorldGuardRegion();

@@ -33,7 +33,7 @@ const respawnStack = new LinkedList();
 
 // -----------------------------------------------------------------------------
 
-events.register("onDeath", EntityDeathEvent);
+events.register(EntityDeathEvent.class, onDeath);
 scheduler.runTimer(UPDATE_INTERVAL_TICKS, UPDATE_INTERVAL_TICKS, onUpdate);
 
 function onDeath(event) {

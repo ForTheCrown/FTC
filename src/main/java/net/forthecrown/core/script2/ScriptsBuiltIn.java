@@ -1,12 +1,13 @@
 package net.forthecrown.core.script2;
 
+import com.google.common.base.Preconditions;
 import java.nio.file.Files;
-import java.util.function.Function;
+import java.nio.file.Path;
+import java.util.Arrays;
 import jdk.dynalink.beans.StaticClass;
 import net.forthecrown.core.FTC;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Worlds;
-import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.Util;
@@ -23,12 +24,11 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.apache.logging.log4j.Logger;
+import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
-import org.openjdk.nashorn.api.scripting.NashornScriptEngine;
 import org.spongepowered.math.vector.Vector2d;
 import org.spongepowered.math.vector.Vector2i;
 import org.spongepowered.math.vector.Vector3d;
@@ -54,30 +54,36 @@ public final class ScriptsBuiltIn {
       Worlds.class
   };
 
-  public static Function<String, WrappedScript> compileFunction(Script script) {
-    return scriptName -> {
-      var file = script.getWorkingDirectory().resolve(scriptName);
+  static final JsCallback COMPILE_FUNCTION = (script, invoker, args) -> {
+    Preconditions.checkArgument(args.length > 0, "Script name required");
 
-      if (!Files.exists(file)) {
-        throw new IllegalStateException(
-            "File " + scriptName + " doesn't exist"
-        );
-      }
+    Path file = script.getWorkingDirectory()
+        .resolve(String.valueOf(args[0]));
 
-      Script loaded = Script.of(file).compile();
-      var wrapped = new WrappedScript(loaded);
-      script.getLoadedSubScripts().add(wrapped);
+    Preconditions.checkArgument(
+        Files.exists(file),
+        "Script '%s' doesn't exist", file
+    );
 
-      return wrapped;
-    };
-  }
-
-  public static void populate(String name, NashornScriptEngine engine) {
-    for (var c : DEFAULT_CLASSES) {
-      engine.put(c.getSimpleName(), StaticClass.forClass(c));
+    String[] scriptArgs;
+    if (args.length > 1) {
+      scriptArgs = Arrays.stream(args, 1, args.length)
+          .map(String::valueOf)
+          .toArray(String[]::new);
+    } else {
+      scriptArgs = ArrayUtils.EMPTY_STRING_ARRAY;
     }
 
-    Logger logger = Loggers.getLogger(name);
-    engine.put("logger", logger);
+    Script loaded = Script.of(file).compile(scriptArgs);
+    var wrapped = new WrappedScript(loaded);
+    script.getLoadedSubScripts().add(wrapped);
+
+    return wrapped;
+  };
+
+  public static void populate(Script script) {
+    for (var c : DEFAULT_CLASSES) {
+      script.put(c.getSimpleName(), StaticClass.forClass(c));
+    }
   }
 }

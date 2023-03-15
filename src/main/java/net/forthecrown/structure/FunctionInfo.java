@@ -181,7 +181,7 @@ public class FunctionInfo {
         data,
         Vectors.read3i(tag.get(TAG_POSITION)),
         tag.containsKey(TAG_INFO)
-            ? tag.get(TAG_INFO).asCompound()
+            ? tag.getCompound(TAG_INFO)
             : null
     );
   }

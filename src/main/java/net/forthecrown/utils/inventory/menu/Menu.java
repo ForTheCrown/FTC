@@ -190,13 +190,9 @@ public class Menu implements InventoryHolder, MenuCloseConsumer {
     Context context = click.getInventory().getContext();
     User user = Users.get(click.getPlayer());
 
-    if (hasFlag(MenuFlag.ALLOW_ITEM_MOVING)) {
-      event.setCancelled(false);
-      click.cancelEvent(false);
-    } else {
-      event.setCancelled(true);
-      click.cancelEvent(true);
-    }
+    boolean cancel = !hasFlag(MenuFlag.ALLOW_ITEM_MOVING);
+    event.setCancelled(cancel);
+    click.cancelEvent(cancel);
 
     if (Cooldown.contains(user, COOLDOWN_CATEGORY)) {
       // On cooldown, node can't allow or prevent item moving, thus just

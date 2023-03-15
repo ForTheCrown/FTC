@@ -54,6 +54,17 @@ public class  ActionTeleport extends UsageAction {
   @Override
   public void onUse(Player player, Usable holder) {
     var user = Users.get(player);
+    var location = this.location.clone();
+
+    if (location.getWorld() == null) {
+      var world = holder.getWorld();
+
+      if (world == null) {
+        location.setWorld(player.getWorld());
+      } else {
+        location.setWorld(world);
+      }
+    }
 
     if (!user.canTeleport()) {
       player.teleport(location);
@@ -92,6 +103,8 @@ public class  ActionTeleport extends UsageAction {
 
     if (args.has(CommandTeleportExact.WORLD)) {
       loc.setWorld(args.get(CommandTeleportExact.WORLD));
+    } else {
+      loc.setWorld(null);
     }
 
     loc.setYaw(args.getOrDefault(CommandTeleportExact.YAW, loc.getYaw()));

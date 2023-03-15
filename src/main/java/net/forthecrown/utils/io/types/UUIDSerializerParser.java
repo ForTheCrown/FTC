@@ -7,6 +7,7 @@ import java.util.UUID;
 import java.util.stream.IntStream;
 import net.forthecrown.grenadier.types.UUIDArgument;
 import net.forthecrown.utils.io.Results;
+import net.forthecrown.utils.io.TagOps;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.NbtOps;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +26,7 @@ public class UUIDSerializerParser implements SerializerParser<UUID> {
 
   @Override
   public <V> @NotNull V serialize(@NotNull DynamicOps<V> ops, @NotNull UUID value) {
-    if (ops instanceof NbtOps) {
+    if (ops instanceof NbtOps || ops instanceof TagOps) {
       return ops.createIntList(
           IntStream.of(UUIDUtil.uuidToIntArray(value))
       );

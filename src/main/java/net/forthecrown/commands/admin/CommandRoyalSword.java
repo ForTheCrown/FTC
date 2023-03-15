@@ -24,6 +24,7 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.TimeArgument;
 import net.forthecrown.inventory.ExtendedItems;
 import net.forthecrown.inventory.weapon.RoyalSword;
+import net.forthecrown.inventory.weapon.SwordRanks;
 import net.forthecrown.inventory.weapon.ability.SwordAbilityManager;
 import net.forthecrown.inventory.weapon.ability.WeaponAbility;
 import net.forthecrown.inventory.weapon.ability.WeaponAbilityType;
@@ -69,7 +70,10 @@ public class CommandRoyalSword extends FtcCommand {
 
   @Override
   public void populateUsages(UsageFactory factory) {
-    factory.usage("create <owner: player>", "Creates a sword with an <owner>");
+    factory.usage("create <owner: player> [<level>]")
+        .addInfo("Creates a sword with an <owner>")
+        .addInfo("If <level> is specified, the sword is upgraded to")
+        .addInfo("that level");
 
     factory.usage("update",
         "Forces your held sword to update",
@@ -113,20 +117,14 @@ public class CommandRoyalSword extends FtcCommand {
     command
         .then(literal("create")
             .then(argument("owner", Arguments.USER)
-                .executes(c -> {
-                  User sender = getUserSender(c);
-                  User user = Arguments.getUser(c, "owner");
+                .executes(c ->  create(c, 0))
 
-                  ItemStack item = ExtendedItems.ROYAL_SWORD.createItem(user.getUniqueId());
-
-                  sender.getInventory().addItem(item);
-
-                  c.getSource().sendAdmin(
-                      Component.text("Created royal sword for ")
-                          .append(user.displayName())
-                  );
-                  return 0;
-                })
+                .then(argument("level", IntegerArgumentType.integer(1, SwordRanks.MAX_RANK))
+                    .executes(c -> {
+                      int level = c.getArgument("level", Integer.class);
+                      return create(c, level - 1);
+                    })
+                )
             )
         )
 
@@ -220,6 +218,36 @@ public class CommandRoyalSword extends FtcCommand {
                 )
             )
         );
+  }
+
+  private int create(CommandContext<CommandSource> c, int level)
+      throws CommandSyntaxException
+  {
+    User sender = getUserSender(c);
+    User user = Arguments.getUser(c, "owner");
+
+    ItemStack item = ExtendedItems.ROYAL_SWORD.createItem(user.getUniqueId());
+
+    if (level > 0) {
+      RoyalSword sword = ExtendedItems.ROYAL_SWORD.get(item);
+      assert sword != null;
+
+      for (int i = 0; i < level; i++) {
+        sword.incrementRank(item);
+      }
+
+      sword.update(item);
+    }
+
+    sender.getInventory().addItem(item);
+
+    c.getSource().sendAdmin(
+        Text.format(
+            "Created a royal sword for {0, user}, rank: {1, number, -roman}",
+            user, level + 1
+        )
+    );
+    return 0;
   }
 
   private int abilityUses(CommandContext<CommandSource> c, boolean infinite)

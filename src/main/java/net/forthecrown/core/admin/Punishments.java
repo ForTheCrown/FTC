@@ -16,7 +16,6 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.Style;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.OfflinePlayer;
 
@@ -204,20 +203,17 @@ public final class Punishments {
     if (!StaffChat.isVanished(source) && GeneralConfig.announcePunishments) {
       source.sendMessage(text);
 
-      Component formatted = StaffChat.format(
-          Component.text()
-              .append(Text.sourceDisplayName(source).color(NamedTextColor.GRAY))
-              .append(Component.text(": ").style(Style.style(NamedTextColor.DARK_GRAY)))
-              .append(text)
-              .build()
+      Announcer.get().announce(
+          Text.format("[Staff] {0}: {1}", Text.sourceDisplayName(source), text)
       );
-
-      Announcer.get().announce(formatted);
       return;
     }
 
     // Tell staff chat
-    StaffChat.sendCommand(source, text);
+    StaffChat.newMessage()
+        .setSource(source)
+        .setMessage(text)
+        .send();
   }
 
   /**

@@ -44,6 +44,7 @@ public class Streak {
     return get();
   }
 
+  /** Recalculate the streak value */
   public void reset() {
     cachedStreak = NOT_COMPUTED;
 
@@ -55,6 +56,14 @@ public class Streak {
     completionTimes.sort(LongComparators.NATURAL_COMPARATOR);
   }
 
+  /**
+   * Gets the streak value.
+   * <p>
+   * Under most circumstances, the cached streak value is returned, but if no
+   * valid value exists, it will be calculated
+   *
+   * @return Streak value
+   */
   public int get() {
     if (completionTimes.isEmpty()) {
       return NO_STREAK;
@@ -139,7 +148,8 @@ public class Streak {
 
       sort();
 
-      // Get to cache streak and max out highest
+      // get() to cache streak and max out highest
+      cachedStreak = NOT_COMPUTED;
       get();
     }
   }
