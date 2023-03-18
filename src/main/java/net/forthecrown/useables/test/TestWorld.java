@@ -4,7 +4,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.types.WorldArgument;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.useables.CheckHolder;
 import net.forthecrown.useables.ConstructType;
@@ -25,7 +25,7 @@ public class TestWorld extends UsageTest {
 
   // --- TYPE ---
   public static final UsageType<TestWorld> TYPE = UsageType.of(TestWorld.class)
-      .setSuggests(WorldArgument.world()::listSuggestions);
+      .setSuggests(ArgumentTypes.world()::listSuggestions);
 
   private final NamespacedKey world;
 
@@ -77,7 +77,7 @@ public class TestWorld extends UsageTest {
   public static TestWorld parse(StringReader reader, CommandSource source)
       throws CommandSyntaxException {
     return new TestWorld(
-        WorldArgument.world().parse(reader)
+        ArgumentTypes.world().parse(reader)
     );
   }
 

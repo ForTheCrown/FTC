@@ -8,7 +8,7 @@ import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.chat.SignedMessage;
@@ -41,7 +41,7 @@ public class CommandSay extends FtcCommand {
    */
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(argument("msg", Arguments.MESSAGE)
             .executes(c -> {

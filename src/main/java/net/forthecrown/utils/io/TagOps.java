@@ -102,10 +102,10 @@ public class TagOps implements DynamicOps<BinaryTag> {
   @Override
   public DataResult<Number> getNumberValue(BinaryTag input) {
     if (input instanceof NumberTag numeric) {
-      return DataResult.success(numeric.doubleValue());
+      return Results.success(numeric.doubleValue());
     }
 
-    return DataResult.error("Not a numeric element: " + input.toNbtString());
+    return Results.error("Not a numeric element: " + input.toNbtString());
   }
 
   @Override
@@ -156,10 +156,10 @@ public class TagOps implements DynamicOps<BinaryTag> {
   @Override
   public DataResult<String> getStringValue(BinaryTag input) {
     if (input.isString()) {
-      return DataResult.success(input.asString().value());
+      return Results.success(input.asString().value());
     }
 
-    return DataResult.error("Not a string: " + input);
+    return Results.error("Not a string: " + input);
   }
 
   @Override
@@ -170,18 +170,18 @@ public class TagOps implements DynamicOps<BinaryTag> {
   @Override
   public DataResult<BinaryTag> mergeToList(BinaryTag list, BinaryTag value) {
     if (!(list instanceof CollectionTag t)) {
-      return DataResult.error("Not a list: " + list);
+      return Results.error("Not a list: " + list);
     }
 
     var listTag = t.copy();
     if (!listTag.addTag(value)) {
-      return Results.errorResult(
+      return Results.error(
           "Element %s is not a matching type for %s list",
           value, list
       );
     }
 
-    return DataResult.success(listTag);
+    return Results.success(listTag);
   }
 
   @Override
@@ -190,11 +190,11 @@ public class TagOps implements DynamicOps<BinaryTag> {
                                           BinaryTag value
   ) {
     if (!map.isCompound()) {
-      return DataResult.error("Not a map: " + map);
+      return Results.error("Not a map: " + map);
     }
 
     if (!key.isString()) {
-      return DataResult.error("Not a string: " + key);
+      return Results.error("Not a string: " + key);
     }
 
     CompoundTag t1 = map.asCompound();
@@ -202,7 +202,7 @@ public class TagOps implements DynamicOps<BinaryTag> {
 
     CompoundTag result = t1.copy();
     result.put(keyString, value);
-    return DataResult.success(result);
+    return Results.success(result);
   }
 
   @Override
@@ -210,10 +210,10 @@ public class TagOps implements DynamicOps<BinaryTag> {
       BinaryTag input
   ) {
     if (!input.isCompound()) {
-      return DataResult.error("Not a map: " + input);
+      return Results.error("Not a map: " + input);
     }
 
-    return DataResult.success(
+    return Results.success(
         input.asCompound()
             .entrySet()
             .stream()
@@ -230,12 +230,12 @@ public class TagOps implements DynamicOps<BinaryTag> {
   @Override
   public DataResult<Stream<BinaryTag>> getStream(BinaryTag input) {
     if (!(input instanceof CollectionTag t)) {
-      return DataResult.error("Not a list: " + input);
+      return Results.error("Not a list: " + input);
     }
 
     Stream.Builder<BinaryTag> builder = Stream.builder();
     t.forEachTag(builder);
-    return DataResult.success(builder.build());
+    return Results.success(builder.build());
   }
 
   @Override

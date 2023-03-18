@@ -700,7 +700,7 @@ public final class Waypoints {
           Messages.createdWaypoint(position, type)
       );
     } else {
-      source.sendAdmin(
+      source.sendSuccess(
           Messages.createdWaypoint(position, type)
       );
     }

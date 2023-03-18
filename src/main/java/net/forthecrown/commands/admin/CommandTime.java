@@ -4,8 +4,8 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.WorldArgument;
+import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
@@ -56,7 +56,7 @@ public class CommandTime extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(literal("set")
 
@@ -77,7 +77,7 @@ public class CommandTime extends FtcCommand {
         )
 
         .then(literal("get")
-            .then(argument("world", WorldArgument.world())
+            .then(argument("world", ArgumentTypes.world())
                 .executes(c -> {
                   World world = c.getArgument("world", World.class);
                   return timeInfo(c.getSource(), world);
@@ -92,7 +92,7 @@ public class CommandTime extends FtcCommand {
   }
 
   private int timeInfo(CommandSource source, World world) {
-    source.sendAdmin(
+    source.sendSuccess(
         Text.format(
             """
                 World times:
@@ -132,7 +132,7 @@ public class CommandTime extends FtcCommand {
 
     world.setFullTime(time);
 
-    source.sendAdmin(
+    source.sendSuccess(
         Component.text("Set time of ")
             .append(Component.text(world.getName()))
             .append(Component.text(" to " + time))

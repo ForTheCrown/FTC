@@ -7,7 +7,7 @@ import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.types.TimeArgument;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.nbt.CompoundTag;
@@ -27,7 +27,7 @@ public class TestCooldown extends UsageTest {
 
   // --- TYPE ---
   public static final UsageType<TestCooldown> TYPE = UsageType.of(TestCooldown.class)
-      .setSuggests(TimeArgument.time()::listSuggestions);
+      .setSuggests(ArgumentTypes.time()::listSuggestions);
 
   /**
    * NBT tag for cooldown duration
@@ -111,7 +111,7 @@ public class TestCooldown extends UsageTest {
   @UsableConstructor(ConstructType.PARSE)
   public static TestCooldown parse(StringReader reader, CommandSource source)
       throws CommandSyntaxException {
-    return new TestCooldown(TimeArgument.time().parse(reader));
+    return new TestCooldown(ArgumentTypes.time().parse(reader).toMillis());
   }
 
   @UsableConstructor(ConstructType.TAG)

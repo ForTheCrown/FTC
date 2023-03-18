@@ -6,7 +6,7 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.UUID;
 import lombok.Data;
-import net.forthecrown.grenadier.types.UUIDArgument;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.nbt.CompoundTag;
@@ -110,7 +110,7 @@ public class EntityIdentifier {
     int chunkZ = reader.readInt();
     reader.expect(FIELD_SEPARATOR);
 
-    UUID id = UUIDArgument.uuid().parse(reader);
+    UUID id = ArgumentTypes.uuid().parse(reader);
 
     return new EntityIdentifier(id, worldName, new ChunkPos(chunkX, chunkZ));
   }

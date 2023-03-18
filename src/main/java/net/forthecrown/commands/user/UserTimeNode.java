@@ -119,7 +119,7 @@ class UserTimeNode extends UserCommandNode {
 
     user.setTime(field.getValue(), value);
 
-    c.getSource().sendAdmin(
+    c.getSource().sendSuccess(
         Text.format("Set field '{0}' to {1} for {2, user}",
             field.getKey(), value, user
         )

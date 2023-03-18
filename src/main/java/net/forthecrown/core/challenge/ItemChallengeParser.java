@@ -22,7 +22,7 @@ public class ItemChallengeParser {
     JsonWrapper json = JsonWrapper.wrap(element);
 
     if (!json.has(KEY_SLOT)) {
-      return Results.errorResult("Missing %s value", KEY_SLOT);
+      return Results.error("Missing %s value", KEY_SLOT);
     }
 
     Slot slot = MenuReader.readSlot(json.get(KEY_SLOT));

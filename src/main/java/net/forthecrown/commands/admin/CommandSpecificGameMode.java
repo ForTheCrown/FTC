@@ -6,7 +6,7 @@ import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.user.User;
 import org.bukkit.GameMode;
 import org.bukkit.permissions.Permission;
@@ -23,7 +23,7 @@ public class CommandSpecificGameMode extends FtcCommand {
   ) {
     super(name);
 
-    this.aliases = aliases;
+    setAliases(aliases);
     this.gameMode = mode;
 
     setPermission(permission);
@@ -45,7 +45,7 @@ public class CommandSpecificGameMode extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .executes(c -> setGameMode(getUserSender(c), c.getSource()))
 

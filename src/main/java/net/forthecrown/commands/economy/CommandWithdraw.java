@@ -10,7 +10,7 @@ import net.forthecrown.core.Messages;
 import net.forthecrown.economy.TransactionType;
 import net.forthecrown.economy.Transactions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.user.User;
 import org.bukkit.Sound;
@@ -34,7 +34,7 @@ public class CommandWithdraw extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command.then(argument("amount", IntegerArgumentType.integer(1))
         .suggests(CommandPay.BAL_SUGGESTIONS)
 

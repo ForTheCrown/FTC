@@ -10,13 +10,15 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import java.util.concurrent.CompletableFuture;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.royalgrenadier.VanillaMappedArgument;
+import net.forthecrown.grenadier.internal.VanillaMappedArgument;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
+import net.minecraft.commands.CommandBuildContext;
 import org.bukkit.command.CommandSender;
 
-public class MessageArgument implements ArgumentType<MessageArgument.Result>,
-    VanillaMappedArgument {
+public class MessageArgument
+    implements ArgumentType<MessageArgument.Result>, VanillaMappedArgument
+{
 
   @Override
   public Result parse(StringReader reader) throws CommandSyntaxException {
@@ -27,14 +29,15 @@ public class MessageArgument implements ArgumentType<MessageArgument.Result>,
   }
 
   @Override
-  public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
-                                                            SuggestionsBuilder builder
+  public <S> CompletableFuture<Suggestions> listSuggestions(
+      CommandContext<S> context,
+      SuggestionsBuilder builder
   ) {
     return MessageSuggestions.get(context, builder, true);
   }
 
   @Override
-  public ArgumentType<?> getVanillaArgumentType() {
+  public ArgumentType<?> getVanillaType(CommandBuildContext context) {
     return StringArgumentType.greedyString();
   }
 

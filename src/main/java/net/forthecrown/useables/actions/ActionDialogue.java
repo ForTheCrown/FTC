@@ -14,7 +14,7 @@ import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
+import net.forthecrown.grenadier.Completions;
 import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.nbt.CompoundTag;
@@ -171,7 +171,7 @@ public class ActionDialogue extends UsageAction {
     reader.skipWhitespace();
     builder = builder.createOffset(reader.getCursor());
 
-    return CompletionProvider.suggestMatching(
+    return Completions.suggest(
         builder,
         holder.getValue().getNodeNames()
     );

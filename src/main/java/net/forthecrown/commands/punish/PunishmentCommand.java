@@ -9,6 +9,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
 import net.forthecrown.commands.arguments.Arguments;
@@ -19,12 +20,13 @@ import net.forthecrown.core.admin.PunishType;
 import net.forthecrown.core.admin.Punishment;
 import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.TimeArgument;
-import net.forthecrown.grenadier.types.args.ArgsArgument;
-import net.forthecrown.grenadier.types.args.Argument;
-import net.forthecrown.grenadier.types.args.ParsedArgs;
+import net.forthecrown.grenadier.Completions;
+import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.grenadier.types.ArgumentTypes;
+import net.forthecrown.grenadier.types.options.ArgumentOption;
+import net.forthecrown.grenadier.types.options.Options;
+import net.forthecrown.grenadier.types.options.OptionsArgument;
+import net.forthecrown.grenadier.types.options.ParsedOptions;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.text.Text;
 import org.bukkit.event.player.PlayerKickEvent;
@@ -44,16 +46,17 @@ public class PunishmentCommand extends FtcCommand {
     register();
   }
 
-  static final Argument<String> REASON = Argument.builder("reason", new ReasonParser())
-      .setAliases("cause")
+  static final ArgumentOption<String> REASON
+      = Options.argument(new ReasonParser())
+      .addLabel("reason", "cause")
       .build();
 
-  static final Argument<Long> TIME = Argument.builder("time", TimeArgument.time())
-      .setDefaultValue(INDEFINITE_EXPIRY)
-      .setAliases("length")
+  static final ArgumentOption<Duration> TIME
+      = Options.argument(ArgumentTypes.time())
+      .addLabel("time", "length")
       .build();
 
-  static final ArgsArgument ARGS = ArgsArgument.builder()
+  static final OptionsArgument ARGS = OptionsArgument.builder()
       .addOptional(REASON)
       .addOptional(TIME)
       .build();
@@ -67,15 +70,19 @@ public class PunishmentCommand extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(argument("user", Arguments.USER)
             .executes(c -> punish(c, null, INDEFINITE_EXPIRY))
 
             .then(argument("args", ARGS)
                 .executes(c -> {
-                  var args = c.getArgument("args", ParsedArgs.class);
-                  return punish(c, args.get(REASON), args.get(TIME));
+                  var args = c.getArgument("args", ParsedOptions.class);
+                  long length = args.has(TIME)
+                      ? args.getValue(TIME).toMillis()
+                      : INDEFINITE_EXPIRY;
+
+                  return punish(c, args.getValue(REASON), length);
                 })
             )
         );
@@ -172,7 +179,7 @@ public class PunishmentCommand extends FtcCommand {
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
                                                               SuggestionsBuilder builder
     ) {
-      return CompletionProvider.suggestMatching(builder, "\"\"", "''");
+      return Completions.suggest(builder, "\"\"", "''");
     }
   }
 }

@@ -27,10 +27,9 @@ libraries: [
   '${nashorn}',
   'org.apache.commons:commons-text:1.10.0',
   'org.tomlj:tomlj:1.1.0',
-  '${nbt}',
-  '${paper_nbt}',
+  '${grenadier}',
 ]
 
 buildTime: '${buildDate}'
 buildID: '${buildID}'
-debug_build: ${debug_build}
+debug_build: ${debugbuild}

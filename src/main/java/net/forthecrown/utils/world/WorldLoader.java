@@ -22,7 +22,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
-import org.bukkit.craftbukkit.v1_19_R2.CraftWorld;
 import org.spongepowered.math.GenericMath;
 
 /**
@@ -227,11 +226,11 @@ public @UtilityClass class WorldLoader {
     private final LoadSection[] sections;
     private final LoadProgress progress;
 
-    private final CraftWorld world;
+    private final World world;
     private boolean stopped;
 
     public LoaderInstance(World world) {
-      this.world = (CraftWorld) world;
+      this.world = world;
 
       // Figure out how much of the world has to be loaded based on
       // the size of the world border, only load chunks within world

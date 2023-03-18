@@ -12,12 +12,13 @@ import java.util.regex.Pattern;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.commands.arguments.Arguments;
-import net.forthecrown.commands.manager.Readers;
+import net.forthecrown.commands.manager.Commands;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.script2.Script;
 import net.forthecrown.core.script2.ScriptManager;
 import net.forthecrown.core.script2.ScriptSource;
-import net.forthecrown.grenadier.types.ComponentArgument;
+import net.forthecrown.grenadier.Readers;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.text.Text;
@@ -38,7 +39,7 @@ public class DialogueRenderer {
   private static final Logger LOGGER = Loggers.getLogger();
 
   private static final EnumArgument<ButtonType> BUTTON_PARSER
-      = EnumArgument.of(ButtonType.class);
+      = ArgumentTypes.enumType(ButtonType.class);
 
   private final User user;
   private final Dialogue entry;
@@ -148,14 +149,14 @@ public class DialogueRenderer {
       throw new IllegalStateException("'text' field required");
     }
 
-    Readers.skip(reader, "text");
+    Commands.skip(reader, "text");
     reader.expect('=');
 
     Component txt = readText(reader);
     HoverEvent<?> hover = null;
 
-    if (Readers.startsWith(reader, "hover")) {
-      Readers.skip(reader, "hover");
+    if (Readers.startsWithIgnoreCase(reader, "hover")) {
+      Commands.skip(reader, "hover");
       reader.expect('=');
 
       var text = readText(reader);
@@ -192,7 +193,7 @@ public class DialogueRenderer {
     reader.skipWhitespace();
 
     if (label.equals("JSON")) {
-      return ComponentArgument.component().parse(reader);
+      return ArgumentTypes.component().parse(reader);
     }
 
     reader.setCursor(c);

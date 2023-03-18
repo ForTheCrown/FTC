@@ -3,7 +3,8 @@ package net.forthecrown.utils.io.types;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
-import net.forthecrown.grenadier.types.TimeArgument;
+import java.time.Duration;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +33,6 @@ public class PeriodSerializerParser implements SerializerParser<Long> {
 
   @Override
   public @NotNull ArgumentType<Long> getArgumentType() {
-    return TimeArgument.time();
+    return ArgumentTypes.map(ArgumentTypes.time(), Duration::toMillis);
   }
 }

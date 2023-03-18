@@ -6,7 +6,8 @@ import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.Completions;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.user.User;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -25,7 +26,7 @@ public class CommandSpeed extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(arg(true))
         .then(arg(false));
@@ -34,7 +35,9 @@ public class CommandSpeed extends FtcCommand {
   private LiteralArgumentBuilder<CommandSource> arg(boolean fly) {
     return literal(fly ? "fly" : "walk")
         .then(argument("value", FloatArgumentType.floatArg(0f, 5f))
-            .suggests(suggestMatching("1", "1.5", "2", "0.5", "5"))
+            .suggests((context, builder) -> {
+              return Completions.suggest(builder, "1", "1.5", "2", "0.5", "5");
+            })
 
             .executes(c -> changeSpeed(
                 getUserSender(c),
@@ -75,7 +78,7 @@ public class CommandSpeed extends FtcCommand {
 
     attribute.setBaseValue(modifier * amount);
 
-    source.sendAdmin(
+    source.sendSuccess(
         Component.text("Set " + (fly ? "fly" : "walk") + "ing speed of ")
             .append(user.displayName().color(NamedTextColor.YELLOW))
             .append(Component.text(" to "))

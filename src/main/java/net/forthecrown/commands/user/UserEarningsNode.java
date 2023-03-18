@@ -89,7 +89,7 @@ class UserEarningsNode extends UserCommandNode {
 
                   data.getAutoSelling().clear();
 
-                  c.getSource().sendAdmin(
+                  c.getSource().sendSuccess(
                       format("Cleared {0, user}'s auto sell materials",
                           user
                       )
@@ -107,7 +107,7 @@ class UserEarningsNode extends UserCommandNode {
 
                       earnings.getAutoSelling().add(material);
 
-                      c.getSource().sendAdmin(
+                      c.getSource().sendSuccess(
                           format("Added {0} to {1, user}'s auto sell list",
                               material, user
                           )
@@ -126,7 +126,7 @@ class UserEarningsNode extends UserCommandNode {
 
                       earnings.getAutoSelling().remove(material);
 
-                      c.getSource().sendAdmin(
+                      c.getSource().sendSuccess(
                           format("Removed {0} from {1, user}'s auto sell list",
                               material, user
                           )
@@ -169,7 +169,7 @@ class UserEarningsNode extends UserCommandNode {
 
                   earnings.clear();
 
-                  c.getSource().sendAdmin(format("Cleared {0, user}'s earnings", user));
+                  c.getSource().sendSuccess(format("Cleared {0, user}'s earnings", user));
                   return 0;
                 })
             )
@@ -185,7 +185,7 @@ class UserEarningsNode extends UserCommandNode {
 
                           int newAmount = earnings.get(material) + amount;
 
-                          c.getSource().sendAdmin(
+                          c.getSource().sendSuccess(
                               format(
                                   "Added {0, rhines} to {1} earnings of {2, user}, now {3, rhines}",
                                   amount, material, user, newAmount
@@ -206,7 +206,7 @@ class UserEarningsNode extends UserCommandNode {
 
                       earnings.remove(material);
 
-                      c.getSource().sendAdmin(removedMessage(material, user));
+                      c.getSource().sendSuccess(removedMessage(material, user));
                       return 0;
                     })
 
@@ -223,9 +223,9 @@ class UserEarningsNode extends UserCommandNode {
                           earnings.set(material, newAmount);
 
                           if (newAmount <= 0) {
-                            c.getSource().sendAdmin(removedMessage(material, user));
+                            c.getSource().sendSuccess(removedMessage(material, user));
                           } else {
-                            c.getSource().sendAdmin(
+                            c.getSource().sendSuccess(
                                 format("Decremented {0} earnings of {1, user} " +
                                         "by {2, rhines}, now: {3, rhines}",
                                     material.name().toLowerCase(),
@@ -253,9 +253,9 @@ class UserEarningsNode extends UserCommandNode {
                           earnings.set(material, amount);
 
                           if (amount == 0) {
-                            c.getSource().sendAdmin(removedMessage(material, user));
+                            c.getSource().sendSuccess(removedMessage(material, user));
                           } else {
-                            c.getSource().sendAdmin(
+                            c.getSource().sendSuccess(
                                 format("Set {0} earnings of {1, user} to {2, rhines}",
                                     material.name().toLowerCase(Locale.ROOT),
                                     user, amount

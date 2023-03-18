@@ -4,7 +4,8 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.registry.Keys;
-import net.forthecrown.royalgrenadier.VanillaMappedArgument;
+import net.forthecrown.grenadier.internal.VanillaMappedArgument;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.arguments.ScoreHolderArgument;
 
 public class FtcKeyArgument implements ArgumentType<String>, VanillaMappedArgument {
@@ -23,7 +24,7 @@ public class FtcKeyArgument implements ArgumentType<String>, VanillaMappedArgume
   }
 
   @Override
-  public ArgumentType<?> getVanillaArgumentType() {
+  public ArgumentType<?> getVanillaType(CommandBuildContext context) {
     return ScoreHolderArgument.scoreHolder();
   }
 }

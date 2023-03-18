@@ -88,7 +88,7 @@ class PunishPage extends AdminUiPage {
                 }
 
                 if (!Punishments.canPunish(
-                    user.getCommandSource(null),
+                    user.getCommandSource(),
                     target
                 )) {
                   throw Exceptions.cannotPunish(target);

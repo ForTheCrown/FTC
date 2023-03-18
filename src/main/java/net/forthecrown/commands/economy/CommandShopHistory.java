@@ -12,10 +12,12 @@ import net.forthecrown.economy.shops.HistoryEntry;
 import net.forthecrown.economy.shops.SignShop;
 import net.forthecrown.economy.shops.SignShops;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.args.ArgsArgument;
-import net.forthecrown.grenadier.types.args.Argument;
-import net.forthecrown.grenadier.types.args.ParsedArgs;
+import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.grenadier.types.options.ArgumentOption;
+import net.forthecrown.grenadier.types.options.Option;
+import net.forthecrown.grenadier.types.options.Options;
+import net.forthecrown.grenadier.types.options.OptionsArgument;
+import net.forthecrown.grenadier.types.options.ParsedOptions;
 import net.forthecrown.utils.LocationFileName;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.context.ContextOption;
@@ -27,6 +29,8 @@ import net.forthecrown.utils.text.format.page.PageFormat;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class CommandShopHistory extends FtcCommand {
 
@@ -53,16 +57,24 @@ public class CommandShopHistory extends FtcCommand {
    * Main Author: Julie
    */
 
-  public static final Argument<Integer> PAGE
-      = Argument.of("page", IntegerArgumentType.integer(1), 1);
+  public static final ArgumentOption<Integer> PAGE
+      = Options.argument(IntegerArgumentType.integer(1))
+      .addLabel("page")
+      .setDefaultValue(1)
+      .build();
 
-  public static final Argument<Integer> PAGE_SIZE
-      = Argument.of("page_size", IntegerArgumentType.integer(5, 25), 10);
+  public static final ArgumentOption<Integer> PAGE_SIZE
+      = Options.argument(IntegerArgumentType.integer(5, 25))
+      .setDefaultValue(10)
+      .addLabel("page_size")
+      .build();
 
-  public static final Argument<LocationFileName> SHOP_NAME
-      = Argument.of("shop_name", LocationFileName::parse);
+  public static final ArgumentOption<LocationFileName> SHOP_NAME
+      = Options.argument(LocationFileName::parse)
+      .addLabel("shop_name")
+      .build();
 
-  public static final ArgsArgument ARGS = ArgsArgument.builder()
+  public static final OptionsArgument ARGS = OptionsArgument.builder()
       .addRequired(PAGE)
       .addOptional(PAGE_SIZE)
       .addOptional(SHOP_NAME)
@@ -97,46 +109,38 @@ public class CommandShopHistory extends FtcCommand {
     return format;
   });
 
-  public static final ParsedArgs EMPTY = new ParsedArgs() {
+  public static final ParsedOptions EMPTY = new ParsedOptions() {
     @Override
-    public <T> T getOrDefault(Argument<T> argument, T t) {
-      return t;
+    public @Nullable ParsedOption getParsedOption(@NotNull Option option) {
+      return null;
     }
 
     @Override
-    public <T> T getOrDefault(String s, Class<T> aClass, T t) {
-      return t;
-    }
-
-    @Override
-    public <T> T getOrDefault(String s, Class<T> aClass, T t, CommandSource source) {
-      return t;
-    }
-
-    @Override
-    public int size() {
-      return 0;
+    public @Nullable ParsedOption getParsedOption(@NotNull String label) {
+      return null;
     }
   };
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .executes(c -> viewPage(c.getSource(), EMPTY))
 
         .then(argument("args", ARGS)
-            .executes(c -> viewPage(c.getSource(), c.getArgument("args", ParsedArgs.class)))
+            .executes(c -> viewPage(c.getSource(), c.getArgument("args", ParsedOptions.class)))
         );
   }
 
-  private int viewPage(CommandSource source, ParsedArgs args) throws CommandSyntaxException {
+  private int viewPage(CommandSource source, ParsedOptions args)
+      throws CommandSyntaxException
+  {
     SignShop shop;
 
     // Get shop, if we were given a shop name
     // get that, else, get the shop the sender is
     // looking at
     if (args.has(SHOP_NAME)) {
-      var name = args.get(SHOP_NAME);
+      var name = args.getValue(SHOP_NAME);
       var shops = Economy.get().getShops();
 
       if ((shop = shops.getShop(name)) == null) {
@@ -154,8 +158,8 @@ public class CommandShopHistory extends FtcCommand {
       throw Exceptions.NOTHING_TO_LIST;
     }
 
-    int page = args.get(PAGE) - 1;
-    int pageSize = args.get(PAGE_SIZE);
+    int page = args.getValue(PAGE) - 1;
+    int pageSize = args.getValue(PAGE_SIZE);
 
     // Ensure the page is valid
     Commands.ensurePageValid(page, pageSize, history.size());

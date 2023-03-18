@@ -4,7 +4,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.utils.dialogue.DialogueManager;
 
 public class CommandNpcDialogue extends FtcCommand {
@@ -19,7 +19,7 @@ public class CommandNpcDialogue extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command.then(argument("input", StringArgumentType.greedyString())
         .executes(c -> {
           String input = c.getArgument("input", String.class);

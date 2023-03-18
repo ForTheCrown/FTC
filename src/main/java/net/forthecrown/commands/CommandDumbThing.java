@@ -4,7 +4,7 @@ import java.util.function.Function;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.FTC;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.utils.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -32,7 +32,7 @@ public class CommandDumbThing extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .executes(c -> {
           Player player = c.getSource().asPlayer();

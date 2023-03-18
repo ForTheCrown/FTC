@@ -10,7 +10,7 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.user.User;
 import net.forthecrown.user.data.UserHomes;
 import net.forthecrown.utils.text.Text;
@@ -43,7 +43,7 @@ public class CommandHomeList extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         // /homes
         .executes(c -> {

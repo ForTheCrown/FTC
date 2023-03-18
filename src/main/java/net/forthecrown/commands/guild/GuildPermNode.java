@@ -8,7 +8,7 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.Messages;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.types.EnumArgument;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.guilds.GuildPermission;
 import net.forthecrown.guilds.GuildPermissionsBook;
 
@@ -21,7 +21,7 @@ class GuildPermNode extends GuildCommandNode {
   @Override
   protected <T extends ArgumentBuilder<CommandSource, T>> void create(T command) {
     command
-        .then(argument("permission", EnumArgument.of(GuildPermission.class))
+        .then(argument("permission", ArgumentTypes.enumType(GuildPermission.class))
             .then(argument("rank_id", IntegerArgumentType.integer(ID_MEMBER, ID_LEADER - 1))
                 .then(guildArgument()
                     .executes(c -> {

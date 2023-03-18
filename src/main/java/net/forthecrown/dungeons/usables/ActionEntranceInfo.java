@@ -4,6 +4,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.useables.Usable;
@@ -19,7 +20,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class ActionEntranceInfo extends UsageAction {
 
-  public static final EnumArgument<Type> TYPE_PARSER = EnumArgument.of(Type.class);
+  public static final EnumArgument<Type> TYPE_PARSER
+      = ArgumentTypes.enumType(Type.class);
 
   // --- TYPE ---
   public static final UsageType<ActionEntranceInfo> TYPE = UsageType.of(ActionEntranceInfo.class)

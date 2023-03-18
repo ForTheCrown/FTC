@@ -43,7 +43,7 @@ public class EmoteScare extends CommandEmote {
   @Override
   public int execute(User sender, User target) {
     sender.sendMessage(scareSender(target));
-    target.sendMessage(scareTarget(sender, test(sender.getCommandSource(this))));
+    target.sendMessage(scareTarget(sender, test(sender.getCommandSource())));
 
     scare(target.getPlayer());
     return 0;

@@ -14,10 +14,11 @@ import net.forthecrown.core.admin.EntryNote;
 import net.forthecrown.core.admin.PunishEntry;
 import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.forthecrown.utils.text.writer.TextWriters;
+import net.kyori.adventure.text.Component;
 
 public class CommandNotes extends FtcCommand {
 
@@ -58,7 +59,7 @@ public class CommandNotes extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(argument("user", Arguments.USER)
             .executes(c -> {
@@ -112,7 +113,9 @@ public class CommandNotes extends FtcCommand {
 
                       notes.remove(index - 1);
 
-                      c.getSource().sendAdmin("Removed note from " + entry.getUser().getName());
+                      c.getSource().sendSuccess(
+                          Component.text("Removed note from " + entry.getUser().getName())
+                      );
                       return 0;
                     })
                 )

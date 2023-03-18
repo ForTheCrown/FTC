@@ -3,8 +3,8 @@ package net.forthecrown.structure;
 import static net.minecraft.world.entity.Entity.ID_TAG;
 
 import net.forthecrown.nbt.CompoundTag;
+import net.forthecrown.nbt.paper.TagTranslators;
 import net.forthecrown.utils.VanillaAccess;
-import net.forthecrown.utils.io.TagTranslators;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.spongepowered.math.vector.Vector3d;

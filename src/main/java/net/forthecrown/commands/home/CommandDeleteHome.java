@@ -12,7 +12,7 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.forthecrown.user.data.UserHomes;
@@ -50,7 +50,7 @@ public class CommandDeleteHome extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         // /deletehome
         .executes(c -> {
@@ -96,7 +96,7 @@ public class CommandDeleteHome extends FtcCommand {
     if (self) {
       user.sendMessage(Messages.deletedHomeSelf(name));
     } else {
-      source.sendAdmin(Messages.deletedHomeOther(user, name));
+      source.sendSuccess(Messages.deletedHomeOther(user, name));
     }
 
     user.playSound(Sound.UI_TOAST_IN, 2, 1.3f);

@@ -34,7 +34,7 @@ public class ChallengeParser {
     JsonWrapper json = JsonWrapper.wrap(object);
 
     if (!json.has(KEY_NAME)) {
-      return Results.errorResult("No display name specified");
+      return Results.error("No display name specified");
     }
 
     JsonChallenge.Builder builder = JsonChallenge.builder()
@@ -78,7 +78,7 @@ public class ChallengeParser {
         );
 
         if (!Event.class.isAssignableFrom(eventClass)) {
-          return Results.errorResult(
+          return Results.error(
               "Class '%s' is not a sub class of '%s'",
               eventClass.getName(), Event.class.getName()
           );
@@ -90,7 +90,7 @@ public class ChallengeParser {
             && !PlayerEvent.class.isAssignableFrom(eventClass)
             && eventClass != PlayerDeathEvent.class
         ) {
-          return Results.errorResult(
+          return Results.error(
               "No script specified and given event (%s) " +
                   "was not a player event",
 
@@ -98,7 +98,7 @@ public class ChallengeParser {
           );
         }
       } catch (ClassNotFoundException e) {
-        return Results.errorResult(
+        return Results.error(
             "Class '%s' not found",
             className
         );

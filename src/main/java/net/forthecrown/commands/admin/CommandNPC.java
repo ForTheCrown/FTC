@@ -1,13 +1,15 @@
 package net.forthecrown.commands.admin;
 
+import static net.kyori.adventure.text.Component.text;
+
 import java.util.Collection;
 import net.forthecrown.commands.arguments.RegistryArguments;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.npc.Npcs;
 import net.forthecrown.core.npc.SimpleNpc;
 import net.forthecrown.core.registry.Holder;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.selectors.EntityArgument;
+import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
@@ -33,13 +35,13 @@ public class CommandNPC extends FtcCommand {
 
   @Override
   @SuppressWarnings("unchecked")
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
-        .then(argument("entities", EntityArgument.multipleEntities())
+        .then(argument("entities", ArgumentTypes.entities())
             .then(argument("key", RegistryArguments.NPC)
 
                 .executes(c -> {
-                  Collection<Entity> entities = EntityArgument.getEntities(c, "entities");
+                  Collection<Entity> entities = ArgumentTypes.getEntities(c, "entities");
                   Holder<SimpleNpc> npcHolder = c.getArgument("key", Holder.class);
                   String key = npcHolder.getKey();
 
@@ -51,8 +53,9 @@ public class CommandNPC extends FtcCommand {
                     Npcs.make(key, e);
                   });
 
-                  c.getSource()
-                      .sendAdmin("Added " + key + " tag to " + entities.size() + " entities");
+                  c.getSource().sendSuccess(
+                      text("Added " + key + " tag to " + entities.size() + " entities")
+                  );
                   return 0;
                 })
             )

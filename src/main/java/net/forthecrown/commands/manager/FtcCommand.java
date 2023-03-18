@@ -15,11 +15,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.forthecrown.commands.help.FtcHelpMap;
-import net.forthecrown.core.FTC;
-import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
+import net.forthecrown.grenadier.AbstractCommand;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.AbstractCommand;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.text.writer.TextWriter;
@@ -39,17 +37,12 @@ public abstract class FtcCommand extends AbstractCommand {
   private final LinkedList<Usage> usages = new LinkedList<>();
 
   protected FtcCommand(@NotNull String name) {
-    super(name, FTC.getPlugin());
-
-    // unknown command for permission message cuz you
-    // don't need to know what kinds of commands we have
-    permissionMessage(Messages.UNKNOWN_COMMAND);
+    super(name);
 
     setPermission(Permissions.registerCmd(getName()));
     setDescription(DEFAULT_DESCRIPTION);
 
-    FtcHelpMap.getInstance()
-        .addCommand(this);
+    FtcHelpMap.getInstance().addCommand(this);
   }
 
   public String getHelpListName() {
@@ -110,7 +103,8 @@ public abstract class FtcCommand extends AbstractCommand {
       return;
     }
 
-    if (aliases != null) {
+    var aliases = getAliases();
+    if (aliases != null && !aliases.isEmpty()) {
       writer.field("Aliases", Joiner.on(", ").join(aliases));
     }
 
@@ -122,7 +116,7 @@ public abstract class FtcCommand extends AbstractCommand {
 
     if (source.hasPermission(Permissions.ADMIN)) {
       var perm = getPermission();
-      writer.field("Permission", perm == null ? "unset" : perm.getName());
+      writer.field("Permission", perm == null ? "unset" : perm);
     }
   }
 
@@ -188,6 +182,10 @@ public abstract class FtcCommand extends AbstractCommand {
     default UsageFactory withPermission(Permission permission) {
       return arguments -> usage(arguments).setPermission(permission);
     }
+
+    default UsageFactory withPermission(String permission) {
+      return arguments -> usage(arguments).setPermission(permission);
+    }
   }
 
   /**
@@ -216,6 +214,10 @@ public abstract class FtcCommand extends AbstractCommand {
     private Predicate<CommandSource> condition = source -> true;
 
     public Usage setPermission(Permission permission) {
+      return setCondition(source -> source.hasPermission(permission));
+    }
+
+    public Usage setPermission(String permission) {
       return setCondition(source -> source.hasPermission(permission));
     }
 

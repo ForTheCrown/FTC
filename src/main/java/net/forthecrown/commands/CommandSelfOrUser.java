@@ -8,7 +8,7 @@ import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.StaffChat;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.inventory.ItemStacks;
 import org.bukkit.Bukkit;
@@ -55,7 +55,7 @@ public class CommandSelfOrUser extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .executes(c -> function.run(getUserSender(c), c.getSource(), true))
 
@@ -92,7 +92,7 @@ public class CommandSelfOrUser extends FtcCommand {
             user.sendMessage(Messages.FED);
           }
 
-          source.sendAdmin(Messages.feeding(user));
+          source.sendSuccess(Messages.feeding(user));
           return 0;
         }
     );
@@ -150,7 +150,7 @@ public class CommandSelfOrUser extends FtcCommand {
 
           item.setItemMeta(meta);
 
-          source.sendAdmin(Messages.repairedItem(user));
+          source.sendSuccess(Messages.repairedItem(user));
           return 0;
         }
     );
@@ -180,7 +180,7 @@ public class CommandSelfOrUser extends FtcCommand {
             if (self) {
               user.sendMessage(Messages.toggleStaffChatSelf(state));
             } else {
-              source.sendAdmin(Messages.toggleStaffChatOther(user, state));
+              source.sendSuccess(Messages.toggleStaffChatOther(user, state));
             }
           }
         },

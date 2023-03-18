@@ -29,19 +29,19 @@ public class GateType extends PieceType<GatePiece> {
     String structName = json.getString("struct");
 
     if (structName == null) {
-      return DataResult.error("No 'struct' set");
+      return Results.error("No 'struct' set");
     }
 
     var opt = Structures.get().getRegistry().get(structName);
 
     if (opt.isEmpty()) {
-      return Results.errorResult("No structure named '%s'", structName);
+      return Results.error("No structure named '%s'", structName);
     }
 
     JsonWrapper palettes = json.getWrapped("palettes");
 
     if (palettes == null) {
-      return DataResult.error(
+      return Results.error(
           "No 'palettes' key to specify 'open' and 'closed' palettes"
       );
     }

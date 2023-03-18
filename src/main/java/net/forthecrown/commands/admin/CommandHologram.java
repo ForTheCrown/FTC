@@ -1,5 +1,7 @@
 package net.forthecrown.commands.admin;
 
+import static net.kyori.adventure.text.Component.text;
+
 import com.mojang.brigadier.arguments.StringArgumentType;
 import java.util.Collection;
 import javax.annotation.Nullable;
@@ -7,9 +9,8 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.FTC;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.pos.PositionArgument;
-import net.forthecrown.grenadier.types.selectors.EntityArgument;
+import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.utils.text.Text;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -46,12 +47,12 @@ public class CommandHologram extends FtcCommand {
    */
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(literal("remove")
-            .then(argument("holograms", EntityArgument.multipleEntities())
+            .then(argument("holograms", ArgumentTypes.entities())
                 .executes(c -> {
-                  Collection<Entity> entities = EntityArgument.getEntities(c, "holograms");
+                  Collection<Entity> entities = ArgumentTypes.getEntities(c, "holograms");
 
                   int removed = 0;
                   for (Entity e : entities) {
@@ -69,7 +70,7 @@ public class CommandHologram extends FtcCommand {
                     removed++;
                   }
 
-                  c.getSource().sendAdmin("Removed " + removed + " holograms");
+                  c.getSource().sendSuccess(text("Removed " + removed + " holograms"));
                   return removed;
                 })
             )
@@ -85,10 +86,10 @@ public class CommandHologram extends FtcCommand {
                 })
             )
 
-            .then(argument("location", PositionArgument.position())
+            .then(argument("location", ArgumentTypes.position())
                 .then(argument("text", StringArgumentType.greedyString())
                     .executes(c -> {
-                      Location loc = PositionArgument.getLocation(c, "location");
+                      Location loc = ArgumentTypes.getLocation(c, "location");
                       createHologram(c.getSource(), loc, c.getArgument("text", String.class));
                       return 0;
                     })
@@ -121,8 +122,8 @@ public class CommandHologram extends FtcCommand {
     }
 
     if (source != null) {
-      source.sendAdmin("Created hologram(s) named:");
-      source.sendAdmin(input.replaceAll("\\{NL}", "\n"));
+      source.sendSuccess(text("Created hologram(s) named:"));
+      source.sendSuccess(text(input.replaceAll("\\{NL}", "\n")));
     }
   }
 }

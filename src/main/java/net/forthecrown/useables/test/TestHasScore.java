@@ -4,9 +4,10 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.types.args.ArgsArgument;
-import net.forthecrown.grenadier.types.args.Argument;
-import net.forthecrown.grenadier.types.scoreboard.ObjectiveArgument;
+import net.forthecrown.grenadier.types.ArgumentTypes;
+import net.forthecrown.grenadier.types.options.ArgumentOption;
+import net.forthecrown.grenadier.types.options.Options;
+import net.forthecrown.grenadier.types.options.OptionsArgument;
 import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.nbt.CompoundTag;
@@ -20,6 +21,7 @@ import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.advancements.critereon.MinMaxBounds;
+import net.minecraft.advancements.critereon.MinMaxBounds.Ints;
 import net.minecraft.commands.arguments.RangeArgument;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -29,13 +31,17 @@ public class TestHasScore extends UsageTest {
 
   // --- PARSING ---
 
-  static final Argument<Objective> OBJ_ARG
-      = Argument.builder("objective", ObjectiveArgument.objective()).build();
+  static final ArgumentOption<Objective> OBJ_ARG
+      = Options.argument(ArgumentTypes.objective())
+      .addLabel("objective")
+      .build();
 
-  static final Argument<MinMaxBounds.Ints> BOUNDS_ARG
-      = Argument.builder("bounds", RangeArgument.intRange()).build();
+  static final ArgumentOption<Ints> BOUNDS_ARG
+      = Options.argument(RangeArgument.intRange())
+      .addLabel("bounds")
+      .build();
 
-  static final ArgsArgument PARSER = ArgsArgument.builder()
+  static final OptionsArgument PARSER = OptionsArgument.builder()
       .addRequired(OBJ_ARG)
       .addRequired(BOUNDS_ARG)
       .build();
@@ -105,15 +111,15 @@ public class TestHasScore extends UsageTest {
     var parsed = PARSER.parse(reader);
 
     return new TestHasScore(
-        parsed.get(OBJ_ARG).getName(),
-        parsed.get(BOUNDS_ARG)
+        parsed.getValue(OBJ_ARG).getName(),
+        parsed.getValue(BOUNDS_ARG)
     );
   }
 
   @UsableConstructor(ConstructType.TAG)
   public static TestHasScore load(BinaryTag element) throws CommandSyntaxException {
     var wrapper = element.asCompound();
-    Objective objective = ObjectiveArgument.objective()
+    Objective objective = ArgumentTypes.objective()
         .parse(new StringReader(wrapper.getString("objective")));
 
     return new TestHasScore(

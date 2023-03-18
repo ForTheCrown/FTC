@@ -16,9 +16,7 @@ import org.tomlj.Toml;
 import org.tomlj.TomlTable;
 
 public final class SerializationHelper {
-
-  private SerializationHelper() {
-  }
+  private SerializationHelper() {}
 
   private static final Logger LOGGER = Loggers.getLogger();
 
@@ -47,14 +45,14 @@ public final class SerializationHelper {
 
   public static <T> DataResult<T> readFileObject(Path file, IoReader<T> reader) {
     if (!Files.exists(file)) {
-      return Results.errorResult("File '%s' doesn't exist", file);
+      return Results.error("File '%s' doesn't exist", file);
     }
 
     try {
-      return DataResult.success(reader.apply(file));
+      return Results.success(reader.apply(file));
     } catch (IOException e) {
       LOGGER.error("Error writing file: '" + file + "'", e);
-      return DataResult.error(e.getMessage());
+      return Results.error(e.getMessage());
     }
   }
 
@@ -91,10 +89,10 @@ public final class SerializationHelper {
     return readFileObject(path, Toml::parse).flatMap(t -> {
       if (!t.errors().isEmpty()) {
         t.errors().forEach(LOGGER::error);
-        return DataResult.error("TOML read errors");
+        return Results.error("TOML read errors");
       }
 
-      return DataResult.success(TomlUtil.toJson(t));
+      return Results.success(TomlUtil.toJson(t));
     });
   }
 

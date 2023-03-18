@@ -30,7 +30,7 @@ import net.forthecrown.core.DynmapUtil;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.SettingsBook;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.user.User;
 import net.forthecrown.user.data.UserInteractions;
 import net.forthecrown.user.property.BoolProperty;
@@ -137,7 +137,7 @@ public class ToggleCommand extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         // /<command>
         .executes(c -> {
@@ -160,7 +160,7 @@ public class ToggleCommand extends FtcCommand {
 
               property.setState(user, state);
 
-              c.getSource().sendAdmin(Messages.toggleOther(displayName, user, state));
+              c.getSource().sendSuccess(Messages.toggleOther(displayName, user, state));
               return 0;
             })
         );

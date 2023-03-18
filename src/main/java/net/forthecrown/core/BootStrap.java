@@ -21,7 +21,6 @@ import net.forthecrown.economy.Economy;
 import net.forthecrown.economy.Transactions;
 import net.forthecrown.events.Events;
 import net.forthecrown.events.MobHealthBar;
-import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.guilds.GuildManager;
 import net.forthecrown.guilds.unlockables.Unlockables;
 import net.forthecrown.inventory.ExtendedItems;
@@ -53,8 +52,6 @@ final class BootStrap {
   private static final Logger LOGGER = Loggers.getPluginLogger();
 
   static void init() {
-    RoyalCommandException.ENABLE_HOVER_STACK_TRACE = FTC.inDebugMode();
-
     long freeMem = Runtime.getRuntime().freeMemory();
 
     // Tools

@@ -58,7 +58,7 @@ public class EmoteJingle extends CommandEmote {
   @Override
   public int execute(User sender, User target) {
     sender.sendMessage(jingleSender(target));
-    target.sendMessage(jingleTarget(sender, test(target.getCommandSource(this))));
+    target.sendMessage(jingleTarget(sender, test(target.getCommandSource())));
 
     jingle(target);
     return 0;

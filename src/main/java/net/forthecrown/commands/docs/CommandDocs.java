@@ -149,9 +149,9 @@ public class CommandDocs {
     }
 
     String name = command.getHelpListName();
-    String perm = command.getPerm();
+    String perm = command.getPermission();
     String desc = command.getDescription();
-    String[] aliases = command.getAliases();
+    List<String> aliases = command.getAliases();
 
     CommandDocument document = new CommandDocument(name, perm, aliases, desc);
     document.usages.addAll(command.getUsages());
@@ -170,7 +170,7 @@ public class CommandDocs {
   class CommandDocument {
     private final String name;
     private final String permission;
-    private final String[] aliases;
+    private final List<String> aliases;
     private final String description;
     private final List<Usage> usages = new ObjectArrayList<>();
 
@@ -203,7 +203,7 @@ public class CommandDocs {
         writer.newLine();
       }
 
-      if (!ArrayUtils.isEmpty(aliases)) {
+      if (!aliases.isEmpty()) {
         StringJoiner joiner = new StringJoiner("`, `", "`", "`");
         for (var s: aliases) {
           joiner.add(s);

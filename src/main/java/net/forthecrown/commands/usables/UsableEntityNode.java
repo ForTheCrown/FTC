@@ -1,5 +1,7 @@
 package net.forthecrown.commands.usables;
 
+import static net.kyori.adventure.text.Component.text;
+
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -7,11 +9,10 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.Commands;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.types.selectors.EntityArgument;
-import net.forthecrown.grenadier.types.selectors.EntitySelector;
+import net.forthecrown.grenadier.types.ArgumentTypes;
+import net.forthecrown.grenadier.types.EntitySelector;
 import net.forthecrown.useables.UsableEntity;
 import net.forthecrown.useables.Usables;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Entity;
@@ -32,11 +33,11 @@ class UsableEntityNode extends BukkitUsableNode<UsableEntity> {
   @Override
   protected void createNewUsableArguments(LiteralArgumentBuilder<CommandSource> command) {
     command
-        .then(argument("entity", EntityArgument.entity())
+        .then(argument("entity", ArgumentTypes.entity())
             .executes(c -> {
               CommandSource source = c.getSource();
               Entity entity = c.getArgument("entity", EntitySelector.class)
-                  .getEntity(source);
+                  .findEntity(source);
 
               if (entity instanceof Player) {
                 throw Exceptions.PLAYER_USABLE;
@@ -48,7 +49,7 @@ class UsableEntityNode extends BukkitUsableNode<UsableEntity> {
 
               Usables.getInstance().createEntity(entity);
 
-              c.getSource().sendAdmin("Creating usable entity");
+              c.getSource().sendSuccess(text("Creating usable entity"));
               return 0;
             })
         );
@@ -63,20 +64,20 @@ class UsableEntityNode extends BukkitUsableNode<UsableEntity> {
           var holder = provider.get(c);
           Usables.getInstance().deleteEntity(holder);
 
-          c.getSource().sendAdmin("Deleted usable entity");
+          c.getSource().sendSuccess(text("Deleted usable entity"));
           return 0;
         });
   }
 
   @Override
   protected ArgumentType<?> getArgumentType() {
-    return EntityArgument.entity();
+    return ArgumentTypes.entity();
   }
 
   @Override
   protected UsableEntity get(String argumentName, CommandContext<CommandSource> context)
       throws CommandSyntaxException {
-    var entity = EntityArgument.getEntity(context, argumentName);
+    var entity = ArgumentTypes.getEntity(context, argumentName);
     var usables = Usables.getInstance();
 
     if (entity instanceof Player) {
@@ -96,8 +97,8 @@ class UsableEntityNode extends BukkitUsableNode<UsableEntity> {
           "Entity {0} is not usable!\n{1} to make it usable",
           entity.teamDisplayName(),
 
-          Component.text("[" + command + "]", NamedTextColor.AQUA)
-              .hoverEvent(Component.text("Click to run"))
+          text("[" + command + "]", NamedTextColor.AQUA)
+              .hoverEvent(text("Click to run"))
               .clickEvent(ClickEvent.runCommand(command))
       );
     }

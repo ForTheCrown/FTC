@@ -8,7 +8,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import java.util.concurrent.CompletableFuture;
 import net.forthecrown.commands.manager.Exceptions;
-import net.forthecrown.grenadier.CompletionProvider;
+import net.forthecrown.grenadier.Completions;
 import net.forthecrown.guilds.Guild;
 import net.forthecrown.guilds.GuildManager;
 
@@ -34,7 +34,7 @@ public class GuildArgument implements ArgumentType<Guild> {
   public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
                                                             SuggestionsBuilder builder
   ) {
-    return CompletionProvider.suggestMatching(builder,
+    return Completions.suggest(builder,
         GuildManager.get().getGuilds()
             .stream()
             .map(Guild::getName)

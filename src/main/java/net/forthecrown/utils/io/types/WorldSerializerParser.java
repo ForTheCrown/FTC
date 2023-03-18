@@ -3,7 +3,7 @@ package net.forthecrown.utils.io.types;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
-import net.forthecrown.grenadier.types.WorldArgument;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
@@ -30,6 +30,6 @@ public class WorldSerializerParser implements SerializerParser<World> {
 
   @Override
   public @NotNull ArgumentType<World> getArgumentType() {
-    return WorldArgument.world();
+    return ArgumentTypes.world();
   }
 }

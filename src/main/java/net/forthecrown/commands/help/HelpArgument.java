@@ -8,10 +8,9 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import java.util.concurrent.CompletableFuture;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.royalgrenadier.VanillaMappedArgument;
-import net.minecraft.commands.arguments.GameProfileArgument;
+import net.forthecrown.grenadier.Readers;
 
-public class HelpArgument implements ArgumentType<String>, VanillaMappedArgument {
+public class HelpArgument implements ArgumentType<String> {
 
   @Override
   public String parse(StringReader reader) throws CommandSyntaxException {
@@ -21,14 +20,7 @@ public class HelpArgument implements ArgumentType<String>, VanillaMappedArgument
       return reader.readQuotedString();
     }
 
-    int start = reader.getCursor();
-
-    while (reader.canRead() && reader.peek() != ' ') {
-      reader.skip();
-    }
-
-    return reader.getString()
-        .substring(start, reader.getCursor());
+    return Readers.readUntilWhitespace(reader);
   }
 
   @Override
@@ -40,12 +32,6 @@ public class HelpArgument implements ArgumentType<String>, VanillaMappedArgument
       return builder.buildFuture();
     }
 
-    return FtcHelpMap.getInstance()
-        .suggest(source, builder);
-  }
-
-  @Override
-  public ArgumentType<?> getVanillaArgumentType() {
-    return GameProfileArgument.gameProfile();
+    return FtcHelpMap.getInstance().suggest(source, builder);
   }
 }

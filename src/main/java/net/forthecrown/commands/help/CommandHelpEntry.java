@@ -2,7 +2,6 @@ package net.forthecrown.commands.help;
 
 import static net.kyori.adventure.text.Component.text;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -45,7 +44,7 @@ public class CommandHelpEntry implements HelpEntry {
     strings.add(command.getName());
 
     if (command.getAliases() != null) {
-      strings.addAll(Arrays.asList(command.getAliases()));
+      strings.addAll(command.getAliases());
     }
 
     strings.addAll(command.createKeywords());

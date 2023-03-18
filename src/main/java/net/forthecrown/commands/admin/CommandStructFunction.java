@@ -1,7 +1,7 @@
 package net.forthecrown.commands.admin;
 
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.structure.FunctionInfo;
 
 public class CommandStructFunction extends FtcCommand {
@@ -28,7 +28,7 @@ public class CommandStructFunction extends FtcCommand {
    */
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(argument("args", FunctionInfo.PARSER));
   }

@@ -1,16 +1,16 @@
 package net.forthecrown.core;
 
-import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 
-public @UtilityClass class DynmapUtil {
+public final class DynmapUtil {
+  private DynmapUtil() {}
 
-  public boolean isInstalled() {
+  public static boolean isInstalled() {
     return Bukkit.getPluginManager()
         .getPlugin("dynmap") != null;
   }
 
-  void registerListener() {
+  static void registerListener() {
     if (!isInstalled()) {
       return;
     }

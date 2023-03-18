@@ -7,7 +7,7 @@ import net.forthecrown.core.FTC;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.config.GeneralConfig;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -47,7 +47,7 @@ public class CommandLeaderboard extends FtcCommand {
    */
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .executes(c -> {
           Player player = c.getSource().asPlayer();

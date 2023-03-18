@@ -23,7 +23,7 @@ public @UtilityClass class FtcCodecs {
 
   public final Codec<String> KEY_CODEC = Codec.STRING.comapFlatMap(s -> {
     if (!Keys.isValidKey(s)) {
-      return Results.errorResult("Invalid key '%s'", s);
+      return Results.error("Invalid key '%s'", s);
     }
 
     return DataResult.success(s);
@@ -75,7 +75,7 @@ public @UtilityClass class FtcCodecs {
                 World w = Bukkit.getWorld(s);
 
                 if (w == null) {
-                  return Results.errorResult(
+                  return Results.error(
                       "Unknown world: '%s'", s
                   );
                 }
@@ -137,7 +137,7 @@ public @UtilityClass class FtcCodecs {
         var result = map.get(s.toUpperCase());
 
         if (result == null) {
-          return Results.errorResult(
+          return Results.error(
               "Unknown '%s' constant: '%s'",
               eClass, s
           );
@@ -156,7 +156,7 @@ public @UtilityClass class FtcCodecs {
         }
       }
 
-      return Results.errorResult(
+      return Results.error(
           "Unknown '%s' constant: '%s'",
           eClass, s
       );

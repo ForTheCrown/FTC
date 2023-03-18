@@ -10,7 +10,9 @@ interface UserProvider {
 
   User get(CommandContext<CommandSource> c) throws CommandSyntaxException;
 
-  default User getOnline(CommandContext<CommandSource> c) throws CommandSyntaxException {
+  default User getOnline(CommandContext<CommandSource> c)
+      throws CommandSyntaxException
+  {
     var result = get(c);
 
     if (!result.isOnline()) {

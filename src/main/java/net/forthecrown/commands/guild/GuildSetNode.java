@@ -176,7 +176,7 @@ class GuildSetNode extends GuildCommandNode {
                     guild.getSettings().removeFlags(flag);
                   }
 
-                  c.getSource().sendAdmin(
+                  c.getSource().sendSuccess(
                       Text.format("{0} now set for {1}: {2}",
                           name,
                           guild.displayName(),

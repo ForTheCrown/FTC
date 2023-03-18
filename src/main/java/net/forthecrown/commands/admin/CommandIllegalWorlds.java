@@ -6,8 +6,8 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.config.GeneralConfig;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.WorldArgument;
+import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.TextJoiner;
 import net.kyori.adventure.text.Component;
@@ -53,7 +53,7 @@ public class CommandIllegalWorlds extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .executes(c -> {
           if (GeneralConfig.getIllegalWorlds().isEmpty()) {
@@ -70,12 +70,12 @@ public class CommandIllegalWorlds extends FtcCommand {
         })
 
         .then(literal("add")
-            .then(argument("world", WorldArgument.world())
+            .then(argument("world", ArgumentTypes.world())
                 .executes(c -> {
                   var world = getWorld(c);
                   GeneralConfig.illegalWorlds.add(world.getName());
 
-                  c.getSource().sendAdmin(
+                  c.getSource().sendSuccess(
                       Text.format("Added '{0}' to illegal worlds list", world.getName())
                   );
                   return 0;
@@ -84,12 +84,12 @@ public class CommandIllegalWorlds extends FtcCommand {
         )
 
         .then(literal("remove")
-            .then(argument("world", WorldArgument.world())
+            .then(argument("world", ArgumentTypes.world())
                 .executes(c -> {
                   var world = getWorld(c);
                   GeneralConfig.illegalWorlds.remove(world.getName());
 
-                  c.getSource().sendAdmin(
+                  c.getSource().sendSuccess(
                       Text.format("Removed '{0}' from illegal worlds list", world.getName())
                   );
                   return 0;

@@ -6,7 +6,7 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.events.player.PlayerJoinListener;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.user.User;
 import net.forthecrown.user.property.Properties;
 import net.kyori.adventure.text.Component;
@@ -56,7 +56,7 @@ public class CommandVanish extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .executes(c -> vanish(c.getSource(), getUserSender(c), false))
 
@@ -94,7 +94,7 @@ public class CommandVanish extends FtcCommand {
 
     user.set(Properties.VANISHED, !vanished);
 
-    source.sendAdmin(
+    source.sendSuccess(
         Component.text((vanished ? "Unv" : "V") + "anished ")
             .append(user.displayName())
     );

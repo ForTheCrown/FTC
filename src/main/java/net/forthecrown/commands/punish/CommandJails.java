@@ -10,7 +10,7 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.JailCell;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.core.registry.Registries;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.math.Bounds3i;
@@ -48,7 +48,7 @@ public class CommandJails extends FtcCommand {
    */
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .executes(c -> {
           TextWriter writer = TextWriters.newWriter();
@@ -98,7 +98,9 @@ public class CommandJails extends FtcCommand {
                   JailCell jailCell = new JailCell(w, pos, cell);
                   Registries.JAILS.register(k, jailCell);
 
-                  c.getSource().sendAdmin("Created jail cell: " + k);
+                  c.getSource().sendSuccess(
+                      Component.text("Created jail cell: " + k)
+                  );
                   return 0;
                 })
             )
@@ -110,7 +112,9 @@ public class CommandJails extends FtcCommand {
                   Holder<JailCell> cell = c.getArgument("jail", Holder.class);
                   Registries.JAILS.remove(cell.getKey());
 
-                  c.getSource().sendAdmin("Removed jail " + cell.getKey());
+                  c.getSource().sendSuccess(
+                      Component.text("Removed jail " + cell.getKey())
+                  );
                   return 0;
                 })
             )

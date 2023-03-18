@@ -35,7 +35,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Switch;
-import org.bukkit.craftbukkit.v1_19_R2.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
 
 /**
  * The end opener should automatically close and open the end portal in Hazelguard. It should be

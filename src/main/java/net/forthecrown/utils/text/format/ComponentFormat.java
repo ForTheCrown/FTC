@@ -20,8 +20,10 @@ import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.forthecrown.core.Main;
 import net.forthecrown.core.registry.Keys;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
@@ -83,7 +85,8 @@ public class ComponentFormat implements ComponentLike {
   /**
    * Used for parsing the {@link FormatType} in arguments
    */
-  private static final EnumArgument<FormatType> TYPE_PARSER = EnumArgument.of(FormatType.class);
+  private static final EnumArgument<FormatType> TYPE_PARSER
+      = ArgumentTypes.enumType(FormatType.class);
 
   /* ----------------------------- INSTANCE FIELDS ------------------------------ */
 
@@ -582,7 +585,7 @@ public class ComponentFormat implements ComponentLike {
 
         // Test if namespace is FTC's, if it is,
         // return the key's value only
-        if (key.namespace().equals(Keys.argumentType().getDefaultNamespace())) {
+        if (key.namespace().equals(Main.NAMESPACE)) {
           return text(key.value());
         }
 

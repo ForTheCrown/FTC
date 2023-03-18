@@ -7,8 +7,8 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import net.forthecrown.grenadier.CmdUtil;
-import net.forthecrown.grenadier.CompletionProvider;
+import net.forthecrown.grenadier.Completions;
+import net.forthecrown.grenadier.Grenadier;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 
@@ -72,11 +72,11 @@ public final class ChatEmotes {
     var token = builder.getRemainingLowerCase();
 
     for (var e : TOKEN_2_EMOTE.entrySet()) {
-      if (!CompletionProvider.startsWith(token, e.getKey())) {
+      if (!Completions.matches(token, e.getKey())) {
         continue;
       }
 
-      builder.suggest(e.getKey(), CmdUtil.toTooltip(e.getValue()));
+      builder.suggest(e.getKey(), Grenadier.toMessage(e.getValue()));
     }
 
     return builder.buildFuture();

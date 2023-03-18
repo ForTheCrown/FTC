@@ -1,19 +1,21 @@
 package net.forthecrown.commands.waypoint;
 
+import static net.kyori.adventure.text.Component.text;
+
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.arguments.RegistryArguments;
+import net.forthecrown.commands.manager.Commands;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.commands.manager.Readers;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.pos.PositionArgument;
+import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.utils.math.Vectors;
@@ -79,7 +81,7 @@ public class CommandWaypoints extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(argument("waypoint", Arguments.WAYPOINT)
             // /waypoints <point> move
@@ -94,9 +96,9 @@ public class CommandWaypoints extends FtcCommand {
                 })
 
                 // /waypoints <point> move <pos>
-                .then(argument("pos", PositionArgument.blockPos())
+                .then(argument("pos", ArgumentTypes.blockPosition())
                     .executes(c -> {
-                      var loc = PositionArgument.getLocation(c, "pos");
+                      var loc = ArgumentTypes.getLocation(c, "pos");
                       Vector3i pos = Vectors.intFrom(loc);
 
                       return move(c, pos, loc.getWorld());
@@ -122,7 +124,7 @@ public class CommandWaypoints extends FtcCommand {
                   WaypointManager.getInstance()
                       .removeWaypoint(waypoint);
 
-                  c.getSource().sendAdmin("Removed waypoint");
+                  c.getSource().sendSuccess(text("Removed waypoint"));
                   return 0;
                 })
             )
@@ -191,7 +193,7 @@ public class CommandWaypoints extends FtcCommand {
     if (unset) {
       waypoint.set(property, null);
 
-      c.getSource().sendAdmin(
+      c.getSource().sendSuccess(
           Text.format("Unset property {0}",
               holder.getKey()
           )
@@ -205,7 +207,7 @@ public class CommandWaypoints extends FtcCommand {
     Object value = type.getArgumentType()
         .parse(input);
 
-    Readers.ensureCannotRead(input);
+    Commands.ensureCannotRead(input);
 
     if (property == WaypointProperties.NAME) {
       String strValue = value.toString();
@@ -217,7 +219,7 @@ public class CommandWaypoints extends FtcCommand {
 
     waypoint.set(property, value);
 
-    c.getSource().sendAdmin(
+    c.getSource().sendSuccess(
         Text.format("Value of {0} is now {1}",
             property.getName(), type.display(value)
         )
@@ -239,7 +241,7 @@ public class CommandWaypoints extends FtcCommand {
 
     waypoint.setPosition(pos, world);
 
-    c.getSource().sendAdmin(
+    c.getSource().sendSuccess(
         Text.format("Moved waypoint to world={0}, pos={1}",
             world.getName(), pos
         )

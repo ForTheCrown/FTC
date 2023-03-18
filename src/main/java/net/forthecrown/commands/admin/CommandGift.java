@@ -3,8 +3,8 @@ package net.forthecrown.commands.admin;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.Worlds;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.selectors.EntityArgument;
+import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import org.bukkit.Location;
 import org.bukkit.block.Chest;
 import org.bukkit.command.CommandSender;
@@ -21,12 +21,12 @@ public class CommandGift extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
-        .then(argument("player", EntityArgument.player())
+        .then(argument("player", ArgumentTypes.player())
             .executes(c -> {
               CommandSender sender = c.getSource().asBukkit();
-              Player player = EntityArgument.getPlayer(c, "player");
+              Player player = ArgumentTypes.getPlayer(c, "player");
               Location targetLoc = player.getLocation();
 
               // Hardcoded coordinates, this is a recipe for great things

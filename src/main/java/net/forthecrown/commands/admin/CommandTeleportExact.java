@@ -4,11 +4,12 @@ import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.WorldArgument;
-import net.forthecrown.grenadier.types.args.ArgsArgument;
-import net.forthecrown.grenadier.types.args.Argument;
-import net.forthecrown.grenadier.types.args.ParsedArgs;
+import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.grenadier.types.ArgumentTypes;
+import net.forthecrown.grenadier.types.options.ArgumentOption;
+import net.forthecrown.grenadier.types.options.Options;
+import net.forthecrown.grenadier.types.options.OptionsArgument;
+import net.forthecrown.grenadier.types.options.ParsedOptions;
 import net.forthecrown.user.UserTeleport;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.text.Text;
@@ -20,18 +21,28 @@ import org.bukkit.entity.Player;
 
 public class CommandTeleportExact extends FtcCommand {
 
-  public static final Argument<World> WORLD = Argument.of("world", WorldArgument.world());
+  public static final ArgumentOption<World> WORLD
+      = Options.argument(ArgumentTypes.world(), "world");
 
-  public static final Argument<Double>
-      CORD_X = Argument.of("x", DoubleArgumentType.doubleArg()),
-      CORD_Y = Argument.of("y", DoubleArgumentType.doubleArg()),
-      CORD_Z = Argument.of("z", DoubleArgumentType.doubleArg());
+  public static final ArgumentOption<Double>
+      CORD_X = Options.argument(DoubleArgumentType.doubleArg(), "x"),
+      CORD_Y = Options.argument(DoubleArgumentType.doubleArg(), "y"),
+      CORD_Z = Options.argument(DoubleArgumentType.doubleArg(), "z");
 
-  public static final Argument<Float>
-      YAW = Argument.of("yaw", FloatArgumentType.floatArg(-180, 180), 0f),
-      PITCH = Argument.of("pitch", FloatArgumentType.floatArg(-90, 90), 0f);
+  public static final ArgumentOption<Float> YAW
+      = Options.argument(FloatArgumentType.floatArg(-180, 180))
+      .setDefaultValue(0F)
+      .addLabel("yaw")
+      .build();
 
-  public static final ArgsArgument ARGS = ArgsArgument.builder()
+
+  public static final ArgumentOption<Float> PITCH
+      = Options.argument(FloatArgumentType.floatArg(-90, 90))
+      .setDefaultValue(0F)
+      .addLabel("pitch")
+      .build();
+
+  public static final OptionsArgument ARGS = OptionsArgument.builder()
       .addRequired(WORLD)
 
       .addRequired(CORD_X)
@@ -80,20 +91,20 @@ public class CommandTeleportExact extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(argument("args", ARGS)
             .executes(c -> {
               var entity = c.getSource().as(Entity.class);
-              var args = c.getArgument("args", ParsedArgs.class);
+              var args = c.getArgument("args", ParsedOptions.class);
 
               Location loc = new Location(
-                  args.get(WORLD),
-                  args.get(CORD_X),
-                  args.get(CORD_Y),
-                  args.get(CORD_Z),
-                  args.get(YAW),
-                  args.get(PITCH)
+                  args.getValue(WORLD),
+                  args.getValue(CORD_X),
+                  args.getValue(CORD_Y),
+                  args.getValue(CORD_Z),
+                  args.getValue(YAW),
+                  args.getValue(PITCH)
               );
 
               if (entity instanceof Player player) {

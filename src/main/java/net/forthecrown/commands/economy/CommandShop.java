@@ -6,7 +6,7 @@ import net.forthecrown.core.Messages;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.economy.Economy;
 import net.forthecrown.economy.sell.SellShopMenu;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 
 public class CommandShop extends FtcCommand {
 
@@ -31,7 +31,7 @@ public class CommandShop extends FtcCommand {
    */
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .executes(c -> {
           var user = getUserSender(c);

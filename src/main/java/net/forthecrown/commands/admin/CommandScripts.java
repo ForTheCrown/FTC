@@ -18,30 +18,36 @@ import net.forthecrown.core.script2.ScriptLoadException;
 import net.forthecrown.core.script2.ScriptManager;
 import net.forthecrown.core.script2.ScriptResult;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.ArrayArgument;
-import net.forthecrown.grenadier.types.args.ArgsArgument;
-import net.forthecrown.grenadier.types.args.Argument;
-import net.forthecrown.grenadier.types.args.ParsedArgs;
+import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.grenadier.types.ArgumentTypes;
+import net.forthecrown.grenadier.types.options.ArgumentOption;
+import net.forthecrown.grenadier.types.options.Options;
+import net.forthecrown.grenadier.types.options.OptionsArgument;
+import net.forthecrown.grenadier.types.options.ParsedOptions;
 import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.writer.TextWriters;
 
 public class CommandScripts extends FtcCommand {
 
-  public static final Argument<List<String>> ARGS_ARRAY
-      = Argument.builder("args", ArrayArgument.of(StringArgumentType.string()))
+  public static final ArgumentOption<List<String>> ARGS_ARRAY
+      = Options.argument(ArgumentTypes.array(StringArgumentType.string()))
+      .addLabel("args")
+      .setDefaultValue(Collections.emptyList())
       .build();
 
-  public static final Argument<String> METHOD_NAME
-      = Argument.builder("method", StringArgumentType.string()).build();
+  public static final ArgumentOption<String> METHOD_NAME
+      = Options.argument(StringArgumentType.string())
+      .addLabel("method")
+      .build();
 
-  public static final Argument<Boolean> CLOSE_AFTER
-      = Argument.builder("close_after", BoolArgumentType.bool())
+  public static final ArgumentOption<Boolean> CLOSE_AFTER
+      = Options.argument(BoolArgumentType.bool())
+      .addLabel("close_after")
       .setDefaultValue(true)
       .build();
 
-  public static final ArgsArgument ARGS = ArgsArgument.builder()
+  public static final OptionsArgument ARGS = OptionsArgument.builder()
       .addOptional(ARGS_ARRAY)
       .addOptional(METHOD_NAME)
       .addOptional(CLOSE_AFTER)
@@ -91,7 +97,7 @@ public class CommandScripts extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         // /script eval <JavaScript>
         .then(literal("eval")
@@ -106,7 +112,7 @@ public class CommandScripts extends FtcCommand {
                 .executes(c -> run(c, CommandShopHistory.EMPTY))
 
                 .then(argument("args", ARGS)
-                    .executes(c -> run(c, c.getArgument("args", ParsedArgs.class)))
+                    .executes(c -> run(c, c.getArgument("args", ParsedOptions.class)))
                 )
             )
         )
@@ -152,7 +158,7 @@ public class CommandScripts extends FtcCommand {
     PathUtil.safeDelete(path)
         .resultOrPartial(Loggers.getLogger()::error);
 
-    c.getSource().sendAdmin(
+    c.getSource().sendSuccess(
         Text.format("Deleting script '{0}'", script)
     );
     return 0;
@@ -167,18 +173,17 @@ public class CommandScripts extends FtcCommand {
     return runScript(c.getSource(), script, true, null);
   }
 
-  private int run(CommandContext<CommandSource> c, ParsedArgs args
+  private int run(CommandContext<CommandSource> c, ParsedOptions args
   ) throws CommandSyntaxException {
     String scriptName = c.getArgument("script", String.class);
     Script script = Script.of(scriptName);
 
-    List<String> stringArgsList
-        = args.getOrDefault(ARGS_ARRAY, Collections.emptyList());
+    List<String> stringArgsList = args.getValue(ARGS_ARRAY);
 
     String[] stringArgs = stringArgsList.toArray(String[]::new);
 
-    boolean closeAfter = args.get(CLOSE_AFTER);
-    String method = args.get(METHOD_NAME);
+    boolean closeAfter = args.getValue(CLOSE_AFTER);
+    String method = args.getValue(METHOD_NAME);
 
     return runScript(c.getSource(), script, closeAfter, method, stringArgs);
   }
@@ -239,7 +244,7 @@ public class CommandScripts extends FtcCommand {
     }
 
     if (method != null) {
-      source.sendAdmin(
+      source.sendSuccess(
           Text.format("Successfully ran {0} in script {1}, result={2}",
               method,
               scriptName,
@@ -247,7 +252,7 @@ public class CommandScripts extends FtcCommand {
           )
       );
     } else {
-      source.sendAdmin(
+      source.sendSuccess(
           Text.format("Successfully ran script {0}, result={1}",
               scriptName,
               result.result().orElse(null)

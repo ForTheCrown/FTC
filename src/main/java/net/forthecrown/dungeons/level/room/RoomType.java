@@ -40,13 +40,13 @@ public class RoomType extends PieceType<RoomPiece> {
     String structName = json.getString("struct");
 
     if (structName == null) {
-      return DataResult.error("No 'struct' set");
+      return Results.error("No 'struct' set");
     }
 
     var opt = Structures.get().getRegistry().get(structName);
 
     if (opt.isEmpty()) {
-      return Results.errorResult("No structure named '%s'", structName);
+      return Results.error("No structure named '%s'", structName);
     }
     BlockStructure structure = opt.get();
 
@@ -66,7 +66,7 @@ public class RoomType extends PieceType<RoomPiece> {
         String paletteName = entry.getValue().getAsString();
 
         if (structure.getPalette(paletteName) == null) {
-          return Results.errorResult("No palette named '%s' in structure '%s'",
+          return Results.error("No palette named '%s' in structure '%s'",
               paletteName, structName
           );
         }

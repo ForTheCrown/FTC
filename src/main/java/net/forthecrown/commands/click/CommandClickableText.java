@@ -3,7 +3,7 @@ package net.forthecrown.commands.click;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 
 public class CommandClickableText extends FtcCommand {
 
@@ -30,7 +30,7 @@ public class CommandClickableText extends FtcCommand {
    */
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(argument("args", StringArgumentType.greedyString())
             .executes(c -> {

@@ -5,8 +5,8 @@ import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.config.GeneralConfig;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.pos.PositionArgument;
+import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import org.bukkit.Location;
 
 public class CommandSetSpawn extends FtcCommand {
@@ -36,14 +36,14 @@ public class CommandSetSpawn extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(literal("world")
             .executes(c -> setWorldSpawn(c.getSource().asPlayer().getLocation(), c.getSource()))
 
-            .then(argument("loc", PositionArgument.position())
+            .then(argument("loc", ArgumentTypes.position())
                 .executes(c -> setWorldSpawn(
-                    PositionArgument.getLocation(c, "loc"),
+                    ArgumentTypes.getLocation(c, "loc"),
                     c.getSource()
                 ))
             )
@@ -52,9 +52,9 @@ public class CommandSetSpawn extends FtcCommand {
         .then(literal("server")
             .executes(c -> setServerSpawn(c.getSource().asPlayer().getLocation(), c.getSource()))
 
-            .then(argument("loc", PositionArgument.position())
+            .then(argument("loc", ArgumentTypes.position())
                 .executes(c -> setServerSpawn(
-                    PositionArgument.getLocation(c, "loc"),
+                    ArgumentTypes.getLocation(c, "loc"),
                     c.getSource()
                 ))
             )

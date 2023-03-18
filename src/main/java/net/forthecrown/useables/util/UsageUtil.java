@@ -10,7 +10,8 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import java.util.concurrent.CompletableFuture;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
+import net.forthecrown.grenadier.Completions;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.grenadier.types.ArrayArgument;
 import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.nbt.BinaryTags;
@@ -28,8 +29,12 @@ public final class UsageUtil {
 
   /* ----------------------------- ITEM UTILITIES ------------------------------ */
 
-  public static final ArgumentType<ItemStack> ITEM_ARGUMENT = new ItemParser();
-  public static final ArrayArgument<ItemStack> ITEM_ARRAY_PARSER = ArrayArgument.of(ITEM_ARGUMENT);
+  public static final ArgumentType<ItemStack> ITEM_ARGUMENT
+      = new ItemParser();
+
+  public static final ArrayArgument<ItemStack> ITEM_ARRAY_PARSER
+      = ArgumentTypes.array(ITEM_ARGUMENT);
+
   public static final String HELD_ITEM_FLAG = "-held_item";
   public static final String INVENTORY_FLAG = "-inventory";
 
@@ -72,7 +77,7 @@ public final class UsageUtil {
   public static <S> CompletableFuture<Suggestions> suggestItems(CommandContext<S> context,
                                                                 SuggestionsBuilder builder
   ) {
-    CompletionProvider.suggestMatching(builder, HELD_ITEM_FLAG, INVENTORY_FLAG);
+    Completions.suggest(builder, HELD_ITEM_FLAG, INVENTORY_FLAG);
     return ITEM_ARRAY_PARSER.listSuggestions(context, builder);
   }
 

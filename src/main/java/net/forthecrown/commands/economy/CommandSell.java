@@ -8,8 +8,8 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.economy.Economy;
 import net.forthecrown.economy.sell.ItemSeller;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.Completions;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.user.User;
 import net.forthecrown.user.data.SellAmount;
 import net.forthecrown.user.property.Properties;
@@ -46,7 +46,7 @@ public class CommandSell extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .executes(c -> {
           var user = getUserSender(c);
@@ -59,7 +59,7 @@ public class CommandSell extends FtcCommand {
             .suggests((context, builder) -> {
               var map = Economy.get().getSellShop().getPriceMap();
 
-              return CompletionProvider.suggestMatching(
+              return Completions.suggest(
                   builder,
                   map::keyIterator
               );

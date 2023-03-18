@@ -3,7 +3,7 @@ package net.forthecrown.commands;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.user.User;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -22,7 +22,7 @@ public class ToolBlockCommands extends FtcCommand {
     super(name);
 
     setAliases(aliases);
-    setPermission(permission);
+    setPermission(selfPerm);
     setDescription(description);
     simpleUsages();
 
@@ -32,7 +32,7 @@ public class ToolBlockCommands extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .executes(c -> function.run(c.getSource(), getUserSender(c), true));
   }

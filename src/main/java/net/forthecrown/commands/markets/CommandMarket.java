@@ -1,5 +1,7 @@
 package net.forthecrown.commands.markets;
 
+import static net.kyori.adventure.text.Component.text;
+
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -21,9 +23,8 @@ import net.forthecrown.economy.market.MarketShop;
 import net.forthecrown.economy.market.Markets;
 import net.forthecrown.economy.market.ShopEntrance;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.EnumArgument;
-import net.forthecrown.grenadier.types.pos.PositionArgument;
+import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.math.Vectors;
@@ -130,7 +131,7 @@ public class CommandMarket extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(literal("refresh_all")
             .executes(c -> {
@@ -140,7 +141,7 @@ public class CommandMarket extends FtcCommand {
                 s.refresh(Markets.getWorld());
               }
 
-              c.getSource().sendAdmin("Refreshed all shops");
+              c.getSource().sendSuccess(text("Refreshed all shops"));
               return 0;
             })
         )
@@ -164,7 +165,7 @@ public class CommandMarket extends FtcCommand {
                   MarketShop shop = new MarketShop(region);
                   Economy.get().getMarkets().add(shop);
 
-                  c.getSource().sendAdmin("Created market shop tied to region '" + rgName + '\'');
+                  c.getSource().sendSuccess(text("Created market shop tied to region '" + rgName + '\''));
                   return 0;
                 })
             )
@@ -179,7 +180,7 @@ public class CommandMarket extends FtcCommand {
                 throw Exceptions.NO_SHOPS_EXIST;
               }
 
-              TextComponent.Builder builder = Component.text()
+              TextComponent.Builder builder = text()
                   .content("Market shops:");
 
               for (MarketShop s : region.getAllShops()) {
@@ -225,8 +226,8 @@ public class CommandMarket extends FtcCommand {
 
                   shop.refresh(Markets.getWorld());
 
-                  c.getSource().sendAdmin(
-                      Component.text("Refreshed shop ")
+                  c.getSource().sendSuccess(
+                      text("Refreshed shop ")
                           .append(MarketDisplay.displayName(shop))
                   );
                   return 0;
@@ -236,12 +237,10 @@ public class CommandMarket extends FtcCommand {
             .then(literal("reset")
                 .executes(c -> {
                   MarketShop shop = get(c);
-                  MarketManager region = Economy.get().getMarkets();
-
                   shop.reset();
 
-                  c.getSource().sendAdmin(
-                      Component.text("Reset ")
+                  c.getSource().sendSuccess(
+                      text("Reset ")
                           .append(MarketDisplay.displayName(shop))
                   );
                   return 0;
@@ -253,8 +252,8 @@ public class CommandMarket extends FtcCommand {
                   MarketShop shop = get(c);
                   shop.unclaim(false);
 
-                  c.getSource().sendAdmin(
-                      Component.text("Unclaimed ").append(MarketDisplay.displayName(shop))
+                  c.getSource().sendSuccess(
+                      text("Unclaimed ").append(MarketDisplay.displayName(shop))
                   );
                   return 0;
                 })
@@ -265,8 +264,8 @@ public class CommandMarket extends FtcCommand {
                   MarketShop shop = get(c);
                   shop.unclaim(true);
 
-                  c.getSource().sendAdmin(
-                      Component.text("Evicted owner of ").append(MarketDisplay.displayName(shop))
+                  c.getSource().sendSuccess(
+                      text("Evicted owner of ").append(MarketDisplay.displayName(shop))
                   );
                   return 0;
                 })
@@ -279,10 +278,10 @@ public class CommandMarket extends FtcCommand {
                       User user = Arguments.getUser(c, "owner");
                       shop.claim(user);
 
-                      c.getSource().sendAdmin(
-                          Component.text("Claimed shop ")
+                      c.getSource().sendSuccess(
+                          text("Claimed shop ")
                               .append(MarketDisplay.displayName(shop))
-                              .append(Component.text(" for "))
+                              .append(text(" for "))
                               .append(user.displayName())
                       );
                       return 0;
@@ -297,7 +296,7 @@ public class CommandMarket extends FtcCommand {
 
                   region.remove(shop);
 
-                  c.getSource().sendAdmin("Deleted shop " + shop.getName());
+                  c.getSource().sendSuccess(text("Deleted shop " + shop.getName()));
                   return 0;
                 })
             )
@@ -311,10 +310,10 @@ public class CommandMarket extends FtcCommand {
 
                           shop.connect(other);
 
-                          c.getSource().sendAdmin(
-                              Component.text("Connected ")
+                          c.getSource().sendSuccess(
+                              text("Connected ")
                                   .append(MarketDisplay.displayName(shop))
-                                  .append(Component.text(" and "))
+                                  .append(text(" and "))
                                   .append(MarketDisplay.displayName(other))
                           );
                           return 0;
@@ -328,10 +327,10 @@ public class CommandMarket extends FtcCommand {
 
                           shop.disconnect(other);
 
-                          c.getSource().sendAdmin(
-                              Component.text("Disconnected ")
+                          c.getSource().sendSuccess(
+                              text("Disconnected ")
                                   .append(MarketDisplay.displayName(shop))
-                                  .append(Component.text(" and "))
+                                  .append(text(" and "))
                                   .append(MarketDisplay.displayName(other))
                           );
                           return 0;
@@ -349,9 +348,9 @@ public class CommandMarket extends FtcCommand {
                       shop.setPrice(price);
 
                       c.getSource().sendMessage(
-                          Component.text("Set price of ")
+                          text("Set price of ")
                               .append(MarketDisplay.displayName(shop))
-                              .append(Component.text(" to "))
+                              .append(text(" to "))
                               .append(UnitFormat.rhines(price))
                       );
                       return 0;
@@ -364,8 +363,8 @@ public class CommandMarket extends FtcCommand {
                   MarketShop shop = get(c);
                   shop.unmerge();
 
-                  c.getSource().sendAdmin(
-                      Component.text("Unmerged ").append(MarketDisplay.displayName(shop))
+                  c.getSource().sendSuccess(
+                      text("Unmerged ").append(MarketDisplay.displayName(shop))
                   );
                   return 0;
                 })
@@ -379,10 +378,10 @@ public class CommandMarket extends FtcCommand {
 
                       shop.merge(other);
 
-                      c.getSource().sendAdmin(
-                          Component.text("Merged ")
+                      c.getSource().sendSuccess(
+                          text("Merged ")
                               .append(MarketDisplay.displayName(shop))
-                              .append(Component.text(" with "))
+                              .append(text(" with "))
                               .append(MarketDisplay.displayName(other))
                       );
                       return 0;
@@ -403,8 +402,8 @@ public class CommandMarket extends FtcCommand {
 
                           shop.removeEntrance(index);
 
-                          c.getSource().sendAdmin(
-                              Component.text("Removed entrance with index " + index + " from ")
+                          c.getSource().sendSuccess(
+                              text("Removed entrance with index " + index + " from ")
                                   .append(MarketDisplay.displayName(shop))
                           );
                           return 0;
@@ -420,8 +419,8 @@ public class CommandMarket extends FtcCommand {
                       return addEntrance(c, face, true);
                     })
 
-                    .then(argument("notice_pos", PositionArgument.blockPos())
-                        .then(argument("doorSign_pos", PositionArgument.blockPos())
+                    .then(argument("notice_pos", ArgumentTypes.blockPosition())
+                        .then(argument("doorSign_pos", ArgumentTypes.blockPosition())
                             .executes(c -> {
                               Player player = c.getSource().asPlayer();
                               BlockFace face = player.getFacing();
@@ -429,7 +428,7 @@ public class CommandMarket extends FtcCommand {
                               return addEntrance(c, face, false);
                             })
 
-                            .then(argument("dir", EnumArgument.of(BlockFace.class))
+                            .then(argument("dir", ArgumentTypes.enumType(BlockFace.class))
                                 .executes(c -> {
                                   BlockFace face = c.getArgument("dir", BlockFace.class);
 
@@ -449,21 +448,21 @@ public class CommandMarket extends FtcCommand {
 
     Location noticeLoc = usePlayerPos ?
         c.getSource().asPlayer().getLocation().add(0, 1, 0)
-        : PositionArgument.getLocation(c, "notice_pos");
+        : ArgumentTypes.getLocation(c, "notice_pos");
 
     Vector3i doorSignPos = usePlayerPos ?
         figureSignLoc(c.getSource().asPlayer())
-        : Vectors.intFrom(PositionArgument.getLocation(c, "doorSign_pos"));
+        : Vectors.intFrom(ArgumentTypes.getLocation(c, "doorSign_pos"));
 
     Vector3i noticePos = Vectors.intFrom(noticeLoc);
     ShopEntrance e = new ShopEntrance(face, noticePos, doorSignPos);
 
     shop.addEntrance(e);
 
-    c.getSource().sendAdmin(
-        Component.text("Added ")
+    c.getSource().sendSuccess(
+        text("Added ")
             .append(MarketDisplay.entranceDisplay(e))
-            .append(Component.text(" to "))
+            .append(text(" to "))
             .append(MarketDisplay.displayName(shop))
     );
     return 0;

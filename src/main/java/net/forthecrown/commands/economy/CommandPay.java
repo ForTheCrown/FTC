@@ -19,9 +19,9 @@ import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.economy.TransactionType;
 import net.forthecrown.economy.Transactions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.royalgrenadier.types.selector.EntityArgumentImpl;
+import net.forthecrown.grenadier.Completions;
+import net.forthecrown.grenadier.Grenadier;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.forthecrown.user.property.Properties;
@@ -73,7 +73,7 @@ public class CommandPay extends FtcCommand {
         continue;
       }
 
-      if (!CompletionProvider.startsWith(token, i + "")) {
+      if (!Completions.matches(token, i + "")) {
         continue;
       }
 
@@ -82,7 +82,7 @@ public class CommandPay extends FtcCommand {
 
     // Suggest user's balance
     var balance = user.getBalance();
-    if (CompletionProvider.startsWith(token, balance + "")) {
+    if (Completions.matches(token, balance + "")) {
       builder.suggest(balance);
     }
 
@@ -97,7 +97,7 @@ public class CommandPay extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(argument("players", Arguments.USERS)
 
@@ -168,7 +168,7 @@ public class CommandPay extends FtcCommand {
     }
 
     if (targets.isEmpty()) {
-      throw EntityArgumentImpl.NO_ENTITIES_FOUND.create();
+      throw Grenadier.exceptions().noEntityFound();
     }
 
     int total = amount * targets.size();

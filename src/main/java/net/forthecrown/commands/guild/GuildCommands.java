@@ -4,7 +4,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.guilds.menu.GuildMenus;
 
 public class GuildCommands {
@@ -67,7 +67,7 @@ public class GuildCommands {
     }
 
     @Override
-    protected void createCommand(BrigadierCommand command) {
+    public void createCommand(GrenadierCommand command) {
       for (var n : NODES) {
         // The help command shouldn't be created
         if (!n.getName().contains("help")) {

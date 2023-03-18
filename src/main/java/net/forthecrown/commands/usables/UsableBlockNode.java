@@ -7,8 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.Commands;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.types.pos.Position;
-import net.forthecrown.grenadier.types.pos.PositionArgument;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.useables.UsableBlock;
 import net.forthecrown.useables.Usables;
 import net.forthecrown.utils.math.WorldVec3i;
@@ -37,8 +36,7 @@ class UsableBlockNode extends BukkitUsableNode<UsableBlock> {
         .then(argument("block_pos", getArgumentType())
             .executes(c -> {
               CommandSource source = c.getSource();
-              Location l = c.getArgument("block_pos", Position.class)
-                  .getLocation(source);
+              Location l = ArgumentTypes.getLocation(c, "block_pos");
 
               if (!(l.getBlock().getState() instanceof TileState)) {
                 throw Exceptions.USABLE_INVALID_BLOCK;
@@ -49,7 +47,7 @@ class UsableBlockNode extends BukkitUsableNode<UsableBlock> {
               }
 
               Usables.getInstance().createBlock(l.getBlock());
-              c.getSource().sendAdmin("Creating usable block");
+              c.getSource().sendSuccess(Component.text("Creating usable block"));
               return 0;
             })
         );
@@ -64,7 +62,7 @@ class UsableBlockNode extends BukkitUsableNode<UsableBlock> {
           var holder = provider.get(c);
           Usables.getInstance().deleteBlock(holder);
 
-          c.getSource().sendAdmin(
+          c.getSource().sendSuccess(
               Text.format("Removed usable block at {0, location, -clickable -world}",
                   new WorldVec3i(holder.getWorld(), holder.getPosition())
               )
@@ -75,13 +73,13 @@ class UsableBlockNode extends BukkitUsableNode<UsableBlock> {
 
   @Override
   protected ArgumentType<?> getArgumentType() {
-    return PositionArgument.blockPos();
+    return ArgumentTypes.blockPosition();
   }
 
   @Override
   protected UsableBlock get(String argumentName, CommandContext<CommandSource> context)
       throws CommandSyntaxException {
-    var pos = PositionArgument.getLocation(context, argumentName);
+    var pos = ArgumentTypes.getLocation(context, argumentName);
     var usables = Usables.getInstance();
 
     if (!(pos.getBlock().getState() instanceof TileState)) {

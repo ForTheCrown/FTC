@@ -12,8 +12,9 @@ import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.economy.Economy;
 import net.forthecrown.economy.market.MarketManager;
 import net.forthecrown.economy.market.MarketShop;
-import net.forthecrown.grenadier.CompletionProvider;
-import net.forthecrown.royalgrenadier.VanillaMappedArgument;
+import net.forthecrown.grenadier.Completions;
+import net.forthecrown.grenadier.internal.VanillaMappedArgument;
+import net.minecraft.commands.CommandBuildContext;
 
 public class MarketArgument implements ArgumentType<MarketShop>, VanillaMappedArgument {
 
@@ -39,11 +40,11 @@ public class MarketArgument implements ArgumentType<MarketShop>, VanillaMappedAr
   public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
                                                             SuggestionsBuilder builder
   ) {
-    return CompletionProvider.suggestMatching(builder, Economy.get().getMarkets().getNames());
+    return Completions.suggest(builder, Economy.get().getMarkets().getNames());
   }
 
   @Override
-  public ArgumentType<?> getVanillaArgumentType() {
+  public ArgumentType<?> getVanillaType(CommandBuildContext context) {
     return StringArgumentType.word();
   }
 }

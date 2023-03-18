@@ -92,7 +92,7 @@ public class UserAltNode extends UserCommandNode {
 
                   alts.addEntry(target.getUniqueId(), user.getUniqueId());
 
-                  c.getSource().sendAdmin(
+                  c.getSource().sendSuccess(
                       Text.format("{0, user} is now an alt for {1, user}",
                           target, user
                       )
@@ -126,7 +126,7 @@ public class UserAltNode extends UserCommandNode {
 
                   alts.removeEntry(target.getUniqueId());
 
-                  c.getSource().sendAdmin(
+                  c.getSource().sendSuccess(
                       Text.format("{0, user} is no longer an alt for {1, user}",
                           target, user
                       )
@@ -149,7 +149,7 @@ public class UserAltNode extends UserCommandNode {
 
               altList.forEach(alts::removeEntry);
 
-              c.getSource().sendAdmin(
+              c.getSource().sendSuccess(
                   Text.format("Cleared {0, number} alts from {1, user}",
                       altList.size(),
                       user

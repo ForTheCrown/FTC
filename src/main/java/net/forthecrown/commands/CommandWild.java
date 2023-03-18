@@ -13,10 +13,9 @@ import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.Worlds;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.WorldArgument;
-import net.forthecrown.grenadier.types.selectors.EntityArgument;
-import net.forthecrown.grenadier.types.selectors.EntitySelector;
+import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.grenadier.types.ArgumentTypes;
+import net.forthecrown.grenadier.types.EntitySelector;
 import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.math.Bounds3i;
@@ -73,7 +72,7 @@ public class CommandWild extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         // /wild
         .executes(c -> {
@@ -90,13 +89,13 @@ public class CommandWild extends FtcCommand {
         })
 
         // /wild <player>
-        .then(argument("player", EntityArgument.multipleEntities())
+        .then(argument("player", ArgumentTypes.entities())
             .requires(c -> c.hasPermission(Permissions.ADMIN))
 
             .executes(c -> wildEntities(c, false))
 
             // /wild <player> <world>
-            .then(argument("world", WorldArgument.world())
+            .then(argument("world", ArgumentTypes.world())
                 .requires(c -> c.hasPermission(Permissions.ADMIN))
 
                 .executes(c -> wildEntities(c, true))
@@ -109,7 +108,7 @@ public class CommandWild extends FtcCommand {
   {
     Collection<? extends Entity> players
         = c.getArgument("player", EntitySelector.class)
-        .getEntities(c.getSource());
+        .findEntities(c.getSource());
 
     World world = worldSet
         ? c.getArgument("world", World.class)

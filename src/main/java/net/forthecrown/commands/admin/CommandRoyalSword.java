@@ -6,6 +6,7 @@ import static net.forthecrown.inventory.ExtendedItems.TAG_DATA;
 import static net.forthecrown.inventory.weapon.ability.WeaponAbility.NO_OVERRIDE;
 import static net.forthecrown.inventory.weapon.ability.WeaponAbility.START_LEVEL;
 import static net.forthecrown.inventory.weapon.ability.WeaponAbility.UNLIMITED_USES;
+import static net.kyori.adventure.text.Component.text;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -20,8 +21,8 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.TimeArgument;
+import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.inventory.ExtendedItems;
 import net.forthecrown.inventory.weapon.RoyalSword;
 import net.forthecrown.inventory.weapon.SwordRanks;
@@ -31,7 +32,6 @@ import net.forthecrown.inventory.weapon.ability.WeaponAbilityType;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.text.Text;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.inventory.ItemStack;
 
@@ -113,7 +113,7 @@ public class CommandRoyalSword extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(literal("create")
             .then(argument("owner", Arguments.USER)
@@ -137,7 +137,7 @@ public class CommandRoyalSword extends FtcCommand {
 
               sword.update(item);
 
-              c.getSource().sendAdmin("Updated held sword");
+              c.getSource().sendSuccess(text("Updated held sword"));
               return 0;
             })
         )
@@ -159,7 +159,7 @@ public class CommandRoyalSword extends FtcCommand {
               sword.incrementRank(item);
               sword.update(item);
 
-              c.getSource().sendAdmin("Upgraded held sword");
+              c.getSource().sendSuccess(text("Upgraded held sword"));
               return 0;
             })
         )
@@ -172,7 +172,7 @@ public class CommandRoyalSword extends FtcCommand {
 
               if (sword.getAbility() == null) {
                 c.getSource().sendMessage(
-                    Component.text("Sword has no ability", NamedTextColor.RED)
+                    text("Sword has no ability", NamedTextColor.RED)
                 );
                 return 0;
               }
@@ -199,7 +199,7 @@ public class CommandRoyalSword extends FtcCommand {
             )
 
             .then(literal("cooldown")
-                .then(argument("ticks", TimeArgument.time())
+                .then(argument("ticks", ArgumentTypes.time())
                     .executes(c -> abilityCooldown(c, false))
                 )
 
@@ -241,7 +241,7 @@ public class CommandRoyalSword extends FtcCommand {
 
     sender.getInventory().addItem(item);
 
-    c.getSource().sendAdmin(
+    c.getSource().sendSuccess(
         Text.format(
             "Created a royal sword for {0, user}, rank: {1, number, -roman}",
             user, level + 1
@@ -265,15 +265,15 @@ public class CommandRoyalSword extends FtcCommand {
     sword.update(item);
 
     if (uses == UNLIMITED_USES) {
-      c.getSource().sendAdmin(
-          Component.text(
+      c.getSource().sendSuccess(
+          text(
               "Set ability's remaining uses to infinite",
               NamedTextColor.GRAY
           )
       );
 
     } else {
-      c.getSource().sendAdmin(
+      c.getSource().sendSuccess(
           Text.format("Set sword ability's remaining uses to &e{0, number}&r.",
               NamedTextColor.GRAY,
               uses
@@ -293,21 +293,21 @@ public class CommandRoyalSword extends FtcCommand {
 
     validateAbility(sword);
 
-    long ticks = remove ? NO_OVERRIDE : TimeArgument.getTicks(c, "ticks");
+    long ticks = remove ? NO_OVERRIDE : ArgumentTypes.getTicks(c, "ticks");
     sword.getAbility().setCooldownOverride(ticks);
 
     sword.update(item);
 
     if (ticks == NO_OVERRIDE) {
-      c.getSource().sendAdmin(
-          Component.text(
+      c.getSource().sendSuccess(
+          text(
               "Removed ability cooldown override",
               NamedTextColor.GRAY
           )
       );
 
     } else {
-      c.getSource().sendAdmin(
+      c.getSource().sendSuccess(
           Text.format(
               "Set cooldown override to &e{0, number}&r ticks "
                   + "or &e{0, time, -ticks}&r.",
@@ -344,7 +344,7 @@ public class CommandRoyalSword extends FtcCommand {
     sword.setAbility(ability);
     sword.update(item);
 
-    c.getSource().sendAdmin(
+    c.getSource().sendSuccess(
         Text.format("&7Set sword's ability to &e{0}",
             holder.getValue().fullDisplayName(user)
         )

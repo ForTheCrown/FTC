@@ -9,7 +9,7 @@ import net.forthecrown.economy.Economy;
 import net.forthecrown.economy.market.MarketManager;
 import net.forthecrown.economy.market.MarketShop;
 import net.forthecrown.economy.market.Markets;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.user.User;
 import net.forthecrown.user.data.UserMarketData;
 
@@ -41,7 +41,7 @@ public class CommandUnclaimShop extends FtcCommand {
    */
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .executes(c -> {
           User user = getUserSender(c);

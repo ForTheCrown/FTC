@@ -7,7 +7,8 @@ import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.Grenadier;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.user.DirectMessage;
 import net.forthecrown.user.User;
 
@@ -31,7 +32,7 @@ public class CommandReply extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command.then(argument("message", Arguments.MESSAGE)
         .executes(c -> {
           User user = getUserSender(c);
@@ -42,7 +43,7 @@ public class CommandReply extends FtcCommand {
           }
 
           DirectMessage.run(
-              CommandSource.of(user.getPlayer(), this),
+              Grenadier.createSource(user.getPlayer()),
               source,
               true,
               c.getArgument("message", MessageArgument.Result.class).getText()

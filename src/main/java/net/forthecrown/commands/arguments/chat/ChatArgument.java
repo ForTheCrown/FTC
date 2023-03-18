@@ -8,20 +8,23 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import java.util.concurrent.CompletableFuture;
 import net.forthecrown.commands.arguments.Arguments;
-import net.forthecrown.grenadier.types.ComponentArgument;
-import net.forthecrown.royalgrenadier.VanillaMappedArgument;
+import net.forthecrown.grenadier.internal.VanillaMappedArgument;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.utils.text.ChatEmotes;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
+import net.minecraft.commands.CommandBuildContext;
 
-public class ChatArgument implements VanillaMappedArgument, ArgumentType<Component> {
+public class ChatArgument
+    implements VanillaMappedArgument, ArgumentType<Component>
+{
 
   @Override
   public Component parse(StringReader reader) throws CommandSyntaxException {
     char peek = reader.peek();
 
     if (peek == '{' || peek == '[' || peek == '"') {
-      var result = ComponentArgument.component().parse(reader);
+      var result = ArgumentTypes.component().parse(reader);
       return ChatEmotes.format(result);
     }
 
@@ -43,7 +46,7 @@ public class ChatArgument implements VanillaMappedArgument, ArgumentType<Compone
   }
 
   @Override
-  public ArgumentType<?> getVanillaArgumentType() {
-    return Arguments.MESSAGE.getVanillaArgumentType();
+  public ArgumentType<?> getVanillaType(CommandBuildContext context) {
+    return Arguments.MESSAGE.getVanillaType(context);
   }
 }

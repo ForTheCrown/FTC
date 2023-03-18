@@ -2,11 +2,10 @@ package net.forthecrown.commands.item;
 
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.grenadier.CmdUtil;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import org.bukkit.permissions.Permission;
 
-public class ItemModCommands extends CmdUtil {
+public class ItemModCommands {
 
   static final Permission PERMISSION = Permissions.ADMIN;
 
@@ -41,7 +40,7 @@ public class ItemModCommands extends CmdUtil {
     }
 
     @Override
-    protected void createCommand(BrigadierCommand command) {
+    public void createCommand(GrenadierCommand command) {
       for (var node : NODES) {
         var literal = literal(node.getArgumentName());
 

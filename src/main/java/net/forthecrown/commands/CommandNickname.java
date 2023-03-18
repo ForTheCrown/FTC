@@ -8,7 +8,8 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.config.GeneralConfig;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.Completions;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserLookup;
 import net.forthecrown.user.UserLookupEntry;
@@ -57,7 +58,7 @@ public class CommandNickname extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         // /nick -> clears nick
         .executes(c -> {
@@ -70,7 +71,9 @@ public class CommandNickname extends FtcCommand {
 
         // /nick <nickname> -> sets nickname or clears it
         .then(argument("nick", StringArgumentType.word())
-            .suggests(suggestMatching(CLEAR))
+            .suggests((context, builder) -> {
+              return Completions.suggest(builder, CLEAR);
+            })
 
             .executes(c -> {
               User user = getUserSender(c);
@@ -111,7 +114,7 @@ public class CommandNickname extends FtcCommand {
                   boolean self = c.getSource().textName().equals(user.getName());
 
                   if (nick == null) {
-                    c.getSource().sendAdmin(Messages.nickClearOther(user));
+                    c.getSource().sendSuccess(Messages.nickClearOther(user));
 
                     if (user.isOnline() && !self) {
                       user.sendMessage(Messages.NICK_CLEARED);
@@ -121,7 +124,7 @@ public class CommandNickname extends FtcCommand {
                       throw Exceptions.ALREADY_THEIR_NICK;
                     }
 
-                    c.getSource().sendAdmin(Messages.nickSetOther(user, nick));
+                    c.getSource().sendSuccess(Messages.nickSetOther(user, nick));
 
                     if (user.isOnline() && !self) {
                       user.sendMessage(Messages.nickSetSelf(nick));

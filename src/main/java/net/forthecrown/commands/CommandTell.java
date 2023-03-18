@@ -6,7 +6,7 @@ import net.forthecrown.commands.arguments.chat.MessageArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.user.DirectMessage;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
@@ -42,7 +42,7 @@ public class CommandTell extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         // /tell <user>
         .then(argument("user", Arguments.ONLINE_USER)
@@ -63,7 +63,7 @@ public class CommandTell extends FtcCommand {
 
   public int sendMsg(CommandSource sender, User target, MessageArgument.Result message)
       throws CommandSyntaxException {
-    CommandSource receiver = target.getCommandSource(this);
+    CommandSource receiver = target.getCommandSource();
 
     if (sender.isPlayer()) {
       User user = Users.get(sender.asPlayer());

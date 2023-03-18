@@ -9,8 +9,9 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import java.util.concurrent.CompletableFuture;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.script2.ScriptManager;
-import net.forthecrown.grenadier.CompletionProvider;
-import net.forthecrown.royalgrenadier.VanillaMappedArgument;
+import net.forthecrown.grenadier.Completions;
+import net.forthecrown.grenadier.internal.VanillaMappedArgument;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.arguments.GameProfileArgument;
 
 public class ScriptArgument implements ArgumentType<String>, VanillaMappedArgument {
@@ -32,12 +33,12 @@ public class ScriptArgument implements ArgumentType<String>, VanillaMappedArgume
   public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
                                                             SuggestionsBuilder builder
   ) {
-    return CompletionProvider.suggestMatching(builder,
+    return Completions.suggest(builder,
         ScriptManager.getInstance().findExistingScripts());
   }
 
   @Override
-  public ArgumentType<?> getVanillaArgumentType() {
+  public ArgumentType<?> getVanillaType(CommandBuildContext context) {
     return GameProfileArgument.gameProfile();
   }
 }

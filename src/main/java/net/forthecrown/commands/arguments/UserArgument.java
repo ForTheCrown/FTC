@@ -6,22 +6,24 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcSuggestions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.types.selectors.EntityArgument;
-import net.forthecrown.grenadier.types.selectors.EntitySelector;
-import net.forthecrown.royalgrenadier.VanillaMappedArgument;
+import net.forthecrown.grenadier.internal.VanillaMappedArgument;
+import net.forthecrown.grenadier.types.ArgumentTypes;
+import net.forthecrown.grenadier.types.EntitySelector;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserLookupEntry;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.Users;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.arguments.ScoreHolderArgument;
 import net.minecraft.commands.arguments.selector.EntitySelectorParser;
 
-public class UserArgument implements ArgumentType<UserParseResult>, VanillaMappedArgument {
+public class UserArgument
+    implements ArgumentType<UserParseResult>, VanillaMappedArgument
+{
 
   public final boolean allowMultiple;
   public final boolean allowOffline;
@@ -35,8 +37,8 @@ public class UserArgument implements ArgumentType<UserParseResult>, VanillaMappe
   public UserParseResult parse(StringReader reader) throws CommandSyntaxException {
     if (reader.peek() == '@') {
       EntitySelector selector = allowMultiple
-          ? EntityArgument.players().parse(reader, true)
-          : EntityArgument.player().parse(reader, true);
+          ? ArgumentTypes.players().parse(reader, true)
+          : ArgumentTypes.player().parse(reader, true);
 
       return new UserParseResult(selector, allowOffline);
     }
@@ -88,11 +90,7 @@ public class UserArgument implements ArgumentType<UserParseResult>, VanillaMappe
   }
 
   @Override
-  public Collection<String> getExamples() {
-    return EntityArgument.players().getExamples();
-  }
-
-  public ArgumentType<?> getVanillaArgumentType() {
+  public ArgumentType<?> getVanillaType(CommandBuildContext context) {
     if (allowOffline) {
       if (allowMultiple) {
         return ScoreHolderArgument.scoreHolders();

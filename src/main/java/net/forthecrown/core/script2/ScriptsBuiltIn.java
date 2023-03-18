@@ -57,8 +57,16 @@ public final class ScriptsBuiltIn {
   static final JsCallback COMPILE_FUNCTION = (script, invoker, args) -> {
     Preconditions.checkArgument(args.length > 0, "Script name required");
 
-    Path file = script.getWorkingDirectory()
-        .resolve(String.valueOf(args[0]));
+    String rawPath = String.valueOf(args[0]);
+    Path file;
+    final String scriptsPrefix = "scripts/";
+
+    if (rawPath.startsWith(scriptsPrefix)) {
+      rawPath = rawPath.substring(scriptsPrefix.length());
+      file = ScriptManager.getInstance().getDirectory().resolve(rawPath);
+    } else {
+      file = script.getWorkingDirectory().resolve(String.valueOf(args[0]));
+    }
 
     Preconditions.checkArgument(
         Files.exists(file),
@@ -77,6 +85,7 @@ public final class ScriptsBuiltIn {
     Script loaded = Script.of(file).compile(scriptArgs);
     var wrapped = new WrappedScript(loaded);
     script.getLoadedSubScripts().add(wrapped);
+    loaded.setParentScript(script);
 
     return wrapped;
   };
@@ -85,5 +94,7 @@ public final class ScriptsBuiltIn {
     for (var c : DEFAULT_CLASSES) {
       script.put(c.getSimpleName(), StaticClass.forClass(c));
     }
+
+    script.putCallback("compile", COMPILE_FUNCTION);
   }
 }

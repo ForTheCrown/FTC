@@ -9,11 +9,11 @@ import net.forthecrown.commands.manager.Commands;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.guilds.GuildManager;
-import net.forthecrown.utils.UUID2IntMap;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.Users;
+import net.forthecrown.utils.UUID2IntMap;
 import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.format.UnitFormat;
@@ -102,7 +102,7 @@ public class UserMapTopCommand extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         // /<command> -> show page 0 with default size
         .executes(c -> showPage(c.getSource(), 0, DEF_PAGE_SIZE))

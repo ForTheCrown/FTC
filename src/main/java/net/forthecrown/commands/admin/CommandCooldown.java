@@ -12,9 +12,9 @@ import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Cooldowns;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.TimeArgument;
+import net.forthecrown.grenadier.Completions;
+import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -44,20 +44,20 @@ public class CommandCooldown extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command.then(argument("user", Arguments.USER)
         .then(argument("category", StringArgumentType.string())
             .suggests((context, builder) -> {
               var input = builder.getRemainingLowerCase();
 
-              if (CompletionProvider.startsWith(input, TRANSIENT_CATEGORY)) {
+              if (Completions.matches(input, TRANSIENT_CATEGORY)) {
                 builder.suggest(
                     TRANSIENT_CATEGORY,
-                    toTooltip("Transient category that does NOT get saved")
+                    () -> "Transient category that does NOT get saved"
                 );
               }
 
-              return CompletionProvider.suggestMatching(
+              return Completions.suggest(
                   builder,
                   Cooldowns.getCooldowns().getExistingCategories()
               );
@@ -70,7 +70,7 @@ public class CommandCooldown extends FtcCommand {
             .then(literal("add")
                 .executes(c -> add(c, true))
 
-                .then(argument("length", TimeArgument.time())
+                .then(argument("length", ArgumentTypes.time())
                     .executes(c -> add(c, false))
                 )
             )
@@ -128,7 +128,7 @@ public class CommandCooldown extends FtcCommand {
     if (neverEnding) {
       length = NO_END_COOLDOWN;
     } else {
-      length = TimeArgument.getMillis(c, "length");
+      length = ArgumentTypes.getMillis(c, "length");
     }
 
     var cds = Cooldowns.getCooldowns();
@@ -141,7 +141,7 @@ public class CommandCooldown extends FtcCommand {
 
     cds.cooldown(user.getUniqueId(), category, length);
 
-    c.getSource().sendAdmin(
+    c.getSource().sendSuccess(
         Text.format(
             "Placed &e{0, user}&r into cooldown, "
                 + "category='&e{1}&r', "
@@ -167,7 +167,7 @@ public class CommandCooldown extends FtcCommand {
       );
     }
 
-    c.getSource().sendAdmin(
+    c.getSource().sendSuccess(
         Text.format("&e{0, user}&r was removed from the '&e{1}&r' cooldown",
             NamedTextColor.GRAY,
             user, category

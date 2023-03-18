@@ -6,8 +6,8 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.GameModeArgument;
+import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.user.User;
 import org.bukkit.GameMode;
 import org.bukkit.permissions.Permission;
@@ -35,9 +35,9 @@ public class CommandGameMode extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
-        .then(argument("gamemode", GameModeArgument.gameMode())
+        .then(argument("gamemode", ArgumentTypes.gameMode())
             .executes(c -> {
               User user = getUserSender(c);
               GameMode gameMode = c.getArgument("gamemode", GameMode.class);
@@ -78,7 +78,7 @@ public class CommandGameMode extends FtcCommand {
         target.sendMessage(Messages.gameModeChangedTarget(source, mode));
       }
 
-      source.sendAdmin(Messages.gameModeChangedOther(target, mode));
+      source.sendSuccess(Messages.gameModeChangedOther(target, mode));
     }
   }
 

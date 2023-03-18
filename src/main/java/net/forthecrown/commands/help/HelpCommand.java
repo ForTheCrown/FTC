@@ -11,7 +11,7 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.core.Worlds;
 import net.forthecrown.core.config.GeneralConfig;
 import net.forthecrown.core.config.ServerRules;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.writer.TextWriter;
@@ -37,7 +37,7 @@ public abstract class HelpCommand extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command.executes(c -> {
       User user = getUserSender(c);
       TextWriter writer = TextWriters.newWriter();
@@ -110,7 +110,7 @@ public abstract class HelpCommand extends FtcCommand {
      */
 
     @Override
-    protected void createCommand(BrigadierCommand command) {
+    public void createCommand(GrenadierCommand command) {
       command.executes(c -> {
         Player player = c.getSource().asPlayer();
         Location loc = player.getLocation();
@@ -178,7 +178,7 @@ public abstract class HelpCommand extends FtcCommand {
      */
 
     @Override
-    protected void createCommand(BrigadierCommand command) {
+    public void createCommand(GrenadierCommand command) {
       command.executes(c -> {
             c.getSource().sendMessage(
                 Component.text()
@@ -373,7 +373,7 @@ public abstract class HelpCommand extends FtcCommand {
         .build();
 
     @Override
-    protected void createCommand(BrigadierCommand command) {
+    public void createCommand(GrenadierCommand command) {
       command.executes(c -> {
         User sender = getUserSender(c);
 

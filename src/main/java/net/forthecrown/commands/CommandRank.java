@@ -1,7 +1,7 @@
 package net.forthecrown.commands;
 
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.inventory.RankMenu;
 
 public class CommandRank extends FtcCommand {
@@ -35,7 +35,7 @@ public class CommandRank extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command.executes(c -> {
       RankMenu.getInstance().open(getUserSender(c));
 

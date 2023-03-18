@@ -1,44 +1,31 @@
 package net.forthecrown.commands.manager;
 
-import static net.forthecrown.grenadier.CompletionProvider.startsWith;
 
 import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.Message;
-import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.config.GeneralConfig;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.Suggester;
-import net.forthecrown.royalgrenadier.WrappedCommandSource;
+import net.forthecrown.grenadier.Completions;
+import net.forthecrown.grenadier.Grenadier;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.Users;
 import net.forthecrown.user.property.Properties;
-import net.forthecrown.utils.VanillaAccess;
 
 /**
  * Utility class for suggestions
  */
 public interface FtcSuggestions {
 
-  Suggester<CommandSource> COMMAND_SUGGESTIONS = (c, b) -> {
-    StringReader reader = new StringReader(b.getInput());
-    reader.setCursor(b.getStart());
-
-    var dispatcher = VanillaAccess.getServer().getCommands()
-        .getDispatcher();
-
-    var parse = dispatcher.parse(
-        reader,
-        ((WrappedCommandSource) c.getSource()).getHandle()
-    );
-
-    return dispatcher.getCompletionSuggestions(parse);
-  };
+  SuggestionProvider<CommandSource> COMMAND_SUGGESTIONS 
+      = Grenadier.suggestAllCommands();
 
   /**
    * Suggests player names.
@@ -82,10 +69,10 @@ public interface FtcSuggestions {
       // Check if we should suggest nicks before, as their
       // nick may just be a shortening of their name
       if (user.hasNickname()
-          && startsWith(token, user.getNickname())
+          && Completions.matches(token, user.getNickname())
       ) {
         builder.suggest(user.getNickname(), uuidTooltip(user.getUniqueId()));
-      } else if (startsWith(token, user.getName())) {
+      } else if (Completions.matches(token, user.getName())) {
         builder.suggest(user.getName(), uuidTooltip(user.getUniqueId()));
       }
     }
@@ -100,5 +87,20 @@ public interface FtcSuggestions {
    */
   static Message uuidTooltip(UUID uuid) {
     return new LiteralMessage(uuid.toString());
+  }
+
+  static CompletableFuture<Suggestions> suggest(SuggestionsBuilder builder,
+                                                Map<String, String> map
+  ) {
+    String token = builder.getRemainingLowerCase();
+
+    map.entrySet()
+        .stream()
+        .filter(e -> Completions.matches(token, e.getKey()))
+        .forEach(entry -> {
+          builder.suggest(entry.getKey(), entry::getValue);
+        });
+
+    return builder.buildFuture();
   }
 }

@@ -1,5 +1,7 @@
 package net.forthecrown.commands.test;
 
+import static net.kyori.adventure.text.Component.text;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -7,7 +9,7 @@ import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.dungeons.DungeonWorld;
 import net.forthecrown.dungeons.level.generator.TreeGenerator;
 import net.forthecrown.dungeons.level.generator.TreeGeneratorConfig;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.io.SerializationHelper;
 import org.apache.logging.log4j.Logger;
@@ -52,14 +54,16 @@ public class CommandDungeonTest extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .executes(c -> {
           var config = getConfig();
 
           TreeGenerator.generateAsync(config).whenComplete((level, err) -> {
             if (err != null) {
-              c.getSource().sendAdmin("Error generating dungeon, check console");
+              c.getSource().sendFailure(
+                  text("Error generating dungeon, check console")
+              );
               return;
             }
 
@@ -75,11 +79,13 @@ public class CommandDungeonTest extends FtcCommand {
               level.place().whenComplete((unused, throwable) -> {
                 if (throwable != null) {
                   LOGGER.error("Error placing level!", throwable);
-                  c.getSource().sendAdmin("Error placing level");
+                  c.getSource().sendFailure(
+                      text("Error placing level")
+                  );
                   return;
                 }
 
-                c.getSource().sendAdmin("Placed dungeon");
+                c.getSource().sendSuccess(text("Placed dungeon"));
               });
             });
           });
@@ -90,7 +96,7 @@ public class CommandDungeonTest extends FtcCommand {
         .then(literal("reset_world")
             .executes(c -> {
               DungeonWorld.reset();
-              c.getSource().sendAdmin("Reset dungeon world");
+              c.getSource().sendSuccess(text("Reset dungeon world"));
               return 0;
             })
         );

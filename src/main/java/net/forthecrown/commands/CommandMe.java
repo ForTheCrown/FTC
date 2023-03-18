@@ -7,7 +7,7 @@ import net.forthecrown.core.admin.BannedWords;
 import net.forthecrown.core.admin.Mute;
 import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
@@ -47,7 +47,7 @@ public class CommandMe extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(argument("action", StringArgumentType.greedyString())
             .executes(c -> {

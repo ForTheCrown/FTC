@@ -6,7 +6,7 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.admin.PunishEntry;
 import net.forthecrown.core.admin.PunishType;
 import net.forthecrown.core.admin.Punishments;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.user.User;
 
 public class PardonCommand extends FtcCommand {
@@ -30,7 +30,7 @@ public class PardonCommand extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command.then(argument("user", Arguments.USER)
         .executes(c -> {
           User user = Arguments.getUser(c, "user");

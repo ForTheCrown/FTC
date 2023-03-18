@@ -1,7 +1,5 @@
 package net.forthecrown.commands.arguments;
 
-import static net.forthecrown.royalgrenadier.GrenadierUtils.correctReader;
-
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -14,6 +12,7 @@ import java.util.concurrent.CompletableFuture;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.Readers;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.Users;
 
@@ -25,6 +24,8 @@ public class HomeArgument implements ArgumentType<HomeParseResult> {
     int cursor = reader.getCursor();
     String name = readName(reader);
 
+    StringReader startReader = Readers.copy(reader, cursor);
+
     if (reader.canRead() && reader.peek() == ':') {
       reader.skip();
 
@@ -35,10 +36,10 @@ public class HomeArgument implements ArgumentType<HomeParseResult> {
         throw Exceptions.unknownUser(reader, cursor, name);
       }
 
-      return new HomeParseResult(correctReader(reader, cursor), entry, homeName);
+      return new HomeParseResult(startReader, entry, homeName);
     }
 
-    return new HomeParseResult(correctReader(reader, cursor), name);
+    return new HomeParseResult(startReader, name);
   }
 
   @Override

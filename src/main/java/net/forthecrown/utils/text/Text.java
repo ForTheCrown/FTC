@@ -18,12 +18,11 @@ import java.util.regex.Pattern;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.commands.admin.CommandTeleportExact;
+import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Worlds;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.AbstractCommand;
-import net.forthecrown.grenadier.types.args.ArgsArgument;
-import net.forthecrown.grenadier.types.args.Argument;
+import net.forthecrown.grenadier.types.options.ArgumentOption;
 import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.nbt.paper.PaperNbt;
 import net.forthecrown.user.User;
@@ -47,7 +46,7 @@ import net.kyori.adventure.util.HSVLike;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.Permissible;
 import org.intellij.lang.annotations.RegExp;
@@ -772,7 +771,7 @@ public final class Text {
 
   /* ---------------------------- ARG JOINERS ----------------------------- */
 
-  public static ArgJoiner argJoiner(AbstractCommand command) {
+  public static ArgJoiner argJoiner(FtcCommand command) {
     return argJoiner("/" + command.getName());
   }
 
@@ -786,14 +785,14 @@ public final class Text {
 
     @Getter
     private final String prefix;
-    private final Map<Argument<?>, String> values = new HashMap<>();
+    private final Map<ArgumentOption<?>, String> values = new HashMap<>();
 
-    public ArgJoiner add(Argument<?> argument, String val) {
+    public ArgJoiner add(ArgumentOption<?> argument, String val) {
       values.put(argument, val);
       return this;
     }
 
-    public <T> ArgJoiner add(Argument<T> argument, T val) {
+    public <T> ArgJoiner add(ArgumentOption<T> argument, T val) {
       if (val == null || argument == null) {
         return this;
       }
@@ -808,8 +807,8 @@ public final class Text {
 
       for (var s : values.entrySet()) {
         joiner
-            .add(s.getKey().getName())
-            .add(ArgsArgument.EQUALS_SEPARATOR + "")
+            .add(s.getKey().getLabels().iterator().next())
+            .add("=")
             .add(s.getValue());
       }
 

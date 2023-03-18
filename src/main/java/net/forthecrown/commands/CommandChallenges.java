@@ -1,5 +1,7 @@
 package net.forthecrown.commands;
 
+import static net.kyori.adventure.text.Component.text;
+
 import com.google.common.base.Strings;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -22,10 +24,9 @@ import net.forthecrown.core.challenge.StreakCategory;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.EnumArgument;
-import net.forthecrown.grenadier.types.pos.PositionArgument;
+import net.forthecrown.grenadier.Completions;
+import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.useables.util.UsageUtil;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserLookupEntry;
@@ -154,7 +155,7 @@ public class CommandChallenges extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .executes(c -> {
           var user = getUserSender(c);
@@ -225,7 +226,7 @@ public class CommandChallenges extends FtcCommand {
                   var registry = ChallengeManager.getInstance()
                       .getChallengeRegistry();
 
-                  return CompletionProvider.suggestMatching(builder,
+                  return Completions.suggest(builder,
                       registry.entries()
                           .stream()
                           .filter(holder -> {
@@ -248,7 +249,7 @@ public class CommandChallenges extends FtcCommand {
                         // Add chest you're facing
                         .executes(c -> itemsChestsAdd(c, false))
 
-                        .then(argument("position", PositionArgument.blockPos())
+                        .then(argument("position", ArgumentTypes.blockPosition())
                             // Add chest at given block
                             .executes(c -> itemsChestsAdd(c, true))
                         )
@@ -299,19 +300,19 @@ public class CommandChallenges extends FtcCommand {
               manager.reset(ResetInterval.WEEKLY);
               manager.reset(ResetInterval.MANUAL);
 
-              c.getSource().sendAdmin(
+              c.getSource().sendSuccess(
                   Text.format("Reset all challenges")
               );
               return 0;
             })
 
-            .then(argument("type", EnumArgument.of(ResetInterval.class))
+            .then(argument("type", ArgumentTypes.enumType(ResetInterval.class))
                 .executes(c -> {
                   var type = c.getArgument("type", ResetInterval.class);
                   ChallengeManager.getInstance()
                       .reset(type);
 
-                  c.getSource().sendAdmin(
+                  c.getSource().sendSuccess(
                       Text.format("Reset all {0} challenges",
                           type.getDisplayName()
                       )
@@ -324,7 +325,7 @@ public class CommandChallenges extends FtcCommand {
         .then(literal("complete_all")
             .requires(IS_ADMIN)
 
-            .then(argument("category", EnumArgument.of(StreakCategory.class))
+            .then(argument("category", ArgumentTypes.enumType(StreakCategory.class))
                 .then(argument("user", Arguments.ONLINE_USER)
                     .executes(this::completeAll)
                 )
@@ -372,7 +373,7 @@ public class CommandChallenges extends FtcCommand {
     holder.getValue()
         .trigger(user.getPlayer());
 
-    c.getSource().sendAdmin(
+    c.getSource().sendSuccess(
         Text.format("Invoking {0} for {1, user}",
             holder.getValue().displayName(user),
             user
@@ -395,7 +396,7 @@ public class CommandChallenges extends FtcCommand {
         .getEntry(user)
         .addProgress(holder, points);
 
-    c.getSource().sendAdmin(
+    c.getSource().sendSuccess(
         Text.format("Gave &e{0, user} &6{1, number}&r points for &f{2}&r.",
             NamedTextColor.GRAY,
             user,
@@ -423,7 +424,7 @@ public class CommandChallenges extends FtcCommand {
       entry.addProgress(chal, chal.getValue().getGoal(user));
     }
 
-    c.getSource().sendAdmin(
+    c.getSource().sendSuccess(
         Text.format("Completed all {0} challenges for {1, user}",
             streak,
             user
@@ -456,7 +457,7 @@ public class CommandChallenges extends FtcCommand {
         .getStorage()
         .saveContainer(container);
 
-    c.getSource().sendAdmin(
+    c.getSource().sendSuccess(
         Text.format("Set active item of {0} to {1, item}",
             holder.getKey(),
             item
@@ -480,16 +481,20 @@ public class CommandChallenges extends FtcCommand {
                throwable
            );
 
-           c.getSource().sendAdmin("Error rerolling item, check console");
+           c.getSource().sendFailure(
+               text("Error rerolling item, check console")
+           );
            return;
          }
 
          if (Strings.isNullOrEmpty(s)) {
-           c.getSource().sendAdmin("Failed to reroll: no valid item found");
+           c.getSource().sendFailure(
+               text("Failed to reroll: no valid item found")
+           );
            return;
          }
 
-         c.getSource().sendAdmin(
+         c.getSource().sendSuccess(
              Text.format("Re-rolled {0}'s target item to {1}",
                  holder.getKey(),
                  s
@@ -511,7 +516,7 @@ public class CommandChallenges extends FtcCommand {
     container.getChests().clear();
     storage.saveContainer(container);
 
-    c.getSource().sendAdmin(
+    c.getSource().sendSuccess(
         Text.format("Cleared item data of {0}", holder.getKey())
     );
     return 0;
@@ -561,7 +566,7 @@ public class CommandChallenges extends FtcCommand {
     Commands.ensureIndexValid(index, container.getChests().size());
     var pos = container.getChests().remove(index - 1);
 
-    c.getSource().sendAdmin(
+    c.getSource().sendSuccess(
         Text.format(
             "Removed item source at {0} (index: {1, number}) from {2}",
             pos, index, holder.getKey()
@@ -582,7 +587,7 @@ public class CommandChallenges extends FtcCommand {
     Location l;
 
     if (posSet) {
-      l = PositionArgument.getLocation(c, "position");
+      l = ArgumentTypes.getLocation(c, "position");
     } else {
       var player = c.getSource().asPlayer();
       var facingBlock = player.getTargetBlockExact(5);
@@ -607,7 +612,7 @@ public class CommandChallenges extends FtcCommand {
 
     storage.saveContainer(container);
 
-    c.getSource().sendAdmin(
+    c.getSource().sendSuccess(
         Text.format("Added item source {0, vector} to {1}",
             l,
             holder.getKey()

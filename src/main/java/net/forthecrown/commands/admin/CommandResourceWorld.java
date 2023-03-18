@@ -1,5 +1,7 @@
 package net.forthecrown.commands.admin;
 
+import static net.kyori.adventure.text.Component.text;
+
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -23,8 +25,8 @@ import net.forthecrown.core.config.ResourceWorldConfig;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.core.resource.ResourceWorld;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.Completions;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.structure.BlockStructure;
 import net.forthecrown.utils.Time;
 import net.forthecrown.utils.text.Text;
@@ -57,13 +59,13 @@ public class CommandResourceWorld extends FtcCommand {
    */
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(literal("regen")
             .executes(c -> {
               ResourceWorld rw = ResourceWorld.get();
 
-              c.getSource().sendAdmin("Starting resource world regen");
+              c.getSource().sendSuccess(text("Starting resource world regen"));
               rw.resetAndLoad();
 
               return 0;
@@ -103,8 +105,8 @@ public class CommandResourceWorld extends FtcCommand {
         .executes(c -> {
 
           c.getSource().sendMessage(
-              Component.text("[RW] ")
-                  .append(Component.text(acc.getName() + ": "))
+              text("[RW] ")
+                  .append(text(acc.getName() + ": "))
                   .append(acc.display())
           );
           return 0;
@@ -118,8 +120,8 @@ public class CommandResourceWorld extends FtcCommand {
 
               acc.set(val);
 
-              c.getSource().sendAdmin(
-                  Component.text("[RW] Set " + acc.getName() + " to ")
+              c.getSource().sendSuccess(
+                  text("[RW] Set " + acc.getName() + " to ")
                       .append(acc.display())
               );
               return 0;
@@ -132,7 +134,7 @@ public class CommandResourceWorld extends FtcCommand {
     RwField<String> WG_REGION_NAME = new RwField<>() {
       @Override
       public Component display() {
-        return Component.text(ResourceWorldConfig.worldGuardSpawn);
+        return text(ResourceWorldConfig.worldGuardSpawn);
       }
 
       @Override
@@ -161,7 +163,7 @@ public class CommandResourceWorld extends FtcCommand {
       ) throws CommandSyntaxException {
         World world = Worlds.resource();
 
-        return CompletionProvider.suggestMatching(builder,
+        return Completions.suggest(builder,
             WorldGuard.getInstance()
                 .getPlatform()
                 .getRegionContainer()
@@ -208,7 +210,7 @@ public class CommandResourceWorld extends FtcCommand {
     RwField<String> TO_RES_GATE = new RwGateField() {
       @Override
       public Component display() {
-        return Component.text(ResourceWorldConfig.toResGate);
+        return text(ResourceWorldConfig.toResGate);
       }
 
       @Override
@@ -226,7 +228,7 @@ public class CommandResourceWorld extends FtcCommand {
     RwField<String> TO_HAZ_GATE = new RwGateField() {
       @Override
       public Component display() {
-        return Component.text(ResourceWorldConfig.toHazGate);
+        return text(ResourceWorldConfig.toHazGate);
       }
 
       @Override
@@ -244,7 +246,7 @@ public class CommandResourceWorld extends FtcCommand {
     RwField<Holder<BlockStructure>> SPAWN_STRUCTURE = new RwField<>() {
       @Override
       public Component display() {
-        return Component.text(ResourceWorldConfig.spawnStructure);
+        return text(ResourceWorldConfig.spawnStructure);
       }
 
       @Override
@@ -280,7 +282,7 @@ public class CommandResourceWorld extends FtcCommand {
     RwField<Boolean> ENABLED = new RwField<>() {
       @Override
       public Component display() {
-        return Component.text(ResourceWorldConfig.enabled);
+        return text(ResourceWorldConfig.enabled);
       }
 
       @Override
@@ -307,7 +309,7 @@ public class CommandResourceWorld extends FtcCommand {
     RwField<Integer> SIZE = new RwField<>() {
       @Override
       public Component display() {
-        return Component.text(ResourceWorldConfig.nextSize);
+        return text(ResourceWorldConfig.nextSize);
       }
 
       @Override
@@ -334,7 +336,7 @@ public class CommandResourceWorld extends FtcCommand {
       public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSource> context,
                                                            SuggestionsBuilder builder
       ) throws CommandSyntaxException {
-        return CompletionProvider.suggestMatching(builder, "1600", "2000", "3000", "4000");
+        return Completions.suggest(builder, "1600", "2000", "3000", "4000");
       }
     };
 
@@ -375,7 +377,7 @@ public class CommandResourceWorld extends FtcCommand {
     default CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSource> context,
                                                           SuggestionsBuilder builder
     ) throws CommandSyntaxException {
-      return CompletionProvider.suggestMatching(builder, Gate.getAllIDs());
+      return Completions.suggest(builder, Gate.getAllIDs());
     }
 
     @Override

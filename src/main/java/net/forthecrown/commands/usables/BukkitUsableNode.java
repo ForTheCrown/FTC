@@ -7,7 +7,9 @@ import net.forthecrown.useables.BukkitSavedUsable;
 import net.forthecrown.utils.text.Text;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class BukkitUsableNode<H extends BukkitSavedUsable> extends InteractableNode<H> {
+public abstract class BukkitUsableNode<H extends BukkitSavedUsable>
+    extends InteractableNode<H>
+{
 
   public BukkitUsableNode(@NotNull String name) {
     super(name);
@@ -43,7 +45,7 @@ public abstract class BukkitUsableNode<H extends BukkitSavedUsable> extends Inte
                   holder.cancelVanilla(state);
                   holder.save();
 
-                  c.getSource().sendAdmin(
+                  c.getSource().sendSuccess(
                       Text.format("Set usage will cancel vanilla interaction: {0}",
                           state
                       )

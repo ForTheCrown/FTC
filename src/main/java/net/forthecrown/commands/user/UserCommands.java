@@ -3,11 +3,10 @@ package net.forthecrown.commands.user;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.grenadier.CmdUtil;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import org.bukkit.permissions.Permission;
 
-public class UserCommands extends CmdUtil {
+public class UserCommands {
 
   static final Permission PERMISSION = Permissions.ADMIN;
   static final String USER_ARG_NAME = "user";
@@ -43,7 +42,7 @@ public class UserCommands extends CmdUtil {
     }
 
     @Override
-    protected void createCommand(BrigadierCommand command) {
+    public void createCommand(GrenadierCommand command) {
       var argument = argument(USER_ARG_NAME, Arguments.USER);
       UserProvider provider = c -> Arguments.getUser(c, USER_ARG_NAME);
 

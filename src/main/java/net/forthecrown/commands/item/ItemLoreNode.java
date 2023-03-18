@@ -13,7 +13,7 @@ import net.forthecrown.commands.manager.Commands;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.Messages;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
+import net.forthecrown.grenadier.Completions;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.Range;
 
@@ -54,7 +54,7 @@ public class ItemLoreNode extends ItemModifierNode {
               var held = getHeld(c.getSource());
               held.lore(null);
 
-              c.getSource().sendAdmin(Messages.CLEARED_LORE);
+              c.getSource().sendSuccess(Messages.CLEARED_LORE);
               return 0;
             })
         )
@@ -74,7 +74,7 @@ public class ItemLoreNode extends ItemModifierNode {
                   lore.add(optionallyWrap(message, c, "text"));
                   held.lore(lore);
 
-                  c.getSource().sendAdmin(Messages.addedLore(message));
+                  c.getSource().sendSuccess(Messages.addedLore(message));
                   return 0;
                 })
             )
@@ -137,7 +137,7 @@ public class ItemLoreNode extends ItemModifierNode {
       for (int i = 1; i <= lore.size(); i++) {
         var suggestion = i + "";
 
-        if (CompletionProvider.startsWith(token, suggestion)) {
+        if (Completions.matches(token, suggestion)) {
           builder.suggest(suggestion);
         }
       }
@@ -168,11 +168,11 @@ public class ItemLoreNode extends ItemModifierNode {
     boolean singleIndex = removeRange.getMaximum().equals(removeRange.getMinimum());
 
     if (singleIndex) {
-      c.getSource().sendAdmin(
+      c.getSource().sendSuccess(
           Messages.removedLoreIndex(removeRange.getMinimum())
       );
     } else {
-      c.getSource().sendAdmin(
+      c.getSource().sendSuccess(
           Messages.removedLoreRange(removeRange)
       );
     }

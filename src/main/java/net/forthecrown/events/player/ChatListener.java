@@ -99,7 +99,7 @@ public class ChatListener implements Listener {
     // then don't send message to chat, just to staff
     if (StaffChat.toggledPlayers.contains(player.getUniqueId())) {
       StaffChat.newMessage()
-          .setSource(user.getCommandSource(null))
+          .setSource(user.getCommandSource())
           .setMessage(event.message())
           .send();
 

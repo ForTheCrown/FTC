@@ -14,9 +14,7 @@ import java.util.Map;
 import java.util.UUID;
 import net.forthecrown.core.registry.Registries;
 import net.forthecrown.core.registry.Registry;
-import net.forthecrown.grenadier.types.ByteArgument;
-import net.forthecrown.grenadier.types.EnumArgument;
-import net.forthecrown.grenadier.types.ShortArgument;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.World;
@@ -33,7 +31,7 @@ public interface SerializerParsers {
   /* ----------------------------- PRIMITIVES ------------------------------ */
 
   SerializerParser<Byte> BYTE = register("byte_type",
-      new PrimitiveSerializerParser<>(ByteArgument.byteArg()) {
+      new PrimitiveSerializerParser<>(ArgumentTypes.map(IntegerArgumentType.integer(), Integer::byteValue)) {
         @Override
         public <V> @NotNull DataResult<Byte> deserialize(@NotNull DynamicOps<V> ops,
                                                          @NotNull V element
@@ -59,7 +57,7 @@ public interface SerializerParsers {
   );
 
   SerializerParser<Short> SHORT = register("short_type",
-      new PrimitiveSerializerParser<>(ShortArgument.shortArg()) {
+      new PrimitiveSerializerParser<>(ArgumentTypes.map(IntegerArgumentType.integer(), Integer::shortValue)) {
         @Override
         public <V> @NotNull DataResult<Short> deserialize(@NotNull DynamicOps<V> ops,
                                                           @NotNull V element
@@ -177,7 +175,7 @@ public interface SerializerParsers {
 
       @Override
       public @NotNull ArgumentType<E> getArgumentType() {
-        return EnumArgument.of(enumClass);
+        return ArgumentTypes.enumType(enumClass);
       }
 
       @Override

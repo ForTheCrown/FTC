@@ -12,7 +12,7 @@ import net.forthecrown.economy.market.MarketManager;
 import net.forthecrown.economy.market.MarketScan;
 import net.forthecrown.economy.market.MarketShop;
 import net.forthecrown.economy.market.Markets;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.user.User;
 
 public class CommandMarketAppeal extends FtcCommand {
@@ -41,7 +41,7 @@ public class CommandMarketAppeal extends FtcCommand {
    */
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .executes(c -> {
           User user = getUserSender(c);

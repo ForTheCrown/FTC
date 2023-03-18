@@ -12,7 +12,6 @@ import net.forthecrown.core.FTC;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.BannedWords;
-import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.guilds.Guild;
 import net.forthecrown.guilds.GuildMember;
 import net.forthecrown.guilds.GuildPermission;
@@ -153,7 +152,7 @@ public class GuildRanksMenu extends MenuPage {
   private static void changePermissions(User user,
                                         Guild guild,
                                         GuildRank rank
-  ) throws RoyalCommandException {
+  ) throws CommandSyntaxException {
     if (rank.getId() == ID_LEADER) {
       throw Exceptions.create("The leader always has all permissions.");
     }

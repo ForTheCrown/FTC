@@ -96,7 +96,7 @@ class UserCosmeticsNode extends UserCommandNode {
 
                   data.set(type, effect.getValue());
 
-                  c.getSource().sendAdmin(
+                  c.getSource().sendSuccess(
                       format("Set {0, user} active {1} cosmetic to {2}",
                           user, type.getDisplayName(), effect.getValue()
                       )
@@ -113,7 +113,7 @@ class UserCosmeticsNode extends UserCommandNode {
 
               data.set(type, null);
 
-              c.getSource().sendAdmin(
+              c.getSource().sendSuccess(
                   format("Unset {0, user} active {1} cosmetic.",
                       user, type.getDisplayName()
                   )
@@ -129,7 +129,7 @@ class UserCosmeticsNode extends UserCommandNode {
 
               data.clear(type);
 
-              c.getSource().sendAdmin(
+              c.getSource().sendSuccess(
                   format("Cleared {0, user}'s available {1} cosmetics",
                       user, type.getDisplayName()
                   )
@@ -147,7 +147,7 @@ class UserCosmeticsNode extends UserCommandNode {
 
                   data.add(effect.getValue());
 
-                  c.getSource().sendAdmin(
+                  c.getSource().sendSuccess(
                       format("Added {0} to {1, user}'s available {2} cosmetics",
                           effect.getValue(), user, type.getDisplayName()
                       )
@@ -166,7 +166,7 @@ class UserCosmeticsNode extends UserCommandNode {
 
                   data.remove(effect.getValue());
 
-                  c.getSource().sendAdmin(
+                  c.getSource().sendSuccess(
                       format("Removed {0} from {1, user}'s available {2} cosmetics",
                           effect.getValue(), user, type.getDisplayName()
                       )

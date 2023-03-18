@@ -8,13 +8,14 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.With;
 import net.forthecrown.commands.arguments.Arguments;
-import net.forthecrown.commands.manager.Readers;
+import net.forthecrown.commands.manager.Commands;
 import net.forthecrown.core.logging.Loggers;
-import net.forthecrown.grenadier.types.args.ArgsArgument;
-import net.forthecrown.grenadier.types.args.Argument;
-import net.forthecrown.grenadier.types.args.ParsedArgs;
-import net.forthecrown.grenadier.types.block.BlockArgument;
-import net.forthecrown.grenadier.types.block.ParsedBlock;
+import net.forthecrown.grenadier.types.ArgumentTypes;
+import net.forthecrown.grenadier.types.BlockArgument;
+import net.forthecrown.grenadier.types.options.ArgumentOption;
+import net.forthecrown.grenadier.types.options.Options;
+import net.forthecrown.grenadier.types.options.OptionsArgument;
+import net.forthecrown.grenadier.types.options.ParsedOptions;
 import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.nbt.CompoundTag;
@@ -40,19 +41,22 @@ public class FunctionInfo {
   public static final String
       FUNCTION_CMD_PREFIX = "function_build";
 
-  private static final Argument<String> FUNC_ARG
-      = Argument.builder(FUNCTION_CMD_PREFIX, Arguments.FTC_KEY)
+  private static final ArgumentOption<String> FUNC_ARG
+      = Options.argument(Arguments.FTC_KEY)
+      .addLabel(FUNCTION_CMD_PREFIX)
       .build();
 
-  private static final Argument<CompoundTag> TAG_ARG
-      = Argument.builder("data", Arguments.COMPOUND)
+  private static final ArgumentOption<CompoundTag> TAG_ARG
+      = Options.argument(ArgumentTypes.compoundTag())
+      .addLabel("data")
       .build();
 
-  private static final Argument<ParsedBlock> TURNS_INTO_ARG
-      = Argument.builder("turns_into", BlockArgument.block())
+  private static final ArgumentOption<BlockArgument.Result> TURNS_INTO_ARG
+      = Options.argument(ArgumentTypes.block())
+      .addLabel("turns_into")
       .build();
 
-  public static final ArgsArgument PARSER = ArgsArgument.builder()
+  public static final OptionsArgument PARSER = OptionsArgument.builder()
       .addRequired(FUNC_ARG)
       .addOptional(TAG_ARG)
       .addOptional(TURNS_INTO_ARG)
@@ -126,21 +130,24 @@ public class FunctionInfo {
 
     // If the input does not start with the command name,
     // this will do nothing, as there's nothing to skip over
-    Readers.skip(reader, COMMAND_NAME);
+    Commands.skip(reader, COMMAND_NAME);
     reader.skipWhitespace();
 
-    ParsedArgs args = PARSER.parse(reader);
+    ParsedOptions args = PARSER.parse(reader);
     var direction = Direction.fromBukkit(
         ((Directional) cmd.getBlockData()).getFacing()
     );
 
     return new FunctionInfo(
-        args.get(FUNC_ARG),
+        args.getValue(FUNC_ARG),
         direction,
 
-        args.has(TURNS_INTO_ARG) ? args.get(TURNS_INTO_ARG).getData() : null,
+        args.has(TURNS_INTO_ARG)
+            ? args.getValue(TURNS_INTO_ARG).getParsedState()
+            : null,
+
         Vectors.from(cmd.getBlock()).sub(origin.toInt()),
-        args.get(TAG_ARG)
+        args.getValue(TAG_ARG)
     );
   }
 

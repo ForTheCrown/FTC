@@ -11,9 +11,7 @@ import net.kyori.adventure.util.Ticks;
  * A class with utility functions relating to time.
  */
 public final class Time {
-
-  private Time() {
-  }
+  private Time() {}
 
   public static long millisToTicks(long millis) {
     return millis / Ticks.SINGLE_TICK_DURATION_MS;

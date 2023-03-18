@@ -29,6 +29,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import net.forthecrown.core.Main;
 import net.forthecrown.core.registry.Keys;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.text.Text;
@@ -119,8 +120,7 @@ public final class JsonUtils {
   }
 
   public static JsonPrimitive writeKey(Key key) {
-
-    if (key.namespace().equals(Keys.argumentType().getDefaultNamespace())) {
+    if (key.namespace().equals(Main.NAMESPACE)) {
       return new JsonPrimitive(key.value());
     }
 

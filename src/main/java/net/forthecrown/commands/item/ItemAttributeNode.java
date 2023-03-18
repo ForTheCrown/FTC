@@ -11,12 +11,13 @@ import java.util.function.Predicate;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.Messages;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.grenadier.types.RegistryArgument;
-import net.forthecrown.grenadier.types.UUIDArgument;
-import net.forthecrown.grenadier.types.args.ArgsArgument;
-import net.forthecrown.grenadier.types.args.Argument;
-import net.forthecrown.grenadier.types.args.ParsedArgs;
+import net.forthecrown.grenadier.types.options.ArgumentOption;
+import net.forthecrown.grenadier.types.options.Options;
+import net.forthecrown.grenadier.types.options.OptionsArgument;
+import net.forthecrown.grenadier.types.options.ParsedOptions;
 import org.bukkit.Registry;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -26,38 +27,42 @@ import org.bukkit.inventory.meta.ItemMeta;
 public class ItemAttributeNode extends ItemModifierNode {
 
   private static final RegistryArgument<Attribute> ARGUMENT_ATTRIBUTE =
-      RegistryArgument.registry(Registry.ATTRIBUTE, "Attribute");
+      ArgumentTypes.registry(Registry.ATTRIBUTE, "Attribute");
 
-  private static final EnumArgument<EquipmentSlot> SLOT_ARGUMENT = EnumArgument.of(
-      EquipmentSlot.class);
+  private static final EnumArgument<EquipmentSlot> SLOT_ARGUMENT
+      = ArgumentTypes.enumType(EquipmentSlot.class);
 
-  private static final Argument<Attribute> ATTR_ARG = Argument.builder("attribute",
-          ARGUMENT_ATTRIBUTE)
-      .setAliases("attr")
+  private static final ArgumentOption<Attribute> ATTR_ARG
+      = Options.argument(ARGUMENT_ATTRIBUTE)
+      .addLabel("attribute")
       .build();
 
-  private static final Argument<UUID> UUID_ARG = Argument.builder("uuid", UUIDArgument.uuid())
-      .setAliases("id")
+  private static final ArgumentOption<UUID> UUID_ARG
+      = Options.argument(ArgumentTypes.uuid())
+      .addLabel("uuid")
       .build();
 
-  private static final Argument<String> NAME_ARG = Argument.builder("name",
-          StringArgumentType.string())
+  private static final ArgumentOption<String> NAME_ARG
+      = Options.argument(StringArgumentType.string())
+      .addLabel("name")
       .build();
 
-  private static final Argument<AttributeModifier.Operation>
-      OPERATION_ARG = Argument.builder("operation",
-          EnumArgument.of(AttributeModifier.Operation.class))
+  private static final ArgumentOption<AttributeModifier.Operation> OPERATION_ARG
+      = Options.argument(ArgumentTypes.enumType(AttributeModifier.Operation.class))
+      .addLabel("operation")
       .build();
 
-  private static final Argument<Double> VALUE_ARG = Argument.builder("value",
-          DoubleArgumentType.doubleArg())
-      .setAliases("amount")
+  private static final ArgumentOption<Double> VALUE_ARG
+      = Options.argument(DoubleArgumentType.doubleArg())
+      .addLabel("value")
       .build();
 
-  private static final Argument<EquipmentSlot> SLOT_ARG = Argument.builder("slot", SLOT_ARGUMENT)
+  private static final ArgumentOption<EquipmentSlot> SLOT_ARG
+      = Options.argument(SLOT_ARGUMENT)
+      .addLabel("slot")
       .build();
 
-  private static final ArgsArgument ATTR_ARGS = ArgsArgument.builder()
+  private static final OptionsArgument ATTR_ARGS = OptionsArgument.builder()
       .addRequired(ATTR_ARG)
       .addRequired(OPERATION_ARG)
       .addRequired(VALUE_ARG)
@@ -112,7 +117,7 @@ public class ItemAttributeNode extends ItemModifierNode {
 
               held.setItemMeta(meta);
 
-              c.getSource().sendAdmin(Messages.CLEARED_ATTRIBUTE_MODS);
+              c.getSource().sendSuccess(Messages.CLEARED_ATTRIBUTE_MODS);
               return 0;
             })
         )
@@ -121,15 +126,27 @@ public class ItemAttributeNode extends ItemModifierNode {
             .then(argument("args", ATTR_ARGS)
                 .executes(c -> {
                   var held = getHeld(c.getSource());
-                  var args = c.getArgument("args", ParsedArgs.class);
+                  var args = c.getArgument("args", ParsedOptions.class);
 
-                  var value = args.get(VALUE_ARG);
-                  var operation = args.get(OPERATION_ARG);
-                  var attribute = args.get(ATTR_ARG);
+                  var value = args.getValue(VALUE_ARG);
+                  var operation = args.getValue(OPERATION_ARG);
+                  var attribute = args.getValue(ATTR_ARG);
 
-                  var slot = args.get(SLOT_ARG);
-                  UUID id = args.getOrDefault(UUID_ARG, UUID.randomUUID());
-                  String name = args.getOrDefault(NAME_ARG, attribute.name().toLowerCase());
+                  var slot = args.getValue(SLOT_ARG);
+
+                  UUID id;
+                  if (args.has(UUID_ARG)) {
+                    id = args.getValue(UUID_ARG);
+                  } else {
+                    id = UUID.randomUUID();
+                  }
+
+                  String name;
+                  if (args.has(NAME_ARG)) {
+                    name = args.getValue(NAME_ARG);
+                  } else {
+                    name = attribute.name().toLowerCase();
+                  }
 
                   AttributeModifier modifier = new AttributeModifier(
                       id, name, value, operation, slot
@@ -140,7 +157,7 @@ public class ItemAttributeNode extends ItemModifierNode {
 
                   held.setItemMeta(meta);
 
-                  c.getSource().sendAdmin(
+                  c.getSource().sendSuccess(
                       Messages.addedAttributeModifier(attribute, modifier)
                   );
                   return 0;
@@ -156,7 +173,7 @@ public class ItemAttributeNode extends ItemModifierNode {
             )
 
             .then(literal("slot")
-                .then(argument("slot", EnumArgument.of(EquipmentSlot.class))
+                .then(argument("slot", ArgumentTypes.enumType(EquipmentSlot.class))
                     .executes(c -> {
                       var slot = c.getArgument("slot", EquipmentSlot.class);
                       return removeAttr(c, meta -> meta.removeAttributeModifier(slot));
@@ -185,7 +202,7 @@ public class ItemAttributeNode extends ItemModifierNode {
 
     held.setItemMeta(meta);
 
-    c.getSource().sendAdmin(Messages.REMOVED_ATTRIBUTE_MOD);
+    c.getSource().sendSuccess(Messages.REMOVED_ATTRIBUTE_MOD);
     return 0;
   }
 }

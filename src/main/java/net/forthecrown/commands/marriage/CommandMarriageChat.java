@@ -5,7 +5,7 @@ import net.forthecrown.commands.arguments.chat.MessageArgument;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.user.MarriageMessage;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
@@ -42,7 +42,7 @@ public class CommandMarriageChat extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(argument("message", Arguments.MESSAGE)
 

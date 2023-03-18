@@ -11,7 +11,7 @@ import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcSuggestions;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
+import net.forthecrown.grenadier.Completions;
 import net.forthecrown.guilds.Guild;
 import net.forthecrown.guilds.GuildManager;
 import net.forthecrown.user.UserLookupEntry;
@@ -69,7 +69,7 @@ public class WaypointArgument implements ArgumentType<ParseResult<Waypoint>> {
     CommandSource source = (CommandSource) context.getSource();
 
     if (source.hasPermission(Permissions.WAYPOINTS_FLAGS)) {
-      CompletionProvider.suggestMatching(builder,
+      Completions.suggest(builder,
           FLAG_NEAREST, FLAG_CURRENT
       );
     }
@@ -78,7 +78,7 @@ public class WaypointArgument implements ArgumentType<ParseResult<Waypoint>> {
     FtcSuggestions.suggestPlayerNames(source, builder, false);
 
     // Suggest guilds
-    CompletionProvider.suggestMatching(builder,
+    Completions.suggest(builder,
         GuildManager.get().getGuilds()
             .stream()
             .filter(guild -> {
@@ -88,7 +88,7 @@ public class WaypointArgument implements ArgumentType<ParseResult<Waypoint>> {
             .map(Guild::getName)
     );
 
-    return CompletionProvider.suggestMatching(
+    return Completions.suggest(
         builder,
         WaypointManager.getInstance().getNames()
     );

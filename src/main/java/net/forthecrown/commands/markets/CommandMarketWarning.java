@@ -15,8 +15,9 @@ import net.forthecrown.economy.Economy;
 import net.forthecrown.economy.market.MarketDisplay;
 import net.forthecrown.economy.market.MarketShop;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.TimeArgument;
+import net.forthecrown.grenadier.Completions;
+import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.user.User;
 import net.kyori.adventure.text.Component;
 
@@ -71,7 +72,7 @@ public class CommandMarketWarning extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(getterArg(MarketGetter.MARKET_NAME))
         .then(getterArg(MarketGetter.USER));
@@ -82,9 +83,11 @@ public class CommandMarketWarning extends FtcCommand {
   private LiteralArgumentBuilder<CommandSource> getterArg(MarketGetter g) {
     return literal(g.getName())
         .then(argument(ARG_NAME, g.getArgument())
-            .then(argument("time", TimeArgument.time())
+            .then(argument("time", ArgumentTypes.time())
                 .then(argument("reason", Arguments.CHAT)
-                    .suggests(suggestMatching(GENERIC_REASONS))
+                    .suggests((context, builder) -> {
+                      return Completions.suggest(builder, GENERIC_REASONS);
+                    })
 
                     .executes(c -> {
                       MarketShop shop = g.get(c, ARG_NAME);
@@ -94,14 +97,14 @@ public class CommandMarketWarning extends FtcCommand {
                       }
 
                       Component reason = c.getArgument("reason", Component.class);
-                      long delay = TimeArgument.getMillis(c, "time");
+                      long delay = ArgumentTypes.getMillis(c, "time");
                       long evictionTime = System.currentTimeMillis() + delay;
 
                       var owner = shop.ownerUser();
 
                       shop.beginEviction(evictionTime, reason, c.getSource().textName());
 
-                      c.getSource().sendAdmin(
+                      c.getSource().sendSuccess(
                           Messages.issuedEviction(owner, evictionTime, reason)
                       );
                       return 0;
@@ -119,7 +122,7 @@ public class CommandMarketWarning extends FtcCommand {
 
                   shop.stopEviction();
 
-                  c.getSource().sendAdmin(
+                  c.getSource().sendSuccess(
                       Component.text()
                           .append(MarketDisplay.displayName(shop))
                           .append(Component.text(" is no longer marked for eviction"))

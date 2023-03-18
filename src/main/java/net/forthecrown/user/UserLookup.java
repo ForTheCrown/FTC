@@ -15,7 +15,7 @@ import lombok.Getter;
 import net.forthecrown.commands.manager.FtcSuggestions;
 import net.forthecrown.core.FTC;
 import net.forthecrown.core.logging.Loggers;
-import net.forthecrown.grenadier.CompletionProvider;
+import net.forthecrown.grenadier.Completions;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.SerializableObject;
@@ -396,7 +396,7 @@ public class UserLookup extends SerializableObject.AbstractSerializer<JsonArray>
       return false;
     }
 
-    return CompletionProvider.startsWith(token, s);
+    return Completions.matches(token, s);
   }
 
   /**

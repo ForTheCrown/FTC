@@ -11,8 +11,8 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.InventoryStorage;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.Completions;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -73,7 +73,7 @@ public class CommandInvStore extends FtcCommand {
               .stream()
               .map(CommandInvStore::wrapIfNeeded);
 
-          return CompletionProvider.suggestMatching(builder, categories);
+          return Completions.suggest(builder, categories);
         };
 
   private static String wrapIfNeeded(String s) {
@@ -87,7 +87,7 @@ public class CommandInvStore extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(literal("save")
             .then(argument("user", Arguments.ONLINE_USER)
@@ -151,7 +151,7 @@ public class CommandInvStore extends FtcCommand {
 
     store.storeInventory(user.getPlayer(), category, clearAfter);
 
-    c.getSource().sendAdmin(
+    c.getSource().sendSuccess(
         Text.format("Stored &e{0, user}&r's inventory in category &e{1}&r.",
             NamedTextColor.GRAY,
             user, category
@@ -177,7 +177,7 @@ public class CommandInvStore extends FtcCommand {
 
     store.returnItems(user.getPlayer(), category, clearCurrent);
 
-    c.getSource().sendAdmin(
+    c.getSource().sendSuccess(
         Text.format(
             "&7Returned items from category &e{0}&r to player &e{1, user}&r.",
             NamedTextColor.GRAY,
@@ -196,7 +196,7 @@ public class CommandInvStore extends FtcCommand {
 
     store.swap(user.getPlayer(), category);
 
-    c.getSource().sendAdmin(
+    c.getSource().sendSuccess(
         Text.format(
             "Swapped &e{0, user}&r's inventory with the stored "
                 + "inventory in category &e{1}&r.",
@@ -222,7 +222,7 @@ public class CommandInvStore extends FtcCommand {
       );
     }
 
-    c.getSource().sendAdmin(
+    c.getSource().sendSuccess(
         Text.format(
             "Gave &e{0, user}&r their items back from category &e{1}&r.",
             NamedTextColor.GRAY,

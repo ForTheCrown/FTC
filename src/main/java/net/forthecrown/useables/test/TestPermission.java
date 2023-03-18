@@ -4,7 +4,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.Messages;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
+import net.forthecrown.grenadier.Completions;
 import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.useables.CheckHolder;
@@ -22,7 +22,7 @@ public class TestPermission extends UsageTest {
 
   public static final UsageType<TestPermission> TYPE = UsageType.of(TestPermission.class)
       .setSuggests((context, builder) -> {
-        return CompletionProvider.suggestMatching(
+        return Completions.suggest(
             builder,
 
             Bukkit.getPluginManager()

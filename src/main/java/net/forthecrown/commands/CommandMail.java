@@ -2,6 +2,7 @@ package net.forthecrown.commands;
 
 import static net.forthecrown.commands.UserMapTopCommand.DEF_PAGE_SIZE;
 import static net.forthecrown.economy.shops.SignShops.EXAMPLE_ITEM_SLOT;
+import static net.kyori.adventure.text.Component.text;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -25,10 +26,11 @@ import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.events.Events;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.args.ArgsArgument;
-import net.forthecrown.grenadier.types.args.Argument;
-import net.forthecrown.grenadier.types.args.ParsedArgs;
+import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.grenadier.types.options.ArgumentOption;
+import net.forthecrown.grenadier.types.options.Options;
+import net.forthecrown.grenadier.types.options.OptionsArgument;
+import net.forthecrown.grenadier.types.options.ParsedOptions;
 import net.forthecrown.inventory.FtcInventory;
 import net.forthecrown.useables.util.UsageUtil;
 import net.forthecrown.user.User;
@@ -84,29 +86,31 @@ public class CommandMail extends FtcCommand {
    * Main Author: Julie
    */
 
-  private static final Argument<Component> MSG_ARG
-      = Argument.builder("message", Arguments.CHAT).build();
+  private static final ArgumentOption<Component> MSG_ARG
+      = Options.argument(Arguments.CHAT, "message");
 
-  private static final Argument<Integer> RHINE_ARG
-      = Argument.builder("rhines", IntegerArgumentType.integer(0))
-          .setDefaultValue(0)
-          .build();
+  private static final ArgumentOption<Integer> RHINE_ARG
+      = Options.argument(IntegerArgumentType.integer(0))
+      .addLabel("rhines")
+      .setDefaultValue(0)
+      .build();
 
-  private static final Argument<Integer> GEM_ARG
-      = Argument.builder("gems", IntegerArgumentType.integer(0))
-          .setDefaultValue(0)
-          .build();
+  private static final ArgumentOption<Integer> GEM_ARG
+      = Options.argument(IntegerArgumentType.integer(0))
+      .addLabel("gems")
+      .setDefaultValue(0)
+      .build();
 
-  private static final Argument<ItemStack> ITEM_ARG
-      = Argument.builder("item", UsageUtil.ITEM_ARGUMENT).build();
+  private static final ArgumentOption<ItemStack> ITEM_ARG
+      = Options.argument(UsageUtil.ITEM_ARGUMENT, "item");
 
-  private static final Argument<String> TAG_ARG
-      = Argument.builder("tag", StringArgumentType.string()).build();
+  private static final ArgumentOption<String> TAG_ARG
+      = Options.argument(StringArgumentType.string(), "tag");
 
-  private static final Argument<String> SCRIPT_ARG
-      = Argument.builder("script", Arguments.SCRIPT).build();
+  private static final ArgumentOption<String> SCRIPT_ARG
+      = Options.argument(Arguments.SCRIPT, "script");
 
-  private static final ArgsArgument ARGS = ArgsArgument.builder()
+  private static final OptionsArgument ARGS = OptionsArgument.builder()
       .addRequired(MSG_ARG)
       .addOptional(ITEM_ARG)
       .addOptional(GEM_ARG)
@@ -138,7 +142,7 @@ public class CommandMail extends FtcCommand {
         (viewerIndex, entry, it) -> {
           // Format index to show meta info about the
           // mail message
-          return Component.text(viewerIndex + ")")
+          return text(viewerIndex + ")")
               .color(NamedTextColor.GOLD)
               .hoverEvent(Messages.messageMetaInfo(entry));
         },
@@ -270,7 +274,7 @@ public class CommandMail extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .executes(c -> readMail(c, 0, DEF_PAGE_SIZE))
 
@@ -347,7 +351,7 @@ public class CommandMail extends FtcCommand {
 
                   list.clear();
 
-                  c.getSource().sendAdmin(Messages.clearedMail(user));
+                  c.getSource().sendSuccess(Messages.clearedMail(user));
                   return 0;
                 })
             )
@@ -445,7 +449,7 @@ public class CommandMail extends FtcCommand {
                   MailMessage message = list.get(index - 1);
                   message.setRead(read);
 
-                  c.getSource().sendAdmin(Messages.markedReadOther(user, read));
+                  c.getSource().sendSuccess(Messages.markedReadOther(user, read));
                   return 0;
                 })
             )
@@ -468,24 +472,24 @@ public class CommandMail extends FtcCommand {
   private RequiredArgumentBuilder<CommandSource, ?> adminSendArgs(boolean all) {
     return argument("args", ARGS)
         .executes(c -> {
-          var args = c.getArgument("args", ParsedArgs.class);
-          MailMessage message = MailMessage.of(args.get(MSG_ARG));
+          var args = c.getArgument("args", ParsedOptions.class);
+          MailMessage message = MailMessage.of(args.getValue(MSG_ARG));
           MailAttachment attachment = new MailAttachment();
 
           if (args.has(TAG_ARG)) {
-            attachment.setTag(args.get(TAG_ARG));
+            attachment.setTag(args.getValue(TAG_ARG));
           }
 
           if (args.has(ITEM_ARG)) {
-            attachment.setItem(args.get(ITEM_ARG));
+            attachment.setItem(args.getValue(ITEM_ARG));
           }
 
           if (args.has(SCRIPT_ARG)) {
-            attachment.setScript(args.get(SCRIPT_ARG));
+            attachment.setScript(args.getValue(SCRIPT_ARG));
           }
 
-          attachment.setRhines(args.get(RHINE_ARG));
-          attachment.setGems(args.get(GEM_ARG));
+          attachment.setRhines(args.getValue(RHINE_ARG));
+          attachment.setGems(args.getValue(GEM_ARG));
 
           if (!attachment.isEmpty()) {
             message.setAttachment(attachment);
@@ -501,13 +505,13 @@ public class CommandMail extends FtcCommand {
                   }
 
                   users.forEach(user -> user.sendMail(message));
-                  c.getSource().sendAdmin("Sent all users mail");
+                  c.getSource().sendSuccess(text("Sent all users mail"));
                 });
           } else {
             var user = Arguments.getUser(c, "user");
             user.sendMail(message);
 
-            c.getSource().sendAdmin(
+            c.getSource().sendSuccess(
                 Messages.mailSent(user, message.getMessage())
             );
           }
@@ -595,7 +599,9 @@ public class CommandMail extends FtcCommand {
     UserManager.get().getAllUsers()
         .whenComplete((users, throwable) -> {
           if (throwable != null) {
-            source.sendAdmin("Error sending mail to all users, check console");
+            source.sendFailure(
+                text("Error sending mail to all users, check console")
+            );
             Loggers.getLogger().error(throwable);
 
             return;
@@ -609,7 +615,7 @@ public class CommandMail extends FtcCommand {
 
           users.forEach(user -> user.sendMail(message));
 
-          source.sendAdmin("Finished sending everyone mail");
+          source.sendSuccess(text("Finished sending everyone mail"));
           Users.unloadOffline();
         });
 
@@ -704,7 +710,7 @@ public class CommandMail extends FtcCommand {
       this.itemSender = itemSender;
       this.msgInput = msgInput;
 
-      this.inventory = FtcInventory.of(this, InventoryType.HOPPER, Component.text("Mail an item"));
+      this.inventory = FtcInventory.of(this, InventoryType.HOPPER, text("Mail an item"));
 
       ItemStack barrier = new ItemStack(Material.BARRIER, 1);
 

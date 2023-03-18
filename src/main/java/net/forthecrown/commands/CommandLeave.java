@@ -6,7 +6,7 @@ import java.util.List;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import org.bukkit.entity.Player;
 
 public class CommandLeave extends FtcCommand {
@@ -24,7 +24,7 @@ public class CommandLeave extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command.executes(c -> {
       Player player = c.getSource().asPlayer();
 

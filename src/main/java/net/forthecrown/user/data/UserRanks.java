@@ -16,6 +16,7 @@ import net.forthecrown.core.registry.RegistryListener;
 import net.forthecrown.economy.sell.MenuReader;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
+import net.forthecrown.utils.io.Results;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -296,14 +297,14 @@ public final class UserRanks {
 
   public static DataResult<UserRank> deserialize(JsonElement element) {
     if (element == null || !element.isJsonObject()) {
-      return DataResult.error("Invalid JSON: " + element);
+      return Results.error("Invalid JSON: " + element);
     }
 
     JsonWrapper json = JsonWrapper.wrap(element.getAsJsonObject());
     var prefix = json.getComponent("prefix");
 
     if (prefix == null) {
-      return DataResult.error("No prefix set");
+      return Results.error("No prefix set");
     }
 
     var builder = UserRank.builder()
@@ -317,16 +318,16 @@ public final class UserRanks {
       builder.tier(json.getEnum("tier", RankTier.class));
 
       if (builder.tier() == NONE) {
-        return DataResult.error("Tier NONE is not supported for ranks");
+        return Results.error("Tier NONE is not supported for ranks");
       }
     } else {
-      return DataResult.error("No tier set");
+      return Results.error("No tier set");
     }
 
     json.getList("description", JsonUtils::readText)
         .forEach(builder::addDesc);
 
-    return DataResult.success(
+    return Results.success(
         builder.menuSlot(json.get("slot", MenuReader::readSlot))
             .build()
     );

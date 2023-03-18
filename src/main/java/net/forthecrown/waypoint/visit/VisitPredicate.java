@@ -3,7 +3,7 @@ package net.forthecrown.waypoint.visit;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.grenadier.exceptions.RoyalCommandException;
+import net.forthecrown.grenadier.SyntaxExceptions;
 import net.forthecrown.waypoint.WaypointProperties;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -90,9 +90,7 @@ public interface VisitPredicate {
 
       var exc = waypoint.getType().isValid(waypoint)
           .map(e -> {
-            Component msg = e instanceof RoyalCommandException r
-                ? r.getComponentMessage()
-                : e.componentMessage();
+            Component msg = SyntaxExceptions.formatCommandException(e);
 
             // Prefix with either 'target' or 'nearest' to
             // make the message a bit more readable

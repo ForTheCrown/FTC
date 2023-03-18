@@ -1,5 +1,8 @@
 package net.forthecrown.commands.admin;
 
+import static net.forthecrown.grenadier.Grenadier.toMessage;
+import static net.kyori.adventure.text.Component.text;
+
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -15,11 +18,9 @@ import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Messages;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.MapArgument;
-import net.forthecrown.grenadier.types.pos.Position;
-import net.forthecrown.grenadier.types.pos.PositionArgument;
+import net.forthecrown.grenadier.Completions;
+import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
@@ -84,9 +85,9 @@ public class CommandSign extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
-        .then(argument("pos", PositionArgument.blockPos())
+        .then(argument("pos", ArgumentTypes.blockPosition())
             .then(literal("clear")
                 .executes(c -> {
                   Sign sign = get(c);
@@ -94,7 +95,7 @@ public class CommandSign extends FtcCommand {
                   SignLines.EMPTY.apply(sign);
                   sign.update();
 
-                  c.getSource().sendAdmin("Cleared sign");
+                  c.getSource().sendSuccess(text("Cleared sign"));
                   return 0;
                 })
             )
@@ -110,7 +111,7 @@ public class CommandSign extends FtcCommand {
                       sign.setGlowingText(glowing);
                       sign.update();
 
-                      c.getSource().sendAdmin(
+                      c.getSource().sendSuccess(
                           Text.format("Set sign glowing: {0}", glowing)
                       );
                       return 0;
@@ -119,15 +120,15 @@ public class CommandSign extends FtcCommand {
             )
 
             .then(literal("type")
-                .then(argument("type", MapArgument.of(types))
+                .then(argument("type", ArgumentTypes.map(types))
                     .executes(c -> {
                       Sign sign = get(c);
                       SignType type = c.getArgument("type", SignType.class);
 
                       type.apply(sign);
 
-                      c.getSource().sendAdmin(
-                          "Set sign's type to: " + type.name()
+                      c.getSource().sendSuccess(
+                          text("Set sign's type to: " + type.name())
                       );
                       return 0;
                     })
@@ -143,7 +144,7 @@ public class CommandSign extends FtcCommand {
                   copies.put(user.getUniqueId(), lines);
 
                   user.sendMessage(
-                      Component.text("Copied sign")
+                      text("Copied sign")
                   );
 
                   return 0;
@@ -164,7 +165,7 @@ public class CommandSign extends FtcCommand {
                   sign.update();
 
                   user.sendMessage(
-                      Component.text("Pasted sign")
+                      text("Pasted sign")
                   );
 
                   return 0;
@@ -172,7 +173,9 @@ public class CommandSign extends FtcCommand {
             )
 
             .then(argument("index", IntegerArgumentType.integer(1, 4))
-                .suggests(suggestMatching("1", "2", "3", "4"))
+                .suggests((context, builder) -> {
+                  return Completions.suggest(builder, "1", "2", "3", "4");
+                })
 
                 .then(literal("set")
                     .then(argument("line", Arguments.CHAT)
@@ -187,15 +190,15 @@ public class CommandSign extends FtcCommand {
                               .legacyAmpersand()
                               .serialize(lineComponent);
 
-                          if (CompletionProvider.startsWith(token, lineText)) {
-                            b.suggest(lineText, toTooltip(lineComponent));
+                          if (Completions.matches(token, lineText)) {
+                            b.suggest(lineText, toMessage(lineComponent));
                             return b.buildFuture();
                           }
 
                           return MessageSuggestions.get(
                               c, b, true,
                               (builder, source) -> {
-                                CompletionProvider.suggestMatching(
+                                Completions.suggest(
                                     builder, "-clear"
                                 );
                               }
@@ -220,13 +223,13 @@ public class CommandSign extends FtcCommand {
     if (Text.isDashClear(text)) {
       sign.line(index - 1, Component.empty());
 
-      c.getSource().sendAdmin(
+      c.getSource().sendSuccess(
           Text.format("Cleared line {0, number}", index)
       );
     } else {
       sign.line(index - 1, text);
 
-      c.getSource().sendAdmin(
+      c.getSource().sendSuccess(
           Text.format("Set line {0, number} to {1}", index, text)
       );
     }
@@ -236,7 +239,7 @@ public class CommandSign extends FtcCommand {
   }
 
   private Sign get(CommandContext<CommandSource> c) throws CommandSyntaxException {
-    Location l = c.getArgument("pos", Position.class).getLocation(c.getSource());
+    Location l = ArgumentTypes.getLocation(c, "pos");
 
     if (!(l.getBlock().getState() instanceof Sign)) {
       throw Exceptions.notSign(l);

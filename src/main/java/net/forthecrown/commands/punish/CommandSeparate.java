@@ -7,7 +7,7 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.logging.Loggers;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.user.User;
 import net.forthecrown.user.data.UserInteractions;
 import org.apache.logging.log4j.Logger;
@@ -46,7 +46,7 @@ public class CommandSeparate extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(argument("first", Arguments.USER)
             .then(argument("second", Arguments.USER)
@@ -65,7 +65,7 @@ public class CommandSeparate extends FtcCommand {
                     firstInter.removeSeparated(second.getUniqueId());
                     secondInter.removeSeparated(first.getUniqueId());
 
-                    c.getSource().sendAdmin(Messages.unseparating(first, second));
+                    c.getSource().sendSuccess(Messages.unseparating(first, second));
 
                     LOGGER.info(STAFF_LOG, "{} un-separated {} and {}",
                         c.getSource().textName(), first, second
@@ -74,7 +74,7 @@ public class CommandSeparate extends FtcCommand {
                     firstInter.addSeparated(second.getUniqueId());
                     secondInter.addSeparated(first.getUniqueId());
 
-                    c.getSource().sendAdmin(Messages.separating(first, second));
+                    c.getSource().sendSuccess(Messages.separating(first, second));
 
                     LOGGER.info(STAFF_LOG, "{} separated {} and {}",
                         c.getSource().textName(), first, second

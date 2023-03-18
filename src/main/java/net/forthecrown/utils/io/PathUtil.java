@@ -19,13 +19,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.core.FTC;
-import net.forthecrown.core.logging.Loggers;
-import org.apache.logging.log4j.Logger;
 
 public final class PathUtil {
   private PathUtil() {}
-
-  private static final Logger LOGGER = Loggers.getLogger();
 
   public static final Pattern UUID_PATTERN
       = Pattern.compile(
@@ -115,7 +111,7 @@ public final class PathUtil {
                                                      IOConsumer<Path> fileConsumer
   ) {
     if (!Files.isDirectory(dir)) {
-      return Results.errorResult("Path '%s' is not a directory", dir);
+      return Results.error("Path '%s' is not a directory", dir);
     }
 
     try (var stream = Files.newDirectoryStream(dir)) {
@@ -143,7 +139,7 @@ public final class PathUtil {
           deleted++;
         } catch (IOException exc) {
           if (!tolerateErrors) {
-            return Results.partialResult(deleted,
+            return Results.partial(deleted,
                 "Couldn't perform operation on file '%s': '%s'",
                 p, exc.getMessage()
             );
@@ -153,7 +149,7 @@ public final class PathUtil {
 
       return DataResult.success(deleted);
     } catch (IOException e) {
-      return Results.errorResult("Couldn't iterate through directory '%s': '%s'", e);
+      return Results.error("Couldn't iterate through directory '%s': '%s'", e);
     }
   }
 
@@ -217,7 +213,7 @@ public final class PathUtil {
         // Don't test for error toleration here because
         // if a directory isn't empty when we try to delete it,
         // it'll fail anyway
-        return Results.partialResult(deleted,
+        return Results.partial(deleted,
             "Couldn't recursively delete directory '%s': '%s'", path, e.getMessage()
         );
       }
@@ -229,7 +225,7 @@ public final class PathUtil {
 
       return DataResult.success(deleted);
     } catch (IOException e) {
-      return Results.partialResult(deleted,
+      return Results.partial(deleted,
           "Couldn't delete file: '%s': '%s'",
           path, e.getMessage()
       );
@@ -282,7 +278,7 @@ public final class PathUtil {
       Files.walkFileTree(directory, walker);
       return DataResult.success(walker.results);
     } catch (IOException exc) {
-      return Results.partialResult(walker.results,
+      return Results.partial(walker.results,
           "Error walking tree! %s",
           exc.getMessage()
       );
@@ -300,11 +296,11 @@ public final class PathUtil {
         .toArray(UUID[]::new);
 
     if (arr.length < 1) {
-      return Results.errorResult("File %s is not a UUID file", path);
+      return Results.error("File %s is not a UUID file", path);
     }
 
     if (arr.length > 1) {
-      return Results.partialResult(
+      return Results.partial(
           arr[0],
           "Path %s contained more than 1 UUID",
           path

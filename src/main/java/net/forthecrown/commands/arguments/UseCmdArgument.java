@@ -13,16 +13,17 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
-import net.forthecrown.royalgrenadier.GrenadierUtils;
-import net.forthecrown.royalgrenadier.VanillaMappedArgument;
+import net.forthecrown.grenadier.Completions;
+import net.forthecrown.grenadier.internal.VanillaMappedArgument;
 import net.forthecrown.useables.command.CmdUsables;
 import net.forthecrown.useables.command.CommandUsable;
+import net.minecraft.commands.CommandBuildContext;
 import org.bukkit.entity.Player;
 
 @RequiredArgsConstructor
-public class UseCmdArgument<T extends CommandUsable> implements ArgumentType<T>,
-    VanillaMappedArgument {
+public class UseCmdArgument<T extends CommandUsable>
+    implements ArgumentType<T>, VanillaMappedArgument
+{
 
   private final Supplier<CmdUsables<T>> manager;
   @Getter
@@ -44,10 +45,8 @@ public class UseCmdArgument<T extends CommandUsable> implements ArgumentType<T>,
     var result = manager.get().get(name);
 
     if (result == null) {
-      throw Exceptions.unknown(typeClass.getSimpleName(),
-          GrenadierUtils.correctReader(reader, cursor),
-          name
-      );
+      reader.setCursor(cursor);
+      throw Exceptions.unknown(typeClass.getSimpleName(), reader, name);
     }
 
     return result;
@@ -68,14 +67,14 @@ public class UseCmdArgument<T extends CommandUsable> implements ArgumentType<T>,
     var manager = this.manager.get();
 
     if (!source.isPlayer() || ignoreChecks) {
-      return CompletionProvider.suggestMatching(builder, manager.keySet());
+      return Completions.suggest(builder, manager.keySet());
     }
 
     var player = source.asOrNull(Player.class);
     var remaining = builder.getRemainingLowerCase();
 
     for (var u : manager.getUsable(player)) {
-      if (!CompletionProvider.startsWith(remaining, u.getName())) {
+      if (!Completions.matches(remaining, u.getName())) {
         continue;
       }
 
@@ -86,7 +85,7 @@ public class UseCmdArgument<T extends CommandUsable> implements ArgumentType<T>,
   }
 
   @Override
-  public ArgumentType<?> getVanillaArgumentType() {
+  public ArgumentType<?> getVanillaType(CommandBuildContext context) {
     return StringArgumentType.word();
   }
 }

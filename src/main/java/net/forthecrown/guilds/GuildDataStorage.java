@@ -267,7 +267,7 @@ public class GuildDataStorage {
           }
 
           if (!el.isJsonArray()) {
-            return Results.errorResult(
+            return Results.error(
                 "Guild chunk file %s, expected JsonArray, found %s",
                 guildId, el.toString()
             );

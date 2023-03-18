@@ -4,7 +4,7 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import org.jetbrains.annotations.NotNull;
 
 abstract class UserCommandNode extends FtcCommand {
@@ -19,7 +19,7 @@ abstract class UserCommandNode extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     var argument = argument(UserCommands.USER_ARG_NAME, Arguments.USER);
     create(argument, c -> Arguments.getUser(c, UserCommands.USER_ARG_NAME));
 

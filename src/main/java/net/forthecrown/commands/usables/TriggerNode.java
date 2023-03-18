@@ -10,8 +10,7 @@ import com.sk89q.worldedit.regions.Region;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.types.EnumArgument;
-import net.forthecrown.grenadier.types.pos.PositionArgument;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.useables.TriggerType;
 import net.forthecrown.useables.UsableTrigger;
 import net.forthecrown.useables.Usables;
@@ -19,6 +18,7 @@ import net.forthecrown.user.User;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.math.WorldBounds3i;
 import net.forthecrown.utils.text.Text;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 
 class TriggerNode extends InteractableNode<UsableTrigger> {
@@ -77,13 +77,13 @@ class TriggerNode extends InteractableNode<UsableTrigger> {
             })
 
             // Area input given, use that lol
-            .then(argument("pos1", PositionArgument.blockPos())
-                .then(argument("pos2", PositionArgument.blockPos())
+            .then(argument("pos1", ArgumentTypes.blockPosition())
+                .then(argument("pos2", ArgumentTypes.blockPosition())
                     .executes(c -> {
                       getUserSender(c);
 
-                      Location p1 = PositionArgument.getLocation(c, "pos1");
-                      Location p2 = PositionArgument.getLocation(c, "pos2");
+                      Location p1 = ArgumentTypes.getLocation(c, "pos1");
+                      Location p2 = ArgumentTypes.getLocation(c, "pos2");
 
                       WorldBounds3i bounds = WorldBounds3i.of(p1, p2);
 
@@ -106,7 +106,7 @@ class TriggerNode extends InteractableNode<UsableTrigger> {
     UsableTrigger trigger = new UsableTrigger(name, area);
     triggers.add(trigger);
 
-    c.getSource().sendAdmin("Created trigger called: " + name);
+    c.getSource().sendSuccess(Component.text("Created trigger called: " + name));
     return 0;
   }
 
@@ -121,7 +121,7 @@ class TriggerNode extends InteractableNode<UsableTrigger> {
 
           triggers.remove(trigger);
 
-          c.getSource().sendAdmin(
+          c.getSource().sendSuccess(
               Text.format("Removed trigger named '{0}'", trigger.getName())
           );
           return 0;
@@ -164,14 +164,14 @@ class TriggerNode extends InteractableNode<UsableTrigger> {
               return 0;
             })
 
-            .then(argument("type", EnumArgument.of(TriggerType.class))
+            .then(argument("type", ArgumentTypes.enumType(TriggerType.class))
                 .executes(c -> {
                   var trigger = provider.get(c);
                   var type = c.getArgument("type", TriggerType.class);
 
                   trigger.setType(type);
 
-                  c.getSource().sendAdmin(
+                  c.getSource().sendSuccess(
                       Text.format("Set {0}'s type to {1}",
                           trigger.getName(),
                           type.name().toLowerCase()

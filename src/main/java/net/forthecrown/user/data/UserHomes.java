@@ -11,8 +11,8 @@ import javax.annotation.Nullable;
 import lombok.Getter;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.logging.Loggers;
-import net.forthecrown.grenadier.CmdUtil;
-import net.forthecrown.grenadier.CompletionProvider;
+import net.forthecrown.grenadier.Completions;
+import net.forthecrown.grenadier.Grenadier;
 import net.forthecrown.user.ComponentType;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserComponent;
@@ -273,11 +273,11 @@ public class UserHomes extends UserComponent {
     for (var e : homes.entrySet()) {
       var name = e.getKey();
 
-      if (CompletionProvider.startsWith(token, name)) {
+      if (Completions.matches(token, name)) {
         var l = e.getValue();
 
         // Suggest name with the location as the hover text
-        builder.suggest(name, CmdUtil.toTooltip(Text.prettyLocation(l, true)));
+        builder.suggest(name, Grenadier.toMessage(Text.prettyLocation(l, true)));
       }
     }
   }

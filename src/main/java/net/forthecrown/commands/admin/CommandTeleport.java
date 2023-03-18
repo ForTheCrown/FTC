@@ -7,10 +7,9 @@ import java.util.Collection;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.pos.PositionArgument;
-import net.forthecrown.grenadier.types.selectors.EntityArgument;
-import net.forthecrown.royalgrenadier.types.selector.EntityArgumentImpl;
+import net.forthecrown.grenadier.Grenadier;
+import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserTeleport;
 import net.forthecrown.user.Users;
@@ -42,13 +41,13 @@ public class CommandTeleport extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
-        .then(argument("entity", EntityArgument.multipleEntities())
-            .then(argument("entity_to", EntityArgument.entity())
+        .then(argument("entity", ArgumentTypes.entities())
+            .then(argument("entity_to", ArgumentTypes.player())
                 .executes(c -> {
-                  Entity entity = EntityArgument.getPlayer(c, "entity_to");
-                  Collection<Entity> entities = EntityArgument.getEntities(c, "entity");
+                  Entity entity = ArgumentTypes.getPlayer(c, "entity_to");
+                  Collection<Entity> entities = ArgumentTypes.getEntities(c, "entity");
 
                   Component display = entity.teamDisplayName();
 
@@ -61,7 +60,7 @@ public class CommandTeleport extends FtcCommand {
                 })
             )
 
-            .then(argument("location_to", PositionArgument.position())
+            .then(argument("location_to", ArgumentTypes.position())
                 .executes(c -> entityTeleport(c, false, false))
 
                 .then(argument("yaw", FloatArgumentType.floatArg(-180f, 180f))
@@ -73,25 +72,25 @@ public class CommandTeleport extends FtcCommand {
                 )
 
                 .then(literal("facing")
-                    .then(argument("facing_pos", PositionArgument.position())
+                    .then(argument("facing_pos", ArgumentTypes.position())
                         .executes(
-                            c -> teleportFacing(c, PositionArgument.getLocation(c, "facing_pos")))
+                            c -> teleportFacing(c, ArgumentTypes.getLocation(c, "facing_pos")))
                     )
 
                     .then(literal("facingEntity")
-                        .then(argument("facing_entity", EntityArgument.entity())
+                        .then(argument("facing_entity", ArgumentTypes.entity())
                             .executes(c -> teleportFacing(c,
-                                EntityArgument.getEntity(c, "facing_entity").getLocation()))
+                                ArgumentTypes.getEntity(c, "facing_entity").getLocation()))
                         )
                     )
                 )
             )
         )
 
-        .then(argument("entity", EntityArgument.entity())
+        .then(argument("entity", ArgumentTypes.entity())
             .executes(c -> {
               User user = getUserSender(c);
-              Entity entity = EntityArgument.getEntity(c, "entity");
+              Entity entity = ArgumentTypes.getEntity(c, "entity");
 
               Component display = entity.teamDisplayName();
 
@@ -110,7 +109,7 @@ public class CommandTeleport extends FtcCommand {
                   .setSilent(true)
                   .start();
 
-              c.getSource().sendAdmin(
+              c.getSource().sendSuccess(
                   Component.text("Teleported ")
                       .append(user.displayName().color(NamedTextColor.YELLOW))
                       .append(Component.text(" to "))
@@ -120,7 +119,7 @@ public class CommandTeleport extends FtcCommand {
             })
         )
 
-        .then(argument("location", PositionArgument.position())
+        .then(argument("location", ArgumentTypes.position())
             .executes(c -> teleport(c, false, false))
 
             .then(argument("yaw", FloatArgumentType.floatArg(-180f, 180f))
@@ -135,21 +134,21 @@ public class CommandTeleport extends FtcCommand {
 
   private int teleportFacing(CommandContext<CommandSource> c, Location facing)
       throws CommandSyntaxException {
-    Location location = PositionArgument.getLocation(c, "location_to");
+    Location location = ArgumentTypes.getLocation(c, "location_to");
     Vector3d dif = Vectors.doubleFrom(location.clone().subtract(facing));
 
     location.setYaw((float) Vectors.getYaw(dif));
     location.setPitch((float) Vectors.getPitch(dif));
 
-    Collection<Entity> entities = EntityArgument.getEntities(c, "entity");
+    Collection<Entity> entities = ArgumentTypes.getEntities(c, "entity");
 
     return teleport(entities, location, Text.clickableLocation(location, false), c.getSource());
   }
 
   private int entityTeleport(CommandContext<CommandSource> c, boolean yaw, boolean pitch)
       throws CommandSyntaxException {
-    Location location = PositionArgument.getLocation(c, "location_to");
-    Collection<Entity> entities = EntityArgument.getEntities(c, "entity");
+    Location location = ArgumentTypes.getLocation(c, "location_to");
+    Collection<Entity> entities = ArgumentTypes.getEntities(c, "entity");
 
     if (yaw) {
       location.setYaw(c.getArgument("yaw", Float.class));
@@ -165,7 +164,7 @@ public class CommandTeleport extends FtcCommand {
   private int teleport(CommandContext<CommandSource> c, boolean yawGiven, boolean pitchGiven)
       throws CommandSyntaxException {
     User user = getUserSender(c);
-    Location loc = PositionArgument.getLocation(c, "location");
+    Location loc = ArgumentTypes.getLocation(c, "location");
 
     if (yawGiven) {
       loc.setYaw(c.getArgument("yaw", Float.class));
@@ -185,7 +184,7 @@ public class CommandTeleport extends FtcCommand {
         .setDelayed(false)
         .start();
 
-    c.getSource().sendAdmin(
+    c.getSource().sendSuccess(
         Component.text("Teleported ")
             .append(user.displayName().color(NamedTextColor.YELLOW))
             .append(Component.text(" to "))
@@ -198,7 +197,7 @@ public class CommandTeleport extends FtcCommand {
                        CommandSource source
   ) throws CommandSyntaxException {
     if (entities.isEmpty()) {
-      throw EntityArgumentImpl.NO_ENTITIES_FOUND.create();
+      throw Grenadier.exceptions().noEntityFound();
     }
 
     int amount = 0;
@@ -227,7 +226,7 @@ public class CommandTeleport extends FtcCommand {
         entities.size() > 1 ? Component.text(amount + " entities").color(NamedTextColor.YELLOW)
             : entDisplay(entities).color(NamedTextColor.YELLOW);
 
-    source.sendAdmin(
+    source.sendSuccess(
         Component.text("Teleported ")
             .append(entMsg)
             .append(Component.text(" to "))

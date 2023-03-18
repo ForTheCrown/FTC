@@ -1,5 +1,7 @@
 package net.forthecrown.commands.admin;
 
+import java.util.Arrays;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -12,7 +14,9 @@ import net.forthecrown.core.module.ModuleServices;
 import net.forthecrown.core.resource.ResourceWorldTracker;
 import net.forthecrown.core.script2.ScriptManager;
 import net.forthecrown.economy.Economy;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.Completions;
+import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.guilds.GuildManager;
 import net.forthecrown.inventory.weapon.ability.SwordAbilityManager;
@@ -29,7 +33,7 @@ import org.jetbrains.annotations.NotNull;
 public class SaveReloadCommands extends FtcCommand {
 
   private static final EnumArgument<Section> SECTION_ARGUMENT
-      = EnumArgument.of(Section.class);
+      = ArgumentTypes.enumType(Section.class);
 
   private final boolean save;
 
@@ -58,7 +62,7 @@ public class SaveReloadCommands extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .executes(c -> {
           if (save) {
@@ -67,11 +71,25 @@ public class SaveReloadCommands extends FtcCommand {
             ModuleServices.RELOAD.run();
           }
 
-          c.getSource().sendAdmin(format(save, "FTC-Plugin"));
+          c.getSource().sendSuccess(format(save, "FTC-Plugin"));
           return 0;
         })
 
         .then(argument("section", SECTION_ARGUMENT)
+            .suggests((context, builder) -> {
+              Stream<String> stream = Arrays.stream(Section.values())
+                  .filter(section -> {
+                    if (save) {
+                      return section.onSave != null;
+                    } else {
+                      return section.onLoad != null;
+                    }
+                  })
+                  .map(section -> section.name().toLowerCase());
+
+              return Completions.suggest(builder, stream);
+            })
+
             .executes(c -> {
               var section = c.getArgument("section", Section.class);
 
@@ -91,7 +109,7 @@ public class SaveReloadCommands extends FtcCommand {
 
               section.run(save);
 
-              c.getSource().sendAdmin(format(save, section.getViewerName()));
+              c.getSource().sendSuccess(format(save, section.getViewerName()));
               return 0;
             })
         );

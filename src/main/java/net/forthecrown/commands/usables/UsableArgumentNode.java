@@ -1,5 +1,7 @@
 package net.forthecrown.commands.usables;
 
+import static net.forthecrown.grenadier.Grenadier.toMessage;
+
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -13,11 +15,10 @@ import lombok.RequiredArgsConstructor;
 import net.forthecrown.commands.manager.Commands;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand.UsageFactory;
-import net.forthecrown.commands.manager.Readers;
 import net.forthecrown.core.registry.Holder;
-import net.forthecrown.grenadier.CmdUtil;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
+import net.forthecrown.grenadier.Completions;
+import net.forthecrown.grenadier.Nodes;
 import net.forthecrown.useables.UsageInstance;
 import net.forthecrown.useables.UsageType;
 import net.forthecrown.useables.UsageTypeHolder;
@@ -26,7 +27,7 @@ import net.forthecrown.utils.text.writer.TextWriters;
 
 @RequiredArgsConstructor
 public class UsableArgumentNode<T extends UsageInstance, H extends UsageTypeHolder>
-    extends CmdUtil
+    extends Nodes
 {
 
   private final UsageTypeAccessor<T, H> accessor;
@@ -165,7 +166,7 @@ public class UsableArgumentNode<T extends UsageInstance, H extends UsageTypeHold
 
               saveCallback.dumbHack(obj);
 
-              c.getSource().sendAdmin(
+              c.getSource().sendSuccess(
                   Text.format("Cleared {0}s", accessor.getName())
               );
               return 0;
@@ -233,7 +234,7 @@ public class UsableArgumentNode<T extends UsageInstance, H extends UsageTypeHold
     }
 
     T instance = parsed.parse(reader, c.getSource());
-    Readers.ensureCannotRead(reader);
+    Commands.ensureCannotRead(reader);
 
     if (first) {
       list.add(0, instance);
@@ -243,7 +244,7 @@ public class UsableArgumentNode<T extends UsageInstance, H extends UsageTypeHold
 
     saveCallback.dumbHack(holder);
 
-    c.getSource().sendAdmin(
+    c.getSource().sendSuccess(
         Text.format(
             "Added {0}: {1}: {2}",
             accessor.getName(),
@@ -289,8 +290,8 @@ public class UsableArgumentNode<T extends UsageInstance, H extends UsageTypeHold
       for (int i = 1; i <= list.size(); i++) {
         var suggestion = i + "";
 
-        if (CompletionProvider.startsWith(token, suggestion)) {
-          builder.suggest(suggestion, toTooltip(list.listInfo(i - 1)));
+        if (Completions.matches(token, suggestion)) {
+          builder.suggest(suggestion, toMessage(list.listInfo(i - 1)));
         }
       }
 
@@ -309,7 +310,7 @@ public class UsableArgumentNode<T extends UsageInstance, H extends UsageTypeHold
     remover.remove(list, c);
     saveCallback.dumbHack(holder);
 
-    c.getSource().sendAdmin(Text.format("Removed {0}", accessor.getName()));
+    c.getSource().sendSuccess(Text.format("Removed {0}", accessor.getName()));
     return 0;
   }
 }

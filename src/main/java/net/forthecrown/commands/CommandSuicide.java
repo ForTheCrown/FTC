@@ -4,7 +4,7 @@ import static net.forthecrown.core.Messages.CMD_SUICIDE;
 
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import org.bukkit.entity.Player;
 
 public class CommandSuicide extends FtcCommand {
@@ -20,7 +20,7 @@ public class CommandSuicide extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .executes(c -> {
           Player player = c.getSource().asPlayer();

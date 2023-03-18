@@ -1,6 +1,5 @@
 package net.forthecrown.commands.manager;
 
-import static net.forthecrown.commands.manager.OpenExceptionType.INSTANCE;
 import static net.forthecrown.waypoint.Waypoints.COLUMN_TOP;
 import static net.forthecrown.waypoint.Waypoints.GUILD_COLUMN;
 import static net.forthecrown.waypoint.Waypoints.PLAYER_COLUMN;
@@ -16,9 +15,11 @@ import net.forthecrown.core.challenge.Challenge;
 import net.forthecrown.core.config.GeneralConfig;
 import net.forthecrown.economy.market.MarketDisplay;
 import net.forthecrown.economy.market.MarketShop;
-import net.forthecrown.grenadier.exceptions.RoyalCommandException;
+import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.Grenadier;
+import net.forthecrown.grenadier.Readers;
+import net.forthecrown.grenadier.SyntaxExceptions;
 import net.forthecrown.guilds.Guild;
-import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.user.User;
 import net.forthecrown.user.data.UserRank;
 import net.forthecrown.utils.math.Vectors;
@@ -51,7 +52,7 @@ public interface Exceptions {
   // ------------------------------------------------
 
   static CommandSyntaxException create(Component component) {
-    return INSTANCE.create(component);
+    return Grenadier.exceptions().create(component);
   }
 
   /**
@@ -60,8 +61,8 @@ public interface Exceptions {
    * @param message The message to create an exception with
    * @return The created exception
    */
-  static RoyalCommandException create(String message) {
-    return INSTANCE.create(Text.renderString(message));
+  static CommandSyntaxException create(String message) {
+    return create(Text.renderString(message));
   }
 
   /**
@@ -73,7 +74,7 @@ public interface Exceptions {
    * @see Text#format(Component, Object...)
    */
   static CommandSyntaxException format(String format, Object... args) {
-    return INSTANCE.create(Text.format(format, args));
+    return create(Text.format(format, args));
   }
 
   /**
@@ -86,7 +87,7 @@ public interface Exceptions {
    * @see Text#format(Component, Object...)
    */
   private static CommandSyntaxException format(String format, TextColor color, Object... args) {
-    return INSTANCE.create(Text.format(format, color, args));
+    return create(Text.format(format, color, args));
   }
 
   /**
@@ -102,7 +103,8 @@ public interface Exceptions {
                                                           ImmutableStringReader reader,
                                                           Object... args
   ) {
-    return INSTANCE.createWithContext(Text.format(format, args), reader);
+    return Grenadier.exceptions()
+        .createWithContext(Text.format(format, args), reader);
   }
 
   /**
@@ -113,7 +115,12 @@ public interface Exceptions {
    * @param exception The exception to format
    */
   static void handleSyntaxException(Audience sender, CommandSyntaxException exception) {
-    sender.sendMessage(GrenadierUtils.formatCommandException(exception));
+    if (sender instanceof CommandSource source) {
+      SyntaxExceptions.handle(exception, source);
+      return;
+    }
+
+    sender.sendMessage(SyntaxExceptions.formatCommandException(exception));
   }
 
   // ---------------------------------------
@@ -160,7 +167,7 @@ public interface Exceptions {
 
   CommandSyntaxException NO_REGION_SELECTION = create("No region selection!");
 
-  CommandSyntaxException NO_PERMISSION = INSTANCE.create(Messages.NO_PERMISSION);
+  CommandSyntaxException NO_PERMISSION = create(Messages.NO_PERMISSION);
 
   CommandSyntaxException DONT_HAVE_TITLE = create("You don't have this title.");
 
@@ -179,7 +186,7 @@ public interface Exceptions {
    * @return The created exception
    */
   static CommandSyntaxException notOnline(User user) {
-    return INSTANCE.create(Messages.notOnline(user));
+    return create(Messages.notOnline(user));
   }
 
   /**
@@ -280,7 +287,7 @@ public interface Exceptions {
    * @return The created exception
    */
   static CommandSyntaxException unknownTrigger(StringReader reader, int cursor, String name) {
-    return unknown("trigger", GrenadierUtils.correctReader(reader, cursor), name);
+    return unknown("trigger", Readers.copy(reader, cursor), name);
   }
 
   // ----------------------------
@@ -468,7 +475,7 @@ public interface Exceptions {
   CommandSyntaxException TRANSFER_SELF = create("Cannot transfer a shop to yourself");
 
   static CommandSyntaxException unknownShop(StringReader reader, int cursor, String name) {
-    return unknown("Shop", GrenadierUtils.correctReader(reader, cursor), name);
+    return unknown("Shop", Readers.copy(reader, cursor), name);
   }
 
   static CommandSyntaxException dontHaveItemForShop(ItemStack item) {
@@ -492,7 +499,7 @@ public interface Exceptions {
 
   static CommandSyntaxException unknownUser(StringReader reader, int cursor, String name) {
     return unknown("user",
-        GrenadierUtils.correctReader(reader, cursor),
+        Readers.copy(reader, cursor),
         name
     );
   }
@@ -870,7 +877,7 @@ public interface Exceptions {
 
   CommandSyntaxException BOSS_NOT_ALIVE = create("Boss is not alive");
 
-  CommandSyntaxException DIEGO_ERROR = INSTANCE.create(Messages.DIEGO_ERROR);
+  CommandSyntaxException DIEGO_ERROR = create(Messages.DIEGO_ERROR);
 
   // -----------------------
   // --- SECTION: GUILDS ---

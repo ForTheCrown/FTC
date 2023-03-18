@@ -12,7 +12,7 @@ import net.forthecrown.commands.tpa.CommandTpask;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserTeleport;
 import net.forthecrown.user.data.UserHomes;
@@ -53,7 +53,7 @@ public class CommandHome extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         // No home name given -> use default home
         // /home

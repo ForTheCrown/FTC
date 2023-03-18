@@ -1,5 +1,7 @@
 package net.forthecrown.commands.admin;
 
+import static net.kyori.adventure.text.Component.text;
+
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -7,8 +9,7 @@ import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.kyori.adventure.text.Component;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.minecraft.commands.arguments.TimeArgument;
 import net.minecraft.server.level.ServerLevel;
 import org.bukkit.World;
@@ -26,7 +27,7 @@ public class CommandPlayerTime extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(argument("user", Arguments.ONLINE_USER)
             .executes(c -> {
@@ -34,8 +35,9 @@ public class CommandPlayerTime extends FtcCommand {
               long time = player.getPlayerTime();
               long days = time / 1000 / 24;
 
-              c.getSource().sendAdmin(
-                  player.getName() + "'s time: " + days + " days, absolute time: " + time);
+              c.getSource().sendSuccess(
+                  text(player.getName() + "'s time: " + days + " days, absolute time: " + time)
+              );
               return 0;
             })
 
@@ -45,7 +47,7 @@ public class CommandPlayerTime extends FtcCommand {
 
                   player.resetPlayerTime();
 
-                  c.getSource().sendAdmin("Reset " + player.getName() + "'s time");
+                  c.getSource().sendSuccess(text("Reset " + player.getName() + "'s time"));
                   return 0;
                 })
             )
@@ -92,10 +94,10 @@ public class CommandPlayerTime extends FtcCommand {
   int setTime(CommandSource source, Player player, long time) {
     player.setPlayerTime(time, false);
 
-    source.sendAdmin(
-        Component.text("Set time of ")
+    source.sendSuccess(
+        text("Set time of ")
             .append(player.displayName())
-            .append(Component.text(" to " + time))
+            .append(text(" to " + time))
     );
     return 0;
   }

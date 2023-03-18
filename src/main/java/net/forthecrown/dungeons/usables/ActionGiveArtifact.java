@@ -4,6 +4,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.dungeons.boss.DrawnedBoss;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.useables.Usable;
@@ -21,8 +22,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class ActionGiveArtifact extends UsageAction {
 
-  private static final EnumArgument<DrawnedBoss.Artifacts> ARTIFACT_PARSER = EnumArgument.of(
-      DrawnedBoss.Artifacts.class);
+  private static final EnumArgument<DrawnedBoss.Artifacts> ARTIFACT_PARSER
+      = ArgumentTypes.enumType(DrawnedBoss.Artifacts.class);
 
   // --- TYPE ---
   public static final UsageType<ActionGiveArtifact> TYPE = UsageType.of(ActionGiveArtifact.class)

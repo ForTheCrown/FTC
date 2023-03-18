@@ -2,7 +2,7 @@ package net.forthecrown.cosmetics;
 
 import static net.forthecrown.utils.text.Text.nonItalic;
 
-import dev.geco.gsit.api.GSitAPI;
+import net.forthecrown.user.property.UserPreference;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.inventory.menu.Menu;
 import net.forthecrown.utils.inventory.menu.MenuBuilder;
@@ -16,9 +16,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 
 public final class CosmeticMenus {
-
-  private CosmeticMenus() {
-  }
+  private CosmeticMenus() {}
 
   public static final MenuNode HEADER = MenuNode.builder()
       .setItem(user -> {
@@ -104,7 +102,9 @@ public final class CosmeticMenus {
     return builder;
   }
 
-  private static MenuNode pageButton(CosmeticType type, Material material, String name,
+  private static MenuNode pageButton(CosmeticType type,
+                                     Material material,
+                                     String name,
                                      String... desc
   ) {
     return MenuNode.builder()
@@ -155,7 +155,7 @@ public final class CosmeticMenus {
   public static MenuNode ridingToggleOption() {
     return MenuNode.builder()
         .setItem((user, context) -> {
-          boolean allows = GSitAPI.canPlayerSit(user.getPlayer());
+          boolean allows = UserPreference.PLAYER_RIDING.getState(user);
 
           var builder = ItemStacks.builder(allows ? Material.SADDLE : Material.BARRIER)
               .addLoreRaw(Component.empty())
@@ -178,8 +178,8 @@ public final class CosmeticMenus {
 
         .setRunnable((user, context) -> {
           context.shouldReloadMenu(true);
-          boolean allows = GSitAPI.canPlayerSit(user.getPlayer());
-          GSitAPI.setCanPlayerSit(user.getPlayer(), !allows);
+          boolean allows = UserPreference.PLAYER_RIDING.getState(user);
+          UserPreference.PLAYER_RIDING.setState(user, !allows);
         })
 
         .build();

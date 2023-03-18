@@ -40,12 +40,13 @@ import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.events.dynamic.HulkSmashListener;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.AbstractCommand;
+import net.forthecrown.grenadier.Grenadier;
 import net.forthecrown.guilds.Guild;
 import net.forthecrown.guilds.GuildManager;
 import net.forthecrown.user.data.CosmeticData;
 import net.forthecrown.user.data.MailAttachment;
 import net.forthecrown.user.data.MailMessage;
+import net.forthecrown.user.data.RanksComponent;
 import net.forthecrown.user.data.TimeField;
 import net.forthecrown.user.data.UserHomes;
 import net.forthecrown.user.data.UserInteractions;
@@ -54,7 +55,6 @@ import net.forthecrown.user.data.UserMarketData;
 import net.forthecrown.user.data.UserRanks;
 import net.forthecrown.user.data.UserShopData;
 import net.forthecrown.user.data.UserTimeTracker;
-import net.forthecrown.user.data.RanksComponent;
 import net.forthecrown.user.property.BoolProperty;
 import net.forthecrown.user.property.Properties;
 import net.forthecrown.user.property.PropertyMap;
@@ -64,6 +64,7 @@ import net.forthecrown.utils.ArrayIterator;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.Time;
 import net.forthecrown.utils.Util;
+import net.forthecrown.utils.io.Results;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.forthecrown.utils.text.writer.TextWriters;
@@ -645,13 +646,13 @@ public class User implements ForwardingAudience.Single,
     var join = getTimeTracker().get(TimeField.LAST_LOGIN);
 
     if (join == UNSET) {
-      return DataResult.error("Join time not set");
+      return Results.error("Join time not set");
     }
 
     var played = Time.timeSince(join) - getAfkTime();
     var timeSeconds = (int) TimeUnit.MILLISECONDS.toSeconds(played);
 
-    return DataResult.success(timeSeconds);
+    return Results.success(timeSeconds);
   }
 
   /* ----------------------------- MAIL ------------------------------ */
@@ -858,13 +859,12 @@ public class User implements ForwardingAudience.Single,
   /**
    * Gets the command source object for this user
    *
-   * @param command The command the source is for
    * @return The {@link CommandSource} that represents the player of this user object
    * @throws UserOfflineException If the user is not online
    */
-  public CommandSource getCommandSource(AbstractCommand command) throws UserOfflineException {
+  public CommandSource getCommandSource() throws UserOfflineException {
     ensureOnline();
-    return CommandSource.of(getPlayer(), command);
+    return Grenadier.createSource(getPlayer());
   }
 
   /**
@@ -889,7 +889,7 @@ public class User implements ForwardingAudience.Single,
       return null;
     }
 
-    return CommandSource.of(lastMessage);
+    return Grenadier.createSource(lastMessage);
   }
 
   /**

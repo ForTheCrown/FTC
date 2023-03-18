@@ -37,7 +37,7 @@ public class CosmeticEmote extends Cosmetic {
   }
 
   private static Material getMaterial(CommandEmote emote, User user) {
-    return emote.test(user.getCommandSource(emote)) ? Material.ORANGE_DYE : Material.GRAY_DYE;
+    return emote.test(user.getCommandSource()) ? Material.ORANGE_DYE : Material.GRAY_DYE;
   }
 
   public String getCommandText() {

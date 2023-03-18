@@ -1,5 +1,7 @@
 package net.forthecrown.commands.admin;
 
+import static net.kyori.adventure.text.Component.text;
+
 import net.forthecrown.commands.arguments.RegistryArguments;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -8,9 +10,8 @@ import net.forthecrown.core.registry.Holder;
 import net.forthecrown.dungeons.BossItems;
 import net.forthecrown.dungeons.boss.DungeonBoss;
 import net.forthecrown.events.PunchingBags;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.EnumArgument;
-import net.forthecrown.grenadier.types.pos.PositionArgument;
+import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.utils.text.Text;
 import org.bukkit.entity.Player;
 
@@ -67,7 +68,7 @@ public class CommandDungeons extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(literal("spawndummy")
             .executes(c -> {
@@ -75,9 +76,9 @@ public class CommandDungeons extends FtcCommand {
               PunchingBags.spawnDummy(player.getLocation());
               return 0;
             })
-            .then(argument("location", PositionArgument.position())
+            .then(argument("location", ArgumentTypes.position())
                 .executes(c -> {
-                  PunchingBags.spawnDummy(PositionArgument.getLocation(c, "location"));
+                  PunchingBags.spawnDummy(ArgumentTypes.getLocation(c, "location"));
                   return 0;
                 })
             )
@@ -85,14 +86,14 @@ public class CommandDungeons extends FtcCommand {
 
         .then(literal("debug")
             .then(literal("apples")
-                .then(argument("boss", EnumArgument.of(BossItems.class))
+                .then(argument("boss", ArgumentTypes.enumType(BossItems.class))
                     .executes(c -> {
                       BossItems boss = c.getArgument("boss", BossItems.class);
 
                       Player player = c.getSource().asPlayer();
                       player.getInventory().addItem(boss.item());
 
-                      c.getSource().sendAdmin("Giving " + Text.prettyEnumName(boss) + " apple");
+                      c.getSource().sendSuccess(text("Giving " + Text.prettyEnumName(boss) + " apple"));
                       return 0;
                     })
                 )
@@ -104,7 +105,7 @@ public class CommandDungeons extends FtcCommand {
                       Holder<DungeonBoss> boss = c.getArgument(bossArg, Holder.class);
 
                       boss.getValue().spawn();
-                      c.getSource().sendAdmin("Spawning boss");
+                      c.getSource().sendSuccess(text("Spawning boss"));
                       return 0;
                     })
                 )
@@ -118,7 +119,7 @@ public class CommandDungeons extends FtcCommand {
                       }
 
                       boss.kill(false);
-                      c.getSource().sendAdmin("Killing boss");
+                      c.getSource().sendSuccess(text("Killing boss"));
                       return 0;
                     })
                 )
@@ -129,7 +130,7 @@ public class CommandDungeons extends FtcCommand {
                       var boss = holder.getValue();
 
                       boss.attemptSpawn(player);
-                      c.getSource().sendAdmin("Attempting boss spawn");
+                      c.getSource().sendSuccess(text("Attempting boss spawn"));
                       return 0;
                     })
                 )

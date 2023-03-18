@@ -3,8 +3,8 @@ package net.forthecrown.commands.admin;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.WorldArgument;
+import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserTeleport;
 import net.forthecrown.utils.text.Text;
@@ -30,9 +30,9 @@ public class CommandWorld extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
-        .then(argument("world", WorldArgument.world())
+        .then(argument("world", ArgumentTypes.world())
             .executes(c -> {
               User user = getUserSender(c);
               World world = c.getArgument("world", World.class);
@@ -61,7 +61,7 @@ public class CommandWorld extends FtcCommand {
                       .setSilent(user.hasPermission(Permissions.CMD_TELEPORT))
                       .start();
 
-                  c.getSource().sendAdmin(
+                  c.getSource().sendSuccess(
                       Text.format("Teleporting {0, user} to {1}",
                           user, world.getName()
                       )

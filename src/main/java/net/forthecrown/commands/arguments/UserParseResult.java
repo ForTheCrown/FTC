@@ -9,8 +9,8 @@ import lombok.Getter;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.types.selectors.EntitySelector;
-import net.forthecrown.royalgrenadier.types.selector.EntityArgumentImpl;
+import net.forthecrown.grenadier.Grenadier;
+import net.forthecrown.grenadier.types.EntitySelector;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.forthecrown.user.property.Properties;
@@ -39,7 +39,7 @@ public class UserParseResult implements ParseResult<User> {
       throws CommandSyntaxException
   {
     User result = isSelectorUsed()
-        ? Users.get(selector.getPlayer(source))
+        ? Users.get(selector.findPlayer(source))
         : user;
 
     assert result != null : "Result is null???";
@@ -68,13 +68,13 @@ public class UserParseResult implements ParseResult<User> {
           && !source.hasPermission(Permissions.VANISH_SEE)
           && user.get(Properties.VANISHED)
       ) {
-        throw EntityArgumentImpl.NO_ENTITIES_FOUND.create();
+        throw Grenadier.exceptions().noPlayerFound();
       }
 
       return new ArrayList<>(Collections.singletonList(user));
     }
 
-    List<User> users = selector.getPlayers(source)
+    List<User> users = selector.findPlayers(source)
         .stream()
         .map(Users::get)
 
@@ -96,7 +96,7 @@ public class UserParseResult implements ParseResult<User> {
         .collect(Collectors.toList());
 
     if (users.isEmpty()) {
-      throw EntityArgumentImpl.NO_ENTITIES_FOUND.create();
+      throw Grenadier.exceptions().noPlayerFound();
     }
 
     return users;

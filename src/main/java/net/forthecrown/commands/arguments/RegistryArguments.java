@@ -19,9 +19,8 @@ import net.forthecrown.core.registry.Registry;
 import net.forthecrown.dungeons.boss.KeyedBoss;
 import net.forthecrown.economy.Economy;
 import net.forthecrown.economy.sell.SellShopMenu;
-import net.forthecrown.grenadier.CompletionProvider;
-import net.forthecrown.royalgrenadier.GrenadierUtils;
-import net.forthecrown.royalgrenadier.VanillaMappedArgument;
+import net.forthecrown.grenadier.Completions;
+import net.forthecrown.grenadier.internal.VanillaMappedArgument;
 import net.forthecrown.structure.BlockStructure;
 import net.forthecrown.structure.Structures;
 import net.forthecrown.useables.UsageAction;
@@ -33,6 +32,7 @@ import net.forthecrown.user.data.UserRanks;
 import net.forthecrown.user.data.UserTimeTracker;
 import net.forthecrown.waypoint.WaypointProperties;
 import net.forthecrown.waypoint.WaypointProperty;
+import net.minecraft.commands.CommandBuildContext;
 
 @Getter
 @SuppressWarnings({"unchecked", "rawtypes"})
@@ -88,10 +88,8 @@ public class RegistryArguments<T> implements ArgumentType<Holder<T>>, VanillaMap
     String key = Arguments.FTC_KEY.parse(reader);
 
     return registry.getHolder(key).orElseThrow(() -> {
-      return Exceptions.unknown(unknown,
-          GrenadierUtils.correctReader(reader, cursor),
-          key
-      );
+      reader.setCursor(cursor);
+      return Exceptions.unknown(unknown, reader, key);
     });
   }
 
@@ -99,11 +97,11 @@ public class RegistryArguments<T> implements ArgumentType<Holder<T>>, VanillaMap
   public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
                                                             SuggestionsBuilder builder
   ) {
-    return CompletionProvider.suggestMatching(builder, registry.keys());
+    return Completions.suggest(builder, registry.keys());
   }
 
   @Override
-  public ArgumentType<?> getVanillaArgumentType() {
-    return Arguments.FTC_KEY.getVanillaArgumentType();
+  public ArgumentType<?> getVanillaType(CommandBuildContext context) {
+    return Arguments.FTC_KEY.getVanillaType(context);
   }
 }

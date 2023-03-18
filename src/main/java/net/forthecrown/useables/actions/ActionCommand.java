@@ -2,11 +2,11 @@ package net.forthecrown.useables.actions;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import lombok.Getter;
-import net.forthecrown.commands.manager.FtcSuggestions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.Suggester;
+import net.forthecrown.grenadier.Grenadier;
 import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.useables.ConstructType;
@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 public class ActionCommand extends UsageAction {
 
-  private static final Suggester<CommandSource> COMMAND_SUGGESTIONS = (context, builder) -> {
+  private static final SuggestionProvider<CommandSource> COMMAND_SUGGESTIONS = (context, builder) -> {
     String filteredInput = builder.getInput()
         .replaceAll("%p", "ap")
         .replaceAll("%plr", "aplr")
@@ -35,7 +35,8 @@ public class ActionCommand extends UsageAction {
         builder.getStart()
     );
 
-    return FtcSuggestions.COMMAND_SUGGESTIONS.getSuggestions(context, builder);
+    return Grenadier.suggestAllCommands()
+        .getSuggestions(context, builder);
   };
 
   private static final CommandSender SILENT_SENDER

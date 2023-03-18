@@ -9,19 +9,17 @@ import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
-import javax.script.Bindings;
 import javax.script.CompiledScript;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.script2.ScriptSource.FileSource;
 import net.forthecrown.core.script2.preprocessor.JsPreProcessor;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.Nullable;
 import org.openjdk.nashorn.api.scripting.NashornScriptEngine;
 import org.openjdk.nashorn.api.scripting.ScriptObjectMirror;
 
@@ -60,6 +58,9 @@ public class Script implements Closeable {
   /** Scripts loaded by this script */
   @Getter(AccessLevel.PACKAGE)
   private final Set<WrappedScript> loadedSubScripts = new ObjectOpenHashSet<>();
+
+  @Setter(AccessLevel.PACKAGE)
+  private Script parentScript;
 
   /** Script's logger */
   private final Logger logger;
@@ -106,89 +107,6 @@ public class Script implements Closeable {
     return new Script(source);
   }
 
-  /**
-   * Reads the script file with the given name.
-   * <p>
-   * Script names are relative to the <code>plugins/ForTheCrown/scripts</code>
-   * directory, as an example, a script used by a challenge might be called,
-   * <code>challenges/on_challenge.js</code>. They must always include the
-   * '.js' file extension as well.
-   * <p>
-   * Be aware! Since scripts can start scheduled tasks and register event
-   * listeners, it's optimal to use a try-with-resources or other method to
-   * ensure that the {@link #close()} method is called after the script is no
-   * longer needed to be in memory.
-   *
-   * @param file The script's name
-   * @return The loaded script.
-   * @throws ScriptLoadException      If an error occurred during script
-   *                                  loading, script evaluation.
-   * @throws IllegalArgumentException If the given file doesn't exist or isn't a
-   *                                  file
-   */
-  public static Script read(String file)
-      throws ScriptLoadException, IllegalArgumentException {
-    return of(file).load();
-  }
-
-  /**
-   * Reads the script file at the given path.
-   * <p>
-   * Be aware! Since scripts can start scheduled tasks and register event
-   * listeners, it's optimal to use a try-with-resources or other method to
-   * ensure that the {@link #close()} method is called after the script is no
-   * longer needed to be in memory.
-   *
-   * @param file The script's file
-   * @return The loaded script
-   * @throws ScriptLoadException      If an error occurred during script
-   *                                  loading, script evaluation.
-   * @throws IllegalArgumentException If the given file doesn't exist or isn't a
-   *                                  file
-   */
-  public static Script read(Path file)
-      throws ScriptLoadException, IllegalArgumentException {
-    return of(file).load();
-  }
-
-  /**
-   * Reads a script file using {@link #read(Path)} and then invokes the method
-   * with the given name and arguments. After the function is executed, the
-   * script is closed
-   *
-   * @param file   The script file to invoke
-   * @param method The name of the method to invoke
-   * @param args   Arguments to pass to the function being invoked
-   * @throws ScriptLoadException      If the script couldn't be loaded, see
-   *                                  {@link #load(String...)}
-   * @throws IllegalArgumentException If the given script file didn't exist or
-   *                                  wasn't a file
-   */
-  public static void run(Path file, String method, Object... args)
-      throws ScriptLoadException, IllegalArgumentException {
-    read(file).invoke(method, args).close();
-  }
-
-  /**
-   * Reads a script file using {@link #read(String)} and then invokes the method
-   * with the given name and arguments. After the function is executed, the
-   * script is closed
-   *
-   * @param f      The name (path) of the script to invoke.
-   * @param method The name of the method to invoke
-   * @param args   Arguments to pass to the function being invoked
-   * @throws ScriptLoadException      If the script couldn't be loaded, see
-   *                                  {@link #load(String...)}
-   * @throws IllegalArgumentException If the given script file didn't exist or
-   *                                  wasn't a file
-   */
-  public static void run(String f, String method, Object... args)
-      throws ScriptLoadException, IllegalArgumentException {
-    read(f).invoke(method, args).close();
-  }
-
-  /* ------------------------------ READING ------------------------------ */
-
   public static Script read(JsonElement element, boolean assumeRawJs) {
     ScriptSource source = ScriptSource.readSource(element, assumeRawJs);
     return new Script(source);
@@ -225,7 +143,8 @@ public class Script implements Closeable {
    * Invokes the method with the given name and passes it the given arguments.
    * <p>
    * If the script is not loaded when this invocation is called, then
-   * {@link #load(String...)} will be called to load the script.
+   * {@link #compile(String...)} will be called to load the script and then
+   * {@link #eval()} to evaluate the global scope.
    * <p>
    * Any exception thrown by this method directly, will be wrapped with a script
    * exception that holds the name of the method, script and actual error to
@@ -238,12 +157,28 @@ public class Script implements Closeable {
    *                             not be loaded either.
    */
   public ScriptResult invoke(String method, Object... args)
-      throws ScriptLoadException {
+      throws ScriptLoadException
+  {
     if (engine == null) {
-      load();
+      compile().eval();
     }
 
-    return invokeSafe(this, mirror, method, args);
+    try {
+      var result = engine.invokeMethod(mirror, method, args);
+
+      return ScriptResult.builder()
+          .result(result)
+          .script(this)
+          .method(method)
+          .build();
+    } catch (Exception e) {
+      return ScriptResult.builder()
+          .exception(e)
+          .script(this)
+          .method(method)
+          .build()
+          .logIfError();
+    }
   }
 
   /**
@@ -259,72 +194,13 @@ public class Script implements Closeable {
    *                             not be loaded either.
    */
   public Optional<ScriptResult> invokeIfExists(String method, Object... args)
-      throws ScriptLoadException {
+      throws ScriptLoadException
+  {
     if (!hasMethod(method)) {
       return Optional.empty();
     }
 
     return Optional.of(invoke(method, args));
-  }
-
-  /**
-   * Delegate for {@link #load(Consumer, String...)} with a null consumer
-   *
-   * @return This
-   * @throws ScriptLoadException If the script couldn't be loaded
-   * @see #load(Consumer, String...)
-   */
-  @Deprecated
-  public Script load(String... args) throws ScriptLoadException {
-    return load(null, args);
-  }
-
-  /**
-   * Loads this script from the script's file.
-   * <p>
-   * If this script has already been loaded, then {@link #close()} will be
-   * called before, effectively reloading the script.
-   * <p>
-   * A script load exception will be thrown in one of the following scenarios:
-   * <pre>
-   * 1. If the script file doesn't exist.
-   * 2. If the script file couldn't be read.
-   * 3. If the script could not be 'compiled' and then evaluated
-   * </pre>
-   * If an exception is thrown, then {@link #close()} will be called again.
-   * <p>
-   * If the script is loaded and read correctly, then this script instance's
-   * fields are set and the script itself is loaded.
-   * <p>
-   * On-top of just loading the script, this method also populates the script's
-   * bindings with the default java classes, specified in
-   * {@link ScriptsBuiltIn}, and adds the {@link #getTasks()} and
-   * {@link #getEvents()} to the script.
-   *
-   * @param loadCallback Callback for placing values into the script's bindings
-   *                     before evaluation
-   * @return This
-   * @throws ScriptLoadException If the script couldn't be loaded
-   * @deprecated This method performs 2 operations at once, compilation and
-   * evaluation of a script, use {@link #compile(String...)} to load and compile
-   * a script, and then use {@link #eval()} to evaluate
-   */
-  @Deprecated
-  public Script load(@Nullable Consumer<Bindings> loadCallback, String... args)
-      throws ScriptLoadException {
-    compile(args);
-
-    if (loadCallback != null) {
-      loadCallback.accept(mirror);
-    }
-
-    var result = eval();
-
-    if (result.error().isPresent()) {
-      throw new ScriptLoadException(this, result.error().get());
-    }
-
-    return this;
   }
 
   /**
@@ -369,7 +245,6 @@ public class Script implements Closeable {
       engine.put("events", events);
       engine.put("args", args);
       engine.put("_script", this);
-      engine.put("workingDirectory", getWorkingDirectory());
       engine.put("logger", getLogger());
 
       this.engine = engine;
@@ -378,7 +253,6 @@ public class Script implements Closeable {
 
       this.compiledScript = engine.compile(reader);
 
-      putCallback("compile", ScriptsBuiltIn.COMPILE_FUNCTION);
       ScriptsBuiltIn.populate(this);
     } catch (IOException | ScriptException exc) {
       close();
@@ -509,6 +383,10 @@ public class Script implements Closeable {
    * Gets the directory the script is inside
    */
   public Path getWorkingDirectory() {
+    if (parentScript != null) {
+      return parentScript.getWorkingDirectory();
+    }
+
     if (source instanceof FileSource source) {
       return source.getPath().getParent();
     }

@@ -7,8 +7,8 @@ import java.time.ZonedDateTime;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.EnumArgument;
+import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.text.Text;
@@ -42,7 +42,7 @@ public class CommandMakeAward extends FtcCommand {
    */
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(argument("award", StringArgumentType.word())
             .then(argument("winner", Arguments.USER)
@@ -53,7 +53,7 @@ public class CommandMakeAward extends FtcCommand {
                     Material.RED_TULIP
                 ))
 
-                .then(argument("mat", EnumArgument.of(Material.class))
+                .then(argument("mat", ArgumentTypes.enumType(Material.class))
                     .executes(c -> doAward(
                         c,
                         c.getArgument("award", String.class),

@@ -2,7 +2,6 @@ package net.forthecrown.guilds;
 
 import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 
-import com.github.rmheuer.mcasset.McAssetExtractor;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -17,6 +16,7 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 import lombok.Getter;
 import net.forthecrown.core.logging.Loggers;
+import net.forthecrown.utils.MinecraftAssetDownloader;
 import net.forthecrown.utils.io.PathUtil;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -76,12 +76,7 @@ public class BannerRenderer {
     if (shouldDownloadAssets()) {
       PathUtil.safeDelete(assetsPath);
 
-      McAssetExtractor.main(
-          new String[] {
-              Bukkit.getMinecraftVersion(),
-              assetsPath.toString()
-          }
-      );
+      MinecraftAssetDownloader.download(assetsPath, "latest");
 
       Files.writeString(
           assetsPath.resolve("version.txt"),

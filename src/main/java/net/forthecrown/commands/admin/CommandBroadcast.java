@@ -4,7 +4,7 @@ import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Announcer;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.kyori.adventure.text.Component;
 
 public class CommandBroadcast extends FtcCommand {
@@ -41,7 +41,7 @@ public class CommandBroadcast extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(argument("message", Arguments.CHAT)
             .executes(c -> {

@@ -6,7 +6,6 @@ import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 
 class SimpleImportPreProcessor extends RegexPreProcessor {
-  // https://regex101.com/r/XgCgIz/1
 
   public SimpleImportPreProcessor() {
     super(Pattern.compile("import +['\"]([a-z0-9/.@&%$_]+)['\"];?",

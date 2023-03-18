@@ -1,17 +1,19 @@
 package net.forthecrown.commands;
 
+import static net.kyori.adventure.text.Component.text;
+
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.List;
 import java.util.function.Consumer;
-import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.Commands;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand.Usage;
 import net.forthecrown.commands.manager.FtcCommand.UsageFactory;
-import net.forthecrown.grenadier.CmdUtil;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.Nodes;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.nbt.path.TagPath;
@@ -23,7 +25,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-public class DataCommands extends CmdUtil {
+public class DataCommands extends Nodes {
   public static final DataAccessor HELD_ITEM_ACCESSOR = new DataAccessor() {
     @Override
     public CompoundTag getTag(CommandContext<CommandSource> context)
@@ -133,7 +135,7 @@ public class DataCommands extends CmdUtil {
         .then(literal("view")
             .executes(c -> viewData(c, accessor, name, null))
 
-            .then(argument("path", Arguments.TAG_PATH)
+            .then(argument("path", ArgumentTypes.tagPath())
                 .executes(c -> {
                   TagPath path = c.getArgument("path", TagPath.class);
                   return viewData(c, accessor, name, path);
@@ -142,12 +144,12 @@ public class DataCommands extends CmdUtil {
         )
 
         .then(literal("set")
-            .then(argument("nbt_tag", Arguments.COMPOUND)
+            .then(argument("nbt_tag", ArgumentTypes.compoundTag())
                 .executes(c -> {
                   CompoundTag tag = c.getArgument("nbt_tag", CompoundTag.class);
                   accessor.setTag(c, tag);
 
-                  c.getSource().sendAdmin(
+                  c.getSource().sendSuccess(
                       Text.format("Set {0} data",
                           NamedTextColor.GRAY,
                           name
@@ -159,8 +161,8 @@ public class DataCommands extends CmdUtil {
         )
 
         .then(literal("insert")
-            .then(argument("path", Arguments.TAG_PATH)
-                .then(argument("nbt", Arguments.TAG)
+            .then(argument("path", ArgumentTypes.tagPath())
+                .then(argument("nbt", ArgumentTypes.binaryTag())
                     .executes(c -> {
                       CompoundTag tag = accessor.getTag(c);
                       TagPath path = c.getArgument("path", TagPath.class);
@@ -174,7 +176,7 @@ public class DataCommands extends CmdUtil {
 
                       accessor.setTag(c, tag);
 
-                      c.getSource().sendAdmin(
+                      c.getSource().sendSuccess(
                           Text.format(
                               "Placed data into &e{0}&r tag at &e{1}&r",
                               NamedTextColor.GRAY,
@@ -188,7 +190,7 @@ public class DataCommands extends CmdUtil {
         )
 
         .then(literal("merge")
-            .then(argument("nbt", Arguments.COMPOUND)
+            .then(argument("nbt", ArgumentTypes.compoundTag())
                 .executes(c -> {
                   CompoundTag tag = accessor.getTag(c);
                   CompoundTag mergeSource
@@ -197,14 +199,14 @@ public class DataCommands extends CmdUtil {
                   tag.merge(mergeSource);
                   accessor.setTag(c, tag);
 
-                  c.getSource().sendAdmin("Merged " + name + " data");
+                  c.getSource().sendSuccess(text("Merged " + name + " data"));
                   return 0;
                 })
             )
         )
 
         .then(literal("remove")
-            .then(argument("path", Arguments.TAG_PATH)
+            .then(argument("path", ArgumentTypes.tagPath())
                 .executes(c -> {
                   TagPath path = c.getArgument("path", TagPath.class);
                   CompoundTag tag = accessor.getTag(c);
@@ -219,7 +221,7 @@ public class DataCommands extends CmdUtil {
 
                   accessor.setTag(c, tag);
 
-                  c.getSource().sendAdmin(
+                  c.getSource().sendSuccess(
                       Text.format("Removed {0, number} tags at '{1}'",
                           removed, path.getInput()
                       )
@@ -248,8 +250,8 @@ public class DataCommands extends CmdUtil {
         throw Exceptions.format("Nothing at path '{0}'", path.getInput());
       } else {
         component = TextJoiner.on(",\n")
-            .setPrefix(Component.text("["))
-            .setSuffix(Component.text("]"))
+            .setPrefix(text("["))
+            .setSuffix(text("]"))
             .add(tags.stream().map(tag1 -> Text.displayTag(tag1, true)))
             .asComponent();
       }
@@ -259,7 +261,7 @@ public class DataCommands extends CmdUtil {
     }
 
     context.getSource().sendMessage(
-        Component.text(name + " data: ")
+        text(name + " data: ")
             .append(component)
     );
     return 0;

@@ -8,7 +8,7 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.core.config.GeneralConfig;
 import net.forthecrown.economy.TransactionType;
 import net.forthecrown.economy.Transactions;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.user.User;
 import net.forthecrown.user.data.UserRanks;
 import org.bukkit.Sound;
@@ -43,7 +43,7 @@ public class CommandBecomeBaron extends FtcCommand {
    */
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         // /becomebaron
         .executes(c -> {

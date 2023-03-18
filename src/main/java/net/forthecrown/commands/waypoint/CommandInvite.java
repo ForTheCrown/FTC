@@ -5,8 +5,8 @@ import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.royalgrenadier.types.selector.EntityArgumentImpl;
+import net.forthecrown.grenadier.Grenadier;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.forthecrown.user.property.Properties;
@@ -42,7 +42,7 @@ public class CommandInvite extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(argument("users", Arguments.ONLINE_USERS)
             .executes(c -> {
@@ -90,7 +90,7 @@ public class CommandInvite extends FtcCommand {
                   if (selfRemoved) {
                     throw Exceptions.CANNOT_INVITE_SELF;
                   } else {
-                    throw EntityArgumentImpl.NO_ENTITIES_FOUND.create();
+                    throw Grenadier.exceptions().noEntityFound();
                   }
                 }
               }

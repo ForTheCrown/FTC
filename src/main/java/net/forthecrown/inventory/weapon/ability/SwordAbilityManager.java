@@ -186,7 +186,7 @@ public class SwordAbilityManager {
       AbilityReadContext context
   ) {
     if (element == null || !element.isJsonObject()) {
-      return DataResult.error("Element was not a object/table");
+      return Results.error("Element was not a object/table");
     }
 
     JsonWrapper json = JsonWrapper.wrap(element.getAsJsonObject());
@@ -197,17 +197,17 @@ public class SwordAbilityManager {
         .or(() -> missingKey(json, "script"));
 
     if (missing.isPresent()) {
-      return DataResult.error(missing.get());
+      return Results.error(missing.get());
     }
 
     if (context.cooldown == null && !json.has("cooldown")) {
-      return DataResult.error(
+      return Results.error(
           "Generic cooldown is unset, and no 'baseCooldown' value is set"
       );
     }
 
     if (context.useLimit == null && !json.has("useLimit")) {
-      return DataResult.error(
+      return Results.error(
           "Generic useLimit is unset and no 'useLimit' value is set"
       );
     }
@@ -222,16 +222,16 @@ public class SwordAbilityManager {
     // Read recipe
     var list = context.itemMap.get(registryKey);
     if (list == null) {
-      return DataResult.error("No items found");
+      return Results.error("No items found");
     }
     list.forEach(builder::addItem);
 
     if (ItemStacks.isEmpty(builder.item())) {
-      return DataResult.error("Item at 'item' is empty!");
+      return Results.error("Item at 'item' is empty!");
     }
 
     if (!json.has("levelUses")) {
-      return DataResult.error("No 'levelUses' set");
+      return Results.error("No 'levelUses' set");
     }
 
     JsonUtils.stream(json.getArray("levelUses"))
@@ -257,7 +257,7 @@ public class SwordAbilityManager {
 
     var cd = builder.cooldown();
     if (cd.getMin() <= 0 || cd.getMax() <= 0) {
-      return DataResult.error("Cooldown min or max was below 0");
+      return Results.error("Cooldown min or max was below 0");
     }
 
     AbilityTrialArea trialInfo = context.trials.get(registryKey);
@@ -314,14 +314,14 @@ public class SwordAbilityManager {
   DataResult<Map<String, AbilityTrialArea>> readTrialInfo() {
     return SerializationHelper.readTomlAsJson(getTrialData()).flatMap(object -> {
       if (!object.has("trial_world")) {
-        return DataResult.error("JSON had no 'trial_world' set");
+        return Results.error("JSON had no 'trial_world' set");
       }
 
       String worldName = object.remove("trial_world").getAsString();
       World world = Bukkit.getWorld(worldName);
 
       if (world == null) {
-        return Results.errorResult("Unknown world '%s'", worldName);
+        return Results.error("Unknown world '%s'", worldName);
       }
 
       if (!object.has("inventory_store")) {
@@ -338,7 +338,7 @@ public class SwordAbilityManager {
         JsonWrapper json = JsonWrapper.wrap(e.getValue().getAsJsonObject());
 
         if (!json.has("position")) {
-          return Results.errorResult(
+          return Results.error(
               "Trial area entry '%s' has no 'position' set",
               key
           );
@@ -400,13 +400,13 @@ public class SwordAbilityManager {
 
   DataResult<TrialInfoNode> readInfoNode(JsonElement element) {
     if (!element.isJsonArray()) {
-      return DataResult.error("Element was not Array");
+      return Results.error("Element was not Array");
     }
 
     JsonArray arr = element.getAsJsonArray();
 
     if (arr.isEmpty()) {
-      return DataResult.error("Empty array");
+      return Results.error("Empty array");
     }
 
     TrialInfoNode root = null;
@@ -416,7 +416,7 @@ public class SwordAbilityManager {
       JsonWrapper json = JsonWrapper.wrap(e.getAsJsonObject());
 
       if (!json.has("info")) {
-        return DataResult.error("Node has no 'info' value: " + e);
+        return Results.error("Node has no 'info' value: " + e);
       }
 
       long delay = 0;

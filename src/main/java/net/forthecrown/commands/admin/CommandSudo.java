@@ -7,8 +7,8 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcSuggestions;
 import net.forthecrown.core.Messages;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.Completions;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.user.User;
 
 public class CommandSudo extends FtcCommand {
@@ -37,7 +37,7 @@ public class CommandSudo extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(argument("user", Arguments.ONLINE_USER)
             .then(argument("text", StringArgumentType.greedyString())
@@ -47,7 +47,7 @@ public class CommandSudo extends FtcCommand {
                   if (token.isBlank()
                       || CHAT_PREFIX.startsWith(token.toLowerCase())
                   ) {
-                    CompletionProvider.suggestMatching(b, CHAT_PREFIX);
+                    Completions.suggest(b, CHAT_PREFIX);
                   }
 
                   if (!token.startsWith(CHAT_PREFIX)) {
@@ -69,10 +69,10 @@ public class CommandSudo extends FtcCommand {
                     text = text.substring(CHAT_PREFIX.length()).trim();
 
                     user.getPlayer().chat(text);
-                    source.sendAdmin(Messages.sudoChat(user, text));
+                    source.sendSuccess(Messages.sudoChat(user, text));
                   } else {
                     user.getPlayer().performCommand(text);
-                    source.sendAdmin(Messages.sudoCommand(user, text));
+                    source.sendSuccess(Messages.sudoCommand(user, text));
                   }
 
                   return 0;

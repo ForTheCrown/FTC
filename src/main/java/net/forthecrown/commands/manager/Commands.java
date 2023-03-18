@@ -129,6 +129,7 @@ import net.forthecrown.commands.waypoint.CommandVisit;
 import net.forthecrown.commands.waypoint.CommandWaypoints;
 import net.forthecrown.core.FTC;
 import net.forthecrown.core.module.OnEnable;
+import net.forthecrown.grenadier.Readers;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.text.format.page.PageEntryIterator;
 import org.bukkit.entity.Player;
@@ -361,5 +362,34 @@ public final class Commands {
     }
 
     return s;
+  }
+
+  /**
+   * Skips the given string in the given reader, if the given reader's remaining input starts with
+   * the given string.
+   *
+   * @param reader The reader to move the cursor of
+   * @param s      The string to skip
+   */
+  public static void skip(StringReader reader, String s) {
+    if (!Readers.startsWithIgnoreCase(reader, s)) {
+      return;
+    }
+
+    reader.setCursor(reader.getCursor() + s.length());
+  }
+
+  /**
+   * Ensures that the given string reader is at the end of its input
+   *
+   * @param reader The reader to test
+   * @throws CommandSyntaxException If the reader is not at the end of it's input
+   */
+  public static void ensureCannotRead(StringReader reader) throws CommandSyntaxException {
+    if (reader.canRead()) {
+      throw CommandSyntaxException.BUILT_IN_EXCEPTIONS
+          .dispatcherUnknownArgument()
+          .createWithContext(reader);
+    }
   }
 }

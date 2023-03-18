@@ -9,7 +9,7 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Messages;
 import net.forthecrown.economy.TransactionType;
 import net.forthecrown.economy.Transactions;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.inventory.ItemStacks;
@@ -52,7 +52,7 @@ public class CommandDeposit extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .executes(c -> {
           User user = getUserSender(c);

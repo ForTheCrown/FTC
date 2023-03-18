@@ -59,7 +59,7 @@ public class Vectors {
    * Name of the X axis: 'x'
    */
   public final String
-      AXIS_X = "x",
+  AXIS_X = "x",
 
   /**
    * Name of the Y axis: 'y'
@@ -80,7 +80,7 @@ public class Vectors {
    * ID/index of the X axis
    */
   public final int
-      AXIS_ID_X = 0,
+  AXIS_ID_X = 0,
 
   /**
    * ID/index of the Y Axis

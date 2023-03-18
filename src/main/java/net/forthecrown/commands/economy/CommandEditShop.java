@@ -17,7 +17,8 @@ import net.forthecrown.economy.shops.ShopType;
 import net.forthecrown.economy.shops.SignShop;
 import net.forthecrown.economy.shops.SignShops;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.Completions;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.user.User;
@@ -138,7 +139,7 @@ public class CommandEditShop extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .executes(c -> {
           c.getSource().sendMessage(usageMessage);
@@ -253,7 +254,9 @@ public class CommandEditShop extends FtcCommand {
         )
         .then(literal("line")
             .then(argument("line_actual", IntegerArgumentType.integer(2, 3))
-                .suggests(suggestMatching("2", "3"))
+                .suggests((context, builder) -> {
+                  return Completions.suggest(builder, "2", "3");
+                })
 
                 .then(argument("line_text", Arguments.MESSAGE)
                     .suggests((context, builder) -> {

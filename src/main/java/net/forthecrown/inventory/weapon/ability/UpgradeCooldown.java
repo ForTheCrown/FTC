@@ -4,11 +4,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.time.Duration;
 import java.time.LocalTime;
 import java.util.concurrent.TimeUnit;
 import lombok.Getter;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.grenadier.types.ArrayArgument;
-import net.forthecrown.grenadier.types.TimeArgument;
 import net.forthecrown.inventory.weapon.SwordRank;
 import net.forthecrown.inventory.weapon.SwordRanks;
 import net.forthecrown.utils.Time;
@@ -21,8 +22,8 @@ import org.spongepowered.math.GenericMath;
 
 @Getter
 public class UpgradeCooldown implements ComponentLike {
-  private static final ArrayArgument<Long> TIME_PARSER
-      = ArrayArgument.of(TimeArgument.time());
+  private static final ArrayArgument<Duration> TIME_PARSER
+      = ArgumentTypes.array(ArgumentTypes.time());
 
   private final long min;
   private final long max;
@@ -136,7 +137,7 @@ public class UpgradeCooldown implements ComponentLike {
     try {
       long time = TIME_PARSER.parse(new StringReader(input))
           .stream()
-          .mapToLong(value -> value)
+          .mapToLong(Duration::toMillis)
           .sum();
 
       return Time.millisToTicks(time);

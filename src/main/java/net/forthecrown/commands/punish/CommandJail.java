@@ -19,8 +19,8 @@ import net.forthecrown.core.admin.PunishType;
 import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.args.ParsedArgs;
+import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.grenadier.types.options.ParsedOptions;
 import net.forthecrown.user.User;
 
 public class CommandJail extends FtcCommand {
@@ -56,7 +56,7 @@ public class CommandJail extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(argument("user", Arguments.USER)
             .then(argument("jail", RegistryArguments.JAIL_CELL)
@@ -64,8 +64,12 @@ public class CommandJail extends FtcCommand {
 
                 .then(argument("args", ARGS)
                     .executes(c -> {
-                      var args = c.getArgument("args", ParsedArgs.class);
-                      return punish(c, args.get(REASON), args.get(TIME));
+                      var args = c.getArgument("args", ParsedOptions.class);
+                      long length = args.has(TIME)
+                          ? args.getValue(TIME).toMillis()
+                          : INDEFINITE_EXPIRY;
+
+                      return punish(c, args.getValue(REASON), length);
                     })
                 )
             )

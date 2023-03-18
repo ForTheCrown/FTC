@@ -9,10 +9,10 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import java.util.concurrent.CompletableFuture;
 import net.forthecrown.commands.manager.Exceptions;
-import net.forthecrown.grenadier.CompletionProvider;
-import net.forthecrown.grenadier.types.item.ItemArgument;
-import net.forthecrown.grenadier.types.item.ParsedItemStack;
-import net.forthecrown.royalgrenadier.VanillaMappedArgument;
+import net.forthecrown.grenadier.Completions;
+import net.forthecrown.grenadier.internal.VanillaMappedArgument;
+import net.forthecrown.grenadier.types.ArgumentTypes;
+import net.minecraft.commands.CommandBuildContext;
 import org.bukkit.inventory.ItemStack;
 
 class ItemParser implements ArgumentType<ItemStack>, VanillaMappedArgument {
@@ -33,7 +33,7 @@ class ItemParser implements ArgumentType<ItemStack>, VanillaMappedArgument {
       reader.skipWhitespace();
     }
 
-    ParsedItemStack parsedItem = ItemArgument.itemStack().parse(reader);
+    var parsedItem = ArgumentTypes.item().parse(reader);
     return parsedItem.create(amount, true);
   }
 
@@ -47,12 +47,12 @@ class ItemParser implements ArgumentType<ItemStack>, VanillaMappedArgument {
       if (builder.getRemainingLowerCase().isBlank()
           || StringReader.isAllowedNumber(builder.getRemainingLowerCase().charAt(0))
       ) {
-        CompletionProvider.suggestMatching(builder, "64", "32", "16", "8", "1");
+        Completions.suggest(builder, "64", "32", "16", "8", "1");
       }
 
-      return ItemArgument.itemStack().listSuggestions(context, builder);
+      return ArgumentTypes.item().listSuggestions(context, builder);
     } else {
-      return ItemArgument.itemStack().listSuggestions(
+      return ArgumentTypes.item().listSuggestions(
           context,
           builder.createOffset(builder.getInput().lastIndexOf(' ') + 1)
       );
@@ -60,7 +60,7 @@ class ItemParser implements ArgumentType<ItemStack>, VanillaMappedArgument {
   }
 
   @Override
-  public ArgumentType<?> getVanillaArgumentType() {
+  public ArgumentType<?> getVanillaType(CommandBuildContext context) {
     return StringArgumentType.greedyString();
   }
 }

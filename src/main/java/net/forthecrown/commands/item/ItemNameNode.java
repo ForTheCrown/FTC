@@ -8,7 +8,7 @@ import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.arguments.chat.MessageSuggestions;
 import net.forthecrown.core.Messages;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
+import net.forthecrown.grenadier.Completions;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.translation.GlobalTranslator;
@@ -49,7 +49,7 @@ public class ItemNameNode extends ItemModifierNode {
         .then(argument("name", Arguments.CHAT)
             .suggests((context, builder) -> {
               return MessageSuggestions.get(context, builder, true, (builder1, source) -> {
-                CompletionProvider.suggestMatching(builder1, CLEAR);
+                Completions.suggest(builder1, CLEAR);
 
                 // Suggest existing item name
                 getItemSuggestions(source, itemStack -> {
@@ -59,7 +59,7 @@ public class ItemNameNode extends ItemModifierNode {
                       GlobalTranslator.render(name, Locale.ENGLISH)
                   );
 
-                  CompletionProvider.suggestMatching(builder1, legacy);
+                  Completions.suggest(builder1, legacy);
                 });
               });
             })
@@ -71,10 +71,10 @@ public class ItemNameNode extends ItemModifierNode {
 
               if (Text.isDashClear(name)) {
                 meta.displayName(null);
-                c.getSource().sendAdmin(Messages.CLEARED_ITEM_NAME);
+                c.getSource().sendSuccess(Messages.CLEARED_ITEM_NAME);
               } else {
                 meta.displayName(optionallyWrap(name, c, "name"));
-                c.getSource().sendAdmin(Messages.setItemName(name));
+                c.getSource().sendSuccess(Messages.setItemName(name));
               }
 
               held.setItemMeta(meta);

@@ -8,6 +8,7 @@ import net.forthecrown.commands.arguments.RegistryArguments;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.grenadier.types.ArrayArgument;
 import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.user.User;
@@ -21,11 +22,14 @@ import net.forthecrown.utils.text.writer.TextWriters;
 
 class UserTitlesNode extends UserCommandNode {
 
-  private static final EnumArgument<RankTier> TIER_ARG = EnumArgument.of(RankTier.class);
-  private static final RegistryArguments<UserRank> TITLE_ARG = RegistryArguments.RANKS;
+  private static final EnumArgument<RankTier> TIER_ARG
+      = ArgumentTypes.enumType(RankTier.class);
+
+  private static final RegistryArguments<UserRank> TITLE_ARG
+      = RegistryArguments.RANKS;
 
   private static final ArrayArgument<Holder<UserRank>> TITLE_ARRAY_ARG
-      = ArrayArgument.of(TITLE_ARG);
+      = ArgumentTypes.array(TITLE_ARG);
 
   public UserTitlesNode() {
     super("user_titles", "titles");
@@ -98,7 +102,7 @@ class UserTitlesNode extends UserCommandNode {
 
                   user.getTitles().setTitle(title.getValue());
 
-                  c.getSource().sendAdmin(
+                  c.getSource().sendSuccess(
                       Text.format("Set {0, user}'s title to {1}",
                           user, title.getValue()
                       )
@@ -139,7 +143,7 @@ class UserTitlesNode extends UserCommandNode {
                       if (tier.ordinal() < current.ordinal()) {
                         titles.demote(tier);
 
-                        c.getSource().sendAdmin(
+                        c.getSource().sendSuccess(
                             Text.format("Demoted {0, user} to {1}",
                                 user,
                                 tier.getDisplayName()
@@ -148,7 +152,7 @@ class UserTitlesNode extends UserCommandNode {
                       } else {
                         titles.addTier(tier);
 
-                        c.getSource().sendAdmin(
+                        c.getSource().sendSuccess(
                             Text.format("Set {1, user}'s tier to {0}",
                                 tier, user
                             )
@@ -230,7 +234,7 @@ class UserTitlesNode extends UserCommandNode {
       format = "Added titles to {0, user}: {1}";
     }
 
-    c.getSource().sendAdmin(
+    c.getSource().sendSuccess(
         Text.format(format,
             user, TextJoiner.onComma()
                 .add(titles)

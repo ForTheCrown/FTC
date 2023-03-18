@@ -50,7 +50,7 @@ class TimeSelectionPage extends AdminUiPage {
 
                 context.get(PUNISHMENT)
                     .setLength(length)
-                    .punish(user.getCommandSource(null));
+                    .punish(user.getCommandSource());
 
                 AdminUI.open(user, entry.getUser());
               })

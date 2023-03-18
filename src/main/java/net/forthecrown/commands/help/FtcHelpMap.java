@@ -5,6 +5,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import com.sk89q.worldedit.util.function.LevenshteinDistance;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Collection;
@@ -20,7 +21,7 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcCommand.Usage;
 import net.forthecrown.commands.manager.FtcCommand.UsageFactory;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
+import net.forthecrown.grenadier.Completions;
 import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.context.ContextOption;
 import net.forthecrown.utils.context.ContextSet;
@@ -36,7 +37,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
-import org.apache.commons.text.similarity.LevenshteinDistance;
 
 public class FtcHelpMap {
 
@@ -135,7 +135,7 @@ public class FtcHelpMap {
     getAll().stream()
         .filter(entry -> entry.test(source))
         .flatMap(entry -> entry.getKeywords().stream())
-        .filter(s -> CompletionProvider.startsWith(unquoted, s))
+        .filter(s -> Completions.matches(unquoted, s))
         .map(s -> Commands.optionallyQuote(quote + "", s))
         .forEach(builder::suggest);
 
@@ -228,7 +228,6 @@ public class FtcHelpMap {
     // that match the most
     result = new ObjectArrayList<>();
     int max = tag.length() / 5 + 3;
-    LevenshteinDistance distance = new LevenshteinDistance(max);
 
     for (var v: getAll()) {
       if (!v.test(source)) {
@@ -239,7 +238,7 @@ public class FtcHelpMap {
 
       for (var keyword: keywords) {
         var s = normalize(keyword);
-        int dis = distance.apply(tag, s);
+        int dis = LevenshteinDistance.distance(tag, s);
 
         // -1 means above max threshold
         if (dis == -1) {

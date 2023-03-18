@@ -1,5 +1,7 @@
 package net.forthecrown.commands.admin;
 
+import static net.kyori.adventure.text.Component.text;
+
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Collection;
@@ -7,10 +9,9 @@ import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.pos.Position;
-import net.forthecrown.grenadier.types.pos.PositionArgument;
-import net.forthecrown.grenadier.types.selectors.EntityArgument;
+import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.grenadier.types.ArgumentTypes;
+import net.forthecrown.grenadier.types.ParsedPosition;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -58,8 +59,8 @@ public class CommandLaunch extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
-    command.then(argument("entity", EntityArgument.multipleEntities())
+  public void createCommand(GrenadierCommand command) {
+    command.then(argument("entity", ArgumentTypes.entities())
         .executes(c -> {
           Player player = c.getSource().asPlayer();
           Vector dir = player.getLocation().getDirection();
@@ -67,12 +68,12 @@ public class CommandLaunch extends FtcCommand {
           return launch(c, dir, false);
         })
 
-        .then(argument("vec", PositionArgument.position())
+        .then(argument("vec", ArgumentTypes.position())
             .executes(c -> launchVelocityGiven(c, false))
         )
 
         .then(literal("add")
-            .then(argument("vec", PositionArgument.position())
+            .then(argument("vec", ArgumentTypes.position())
                 .executes(c -> launchVelocityGiven(c, false))
             )
         )
@@ -82,15 +83,22 @@ public class CommandLaunch extends FtcCommand {
   int launchVelocityGiven(CommandContext<CommandSource> c,
                           boolean add
   ) throws CommandSyntaxException {
-    Position pos = c.getArgument("vec", Position.class);
+    ParsedPosition pos = c.getArgument("vec", ParsedPosition.class);
 
-    if (pos.isXRelative() || pos.isYRelative() || pos.isZRelative()) {
+    if (pos.getXCoordinate().relative()
+        || pos.getYCoordinate().relative()
+        || pos.getZCoordinate().relative()
+    ) {
       throw Exceptions.CANNOT_USE_RELATIVE_CORD;
     }
 
     return launch(
         c,
-        new Vector(pos.getX(), pos.getY(), pos.getZ()),
+        new Vector(
+            pos.getXCoordinate().value(),
+            pos.getYCoordinate().value(),
+            pos.getZCoordinate().value()
+        ),
         add
     );
   }
@@ -99,7 +107,7 @@ public class CommandLaunch extends FtcCommand {
              Vector velocity,
              boolean add
   ) throws CommandSyntaxException {
-    Collection<Entity> entities = EntityArgument.getEntities(c, "entity");
+    Collection<Entity> entities = ArgumentTypes.getEntities(c, "entity");
 
     for (Entity e : entities) {
       if (add) {
@@ -109,7 +117,7 @@ public class CommandLaunch extends FtcCommand {
       }
     }
 
-    c.getSource().sendAdmin("Launched " + entities.size() + " entities");
+    c.getSource().sendSuccess(text("Launched " + entities.size() + " entities"));
     return 0;
   }
 }

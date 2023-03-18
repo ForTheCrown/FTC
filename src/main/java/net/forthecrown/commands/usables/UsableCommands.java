@@ -3,15 +3,15 @@ package net.forthecrown.commands.usables;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.forthecrown.commands.manager.FtcCommand.UsageFactory;
-import net.forthecrown.grenadier.CmdUtil;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.Nodes;
 import net.forthecrown.useables.CheckHolder;
 import net.forthecrown.useables.Usable;
 import net.forthecrown.useables.UsageAction;
 import net.forthecrown.useables.UsageTest;
 import net.forthecrown.utils.text.Text;
 
-public class UsableCommands extends CmdUtil {
+public class UsableCommands extends Nodes {
 
   public static final UsableArgumentNode<UsageTest, CheckHolder> CHECK_NODE
       = new UsableArgumentNode<>(UsageTypeAccessor.CHECKS) {
@@ -51,7 +51,7 @@ public class UsableCommands extends CmdUtil {
                     holder.setSilent(state);
                     saveCallback.dumbHack(holder);
 
-                    c.getSource().sendAdmin(Text.format("Set silent: {0}", state));
+                    c.getSource().sendSuccess(Text.format("Set silent: {0}", state));
                     return 0;
                   })
               )

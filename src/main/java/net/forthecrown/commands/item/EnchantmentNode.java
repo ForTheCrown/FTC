@@ -10,8 +10,8 @@ import net.forthecrown.core.Messages;
 import net.forthecrown.dungeons.enchantments.FtcEnchant;
 import net.forthecrown.dungeons.enchantments.FtcEnchants;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
-import net.forthecrown.grenadier.types.EnchantArgument;
+import net.forthecrown.grenadier.Completions;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
@@ -57,7 +57,7 @@ public class EnchantmentNode extends ItemModifierNode {
             })
         )
 
-        .then(argument(ENCHANTMENT_ARG, EnchantArgument.enchantment())
+        .then(argument(ENCHANTMENT_ARG, ArgumentTypes.enchantment())
             .executes(c -> enchant(c, MIN_LEVEL))
 
             .then(argument("level", IntegerArgumentType.integer(MIN_LEVEL))
@@ -72,7 +72,7 @@ public class EnchantmentNode extends ItemModifierNode {
                   for (int i = MIN_LEVEL; i <= ench.getMaxLevel(); i++) {
                     var suggestion = i + "";
 
-                    if (CompletionProvider.startsWith(token, suggestion)) {
+                    if (Completions.matches(token, suggestion)) {
                       builder.suggest(suggestion);
                     }
                   }
@@ -97,7 +97,7 @@ public class EnchantmentNode extends ItemModifierNode {
 
                   held.removeEnchantment(enchantment);
 
-                  c.getSource().sendAdmin(Messages.removedEnchant(enchantment));
+                  c.getSource().sendSuccess(Messages.removedEnchant(enchantment));
                   return 0;
                 })
             )
@@ -139,7 +139,7 @@ public class EnchantmentNode extends ItemModifierNode {
     }
 
     item.setItemMeta(meta);
-    c.getSource().sendAdmin(Messages.addedEnchant(enchantment, level));
+    c.getSource().sendSuccess(Messages.addedEnchant(enchantment, level));
     return 0;
   }
 }

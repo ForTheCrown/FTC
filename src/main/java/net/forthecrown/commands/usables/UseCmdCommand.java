@@ -14,15 +14,14 @@ import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.WorldArgument;
-import net.forthecrown.grenadier.types.args.ArgsArgument;
-import net.forthecrown.grenadier.types.args.Argument;
-import net.forthecrown.grenadier.types.args.ParsedArgs;
-import net.forthecrown.grenadier.types.item.ItemArgument;
-import net.forthecrown.grenadier.types.item.ParsedItemStack;
-import net.forthecrown.grenadier.types.pos.Position;
-import net.forthecrown.grenadier.types.pos.PositionArgument;
+import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.grenadier.types.ArgumentTypes;
+import net.forthecrown.grenadier.types.ItemArgument.Result;
+import net.forthecrown.grenadier.types.ParsedPosition;
+import net.forthecrown.grenadier.types.options.ArgumentOption;
+import net.forthecrown.grenadier.types.options.Options;
+import net.forthecrown.grenadier.types.options.OptionsArgument;
+import net.forthecrown.grenadier.types.options.ParsedOptions;
 import net.forthecrown.useables.command.CommandUsable;
 import net.forthecrown.useables.command.Kit;
 import net.forthecrown.useables.command.Warp;
@@ -93,7 +92,7 @@ public abstract class UseCmdCommand<T extends CommandUsable> extends FtcCommand 
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .executes(c -> {
           var user = getUserSender(c);
@@ -125,7 +124,7 @@ public abstract class UseCmdCommand<T extends CommandUsable> extends FtcCommand 
 
                   argument.getManager().add(t);
 
-                  c.getSource().sendAdmin(
+                  c.getSource().sendSuccess(
                       Text.format(
                           "Created {0, class, -simple} {1}",
 
@@ -157,7 +156,7 @@ public abstract class UseCmdCommand<T extends CommandUsable> extends FtcCommand 
 
                   t.onInteract(user.getPlayer(), true);
 
-                  c.getSource().sendAdmin(
+                  c.getSource().sendSuccess(
                       Text.format(otherUserFormat,
                           user,
                           t.displayName()
@@ -174,7 +173,7 @@ public abstract class UseCmdCommand<T extends CommandUsable> extends FtcCommand 
                   var value = argument.get(c, "usable");
                   argument.getManager().remove(value);
 
-                  c.getSource().sendAdmin(
+                  c.getSource().sendSuccess(
                       Text.format("Removed {0, class, -simple} named '{1}'",
                           argument.getTypeClass(),
                           value.getName()
@@ -260,7 +259,7 @@ public abstract class UseCmdCommand<T extends CommandUsable> extends FtcCommand 
             kit.getItems().clear();
             kit.getItems().addAll(items);
 
-            c.getSource().sendAdmin(
+            c.getSource().sendSuccess(
                 Text.format("Set items of {0}",
                     kit.displayName()
                 )
@@ -300,7 +299,7 @@ public abstract class UseCmdCommand<T extends CommandUsable> extends FtcCommand 
 
                 kit.getItems().add(heldItem.clone());
 
-                c.getSource().sendAdmin(
+                c.getSource().sendSuccess(
                     Text.format(
                         "Added {0, item} to {1}",
                         heldItem,
@@ -311,10 +310,10 @@ public abstract class UseCmdCommand<T extends CommandUsable> extends FtcCommand 
               })
 
               // Add item by parsed value and quantity
-              .then(argument("item", ItemArgument.itemStack())
+              .then(argument("item", ArgumentTypes.item())
                   .then(argument("amount", IntegerArgumentType.integer(1, 64))
                       .executes(c -> {
-                        var item = c.getArgument("item", ParsedItemStack.class);
+                        var item = c.getArgument("item", Result.class);
                         var amount = c.getArgument("amount", Integer.class);
 
                         var stack = item.create(amount, true);
@@ -322,7 +321,7 @@ public abstract class UseCmdCommand<T extends CommandUsable> extends FtcCommand 
                         var kit = get(c);
                         kit.getItems().add(stack);
 
-                        c.getSource().sendAdmin(
+                        c.getSource().sendSuccess(
                             Text.format("Added {0, item} to {1}",
                                 stack,
                                 kit.displayName()
@@ -346,7 +345,7 @@ public abstract class UseCmdCommand<T extends CommandUsable> extends FtcCommand 
 
                     var removed = kit.getItems().remove(index);
 
-                    c.getSource().sendAdmin(
+                    c.getSource().sendSuccess(
                         Text.format("Removed {0, item} from {1}",
                             removed,
                             kit.displayName()
@@ -382,19 +381,25 @@ public abstract class UseCmdCommand<T extends CommandUsable> extends FtcCommand 
 
   private static class WarpCommand extends UseCmdCommand<Warp> {
 
-    static final Argument<Position> position
-        = Argument.of("pos", PositionArgument.position());
+    static final ArgumentOption<ParsedPosition> position
+        = Options.argument(ArgumentTypes.position(), "pos");
 
-    static final Argument<Float> yaw
-        = Argument.of("yaw", FloatArgumentType.floatArg(-180, 180), 0f);
+    static final ArgumentOption<Float> yaw
+        = Options.argument(FloatArgumentType.floatArg(-180, 180))
+        .setDefaultValue(0F)
+        .addLabel("yaw")
+        .build();
 
-    static final Argument<Float> pitch
-        = Argument.of("pitch", FloatArgumentType.floatArg(-90, 90), 0f);
+    static final ArgumentOption<Float> pitch
+        = Options.argument(FloatArgumentType.floatArg(-90, 90))
+        .setDefaultValue(0F)
+        .addLabel("pitch")
+        .build();
 
-    static final Argument<World> world
-        = Argument.of("world", WorldArgument.world());
+    static final ArgumentOption<World> world
+        = Options.argument(ArgumentTypes.world(), "world");
 
-    static final ArgsArgument args = ArgsArgument.builder()
+    static final OptionsArgument args = OptionsArgument.builder()
         .addOptional(position)
         .addOptional(yaw)
         .addOptional(pitch)
@@ -433,7 +438,7 @@ public abstract class UseCmdCommand<T extends CommandUsable> extends FtcCommand 
             var location = player.getLocation();
             warp.setDestination(location);
 
-            c.getSource().sendAdmin(
+            c.getSource().sendSuccess(
                 Text.format("Set destination of {0} to {1}",
                     warp.displayName(),
                     Text.clickableLocation(location, true)
@@ -445,22 +450,30 @@ public abstract class UseCmdCommand<T extends CommandUsable> extends FtcCommand 
           .then(argument("args", args)
               .executes(c -> {
                 var warp = get(c);
-                var parsedArgs = c.getArgument("args", ParsedArgs.class);
+                var parsedArgs = c.getArgument("args", ParsedOptions.class);
 
                 var location = c.getSource().getLocation();
 
                 if (parsedArgs.has(position)) {
-                  var pos = parsedArgs.get(position);
+                  var pos = parsedArgs.getValue(position);
                   pos.apply(location);
                 }
 
-                location.setYaw(parsedArgs.getOrDefault(yaw, location.getYaw()));
-                location.setPitch(parsedArgs.getOrDefault(pitch, location.getPitch()));
-                location.setWorld(parsedArgs.getOrDefault(world, location.getWorld()));
+                if (parsedArgs.has(yaw)) {
+                  location.setYaw(parsedArgs.getValue(yaw));
+                }
+
+                if (parsedArgs.has(pitch)) {
+                  location.setPitch(parsedArgs.getValue(pitch));
+                }
+
+                if (parsedArgs.has(world)) {
+                  location.setWorld(parsedArgs.getValue(world));
+                }
 
                 warp.setDestination(location);
 
-                c.getSource().sendAdmin(
+                c.getSource().sendSuccess(
                     Text.format("Set destination of {0} to {1, location, -clickable -world}",
                         warp.displayName(),
                         location
@@ -473,7 +486,8 @@ public abstract class UseCmdCommand<T extends CommandUsable> extends FtcCommand 
 
     @Override
     protected Warp create(Player player, String name, CommandContext<CommandSource> context)
-        throws CommandSyntaxException {
+        throws CommandSyntaxException
+    {
       Warp warp = new Warp(name, player.getLocation());
 
       Permission p = Permissions.register("ftc.warps." + name);

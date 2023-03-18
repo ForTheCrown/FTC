@@ -3,7 +3,7 @@ package net.forthecrown.commands.admin;
 import java.lang.management.ManagementFactory;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.TextJoiner;
 import net.kyori.adventure.text.Component;
@@ -23,7 +23,7 @@ public class CommandMemory extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .executes(c -> {
           var worlds = TextJoiner.onNewLine()

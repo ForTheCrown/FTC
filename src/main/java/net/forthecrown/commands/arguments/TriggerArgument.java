@@ -8,13 +8,16 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import java.util.concurrent.CompletableFuture;
 import net.forthecrown.commands.manager.Exceptions;
-import net.forthecrown.grenadier.CompletionProvider;
-import net.forthecrown.royalgrenadier.VanillaMappedArgument;
+import net.forthecrown.grenadier.Completions;
+import net.forthecrown.grenadier.internal.VanillaMappedArgument;
 import net.forthecrown.useables.UsableTrigger;
 import net.forthecrown.useables.Usables;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.arguments.ScoreHolderArgument;
 
-public class TriggerArgument implements ArgumentType<UsableTrigger>, VanillaMappedArgument {
+public class TriggerArgument
+    implements ArgumentType<UsableTrigger>, VanillaMappedArgument
+{
 
   @Override
   public UsableTrigger parse(StringReader reader) throws CommandSyntaxException {
@@ -33,12 +36,12 @@ public class TriggerArgument implements ArgumentType<UsableTrigger>, VanillaMapp
   public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
                                                             SuggestionsBuilder builder
   ) {
-    return CompletionProvider.suggestMatching(builder,
+    return Completions.suggest(builder,
         Usables.getInstance().getTriggers().getNames());
   }
 
   @Override
-  public ArgumentType<?> getVanillaArgumentType() {
+  public ArgumentType<?> getVanillaType(CommandBuildContext context) {
     return ScoreHolderArgument.scoreHolder();
   }
 }

@@ -9,11 +9,11 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.commands.arguments.SuggestionFunction;
 import net.forthecrown.commands.manager.FtcSuggestions;
-import net.forthecrown.commands.manager.Readers;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
+import net.forthecrown.grenadier.Completions;
+import net.forthecrown.grenadier.Readers;
 import net.forthecrown.grenadier.Suggester;
 import net.forthecrown.utils.text.ChatEmotes;
 import org.apache.logging.log4j.Logger;
@@ -123,7 +123,7 @@ public class MessageSuggestions {
 
   private void suggestHex(final int start, String prefix) {
     suggest(start, (builder, source) -> {
-      CompletionProvider.suggestMatching(builder, FormatSuggestions.HEX_2_NAME);
+      FtcSuggestions.suggest(builder, FormatSuggestions.HEX_2_NAME);
     });
 
     // Skip the 6 hex digits, if possible
@@ -137,7 +137,7 @@ public class MessageSuggestions {
 
   private void suggestGradient() {
     suggest(reader.getCursor(), (builder, source) -> {
-      CompletionProvider.suggestMatching(builder, GRADIENT_START);
+      Completions.suggest(builder, GRADIENT_START);
     });
 
     int charIndex = 0;
@@ -238,7 +238,7 @@ public class MessageSuggestions {
   }
 
   private void suggestColorNames(SuggestionsBuilder builder, CommandSource source) {
-    CompletionProvider.suggestMatching(builder, FormatSuggestions.HEX_2_NAME.values());
+    Completions.suggest(builder, FormatSuggestions.HEX_2_NAME.values());
   }
 
   private void suggestEmotes(SuggestionsBuilder builder, CommandSource source) {
@@ -254,7 +254,7 @@ public class MessageSuggestions {
       return;
     }
 
-    CompletionProvider.suggestMatching(builder, FormatSuggestions.FORMAT_SUGGESTIONS);
+    FtcSuggestions.suggest(builder, FormatSuggestions.FORMAT_SUGGESTIONS);
   }
 
   private void suggestPlayers(SuggestionsBuilder builder, CommandSource source) {

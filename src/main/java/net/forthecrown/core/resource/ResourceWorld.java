@@ -72,7 +72,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Orientable;
-import org.bukkit.craftbukkit.v1_19_R2.CraftHeightMap;
+import org.bukkit.craftbukkit.v1_19_R3.CraftHeightMap;
 import org.mcteam.ancientgates.Gate;
 import org.mcteam.ancientgates.Gates;
 import org.spongepowered.math.vector.Vector3i;

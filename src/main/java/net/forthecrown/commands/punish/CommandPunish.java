@@ -3,7 +3,7 @@ package net.forthecrown.commands.punish;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.admin.ui.AdminUI;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.user.User;
 
 public class CommandPunish extends FtcCommand {
@@ -32,7 +32,7 @@ public class CommandPunish extends FtcCommand {
    */
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(argument("user", Arguments.USER)
             .executes(c -> {

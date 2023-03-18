@@ -1,5 +1,7 @@
 package net.forthecrown.commands.admin;
 
+import static net.kyori.adventure.text.Component.text;
+
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -11,9 +13,9 @@ import net.forthecrown.core.EndOpener;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.config.EndConfig;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.pos.Position;
-import net.forthecrown.grenadier.types.pos.PositionArgument;
+import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.grenadier.types.ArgumentTypes;
+import net.forthecrown.grenadier.types.ParsedPosition;
 import net.forthecrown.utils.math.WorldVec3i;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
@@ -44,18 +46,18 @@ public class CommandEndOpener extends FtcCommand {
    */
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(literal("regen")
             .executes(c -> {
-              c.getSource().sendAdmin("Starting remake");
+              c.getSource().sendSuccess(text("Starting remake"));
 
-              c.getSource().sendAdmin("Starting end regeneration");
+              c.getSource().sendSuccess(text("Starting end regeneration"));
               EndOpener opener = EndOpener.get();
 
               opener.regenerateEnd()
                   .whenComplete((unused, throwable) -> {
-                    c.getSource().sendAdmin("Regenerated end");
+                    c.getSource().sendSuccess(text("Regenerated end"));
                   });
 
               return 0;
@@ -80,14 +82,14 @@ public class CommandEndOpener extends FtcCommand {
     EndOpener opener = EndOpener.get();
     opener.setOpen(open);
 
-    c.getSource().sendAdmin((open ? "Opened" : "Closed") + " The End");
+    c.getSource().sendSuccess(text((open ? "Opened" : "Closed") + " The End"));
     return 0;
   }
 
   private <T> LiteralArgumentBuilder<CommandSource> accessorArg(OpenerAccessor<T> p) {
     return literal(p.getName())
         .executes(c -> {
-          Component display = Component.text("End opener " + p.getName() + ": ")
+          Component display = text("End opener " + p.getName() + ": ")
               .append(p.display());
 
           c.getSource().sendMessage(display);
@@ -99,8 +101,8 @@ public class CommandEndOpener extends FtcCommand {
               T val = c.getArgument("val", p.getTypeClass());
               p.set(val, c);
 
-              c.getSource().sendAdmin(
-                  Component.text("Set end opener " + p.getName() + " to ")
+              c.getSource().sendSuccess(
+                  text("Set end opener " + p.getName() + " to ")
                       .append(p.display())
               );
               return 0;
@@ -128,7 +130,7 @@ public class CommandEndOpener extends FtcCommand {
 
       @Override
       public Component display() {
-        return Component.text(EndConfig.nextSize);
+        return text(EndConfig.nextSize);
       }
 
       @Override
@@ -155,7 +157,7 @@ public class CommandEndOpener extends FtcCommand {
 
       @Override
       public Component display() {
-        return Component.text(EndConfig.enabled);
+        return text(EndConfig.enabled);
       }
 
       @Override
@@ -164,20 +166,20 @@ public class CommandEndOpener extends FtcCommand {
       }
     };
 
-    OpenerAccessor<Position> LEVER_POS = new OpenerAccessor<>() {
+    OpenerAccessor<ParsedPosition> LEVER_POS = new OpenerAccessor<>() {
       @Override
       public String getName() {
         return "leverPos";
       }
 
       @Override
-      public ArgumentType<Position> getType() {
-        return PositionArgument.position();
+      public ArgumentType<ParsedPosition> getType() {
+        return ArgumentTypes.position();
       }
 
       @Override
-      public Class<Position> getTypeClass() {
-        return Position.class;
+      public Class<ParsedPosition> getTypeClass() {
+        return ParsedPosition.class;
       }
 
       @Override
@@ -186,8 +188,8 @@ public class CommandEndOpener extends FtcCommand {
       }
 
       @Override
-      public void set(Position val, CommandContext<CommandSource> c) {
-        WorldVec3i vec = WorldVec3i.of(val.getLocation(c.getSource()));
+      public void set(ParsedPosition val, CommandContext<CommandSource> c) {
+        WorldVec3i vec = WorldVec3i.of(val.apply(c.getSource()));
         EndConfig.leverPos = vec;
       }
     };

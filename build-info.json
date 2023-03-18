@@ -1,0 +1,8 @@
+{
+  "test_server": {
+    "directory": "D:/ftc_v5",
+    "launch_file": "run.bat"
+  },
+  "build_id": 1719,
+  "debug_build": true
+}

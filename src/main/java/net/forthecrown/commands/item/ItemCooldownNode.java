@@ -3,8 +3,8 @@ package net.forthecrown.commands.item;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.grenadier.types.RegistryArgument;
-import net.forthecrown.grenadier.types.TimeArgument;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -13,7 +13,7 @@ import org.bukkit.Registry;
 public class ItemCooldownNode extends ItemModifierNode {
 
   private static final RegistryArgument<Material> MATERIAL_ARG
-      = RegistryArgument.registry(Registry.MATERIAL, "Material");
+      = ArgumentTypes.registry(Registry.MATERIAL, "material");
 
   public ItemCooldownNode() {
     super("item_cooldown", "itemcooldown");
@@ -61,11 +61,11 @@ public class ItemCooldownNode extends ItemModifierNode {
           return 0;
         })
 
-        .then(argument("cooldown", TimeArgument.time())
+        .then(argument("cooldown", ArgumentTypes.time())
             .executes(c -> {
               var player = c.getSource().asPlayer();
               Material material = c.getArgument("material", Material.class);
-              long cooldownTicks = TimeArgument.getTicks(c, "cooldown");
+              long cooldownTicks = ArgumentTypes.getTicks(c, "cooldown");
 
               player.setCooldown(material, (int) cooldownTicks);
 

@@ -4,7 +4,6 @@ import static net.forthecrown.commands.economy.CommandShopHistory.EMPTY;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
-import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -28,18 +27,18 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.ArrayArgument;
-import net.forthecrown.grenadier.types.EnumArgument;
-import net.forthecrown.grenadier.types.args.ArgsArgument;
-import net.forthecrown.grenadier.types.args.Argument;
-import net.forthecrown.grenadier.types.args.ParsedArgs;
-import net.forthecrown.grenadier.types.block.BlockPredicateArgument;
-import net.forthecrown.grenadier.types.pos.Position;
-import net.forthecrown.grenadier.types.pos.PositionArgument;
+import net.forthecrown.grenadier.Completions;
+import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.grenadier.internal.VanillaMappedArgument;
+import net.forthecrown.grenadier.types.ArgumentTypes;
+import net.forthecrown.grenadier.types.BlockFilterArgument;
+import net.forthecrown.grenadier.types.ParsedPosition;
+import net.forthecrown.grenadier.types.options.ArgumentOption;
+import net.forthecrown.grenadier.types.options.FlagOption;
+import net.forthecrown.grenadier.types.options.Options;
+import net.forthecrown.grenadier.types.options.OptionsArgument;
+import net.forthecrown.grenadier.types.options.ParsedOptions;
 import net.forthecrown.nbt.CompoundTag;
-import net.forthecrown.royalgrenadier.VanillaMappedArgument;
 import net.forthecrown.structure.BlockProcessors;
 import net.forthecrown.structure.BlockStructure;
 import net.forthecrown.structure.Rotation;
@@ -51,6 +50,7 @@ import net.forthecrown.utils.math.Transform;
 import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.utils.math.WorldBounds3i;
 import net.forthecrown.utils.text.Text;
+import net.minecraft.commands.CommandBuildContext;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -64,73 +64,75 @@ import org.spongepowered.math.vector.Vector3i;
 public class CommandFtcStruct extends FtcCommand {
   /* ----------------------------- CREATION ARGUMENTS ------------------------------ */
 
-  private static final Argument<List<EntityType>> IGNORE_ENT_ARG
-      = Argument.builder("ignore_entities", ArrayArgument.of(EnumArgument.of(EntityType.class)))
+  private static final ArgumentOption<List<EntityType>> IGNORE_ENT_ARG
+      = Options.argument(ArgumentTypes.array(ArgumentTypes.enumType(EntityType.class)))
+      .addLabel("ignore_entities")
       .setDefaultValue(Collections.emptyList())
       .build();
 
-  private static final Argument<List<BlockPredicateArgument.Result>> BLOCK_FILTER
-      = Argument.builder("ignore_blocks", ArrayArgument.of(BlockPredicateArgument.blockPredicate()))
+  private static final ArgumentOption<List<BlockFilterArgument.Result>> BLOCK_FILTER
+      = Options.argument(ArgumentTypes.array(ArgumentTypes.blockFilter()))
+      .addLabel("ignore_blocks")
       .setDefaultValue(Collections.emptyList())
       .build();
 
-  private static final Argument<Boolean> INCLUDE_FUNCTIONS
-      = Argument.builder("include_functions", BoolArgumentType.bool())
-      .setDefaultValue(false)
-      .build();
+  private static final FlagOption INCLUDE_FUNCTIONS
+      = Options.flag("include_functions");
 
-  private static final ArgsArgument FILL_ARGS = ArgsArgument.builder()
+  private static final OptionsArgument FILL_ARGS = OptionsArgument.builder()
       .addOptional(BLOCK_FILTER)
       .addOptional(IGNORE_ENT_ARG)
-      .addOptional(INCLUDE_FUNCTIONS)
+      .addFlag(INCLUDE_FUNCTIONS)
       .build();
 
   /* ----------------------------- PLACEMENT ARGUMENTS ------------------------------ */
 
-  static final Argument<Rotation> ROT_ARG
-      = Argument.builder("rotation", EnumArgument.of(Rotation.class))
-      .setAliases("rot", "rotated")
+  static final ArgumentOption<Rotation> ROT_ARG
+      = Options.argument(ArgumentTypes.enumType(Rotation.class))
+      .addLabel("rotation")
       .setDefaultValue(Rotation.NONE)
       .build();
 
-  private static final Argument<Vector3d> OFFSET_ARG
-      = Argument.builder("offset", new VectorParser())
+  private static final ArgumentOption<Vector3d> OFFSET_ARG
+      = Options.argument(new VectorParser())
+      .addLabel("offset")
       .setDefaultValue(Vector3d.ZERO)
       .build();
 
-  private static final Argument<Vector3d> PIVOT_ARG
-      = Argument.builder("pivot", new VectorParser())
+  private static final ArgumentOption<Vector3d> PIVOT_ARG
+      = Options.argument(new VectorParser())
+      .addLabel("pivot")
       .setDefaultValue(Vector3d.ZERO)
       .build();
 
-  private static final Argument<Position> POS_ARG
-      = Argument.builder("pos", PositionArgument.blockPos())
-      .setDefaultValue(Position.SELF)
+  private static final ArgumentOption<ParsedPosition> POS_ARG
+      = Options.argument(ArgumentTypes.blockPosition())
+      .addLabel("pos")
+      .setDefaultValue(ParsedPosition.IDENTITY)
       .build();
 
-  private static final Argument<Boolean> PLACE_ENTITIES
-      = Argument.builder("place_entities", BoolArgumentType.bool())
-      .setDefaultValue(true)
-      .build();
-
-  private static final Argument<Boolean> IGNORE_AIR
-      = Argument.builder("ignore_air", BoolArgumentType.bool())
-      .setDefaultValue(false)
-      .build();
-
-  private static final Argument<String> PALETTE_ARG
-      = Argument.builder("palette", new PaletteParser())
+  private static final ArgumentOption<String> PALETTE_ARG
+      = Options.argument(new PaletteParser())
+      .addLabel("palette")
       .setDefaultValue(BlockStructure.DEFAULT_PALETTE_NAME)
       .build();
 
-  private static final ArgsArgument PLACE_ARGS = ArgsArgument.builder()
+  private static final FlagOption PLACE_ENTITIES
+      = Options.flag("place_entities");
+
+  private static final FlagOption IGNORE_AIR
+      = Options.flag("ignore_air");
+
+  private static final OptionsArgument PLACE_ARGS = OptionsArgument.builder()
       .addOptional(OFFSET_ARG)
       .addOptional(ROT_ARG)
       .addOptional(POS_ARG)
       .addOptional(PIVOT_ARG)
-      .addOptional(PLACE_ENTITIES)
       .addOptional(PALETTE_ARG)
-      .addOptional(IGNORE_AIR)
+
+      .addFlag(PLACE_ENTITIES)
+      .addFlag(IGNORE_AIR)
+
       .build();
 
   private static final DataAccessor HEADER_ACCESSOR = new DataAccessor() {
@@ -246,14 +248,14 @@ public class CommandFtcStruct extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(literal("create")
             .then(argument("name", Arguments.FTC_KEY)
                 .executes(c -> create(c, EMPTY))
 
                 .then(argument("args", FILL_ARGS)
-                    .executes(c -> create(c, c.getArgument("args", ParsedArgs.class)))
+                    .executes(c -> create(c, c.getArgument("args", ParsedOptions.class)))
                 )
             )
         )
@@ -263,7 +265,7 @@ public class CommandFtcStruct extends FtcCommand {
                 .executes(c -> place(c, EMPTY))
 
                 .then(argument("args", PLACE_ARGS)
-                    .executes(c -> place(c, c.getArgument("args", ParsedArgs.class)))
+                    .executes(c -> place(c, c.getArgument("args", ParsedOptions.class)))
                 )
             )
 
@@ -274,7 +276,7 @@ public class CommandFtcStruct extends FtcCommand {
 
                         .then(argument("args", FILL_ARGS)
                             .executes(c -> {
-                              var args = c.getArgument("args", ParsedArgs.class);
+                              var args = c.getArgument("args", ParsedOptions.class);
                               return addPalette(c, args);
                             })
                         )
@@ -296,7 +298,7 @@ public class CommandFtcStruct extends FtcCommand {
 
                           structure.getPalettes().remove(palette);
 
-                          c.getSource().sendAdmin(
+                          c.getSource().sendSuccess(
                               Text.format("Removed palette '{0}' from structure '{1}'",
                                   palette, holder.getKey()
                               )
@@ -316,7 +318,7 @@ public class CommandFtcStruct extends FtcCommand {
                     throw Exceptions.REMOVED_NO_DATA;
                   }
 
-                  c.getSource().sendAdmin(
+                  c.getSource().sendSuccess(
                       Text.format("Removed structure: '{0}'", holder.getKey())
                   );
                   return 0;
@@ -329,7 +331,7 @@ public class CommandFtcStruct extends FtcCommand {
 
   /* ----------------------------- PLACEMENT ------------------------------ */
 
-  private int place(CommandContext<CommandSource> c, ParsedArgs args)
+  private int place(CommandContext<CommandSource> c, ParsedOptions args)
       throws CommandSyntaxException {
     Holder<BlockStructure> holder = c.getArgument("structure", Holder.class);
     BlockStructure structure = holder.getValue();
@@ -343,14 +345,14 @@ public class CommandFtcStruct extends FtcCommand {
     }
 
     Location location = c.getSource().getLocation();
-    args.get(POS_ARG).apply(location);
+    args.getValue(POS_ARG).apply(location);
 
     Transform transform = Transform.IDENTITY
-        .withOffset(args.get(OFFSET_ARG))
-        .withRotation(args.get(ROT_ARG))
-        .withPivot(args.get(PIVOT_ARG));
+        .withOffset(args.getValue(OFFSET_ARG))
+        .withRotation(args.getValue(ROT_ARG))
+        .withPivot(args.getValue(PIVOT_ARG));
 
-    var palette = args.get(PALETTE_ARG);
+    var palette = args.getValue(PALETTE_ARG);
 
     if (structure.getPalette(palette) == null) {
       throw Exceptions.format("No palette named '{0}' in '{1}'",
@@ -362,16 +364,16 @@ public class CommandFtcStruct extends FtcCommand {
         .transform(transform)
         .world(location.getWorld())
         .pos(Vectors.intFrom(location))
-        .paletteName(args.get(PALETTE_ARG));
+        .paletteName(args.getValue(PALETTE_ARG));
 
-    if (!args.get(PLACE_ENTITIES)) {
+    if (!args.has(PLACE_ENTITIES)) {
       builder.entitySpawner(null);
     }
 
     StructurePlaceConfig config = builder.build();
     structure.place(config);
 
-    c.getSource().sendAdmin(
+    c.getSource().sendSuccess(
         Text.format("Placed structure: '{0}'", holder.getKey())
     );
     return 0;
@@ -379,7 +381,7 @@ public class CommandFtcStruct extends FtcCommand {
 
   /* ----------------------------- PALETTE CREATION ------------------------------ */
 
-  private int addPalette(CommandContext<CommandSource> c, ParsedArgs args)
+  private int addPalette(CommandContext<CommandSource> c, ParsedOptions args)
       throws CommandSyntaxException {
     Holder<BlockStructure> holder = c.getArgument("structure", Holder.class);
     BlockStructure structure = holder.getValue();
@@ -393,7 +395,7 @@ public class CommandFtcStruct extends FtcCommand {
 
     scan(c, structure, name, args);
 
-    c.getSource().sendAdmin(
+    c.getSource().sendSuccess(
         Text.format("Added palette named '{0}' to '{1}'",
             name, holder.getKey()
         )
@@ -403,7 +405,7 @@ public class CommandFtcStruct extends FtcCommand {
 
   /* ----------------------------- CREATION ------------------------------ */
 
-  private int create(CommandContext<CommandSource> c, ParsedArgs args)
+  private int create(CommandContext<CommandSource> c, ParsedOptions args)
       throws CommandSyntaxException {
     String key = c.getArgument("name", String.class);
     var registry = Structures.get().getRegistry();
@@ -417,14 +419,16 @@ public class CommandFtcStruct extends FtcCommand {
 
     var holder = registry.register(key, structure);
 
-    c.getSource().sendAdmin(
+    c.getSource().sendSuccess(
         Text.format("Created structure named '{0}'", holder.getKey())
     );
     return 0;
   }
 
-  private void scan(CommandContext<CommandSource> c, BlockStructure structure, String palette,
-                    ParsedArgs args
+  private void scan(CommandContext<CommandSource> c,
+                    BlockStructure structure,
+                    String palette,
+                    ParsedOptions args
   ) throws CommandSyntaxException {
     Player player = c.getSource().asPlayer();
 
@@ -450,7 +454,7 @@ public class CommandFtcStruct extends FtcCommand {
     Predicate<Entity> entityFilter = entity -> entity.getType() != EntityType.PLAYER;
 
     if (args.has(BLOCK_FILTER)) {
-      var list = args.get(BLOCK_FILTER);
+      var list = args.getValue(BLOCK_FILTER);
 
       blockFilter = blockFilter.and(block -> {
         for (var r : list) {
@@ -464,7 +468,7 @@ public class CommandFtcStruct extends FtcCommand {
     }
 
     if (args.has(IGNORE_ENT_ARG)) {
-      var list = args.get(IGNORE_ENT_ARG);
+      var list = args.getValue(IGNORE_ENT_ARG);
       Set<EntityType> ignoreTypes = new ObjectOpenHashSet<>(list);
 
       entityFilter = entityFilter.and(entity -> {
@@ -476,7 +480,7 @@ public class CommandFtcStruct extends FtcCommand {
         .area(bounds3i)
         .blockPredicate(blockFilter)
         .entityPredicate(entityFilter)
-        .includeFunctionBlocks(args.get(INCLUDE_FUNCTIONS))
+        .includeFunctionBlocks(args.has(INCLUDE_FUNCTIONS))
         .paletteName(palette)
         .build();
 
@@ -502,7 +506,7 @@ public class CommandFtcStruct extends FtcCommand {
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
                                                               SuggestionsBuilder builder
     ) {
-      return CompletionProvider.suggestMatching(builder, "0 0 0", "1 1 1", "-1 -1 -1");
+      return Completions.suggest(builder, "0 0 0", "1 1 1", "-1 -1 -1");
     }
   }
 
@@ -518,12 +522,12 @@ public class CommandFtcStruct extends FtcCommand {
                                                               SuggestionsBuilder builder
     ) {
       Holder<BlockStructure> holder = context.getArgument("structure", Holder.class);
-      return CompletionProvider.suggestMatching(builder, holder.getValue().getPalettes().keySet());
+      return Completions.suggest(builder, holder.getValue().getPalettes().keySet());
     }
 
     @Override
-    public ArgumentType<?> getVanillaArgumentType() {
-      return Arguments.FTC_KEY.getVanillaArgumentType();
+    public ArgumentType<?> getVanillaType(CommandBuildContext context) {
+      return Arguments.FTC_KEY.getVanillaType(context);
     }
   }
 }

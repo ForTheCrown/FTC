@@ -1,0 +1,23 @@
+{
+  "normal": {
+    "script": "banks/normal.js",
+    "exit_buttons": [],
+    "entrance_button": { "x": 0, "y": 0, "z": 0 },
+    "teleports": {
+      "entrance": {
+        "x"    : 0,
+        "y"    : 0,
+        "z"    : 0,
+        "yaw"  : 0,
+        "pitch": 0
+      },
+      "exit": {
+        "x"    : 0,
+        "y"    : 0,
+        "z"    : 0,
+        "yaw"  : 0,
+        "pitch": 0
+      }
+    }
+  }
+}

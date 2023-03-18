@@ -9,10 +9,10 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.utils.UUID2IntMap;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserManager;
+import net.forthecrown.utils.UUID2IntMap;
 import net.forthecrown.utils.text.format.UnitFormat;
 import net.kyori.adventure.text.Component;
 
@@ -78,7 +78,7 @@ public class UserMapCommand extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         // /<command>
         .executes(c -> lookup(c.getSource(), getUserSender(c)))
@@ -102,7 +102,7 @@ public class UserMapCommand extends FtcCommand {
                       map.set(user.getUniqueId(), amount);
                       int newAmount = map.get(user.getUniqueId());
 
-                      c.getSource().sendAdmin(
+                      c.getSource().sendSuccess(
                           format("Set {0, user}'s {1} to {2}",
                               user,
                               getName(),
@@ -126,7 +126,7 @@ public class UserMapCommand extends FtcCommand {
                       map.add(user.getUniqueId(), amount);
                       int newAmount = map.get(user.getUniqueId());
 
-                      c.getSource().sendAdmin(
+                      c.getSource().sendSuccess(
                           format("Added {0} to {1, user}'s {2}, new value: {3}",
                               displayProvider.apply(amount),
                               user,
@@ -151,7 +151,7 @@ public class UserMapCommand extends FtcCommand {
                       map.remove(user.getUniqueId(), amount);
                       int newAmount = map.get(user.getUniqueId());
 
-                      c.getSource().sendAdmin(
+                      c.getSource().sendSuccess(
                           format("Subtracted {0} from {1, user}'s {2}, new value: {3}",
                               displayProvider.apply(amount),
                               user,
@@ -176,7 +176,7 @@ public class UserMapCommand extends FtcCommand {
                   var user = Arguments.getUser(c, "user");
                   map.remove(user.getUniqueId());
 
-                  c.getSource().sendAdmin(
+                  c.getSource().sendSuccess(
                       format("Removed {0, user} from {1} list", user, getName())
                   );
                   return 0;

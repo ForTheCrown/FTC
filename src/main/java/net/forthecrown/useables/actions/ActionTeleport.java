@@ -1,15 +1,18 @@
 package net.forthecrown.useables.actions;
 
+import static net.forthecrown.commands.admin.CommandTeleportExact.PITCH;
+import static net.forthecrown.commands.admin.CommandTeleportExact.YAW;
+
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.admin.CommandTeleportExact;
-import net.forthecrown.commands.economy.CommandShopHistory;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.types.args.ArgsArgument;
-import net.forthecrown.grenadier.types.args.Argument;
-import net.forthecrown.grenadier.types.args.ParsedArgs;
-import net.forthecrown.grenadier.types.pos.Position;
-import net.forthecrown.grenadier.types.pos.PositionArgument;
+import net.forthecrown.grenadier.types.ArgumentTypes;
+import net.forthecrown.grenadier.types.ParsedPosition;
+import net.forthecrown.grenadier.types.options.ArgumentOption;
+import net.forthecrown.grenadier.types.options.Options;
+import net.forthecrown.grenadier.types.options.OptionsArgument;
+import net.forthecrown.grenadier.types.options.ParsedOptions;
 import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.useables.ConstructType;
 import net.forthecrown.useables.Usable;
@@ -27,13 +30,14 @@ import org.jetbrains.annotations.Nullable;
 
 public class  ActionTeleport extends UsageAction {
 
-  private static final Argument<Position> POS_ARG
-      = Argument.builder("pos", PositionArgument.position())
-      .setDefaultValue(Position.SELF)
+  private static final ArgumentOption<ParsedPosition> POS_ARG
+      = Options.argument(ArgumentTypes.position())
+      .addLabel("pos")
+      .setDefaultValue(ParsedPosition.IDENTITY)
       .build();
 
-  private static final ArgsArgument ARGS = ArgsArgument.builder()
-      .addOptional(CommandTeleportExact.YAW)
+  private static final OptionsArgument ARGS = OptionsArgument.builder()
+      .addOptional(YAW)
       .addOptional(CommandTeleportExact.PITCH)
       .addOptional(CommandTeleportExact.WORLD)
       .addOptional(POS_ARG)
@@ -91,24 +95,30 @@ public class  ActionTeleport extends UsageAction {
 
   @UsableConstructor(ConstructType.PARSE)
   public static ActionTeleport parse(StringReader reader, CommandSource source)
-      throws CommandSyntaxException {
-    ParsedArgs args = CommandShopHistory.EMPTY;
-
-    if (reader.canRead()) {
-      args = ARGS.parse(reader);
+      throws CommandSyntaxException
+  {
+    if (!reader.canRead()) {
+      return new ActionTeleport(source.getLocation());
     }
 
+    ParsedOptions args = ARGS.parse(reader);
+
     var loc = source.getLocation();
-    args.get(POS_ARG).apply(loc);
+    args.getValue(POS_ARG).apply(loc);
 
     if (args.has(CommandTeleportExact.WORLD)) {
-      loc.setWorld(args.get(CommandTeleportExact.WORLD));
+      loc.setWorld(args.getValue(CommandTeleportExact.WORLD));
     } else {
       loc.setWorld(null);
     }
 
-    loc.setYaw(args.getOrDefault(CommandTeleportExact.YAW, loc.getYaw()));
-    loc.setPitch(args.getOrDefault(CommandTeleportExact.PITCH, loc.getPitch()));
+    if (args.has(YAW)) {
+      loc.setYaw(args.getValue(YAW));
+    }
+
+    if (args.has(PITCH)) {
+      loc.setPitch(args.getValue(PITCH));
+    }
 
     return new ActionTeleport(loc);
   }

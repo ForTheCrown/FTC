@@ -9,7 +9,7 @@ import static net.forthecrown.core.Messages.tpaTargetMessage;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.user.TeleportRequest;
 import net.forthecrown.user.User;
 import org.bukkit.Sound;
@@ -47,7 +47,7 @@ public class CommandTpaskHere extends FtcCommand {
   }
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command.then(argument("player", Arguments.ONLINE_USER)
         .executes(c -> {
           User player = getUserSender(c);

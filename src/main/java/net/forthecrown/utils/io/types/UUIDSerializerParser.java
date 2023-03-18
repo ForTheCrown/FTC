@@ -5,7 +5,7 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
 import java.util.UUID;
 import java.util.stream.IntStream;
-import net.forthecrown.grenadier.types.UUIDArgument;
+import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.utils.io.Results;
 import net.forthecrown.utils.io.TagOps;
 import net.minecraft.core.UUIDUtil;
@@ -21,7 +21,7 @@ public class UUIDSerializerParser implements SerializerParser<UUID> {
 
   @Override
   public @NotNull ArgumentType<UUID> getArgumentType() {
-    return UUIDArgument.uuid();
+    return ArgumentTypes.uuid();
   }
 
   @Override
@@ -48,7 +48,7 @@ public class UUIDSerializerParser implements SerializerParser<UUID> {
           try {
             return DataResult.success(UUID.fromString(s));
           } catch (IllegalArgumentException e) {
-            return Results.errorResult(
+            return Results.error(
                 "Invalid UUID: '%s' error: %s",
                 s, e.getMessage()
             );

@@ -23,7 +23,7 @@ import net.forthecrown.core.challenge.StreakCategory;
 import net.forthecrown.core.challenge.StreakIncreaseEvent;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.ModuleServices;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.guilds.GuildManager;
 import net.forthecrown.useables.Usables;
 import net.forthecrown.user.User;
@@ -68,7 +68,7 @@ public class CommandFtcTest extends FtcCommand {
    */
 
   @Override
-  protected void createCommand(BrigadierCommand command) {
+  public void createCommand(GrenadierCommand command) {
     command
         .then(literal("test_staff_log_marker")
             .executes(c -> {

@@ -32,8 +32,8 @@ import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.craftbukkit.v1_19_R2.persistence.CraftPersistentDataContainer;
-import org.bukkit.craftbukkit.v1_19_R2.persistence.CraftPersistentDataTypeRegistry;
+import org.bukkit.craftbukkit.v1_19_R3.persistence.CraftPersistentDataContainer;
+import org.bukkit.craftbukkit.v1_19_R3.persistence.CraftPersistentDataTypeRegistry;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 
@@ -41,11 +41,10 @@ import org.bukkit.persistence.PersistentDataContainer;
  * A utility class to do some tedious tasks that involve NBT serialization.
  */
 public final class TagUtil {
+  private TagUtil() {}
 
-  private static final CraftPersistentDataTypeRegistry REGISTRY = new CraftPersistentDataTypeRegistry();
-
-  private TagUtil() {
-  }
+  private static final CraftPersistentDataTypeRegistry REGISTRY
+      = new CraftPersistentDataTypeRegistry();
 
   public static IntArrayTag writeUUID(UUID uuid) {
     return BinaryTags.saveUuid(uuid);

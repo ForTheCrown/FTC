@@ -63,13 +63,13 @@ class UserTabNode extends UserCommandNode {
               if (Text.isDashClear(value)) {
                 user.set(property, null);
 
-                c.getSource().sendAdmin(
+                c.getSource().sendSuccess(
                     Text.format("Cleared {0, user}'s {1}", user, property.getKey())
                 );
               } else {
                 user.set(property, value);
 
-                c.getSource().sendAdmin(
+                c.getSource().sendSuccess(
                     Text.format("Set {0, user} {1} to {2}",
                         user, property.getKey(),
                         value

@@ -178,12 +178,10 @@ public class ChallengeEntry {
 
     // Run all scripts for each category
     scripts.forEach(scriptName -> {
-      Script.run(
-          scriptName,
-          Challenges.METHOD_STREAK_INCREASE,
-          user,
-          streakValue
-      );
+      try (Script script = Script.of(scriptName)) {
+        script.compile().eval();
+        script.invoke(Challenges.METHOD_STREAK_INCREASE, user, streakValue);
+      }
     });
   }
 
