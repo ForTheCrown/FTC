@@ -3,7 +3,7 @@ The ForTheCrown SMP's plugin code.
 Server IP: `mc.forthecrown.net`
 
 ## Building
-To build the plugin you should first check [`build-data.json`](build-data.json) 
+To build the plugin you should first check [`build-info.json`](build-info.json) 
 to ensure that debug mode is enabled/disabled, according to your requirement.  
   
 Then execute the `gradlew build` command to build the plugin.  
@@ -11,7 +11,7 @@ Then execute the `gradlew build` command to build the plugin.
 The resulting jar files will be in `build/libs` and will be named something 
 similar to `ForTheCrown-1.19.3-1655-DEBUG.jar`  
   
-You can also use the `build-data.json` to  define a test server path and a
+You can also use the `build-info.json` to  define a test server path and a
 launch file to immediately spin up a test server after building, this only
 happens if you've defined the values in the JSON file and then used the 
 `buildToTestServer` task.
