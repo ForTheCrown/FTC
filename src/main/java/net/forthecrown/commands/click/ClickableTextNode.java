@@ -1,9 +1,11 @@
 package net.forthecrown.commands.click;
 
+import com.google.common.base.Preconditions;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import java.util.Objects;
 import lombok.Getter;
 import net.forthecrown.user.User;
 import net.kyori.adventure.text.Component;
@@ -11,7 +13,6 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang3.Validate;
 
 public class ClickableTextNode {
 
@@ -46,7 +47,7 @@ public class ClickableTextNode {
   }
 
   public ClickableTextNode addNode(ClickableTextNode node) {
-    Validate.isTrue(node != this, "Bruh");
+    Preconditions.checkArgument(node != this, "Bruh");
 
     nameHash2Node.put(node.hashedNameLong, node);
     node.parent = this;
@@ -58,7 +59,7 @@ public class ClickableTextNode {
   }
 
   public void removeNode(String name) {
-    Validate.notNull(name, "Name was null");
+    Objects.requireNonNull(name, "Null name");
     nameHash2Node.remove(ClickableTexts.toCodedHash(name.hashCode()));
   }
 

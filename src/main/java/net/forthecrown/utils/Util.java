@@ -196,10 +196,13 @@ public final class Util {
    */
   @FormatMethod
   public static void consoleCommand(@FormatString String format, Object... args) {
-    Bukkit.dispatchCommand(
-        Bukkit.getConsoleSender(),
-        format.formatted(args)
-    );
+    String cmd = String.format(format, args);
+
+    try {
+      Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
+    } catch (Throwable t) {
+      Loggers.getLogger().error("Error executing command '{}'", cmd, t);
+    }
   }
 
   /**

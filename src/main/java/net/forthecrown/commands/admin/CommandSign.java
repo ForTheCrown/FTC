@@ -32,15 +32,6 @@ import org.bukkit.block.data.type.WallSign;
 
 public class CommandSign extends FtcCommand {
 
-  public CommandSign() {
-    super("sign");
-
-    setAliases("editsign");
-    setDescription("Allows you to edit a sign");
-
-    register();
-  }
-
   private final Map<UUID, SignLines> copies = new Object2ObjectOpenHashMap<>();
 
   private final Map<String, SignType> types = Map.ofEntries(
@@ -54,6 +45,15 @@ public class CommandSign extends FtcCommand {
       entry("crimson"),
       entry("warped")
   );
+
+  public CommandSign() {
+    super("sign");
+
+    setAliases("editsign");
+    setDescription("Allows you to edit a sign");
+
+    register();
+  }
 
   private static Entry<String, SignType> entry(String name) {
     Material wallSign = Material.matchMaterial(name + "_wall_sign");

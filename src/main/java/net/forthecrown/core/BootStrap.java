@@ -9,7 +9,9 @@ import net.forthecrown.core.challenge.ChallengeManager;
 import net.forthecrown.core.config.ConfigManager;
 import net.forthecrown.core.config.Configs;
 import net.forthecrown.core.logging.Loggers;
+import net.forthecrown.core.module.ModuleService;
 import net.forthecrown.core.module.ModuleServices;
+import net.forthecrown.core.module.OnEnable;
 import net.forthecrown.core.resource.ResourceWorld;
 import net.forthecrown.core.resource.ResourceWorldTracker;
 import net.forthecrown.core.script2.ScriptManager;
@@ -53,6 +55,9 @@ final class BootStrap {
 
   static void init() {
     long freeMem = Runtime.getRuntime().freeMemory();
+
+    ModuleService onEnable = ModuleService.of(OnEnable.class);
+    ModuleServices.SERVICES.register("on_enable", onEnable);
 
     // Tools
     init(InventoryStorage::getStorage);
@@ -141,13 +146,12 @@ final class BootStrap {
     // Schedule and run module services
     ModuleServices.DAY_CHANGE.schedule();
     ModuleServices.SAVE.schedule();
-    ModuleServices.ON_ENABLE.run();
+
+    onEnable.run();
     ModuleServices.RELOAD.run();
 
-    // Only required for startup, afterwards, they're useless
-    ModuleServices.ON_ENABLE
-        .getCallbacks()
-        .clear();
+    onEnable.getCallbacks().clear();
+    ModuleServices.SERVICES.remove("on_enable");
 
     Transformers.runCurrent();
 

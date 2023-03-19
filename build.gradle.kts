@@ -4,8 +4,6 @@ plugins {
   java
 
   id("io.papermc.paperweight.userdev") version "1.5.3"
-  id("com.github.johnrengelman.shadow") version "8.1.0"
-
   id("ftc_plugin")
 }
 
@@ -13,11 +11,13 @@ val minecraftVersion = "1.19.4"
 val baseJarName = "ForTheCrown"
 ftc.jarBaseName = baseJarName
 
-val grenadier = "net.forthecrown:grenadier:2.0.1"
+// Dependency values, these are also used in processResources
+val grenadier = "net.forthecrown:grenadier:2.0.4"
 val nashorn = "org.openjdk.nashorn:nashorn-core:15.4"
+val mathlib = "org.spongepowered:math:2.1.0-SNAPSHOT"
 
 group = "net.forthecrown"
-version = "${minecraftVersion}-${ftc.buildId}-${if (ftc.isDebugBuild) "DEBUG" else "RELEASE"}"
+version = "${minecraftVersion}-${ftc.buildId}-${if (ftc.isDebugBuild) "SNAPSHOT" else "RELEASE"}"
 
 repositories {
   mavenCentral()
@@ -62,7 +62,8 @@ dependencies {
   compileOnly("org.tomlj:tomlj:1.1.0")
   compileOnly(nashorn)
   compileOnly("org.apache.commons:commons-text:1.10.0")
-  implementation("org.spongepowered:math:2.1.0-SNAPSHOT")
+  compileOnly(mathlib)
+  testImplementation(mathlib)
 
   // Plugin dependencies
   compileOnly("us.dynmap:DynmapCoreAPI:3.4")
@@ -121,16 +122,20 @@ tasks {
   processResources {
     filteringCharset = Charsets.UTF_8.name()
 
-    filesMatching("plugin.yml") {
-      val date = Date()
+    val fileList = listOf(
+      "paper-plugin.yml",
+      "runtime_dependencies.json"
+    )
 
+    filesMatching(fileList) {
       expand(
         "version"    to version,
         "nashorn"    to nashorn,
         "grenadier"  to grenadier,
         "buildID"    to ftc.buildId,
         "debugbuild" to ftc.isDebugBuild,
-        "buildDate"  to date.toString()
+        "buildDate"  to Date().toString(),
+        "mathlib"    to mathlib
       )
     }
 

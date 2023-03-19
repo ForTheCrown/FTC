@@ -2,6 +2,7 @@ package net.forthecrown.utils.text.function;
 
 import static net.forthecrown.utils.text.ChatParser.FLAG_LINKS;
 
+import com.google.common.base.Strings;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -17,28 +18,37 @@ import org.jetbrains.annotations.Nullable;
 public class TimeFunction extends TextFunction {
 
   public TimeFunction() {
-    super(FLAG_LINKS, Pattern.compile("<t[:=][0-9]+(:[tTdDfFR])?>"));
+    super(FLAG_LINKS, Pattern.compile("<t[:=](-?[0-9]+|present)(?::([tTdDfFR]))?>"));
   }
 
   @Override
   public @Nullable Component render(MatchResult group, int flags)
-      throws CommandSyntaxException {
-    String input = group.group();
+      throws CommandSyntaxException
+  {
+    String time = group.group(1);
+    String unit = group.group(2);
 
-    // Skip '<t:' and trailing '>'
-    input = input.substring(3, input.length() - 1);
-    FormatterType type = FormatterType.DEFAULT;
-    String replaced = input.replaceAll("^[0-9]+", "");
+    FormatterType type;
 
-    if (!replaced.isBlank()) {
-      input = input.substring(0, input.length() - replaced.length());
+    if (Strings.isNullOrEmpty(unit)) {
+      type = FormatterType.DEFAULT;
+    } else {
+      type = FormatterType.byChar(unit.charAt(0));
 
-      type = FormatterType.byChar(replaced.charAt(1));
-      assert type != null;
+      if (type == null) {
+        return null;
+      }
     }
 
-    long value = Long.parseLong(input);
-    return type.format(value);
+    long timestamp;
+
+    if (time.equalsIgnoreCase("present")) {
+      timestamp = System.currentTimeMillis();
+    } else {
+      timestamp = Long.parseLong(time);
+    }
+
+    return type.format(timestamp);
   }
 
   @Getter

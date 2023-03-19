@@ -14,8 +14,10 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * A class that helps adding cooldowns to things.
+ * A class that helps to add cooldowns to things.
+ * @deprecated Use {@link Cooldowns} directly. This class is no longer supported
  */
+@Deprecated
 public final class Cooldown {
   private Cooldown() {}
 

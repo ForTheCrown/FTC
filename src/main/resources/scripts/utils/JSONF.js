@@ -23,11 +23,5 @@ function saveJsonFile(filePath, value) {
 }
 
 function getWorkingDirectory() {
-  let parent = _script.getParentScript();
-
-  if (parent == null) {
-    return workingDirectory;
-  }
-
-  return parent.getWorkingDirectory();
+  return _script.getWorkingDirectory();
 }

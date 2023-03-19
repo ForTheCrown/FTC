@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.logging.Loggers;
@@ -268,6 +269,11 @@ public class Cooldowns {
 
     if (timeMillis == NO_END_COOLDOWN) {
       throw Exceptions.format("This could only be done once");
+    }
+
+    if (timeMillis > TimeUnit.MINUTES.toMillis(10)) {
+      Duration remaining = getRemainingTime(uuid, category);
+      throw Exceptions.format("You can do this in {0, time}", remaining);
     }
 
     throw Exceptions.onCooldown(timeMillis);

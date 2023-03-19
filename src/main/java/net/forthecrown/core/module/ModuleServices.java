@@ -11,9 +11,6 @@ public class ModuleServices {
   public static final ModuleService RELOAD
       = ModuleService.of(OnLoad.class);
 
-  public static final ModuleService ON_ENABLE
-      = ModuleService.of(OnEnable.class);
-
   public static final ModuleService ON_DISABLE
       = ModuleService.of(OnDisable.class);
 
@@ -26,7 +23,6 @@ public class ModuleServices {
   static {
     SERVICES.register("save", SAVE);
     SERVICES.register("reload", RELOAD);
-    SERVICES.register("on_enable", ON_ENABLE);
     SERVICES.register("on_disable", ON_DISABLE);
     SERVICES.register("day_change", DAY_CHANGE);
   }

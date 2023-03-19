@@ -1,8 +1,12 @@
 package net.forthecrown.gradle;
 
-import java.io.IOException;
+import java.io.File;
 import java.nio.file.Path;
+import java.util.Set;
 import org.gradle.api.Project;
+import org.gradle.api.Rule;
+import org.gradle.api.file.SourceDirectorySet;
+import org.gradle.api.tasks.SourceSetContainer;
 
 public class FtcExtension {
   private final BuildInfo info;
@@ -10,9 +14,14 @@ public class FtcExtension {
 
   private String jarBaseName;
 
+  private final SourceSetContainer sourceSets;
+
   public FtcExtension(Project project, BuildInfo info) {
     this.project = project;
     this.info = info;
+
+    this.sourceSets = project.getExtensions()
+        .getByType(SourceSetContainer.class);
   }
 
   public void incrementBuildId() {
@@ -28,18 +37,18 @@ public class FtcExtension {
         .resolve("libs")
         .resolve(jarName);
 
-    Path resources = project.getProjectDir()
-        .toPath()
-        .resolve("src")
-        .resolve("main")
-        .resolve("resources");
+    SourceDirectorySet resources = sourceSets.getByName("main").getResources();
+    Set<File> files = resources.getSrcDirs();
 
-    System.out.printf("resources='%s', jarPath='%s'\n", resources, jarPath);
+    for (var f: files) {
+      var resourceDir = f.toPath();
+      System.out.printf("resources='%s', jarPath='%s'\n", resourceDir, jarPath);
 
-    try {
-      JarResourceSync.sync(resources, jarPath);
-    } catch (Exception exc) {
-      throw new RuntimeException(exc);
+      try {
+        JarResourceSync.sync(resourceDir, jarPath);
+      } catch (Exception exc) {
+        throw new RuntimeException(exc);
+      }
     }
   }
 

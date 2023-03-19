@@ -45,10 +45,7 @@ public class MinecraftAssetDownloader {
   }
 
   public static void download(Path dir, String version) {
-    MinecraftAssetDownloader downloader
-        = new MinecraftAssetDownloader(version, dir);
-
-    downloader.run();
+    new MinecraftAssetDownloader(version, dir).run();
   }
 
   public void run() {
@@ -108,7 +105,7 @@ public class MinecraftAssetDownloader {
       gameVersion = obj.getAsJsonObject("latest").get("release").getAsString();
     }
 
-    JsonArray versionArray = obj.getAsJsonArray("version");
+    JsonArray versionArray = obj.getAsJsonArray("versions");
 
     for (var e: versionArray) {
       JsonObject versionObj = e.getAsJsonObject();

@@ -1,6 +1,7 @@
 package net.forthecrown.commands.admin;
 
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.FTC;
 import net.forthecrown.core.Permissions;
@@ -20,9 +21,10 @@ public class CommandFtcVersion extends FtcCommand {
   @Override
   public void createCommand(GrenadierCommand command) {
     command.executes(c -> {
-      var pluginInput = FTC.getPlugin().getResource("plugin.yml");
-      var yaml = YamlConfiguration
-          .loadConfiguration(new InputStreamReader(pluginInput));
+      var pluginInput = FTC.getPlugin().getResource("paper-plugin.yml");
+      var yaml = YamlConfiguration.loadConfiguration(
+          new InputStreamReader(pluginInput, StandardCharsets.UTF_8)
+      );
 
       String buildTime = yaml.getString("buildTime");
       String buildId = yaml.getString("buildID");

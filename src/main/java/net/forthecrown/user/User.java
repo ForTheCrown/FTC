@@ -4,6 +4,7 @@ import static net.forthecrown.user.data.UserTimeTracker.UNSET;
 
 import com.destroystokyo.paper.profile.CraftPlayerProfile;
 import com.destroystokyo.paper.profile.PlayerProfile;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.mojang.serialization.DataResult;
 import github.scarsz.discordsrv.DiscordSRV;
@@ -79,7 +80,6 @@ import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.query.Flag;
 import net.luckperms.api.query.QueryMode;
 import net.luckperms.api.query.QueryOptions;
-import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -1574,14 +1574,14 @@ public class User implements ForwardingAudience.Single,
    * Makes this user enter an AFK state
    *
    * @param reason The reason the user is entering the AFK state
-   * @throws IllegalArgumentException If the user is already AFK
+   * @throws IllegalStateException    If the user is already AFK
    * @throws UserOfflineException     If the user is not AFK
    */
   public void afk(@Nullable Component reason)
-      throws IllegalArgumentException, UserOfflineException
+      throws IllegalStateException, UserOfflineException
   {
     ensureOnline();
-    Validate.isTrue(!afk, "User is already AFK");
+    Preconditions.checkState(!afk, "User is already AFK");
 
     setAfk(true, reason);
 
@@ -1618,12 +1618,12 @@ public class User implements ForwardingAudience.Single,
   /**
    * Makes this user leave their AFK state
    *
-   * @throws IllegalArgumentException If the user is not AFK
+   * @throws IllegalStateException    If the user is not AFK
    * @throws UserOfflineException     If the user is not online
    */
-  public void unafk() throws IllegalArgumentException, UserOfflineException {
+  public void unafk() throws IllegalStateException, UserOfflineException {
     ensureOnline();
-    Validate.isTrue(afk, "User is not AFK");
+    Preconditions.checkState(afk, "User is not AFK");
 
     setAfk(false, null);
 

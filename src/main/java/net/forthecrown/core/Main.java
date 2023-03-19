@@ -3,6 +3,7 @@ package net.forthecrown.core;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.ModuleServices;
 import net.forthecrown.dungeons.enchantments.FtcEnchants;
+import net.forthecrown.grenadier.Grenadier;
 import net.kyori.adventure.key.Namespaced;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
@@ -22,6 +23,8 @@ public final class Main extends JavaPlugin implements Namespaced {
 
   @Override
   public void onEnable() {
+    Grenadier.plugin(this);
+
     setDebugMode();
 
     // Register dynmap hook connection thing
@@ -48,7 +51,7 @@ public final class Main extends JavaPlugin implements Namespaced {
 
   private void setDebugMode() {
     YamlConfiguration config = YamlConfiguration.loadConfiguration(
-        getTextResource("plugin.yml")
+        getTextResource("paper-plugin.yml")
     );
 
     debugMode = config.getBoolean("debug_build");

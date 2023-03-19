@@ -4,11 +4,13 @@ import static net.forthecrown.utils.text.Text.nonItalic;
 import static net.kyori.adventure.text.Component.empty;
 import static net.kyori.adventure.text.Component.text;
 
+import com.google.common.base.Preconditions;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -22,7 +24,6 @@ import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -69,12 +70,16 @@ public final class Users {
    *                                  user that has played on this server
    */
   public static User get(@NotNull UUID base) throws IllegalArgumentException {
-    Validate.notNull(base, "UUID cannot be null");
+    Objects.requireNonNull(base);
+
     UserLookupEntry entry = UserManager.get()
         .getUserLookup()
         .getEntry(base);
 
-    Validate.notNull(entry, "Given UUID did not belong to a player: %s", base);
+    Preconditions.checkArgument(entry != null,
+        "Given UUID did not belong to a player: %s",
+        base
+    );
 
     return get(entry);
   }

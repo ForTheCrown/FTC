@@ -244,10 +244,12 @@ public class DataCommands extends Nodes {
     if (path != null) {
       List<BinaryTag> tags = path.get(tag);
 
+      if (tags.isEmpty()) {
+        throw Exceptions.format("Nothing at path '{0}'", path.getInput());
+      }
+
       if (tags.size() == 1) {
         component = Text.displayTag(tags.get(0), true);
-      } else if (tags.isEmpty()) {
-        throw Exceptions.format("Nothing at path '{0}'", path.getInput());
       } else {
         component = TextJoiner.on(",\n")
             .setPrefix(text("["))

@@ -1,5 +1,6 @@
 package net.forthecrown.user.data;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import java.util.Objects;
@@ -16,7 +17,6 @@ import net.forthecrown.utils.text.TextJoiner;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.apache.commons.lang3.Validate;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -89,8 +89,8 @@ public class UserRank implements ComponentLike {
 
       // Ensure given slot is in the upper 2x7 area and
       // not in the extra rank array below
-      Validate.isTrue(r > 0 && r < 3, "Invalid row %s", r);
-      Validate.isTrue(c > 0 && c < 8, "Invalid column %s", c);
+      Preconditions.checkArgument(r > 0 && r < 3, "Invalid row %s", r);
+      Preconditions.checkArgument(c > 0 && c < 8, "Invalid column %s", c);
     }
   }
 

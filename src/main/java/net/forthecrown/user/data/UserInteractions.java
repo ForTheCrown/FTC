@@ -1,5 +1,6 @@
 package net.forthecrown.user.data;
 
+import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
@@ -18,7 +19,6 @@ import net.forthecrown.user.Users;
 import net.forthecrown.user.property.Properties;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
-import org.apache.commons.lang3.Validate;
 
 public class UserInteractions extends UserComponent {
 
@@ -77,10 +77,12 @@ public class UserInteractions extends UserComponent {
   /**
    * Divorces the user this interactions object is attached to.
    *
-   * @throws IllegalArgumentException If the user is not married
+   * @throws IllegalStateException If the user is not married
    */
-  public void divorce() throws IllegalArgumentException {
-    Validate.isTrue(isMarried(), "User is not married, cannot divorce");
+  public void divorce() throws IllegalStateException {
+    Preconditions.checkState(isMarried(),
+        "User is not married, cannot divorce"
+    );
 
     var spouse = spouseUser();
 
