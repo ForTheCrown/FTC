@@ -26,10 +26,3 @@ contribute to our codebase.
   
 As a general rule of thumb, we use [Google's Java style](https://google.github.io/styleguide/javaguide.html)
 with a column character limit of 80.
-
-## Dependencies
-FTC mostly on the PaperMC and other open-source libraries that can be 
-accessed easily through maven repositories, some plugins, however, tend to
-cause issues when used like this, for those plugins, the [`libs`](libs) 
-directory holds the jar files of the dependencies that cannot be acquired
-through maven repositories.
