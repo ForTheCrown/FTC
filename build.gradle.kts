@@ -37,11 +37,14 @@ repositories {
   // DiscordSRV
   maven("https://nexus.scarsz.me/content/groups/public/")
 
-  // VotingPlugin and GSit
+  // GSit
   maven("https://jitpack.io")
 
   // AncientGates
   maven("https://repo.codemc.org/repository/maven-public/")
+
+  // VotingPlugin
+  maven("https://nexus.bencodez.com/repository/maven-public")
 }
 
 dependencies {
@@ -68,7 +71,7 @@ dependencies {
   compileOnly("com.discordsrv:discordsrv:1.26.0")
   compileOnly("net.luckperms:api:5.4")
   compileOnly("org.mcteam.ancientgates:ancientgates:2.6")
-  compileOnly("com.github.BenCodez:VotingPlugin:6.11.2")
+  compileOnly("com.bencodez:votingplugin:6.11.3")
   compileOnly("com.github.Gecolay.GSit:core:1.3.7")
 
   // Minecraft, Bukkit and Paper
