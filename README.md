@@ -1,20 +1,20 @@
 # FTC
-The ForTheCrown SMP's plugin repository.  
+The ForTheCrown SMP's plugin code.  
 Server IP: `mc.forthecrown.net`
 
 ## Building
-To build the plugin you should first check [`buildver.properties`](buildver.properties) 
+To build the plugin you should first check [`build-data.json`](build-data.json) 
 to ensure that debug mode is enabled/disabled, according to your requirement.  
   
 Then execute the `gradlew build` command to build the plugin.  
   
 The resulting jar files will be in `build/libs` and will be named something 
-similar to `ForTheCrown-Debug-1.19.3-1655.jar`  
+similar to `ForTheCrown-1.19.3-1655-DEBUG.jar`  
   
-You can also use [`test_server.properties`](test_server.properties) to 
-define a test server pathand a launch file to immediately spin up a test 
-server after building, this only happens if you've defined the values in 
-the properties file and then used the `build_to_test_server` task.
+You can also use the `build-data.json` to  define a test server path and a
+launch file to immediately spin up a test server after building, this only
+happens if you've defined the values in the JSON file and then used the 
+`buildToTestServer` task.
 
 ## Contributing
 If you wanna contribute to the FTC repository, fork this project, make your 
