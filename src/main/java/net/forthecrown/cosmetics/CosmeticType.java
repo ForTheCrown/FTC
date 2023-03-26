@@ -48,7 +48,7 @@ public class CosmeticType<T extends Cosmetic> {
         WordUtils.capitalizeFully(name.replaceAll("_effects", ""))
     );
 
-    var holder = Registries.COSMETIC.register(name, this);
+    var holder = Cosmetics.REGISTRY.register(name, this);
     this.id = holder.getId();
   }
 

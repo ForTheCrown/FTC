@@ -1,13 +1,15 @@
 package net.forthecrown.useables.test;
 
 import net.forthecrown.core.registry.Registries;
+import net.forthecrown.core.registry.Registry;
 import net.forthecrown.useables.UsageTest;
 import net.forthecrown.useables.UsageType;
 
 public final class UsageTests {
+  private UsageTests() {}
 
-  private UsageTests() {
-  }
+  public static final Registry<UsageType<? extends UsageTest>> REGISTRY
+      = Registries.newFreezable();
 
   public static final String
       KEY_PERMISSION = "has_permission",
@@ -54,10 +56,10 @@ public final class UsageTests {
 
     register(KEY_SCRIPT, TestScript.TYPE);
 
-    Registries.USAGE_CHECKS.freeze();
+    REGISTRY.freeze();
   }
 
   private static void register(String key, UsageType<? extends UsageTest> type) {
-    Registries.USAGE_CHECKS.register(key, type);
+    REGISTRY.register(key, type);
   }
 }

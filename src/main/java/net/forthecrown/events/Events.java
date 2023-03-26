@@ -97,6 +97,8 @@ public final class Events {
     register(new AutoSellListener());
     register(new DurabilityListener());
 
+    register(new CommandBroadcastListener());
+
     GuildEvents.registerAll();
 
     register(new LoginListener());

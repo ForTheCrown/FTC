@@ -8,6 +8,7 @@ import io.papermc.paper.util.StacktraceDeobfuscator;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.util.Set;
 import lombok.Getter;
 import net.forthecrown.core.FtcDiscord;
 import org.apache.logging.log4j.core.LogEvent;
@@ -22,6 +23,27 @@ class DiscordAppender extends AbstractAppender {
 
   static final String THROWABLE_TOO_LONG = "\nThrowable too long to include";
 
+  /**
+   * List of loggers names that are to be ignored by this appender, as they
+   * print meaningless information too frequently.
+   * <p>
+   * Each entry's reason for being on the list: <pre>
+   * 1. Votifier: 'readAddress(..) failed: Connection reset by peer'
+   *    Means nothing and is thrown too frequently
+   *
+   * 2. nms login listener: Logs error messages of what are most likely cracked
+   *                        clients trying to join
+   *
+   * 3. BuycraftX: Cannot process analytic events or something, seems to affect
+   *               nothing and just clogs up error channel
+   * </pre>
+   */
+  public static final Set<String> IGNORED_LOGGERS = Set.of(
+      "Votifier",
+      "net.minecraft.server.network.LoginListener",
+      "BuycraftX"
+  );
+
   public DiscordAppender() {
     super(APPENDER_NAME, null, null, false, null);
     setStarted();
@@ -29,10 +51,18 @@ class DiscordAppender extends AbstractAppender {
 
   @Override
   public void append(LogEvent event) {
+    var loggerName = event.getLoggerName();
+
+    // Filter out ignored loggers
+    for (var s: IGNORED_LOGGERS) {
+      if (loggerName.contains(s)) {
+        return;
+      }
+    }
+
     var levelName = event.getLevel().name();
     var formattedMessage = event.getMessage().getFormattedMessage();
     var thrown = event.getThrown();
-    var loggerName = event.getLoggerName();
 
     String prefix = "**" + levelName + "** [" + loggerName + "] ";
     StringBuilder builder = new StringBuilder()

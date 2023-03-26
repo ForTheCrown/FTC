@@ -20,7 +20,6 @@ import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnDisable;
 import net.forthecrown.core.module.OnLoad;
 import net.forthecrown.core.module.OnSave;
-import net.forthecrown.core.registry.Keys;
 import net.forthecrown.user.data.UserRanks;
 import net.forthecrown.utils.UUID2IntMap;
 import net.forthecrown.utils.UUID2IntMap.KeyValidator;
@@ -28,6 +27,7 @@ import net.forthecrown.utils.io.FtcJar;
 import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.utils.io.SerializableObject;
 import net.forthecrown.utils.io.SerializationHelper;
+import net.forthecrown.core.registry.Registries;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
@@ -194,7 +194,7 @@ public final class UserManager implements SerializableObject {
 
     SerializationHelper.readTomlAsJson(rankJson, wrapper -> {
       for (var e : wrapper.entrySet()) {
-        if (!Keys.isValidKey(e.getKey())) {
+        if (!Registries.isValidKey(e.getKey())) {
           LOGGER.warn("{} is an invalid registry key", e.getKey());
           continue;
         }

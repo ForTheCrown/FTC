@@ -6,7 +6,7 @@ const ArmorStand = Java.type("org.bukkit.entity.ArmorStand");
 const UnitFormat = Java.type("net.forthecrown.utils.text.format.UnitFormat");
 const StreakCategory = Java.type("net.forthecrown.core.challenge.StreakCategory");
 const DynamicArmorStand = Java.type("net.forthecrown.utils.stand.DynamicArmorStand");
-import "@ftc.core.registry.Keys";
+import "@ftc.core.Keys";
 
 // Constants
 const STAND_POSITION = Vector3d.from(207.5, 73.15, 188.5);

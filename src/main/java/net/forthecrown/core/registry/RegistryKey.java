@@ -15,8 +15,8 @@ public class RegistryKey {
   private final String value;
 
   private RegistryKey(String registry, String value) {
-    this.registry = Keys.ensureValid(registry);
-    this.value = Keys.ensureValid(value);
+    this.registry = Registries.ensureValidKey(registry);
+    this.value = Registries.ensureValidKey(value);
   }
 
   public static RegistryKey of(String registry, String name) {

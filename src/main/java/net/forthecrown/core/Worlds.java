@@ -1,7 +1,6 @@
 package net.forthecrown.core;
 
 import java.util.Objects;
-import net.forthecrown.core.registry.Keys;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.bukkit.Bukkit;

@@ -1,30 +1,15 @@
-package net.forthecrown.core.registry;
+package net.forthecrown.core;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import java.util.regex.Pattern;
-import net.forthecrown.core.FTC;
 import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.grenadier.types.KeyArgument;
-import org.apache.commons.lang3.Validate;
 import org.bukkit.NamespacedKey;
-import org.intellij.lang.annotations.Language;
 
 /**
  * Utility methods relating to {@link NamespacedKey}s and {@link net.kyori.adventure.key.Key}s
  */
 public interface Keys {
-
-  /**
-   * The regex for determining if a {@link Registry} key is valid
-   */
-  @Language("RegExp")
-  String VALID_KEY_REGEX = "[a-zA-Z0-9+\\-/._]+";
-
-  /**
-   * Pattern made with {@link #VALID_KEY_REGEX}
-   */
-  Pattern VALID_KEY = Pattern.compile(VALID_KEY_REGEX);
 
   /**
    * Namespaced key parser with "forthecrown" as the default namespace
@@ -103,41 +88,4 @@ public interface Keys {
     return FTC_KEY_PARSER;
   }
 
-  /**
-   * Ensures a given key matches the {@link #VALID_KEY_REGEX} regex pattern
-   *
-   * @param s The string to test
-   * @return The input string
-   * @throws IllegalArgumentException If the given key was not valid
-   */
-  static @org.intellij.lang.annotations.Pattern(VALID_KEY_REGEX) String ensureValid(String s)
-      throws IllegalArgumentException {
-    Validate.isTrue(
-        isValidKey(s),
-        "Invalid key: '%s', did not match '%s' pattern",
-        s, VALID_KEY_REGEX
-    );
-
-    return s;
-  }
-
-  /**
-   * Tests if the entire given string matches the {@link #VALID_KEY_REGEX} regex pattern
-   *
-   * @param s The string to test
-   * @return True, if the entire string matches, false otherwise
-   */
-  static boolean isValidKey(String s) {
-    return VALID_KEY.matcher(s).matches();
-  }
-
-  /**
-   * Tests if a given character matches the {@link #VALID_KEY_REGEX} regex pattern and is valid
-   *
-   * @param c The character to test
-   * @return True, if the character matches, false otherwise
-   */
-  static boolean isValidKeyChar(char c) {
-    return isValidKey("" + c);
-  }
 }

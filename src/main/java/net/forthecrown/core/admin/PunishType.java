@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.config.GeneralConfig;
 import net.forthecrown.core.logging.Loggers;
-import net.forthecrown.core.registry.Registries;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
@@ -85,7 +84,7 @@ public enum PunishType {
     ) {
       // Place user in jail
       String k = punishment.getExtra();
-      var cellOptional = Registries.JAILS.get(k);
+      var cellOptional = Punishments.get().getCells().get(k);
 
       if (cellOptional.isEmpty()) {
         Loggers.getLogger().warn("Cannot jail {}, unknown jail name: '{}'",

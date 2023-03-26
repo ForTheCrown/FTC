@@ -2,7 +2,6 @@ package net.forthecrown.core.script2.preprocessor;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
 import org.apache.commons.io.IOUtils;
 
 public class JsPreProcessor {
@@ -12,8 +11,8 @@ public class JsPreProcessor {
       new SimpleImportPreProcessor()
   };
 
-  public static StringReader preprocess(Reader reader) throws IOException {
-    return new StringReader(preprocess(IOUtils.toString(reader)));
+  public static String preprocess(Reader reader) throws IOException {
+    return preprocess(IOUtils.toString(reader));
   }
 
   public static void onScriptsReload() {

@@ -1,7 +1,7 @@
 package net.forthecrown.inventory;
 
-import net.forthecrown.core.module.OnEnable;
 import net.forthecrown.core.registry.Registries;
+import net.forthecrown.core.registry.Registry;
 import net.forthecrown.dungeons.enchantments.FtcEnchants;
 import net.forthecrown.inventory.weapon.RoyalSword;
 import net.forthecrown.inventory.weapon.RoyalSwordType;
@@ -15,6 +15,9 @@ public final class ExtendedItems {
   public static final String TAG_TYPE = "type";
   public static final String TAG_DATA = "data";
 
+  public static final Registry<ExtendedItemType> REGISTRY
+      = Registries.newFreezable();
+
   /**
    * Item type which represents royal swords
    */
@@ -27,18 +30,17 @@ public final class ExtendedItems {
   public static final ExtendedItemType<RoyalCrown> CROWN
       = register(new CrownType());
 
-  @OnEnable
-  public static void init() {
-    Registries.ITEM_TYPES.freeze();
+  static {
+    REGISTRY.freeze();
   }
 
   @SuppressWarnings("unchecked")
   private static <T extends ExtendedItemType<?>> T register(T type) {
-    return (T) Registries.ITEM_TYPES.register(type.getKey(), type).getValue();
+    return (T) REGISTRY.register(type.getKey(), type).getValue();
   }
 
   public static ExtendedItemType<?> getType(ItemStack itemStack) {
-    for (var type : Registries.ITEM_TYPES) {
+    for (var type : REGISTRY) {
       if (type.get(itemStack) != null) {
         fixInvRemain(type, itemStack);
         return type;

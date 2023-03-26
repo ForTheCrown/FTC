@@ -4,8 +4,10 @@ import com.google.gson.JsonElement;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Map;
 import java.util.UUID;
+import lombok.Getter;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.registry.Registries;
+import net.forthecrown.core.registry.Registry;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.forthecrown.utils.io.PathUtil;
@@ -15,6 +17,9 @@ import net.forthecrown.utils.io.SerializableObject;
  * Implementation of {@link Punisher}
  */
 public class Punisher extends SerializableObject.Json {
+
+  @Getter
+  private final Registry<JailCell> cells = Registries.newRegistry();
 
   private final Map<UUID, PunishEntry> entryMap = new Object2ObjectOpenHashMap<>();
   private final Map<UUID, JailCell> jailed = new Object2ObjectOpenHashMap<>();
@@ -89,8 +94,8 @@ public class Punisher extends SerializableObject.Json {
       entries.add(e.getHolder().toString(), element);
     }
 
-    for (JailCell c : Registries.JAILS) {
-      var keyOptional = Registries.JAILS.getKey(c);
+    for (JailCell c : cells) {
+      var keyOptional = cells.getKey(c);
 
       if (keyOptional.isEmpty()) {
         Loggers.getLogger().warn("Unknown jail found, skipping serialization");
@@ -114,7 +119,7 @@ public class Punisher extends SerializableObject.Json {
     entryMap.clear();
 
     // Clear jails
-    Registries.JAILS.clear();
+    cells.clear();
 
     for (Map.Entry<String, JsonElement> e : json.getObject("entries").entrySet()) {
       UUID id = UUID.fromString(e.getKey());
@@ -134,7 +139,7 @@ public class Punisher extends SerializableObject.Json {
       String k = e.getKey();
       JailCell cell = JailCell.deserialize(e.getValue());
 
-      Registries.JAILS.register(k, cell);
+      cells.register(k, cell);
     }
   }
 

@@ -2,18 +2,15 @@ package net.forthecrown.structure;
 
 import static net.forthecrown.structure.BlockInfo.copyTag;
 
-import com.mojang.serialization.Dynamic;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.nbt.paper.PaperNbt;
-import net.forthecrown.utils.io.TagOps;
 import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.math.Transform;
 import net.forthecrown.utils.math.Vectors;
-import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.util.datafix.fixes.References;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
@@ -54,15 +51,20 @@ public class EntityInfo {
   /* ----------------------------- METHODS ------------------------------ */
 
   EntityInfo fixData(int oldVersion, int newVersion) {
-    return withTag(
-        (CompoundTag) DataFixers.getDataFixer()
-            .update(
-                References.ENTITY_TREE,
-                new Dynamic<>(TagOps.OPS, tag),
-                oldVersion, newVersion
-            )
-            .getValue()
+    var tag = this.tag == null
+        ? BinaryTags.compoundTag()
+        : this.tag.copy();
+
+    tag.putString("id", type.asString());
+
+    var newTag = TagUtil.applyFixer(
+        tag,
+        References.ENTITY_TREE,
+        oldVersion, newVersion
     );
+
+    newTag.remove("id");
+    return withTag(newTag);
   }
 
   void place(StructurePlaceConfig config) {

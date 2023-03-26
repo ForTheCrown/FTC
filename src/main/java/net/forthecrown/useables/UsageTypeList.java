@@ -9,12 +9,13 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.core.logging.Loggers;
-import net.forthecrown.core.registry.Registries;
 import net.forthecrown.core.registry.Registry;
 import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.nbt.ListTag;
+import net.forthecrown.useables.actions.UsageActions;
+import net.forthecrown.useables.test.UsageTests;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.kyori.adventure.text.Component;
@@ -41,11 +42,11 @@ public class UsageTypeList<V extends UsageInstance> implements Iterable<V> {
   private final List<V> instances = new ObjectArrayList<>();
 
   public static UsageTypeList<UsageAction> newActionList() {
-    return new UsageTypeList<>(Registries.USAGE_ACTIONS);
+    return new UsageTypeList<>(UsageActions.REGISTRY);
   }
 
   public static UsageTypeList<UsageTest> newTestList() {
-    return new UsageTypeList<>(Registries.USAGE_CHECKS);
+    return new UsageTypeList<>(UsageTests.REGISTRY);
   }
 
   /**

@@ -1,13 +1,15 @@
 package net.forthecrown.useables.actions;
 
 import net.forthecrown.core.registry.Registries;
+import net.forthecrown.core.registry.Registry;
 import net.forthecrown.useables.UsageAction;
 import net.forthecrown.useables.UsageType;
 
 public final class UsageActions {
+  private UsageActions() {}
 
-  private UsageActions() {
-  }
+  public static final Registry<UsageType<? extends UsageAction>> REGISTRY
+      = Registries.newFreezable();
 
   public static final String
       KEY_SHOW_TEXT = "show_text",
@@ -34,10 +36,10 @@ public final class UsageActions {
 
     ActionUserMap.Type.registerAll();
 
-    Registries.USAGE_ACTIONS.freeze();
+    REGISTRY.freeze();
   }
 
   private static void register(String key, UsageType<? extends UsageAction> type) {
-    Registries.USAGE_ACTIONS.register(key, type);
+    REGISTRY.register(key, type);
   }
 }

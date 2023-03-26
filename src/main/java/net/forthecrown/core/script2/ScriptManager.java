@@ -19,7 +19,6 @@ import net.forthecrown.core.FTC;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnDayChange;
 import net.forthecrown.core.module.OnLoad;
-import net.forthecrown.core.registry.Keys;
 import net.forthecrown.core.registry.Registries;
 import net.forthecrown.core.registry.Registry;
 import net.forthecrown.core.script2.preprocessor.JsPreProcessor;
@@ -116,7 +115,7 @@ public class ScriptManager {
 
     SerializationHelper.readTomlAsJson(loaderFile, wrapper -> {
       for (var e : wrapper.entrySet()) {
-        if (!Keys.isValidKey(e.getKey())) {
+        if (!Registries.isValidKey(e.getKey())) {
           LOGGER.warn("'{}' is an invalid key", e.getKey());
           continue;
         }

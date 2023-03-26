@@ -2,7 +2,7 @@ package net.forthecrown.dungeons;
 
 import static net.forthecrown.core.Messages.DUNGEON_LORE;
 
-import net.forthecrown.core.registry.Keys;
+import net.forthecrown.core.Keys;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.math.WorldBounds3i;
 import net.kyori.adventure.text.Component;

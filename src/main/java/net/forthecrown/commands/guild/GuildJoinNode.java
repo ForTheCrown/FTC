@@ -13,7 +13,7 @@ class GuildJoinNode extends GuildCommandNode {
 
   @Override
   public void populateUsages(UsageFactory factory) {
-    factory.usage("join <guild>", "Joins a guild");
+    factory.usage("<guild>", "Joins a guild");
   }
 
   @Override

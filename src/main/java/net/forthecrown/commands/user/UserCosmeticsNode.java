@@ -9,7 +9,6 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.forthecrown.commands.arguments.RegistryArguments;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.registry.Holder;
-import net.forthecrown.core.registry.Registries;
 import net.forthecrown.cosmetics.Cosmetic;
 import net.forthecrown.cosmetics.CosmeticType;
 import net.forthecrown.cosmetics.Cosmetics;
@@ -50,7 +49,7 @@ class UserCosmeticsNode extends UserCommandNode {
   protected <T extends ArgumentBuilder<CommandSource, T>> void create(T command,
                                                                       UserProvider provider
   ) {
-    for (var type : Registries.COSMETIC) {
+    for (var type : Cosmetics.REGISTRY) {
       if (type.equals(Cosmetics.EMOTE)) {
         continue;
       }

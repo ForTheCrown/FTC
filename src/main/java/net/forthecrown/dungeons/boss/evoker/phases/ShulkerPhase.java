@@ -1,6 +1,6 @@
 package net.forthecrown.dungeons.boss.evoker.phases;
 
-import net.forthecrown.core.registry.Keys;
+import net.forthecrown.core.Keys;
 import net.forthecrown.dungeons.DungeonUtils;
 import net.forthecrown.dungeons.boss.BossContext;
 import net.forthecrown.dungeons.boss.evoker.BossMessage;

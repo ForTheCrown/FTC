@@ -5,7 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.core.registry.Keys;
+import net.forthecrown.core.Keys;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.JsonSerializable;
 import net.forthecrown.utils.Util;

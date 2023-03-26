@@ -71,6 +71,7 @@ import net.forthecrown.commands.admin.CommandVanish;
 import net.forthecrown.commands.admin.CommandWorld;
 import net.forthecrown.commands.admin.SaveReloadCommands;
 import net.forthecrown.commands.click.CommandClickableText;
+import net.forthecrown.commands.docs.CommandDocGen;
 import net.forthecrown.commands.economy.CommandBecomeBaron;
 import net.forthecrown.commands.economy.CommandDeposit;
 import net.forthecrown.commands.economy.CommandEditShop;
@@ -193,6 +194,7 @@ public final class Commands {
     new CommandInvStore();
     new CommandCooldown();
     new CommandFtcVersion();
+    new CommandDocGen();
 
     InteractableCommands.createCommands();
     CommandSpecificGameMode.createCommands();

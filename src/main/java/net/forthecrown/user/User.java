@@ -12,6 +12,7 @@ import github.scarsz.discordsrv.dependencies.jda.api.entities.Member;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectArrays;
 import it.unimi.dsi.fastutil.objects.ObjectList;
+import java.lang.management.ManagementFactory;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Objects;
@@ -80,6 +81,7 @@ import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.query.Flag;
 import net.luckperms.api.query.QueryMode;
 import net.luckperms.api.query.QueryOptions;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -101,6 +103,8 @@ import org.jetbrains.annotations.Nullable;
 public class User implements ForwardingAudience.Single,
     HoverEventSource<Component>, Identity
 {
+
+  private static final Logger LOGGER = Loggers.getLogger();
 
   /**
    * The user's unique ID
@@ -616,15 +620,26 @@ public class User implements ForwardingAudience.Single,
     }
 
     // Log play time
-    logTime().resultOrPartial(Loggers.getLogger()::warn).ifPresent(integer -> {
-      Loggers.getLogger().info("Adding {} seconds or {} hours to {}'s playtime",
-          integer,
-          TimeUnit.SECONDS.toHours(integer),
-          this
-      );
+    logTime().resultOrPartial(LOGGER::warn).ifPresent(seconds -> {
+      long uptimeMillis = ManagementFactory.getRuntimeMXBean().getUptime();
+
+      // Prevent excessive playtime bug
+      if (TimeUnit.SECONDS.toMillis(seconds) > uptimeMillis) {
+        LOGGER.warn(
+            "Playtime bug in user {}, online for {} seconds ({} hours)???",
+            this, seconds, TimeUnit.SECONDS.toHours(seconds)
+        );
+
+        return;
+      } else {
+        LOGGER.info(
+            "Adding {} seconds or {} hours to {}'s playtime",
+            seconds, TimeUnit.SECONDS.toHours(seconds), this
+        );
+      }
 
       UserManager.get().getPlayTime()
-          .add(getUniqueId(), integer);
+          .add(getUniqueId(), seconds);
     });
 
     lastOnlineName = getName();
@@ -1009,7 +1024,7 @@ public class User implements ForwardingAudience.Single,
           .checkPermission(name)
           .asBoolean();
     } catch (ExecutionException | InterruptedException e) {
-      Loggers.getLogger().error("Couldn't fetch permission data from LuckPerms", e);
+      LOGGER.error("Couldn't fetch permission data from LuckPerms", e);
     }
 
     return false;

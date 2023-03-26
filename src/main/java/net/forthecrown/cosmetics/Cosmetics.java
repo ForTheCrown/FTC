@@ -5,6 +5,7 @@ import static net.forthecrown.cosmetics.CosmeticType.initializeValues;
 import net.forthecrown.core.config.GeneralConfig;
 import net.forthecrown.core.module.OnEnable;
 import net.forthecrown.core.registry.Registries;
+import net.forthecrown.core.registry.Registry;
 import net.forthecrown.cosmetics.arrows.ArrowEffect;
 import net.forthecrown.cosmetics.arrows.ArrowEffects;
 import net.forthecrown.cosmetics.deaths.DeathEffect;
@@ -18,9 +19,17 @@ import net.forthecrown.cosmetics.travel.TravelEffects;
 import net.forthecrown.utils.inventory.menu.Menus;
 
 public final class Cosmetics {
+  private Cosmetics() {}
 
-  private Cosmetics() {
-  }
+  /**
+   * Registry of cosmetic types, each type holds its own registry for its own
+   * cosmetic values
+   *
+   * @see CosmeticType
+   * @see Cosmetics
+   */
+  public static final Registry<CosmeticType> REGISTRY
+      = Registries.newFreezable();
 
   public static final CosmeticType<ArrowEffect>
       ARROWS = new CosmeticType<>("arrow_effects", () -> GeneralConfig.effectCost_arrow);
@@ -46,6 +55,6 @@ public final class Cosmetics {
     initializeValues(LOGIN, LoginEffects.class);
     Cosmetics.LOGIN.initializeInventory(Menus.DEFAULT_INV_SIZE);
 
-    Registries.COSMETIC.freeze();
+    REGISTRY.freeze();
   }
 }

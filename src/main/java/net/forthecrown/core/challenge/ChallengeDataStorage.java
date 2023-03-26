@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 import lombok.Getter;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.registry.Holder;
-import net.forthecrown.core.registry.Keys;
+import net.forthecrown.core.registry.Registries;
 import net.forthecrown.core.registry.Registry;
 import net.forthecrown.utils.io.FtcJar;
 import net.forthecrown.utils.io.JsonUtils;
@@ -125,7 +125,7 @@ public class ChallengeDataStorage {
       int loaded = 0;
 
       for (var e : json.entrySet()) {
-        if (!Keys.isValidKey(e.getKey())) {
+        if (!Registries.isValidKey(e.getKey())) {
           LOGGER.warn("Invalid key found: '{}'", e.getKey());
           continue;
         }

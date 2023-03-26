@@ -23,11 +23,13 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
+import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import net.forthecrown.core.Announcer;
+import net.forthecrown.core.DiscordBotAnnouncer;
 import net.forthecrown.core.FTC;
 import net.forthecrown.core.Worlds;
 import net.forthecrown.core.logging.Loggers;
@@ -46,6 +48,7 @@ import net.forthecrown.utils.Util;
 import net.forthecrown.utils.VanillaAccess;
 import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.utils.math.WorldBounds3i;
+import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.world.WorldLoader;
 import net.forthecrown.utils.world.WorldReCreator;
 import net.minecraft.core.Holder;
@@ -176,7 +179,7 @@ public class ResourceWorld {
 
   public void resetAndLoad() {
     if (!Structures.get().getRegistry().contains(spawnStructure)) {
-      LOGGER.error(
+      LOGGER.error(STAFF_LOG,
           "Cannot start RW reset, no spawn structure with key '{}' found",
           spawnStructure
       );
@@ -418,6 +421,11 @@ public class ResourceWorld {
 
     lastReset = System.currentTimeMillis();
     LOGGER.info(STAFF_LOG, "Resource World reset finished");
+
+    DiscordBotAnnouncer.announce(
+        "Resource world has been reset! Next reset date: %s",
+        Text.DATE_FORMAT.format(new Date(lastReset + resetInterval))
+    );
   }
 
   private void setGatesOpen(boolean open) {

@@ -10,6 +10,8 @@ import static net.kyori.adventure.text.Component.text;
 import com.google.gson.JsonElement;
 import com.mojang.serialization.DataResult;
 import net.forthecrown.core.registry.Holder;
+import net.forthecrown.core.registry.Ref;
+import net.forthecrown.core.registry.Ref.KeyRef;
 import net.forthecrown.core.registry.Registries;
 import net.forthecrown.core.registry.Registry;
 import net.forthecrown.core.registry.RegistryListener;
@@ -46,13 +48,18 @@ public final class UserRanks {
     });
   }
 
+  public static final String DEFAULT_NAME = "default";
+
+  public static final KeyRef<UserRank> DEFAULT_REF
+      = Ref.key(REGISTRY, DEFAULT_NAME);
+
   public static final UserRank DEFAULT = UserRank.builder()
       .slot(1, 1)
       .defaultTitle(true)
       .prefix("No Title")
       .hidden(true)
       .tier(NONE)
-      .registered("default");
+      .registered(DEFAULT_NAME);
 
   // Auto generated from enum constants
   // Except for the menu slots and description

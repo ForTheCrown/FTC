@@ -30,7 +30,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import net.forthecrown.core.Main;
-import net.forthecrown.core.registry.Keys;
+import net.forthecrown.core.Keys;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.key.Key;

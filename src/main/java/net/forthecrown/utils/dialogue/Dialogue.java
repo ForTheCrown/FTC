@@ -8,9 +8,9 @@ import java.util.Optional;
 import java.util.Set;
 import lombok.Getter;
 import net.forthecrown.core.logging.Loggers;
-import net.forthecrown.core.registry.Keys;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.io.JsonWrapper;
+import net.forthecrown.core.registry.Registries;
 import org.jetbrains.annotations.Nullable;
 
 public class Dialogue {
@@ -109,9 +109,9 @@ public class Dialogue {
     for (var e: json.entrySet()) {
       String key = e.getKey();
 
-      if (!Keys.isValidKey(key)) {
+      if (!Registries.isValidKey(key)) {
         Loggers.getLogger().error("Invalid key '{}', must follow pattern {}",
-            key, Keys.VALID_KEY_REGEX
+            key, Registries.VALID_KEY_REGEX
         );
 
         continue;

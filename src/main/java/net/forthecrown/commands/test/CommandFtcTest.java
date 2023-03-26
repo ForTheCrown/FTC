@@ -2,18 +2,15 @@ package net.forthecrown.commands.test;
 
 import static net.kyori.adventure.text.Component.text;
 
-import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 import net.forthecrown.commands.arguments.Arguments;
-import net.forthecrown.commands.docs.CommandDocs;
 import net.forthecrown.commands.manager.Commands;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -101,28 +98,6 @@ public class CommandFtcTest extends FtcCommand {
 
               return 0;
             })
-        )
-
-        .then(literal("generate_command_docs")
-            .then(argument("stubs", BoolArgumentType.bool())
-                .executes(c -> {
-                  Path dir = PathUtil.pluginPath("command_docs.md");
-                  boolean stubs = c.getArgument("stubs", Boolean.class);
-
-                  var docs = new CommandDocs(stubs);
-                  docs.fill();
-
-                  try {
-                    docs.write(dir);
-                  } catch (IOException exc) {
-                    LOGGER.error("Couldn't write command documentation", exc);
-                    return 0;
-                  }
-
-                  c.getSource().sendMessage("Generated documentation");
-                  return 0;
-                })
-            )
         )
 
         .then(literal("fire_streak_event")

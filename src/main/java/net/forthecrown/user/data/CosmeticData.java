@@ -11,9 +11,9 @@ import java.util.Set;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import net.forthecrown.core.registry.Registries;
 import net.forthecrown.cosmetics.Cosmetic;
 import net.forthecrown.cosmetics.CosmeticType;
+import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.user.ComponentType;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserComponent;
@@ -53,7 +53,7 @@ public class CosmeticData extends UserComponent {
    *
    * @see Entry
    */
-  private final Entry[] entries = new Entry[Registries.COSMETIC.size()];
+  private final Entry[] entries = new Entry[Cosmetics.REGISTRY.size()];
 
   /* ----------------------------- CONSTRUCTOR ------------------------------ */
 
@@ -227,7 +227,7 @@ public class CosmeticData extends UserComponent {
     // Loop through all cosmetic types and test if the JSON has the
     // data for that type, if not, move onto to next type, if it does
     // deserialize the data for it and add it to this cosmetics data
-    for (var t : Registries.COSMETIC) {
+    for (var t : Cosmetics.REGISTRY) {
       if (!json.has(t.getName())) {
         continue;
       }

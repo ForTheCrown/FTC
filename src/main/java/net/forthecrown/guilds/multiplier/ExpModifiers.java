@@ -18,9 +18,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.forthecrown.core.Messages;
 import net.forthecrown.guilds.GuildConfig;
+import net.forthecrown.user.Users;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.util.Ticks;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
@@ -115,6 +118,20 @@ public class ExpModifiers {
 
     ticked.add(multiplier);
     updateTickingState();
+
+    if (multiplier.getType() == MultiplierType.GLOBAL) {
+
+    } else {
+      var guild = Users.get(multiplier.getDonator()).getGuild();
+      Objects.requireNonNull(guild,
+          "User " + multiplier.getDonator() + " had null guild when "
+              + "activating guild multiplier"
+      );
+
+      guild.announce(
+          Component.text("Guild multiplier activated!", NamedTextColor.YELLOW)
+      );
+    }
 
     multiplier.forEachAffected(user -> {
       var active = getActive(user.getUniqueId());

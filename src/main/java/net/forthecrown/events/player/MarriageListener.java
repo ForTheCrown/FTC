@@ -8,8 +8,8 @@ import net.forthecrown.commands.click.ClickableTextNode;
 import net.forthecrown.commands.click.ClickableTexts;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.Messages;
+import net.forthecrown.core.npc.Npcs;
 import net.forthecrown.core.npc.SimpleNpc;
-import net.forthecrown.core.registry.Registries;
 import net.forthecrown.cosmetics.emotes.CosmeticEmotes;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
@@ -66,7 +66,7 @@ public class MarriageListener implements Listener, SimpleNpc {
   );
 
   public MarriageListener() {
-    Registries.NPCS.register(FATHER_TED_KEY, this);
+    Npcs.REGISTRY.register(FATHER_TED_KEY, this);
   }
 
   private static User getTarget(User user) throws CommandSyntaxException {

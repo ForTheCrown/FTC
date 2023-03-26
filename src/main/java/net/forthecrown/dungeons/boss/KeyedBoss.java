@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.registry.FtcKeyed;
-import net.forthecrown.core.registry.Keys;
+import net.forthecrown.core.Keys;
 import net.forthecrown.utils.JsonSerializable;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;

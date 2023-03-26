@@ -3,7 +3,7 @@ package net.forthecrown.dungeons.usables;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.arguments.RegistryArguments;
-import net.forthecrown.core.registry.Registries;
+import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.nbt.BinaryTags;
@@ -32,7 +32,7 @@ public class ActionSpawnBoss extends UsageAction {
 
   @Override
   public void onUse(Player player, Usable holder) {
-    Registries.DUNGEON_BOSSES.get(bossKey).ifPresent(boss -> {
+    Bosses.REGISTRY.get(bossKey).ifPresent(boss -> {
       boss.attemptSpawn(player);
     });
   }

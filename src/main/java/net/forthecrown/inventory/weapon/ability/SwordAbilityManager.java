@@ -20,7 +20,6 @@ import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnEnable;
 import net.forthecrown.core.module.OnLoad;
 import net.forthecrown.core.registry.Holder;
-import net.forthecrown.core.registry.Keys;
 import net.forthecrown.core.registry.Registries;
 import net.forthecrown.core.registry.Registry;
 import net.forthecrown.core.registry.RegistryListener;
@@ -153,7 +152,7 @@ public class SwordAbilityManager {
       for (var e: wrapper.entrySet()) {
         var key = e.getKey();
 
-        if (!Keys.isValidKey(key)) {
+        if (!Registries.isValidKey(key)) {
           LOGGER.warn("{} is an invalid registry key for ability", key);
           continue;
         }

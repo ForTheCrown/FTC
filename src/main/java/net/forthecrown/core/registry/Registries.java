@@ -1,13 +1,11 @@
 package net.forthecrown.core.registry;
 
-import net.forthecrown.core.admin.JailCell;
-import net.forthecrown.core.npc.SimpleNpc;
-import net.forthecrown.cosmetics.CosmeticType;
-import net.forthecrown.dungeons.boss.KeyedBoss;
-import net.forthecrown.inventory.ExtendedItemType;
-import net.forthecrown.useables.UsageAction;
-import net.forthecrown.useables.UsageTest;
-import net.forthecrown.useables.UsageType;
+import com.google.common.base.Preconditions;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import java.util.HashSet;
+import java.util.regex.Pattern;
+import net.forthecrown.utils.TransformingSet;
+import org.intellij.lang.annotations.Language;
 
 /**
  * Class that provides registry constants for some features of FTC and also provides factory
@@ -23,48 +21,20 @@ import net.forthecrown.useables.UsageType;
  * @see #ofEnum(Class)
  * @see Registry
  */
-public interface Registries {
-  // --- CONSTANTS ---
+public final class Registries {
+  private Registries() {}
 
   /**
-   * Jail cell registry
-   *
-   * @see net.forthecrown.core.admin.Punishments
-   * @see net.forthecrown.core.admin.PunishType
+   * The regex for determining if a {@link Registry} key is valid
    */
-  Registry<JailCell> JAILS = newRegistry();
+  @Language("RegExp")
+  public static final
+  String VALID_KEY_REGEX = "[a-zA-Z0-9+\\-/._]+";
 
   /**
-   * Registry of cosmetic types, each type holds its own registry for its cown cosmetic values
-   *
-   * @see CosmeticType
-   * @see net.forthecrown.cosmetics.Cosmetics
+   * Pattern made with {@link #VALID_KEY_REGEX}
    */
-  Registry<CosmeticType> COSMETIC = newFreezable();
-
-  /**
-   * Registry of currently existing dungeon bosses
-   *
-   * @see net.forthecrown.dungeons.boss.DungeonBoss
-   * @see net.forthecrown.dungeons.Bosses
-   */
-  Registry<KeyedBoss> DUNGEON_BOSSES = newFreezable();
-
-  /**
-   * Registry of all intractable NPCs
-   */
-  Registry<SimpleNpc> NPCS = newRegistry();
-
-  /**
-   * Types of special items
-   */
-  Registry<ExtendedItemType> ITEM_TYPES = newFreezable();
-
-  // Usables
-  Registry<UsageType<? extends UsageAction>> USAGE_ACTIONS = newFreezable();
-  Registry<UsageType<? extends UsageTest>> USAGE_CHECKS = newFreezable();
-
-  // --- STATIC FUNCTIONS ---
+  public static final Pattern VALID_KEY = Pattern.compile(VALID_KEY_REGEX);
 
   /**
    * Creates a registry which CANNOT be frozen.
@@ -76,7 +46,7 @@ public interface Registries {
    * @return The created registry
    * @see Registry#freeze()
    */
-  static <V> Registry<V> newRegistry() {
+  public static <V> Registry<V> newRegistry() {
     return new Registry<>(false);
   }
 
@@ -89,7 +59,7 @@ public interface Registries {
    * @return The created registry
    * @see Registry#freeze()
    */
-  static <V> Registry<V> newFreezable() {
+  public static <V> Registry<V> newFreezable() {
     return new Registry<>(true);
   }
 
@@ -104,7 +74,7 @@ public interface Registries {
    * @param <E>       The enum's type
    * @return The created frozen registry
    */
-  static <E extends Enum<E>> Registry<E> ofEnum(Class<E> enumClass) {
+  public static <E extends Enum<E>> Registry<E> ofEnum(Class<E> enumClass) {
     Registry<E> registry = newFreezable();
 
     for (var e : enumClass.getEnumConstants()) {
@@ -121,5 +91,63 @@ public interface Registries {
 
     registry.freeze();
     return registry;
+  }
+
+  /**
+   * Ensures a given key matches the {@link Registries#VALID_KEY_REGEX} regex pattern
+   *
+   * @param s The string to test
+   * @return The input string
+   * @throws IllegalArgumentException If the given key was not valid
+   */
+  public static @org.intellij.lang.annotations.Pattern(VALID_KEY_REGEX) String ensureValidKey(
+      String s
+  ) throws IllegalArgumentException {
+    Preconditions.checkArgument(isValidKey(s),
+        "Invalid key: '%s' did not match '%s' pattern",
+        s, VALID_KEY_REGEX
+    );
+
+    return s;
+  }
+
+  /**
+   * Tests if the entire given string matches the {@link Registries#VALID_KEY_REGEX} regex pattern
+   *
+   * @param s The string to test
+   * @return True, if the entire string matches, false otherwise
+   */
+  public static boolean isValidKey(String s) {
+    return VALID_KEY.matcher(s).matches();
+  }
+
+  /**
+   * Tests if a given character matches the {@link Registries#VALID_KEY_REGEX} regex pattern and is valid
+   *
+   * @param c The character to test
+   * @return True, if the character matches, false otherwise
+   */
+  public static boolean isValidKeyChar(char c) {
+    return isValidKey("" + c);
+  }
+
+  public static <V> TransformingSet<String, V> keyBackedSet(
+      Registry<V> registry
+  ) {
+    return new TransformingSet<>(
+        new HashSet<>(),
+        registry::orNull,
+        v -> registry.getKey(v).orElseThrow()
+    );
+  }
+
+  public static <V> TransformingSet<Integer, V> idBackedSet(
+      Registry<V> registry
+  ) {
+    return new TransformingSet<>(
+        new IntOpenHashSet(),
+        registry::orNull,
+        v -> registry.getId(v).orElseThrow()
+    );
   }
 }

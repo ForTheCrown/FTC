@@ -8,8 +8,8 @@ import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.JailCell;
+import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.core.registry.Holder;
-import net.forthecrown.core.registry.Registries;
 import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.Util;
@@ -55,7 +55,9 @@ public class CommandJails extends FtcCommand {
           writer.write(Component.text("Jails: ["));
           writer.newLine();
 
-          for (var holder : Registries.JAILS.entries()) {
+          var cells = Punishments.get().getCells();
+
+          for (var holder : cells.entries()) {
             JailCell cell = holder.getValue();
 
             writer.write("{");
@@ -82,8 +84,9 @@ public class CommandJails extends FtcCommand {
                   Region region = Util.getSelectionSafe(BukkitAdapter.adapt(user.getPlayer()));
 
                   String k = c.getArgument("key", String.class);
+                  var cells = Punishments.get().getCells();
 
-                  if (Registries.JAILS.contains(k)) {
+                  if (cells.contains(k)) {
                     throw Exceptions.jailExists(k);
                   }
 
@@ -96,7 +99,7 @@ public class CommandJails extends FtcCommand {
                   }
 
                   JailCell jailCell = new JailCell(w, pos, cell);
-                  Registries.JAILS.register(k, jailCell);
+                  cells.register(k, jailCell);
 
                   c.getSource().sendSuccess(
                       Component.text("Created jail cell: " + k)
@@ -110,7 +113,9 @@ public class CommandJails extends FtcCommand {
             .then(argument("jail", RegistryArguments.JAIL_CELL)
                 .executes(c -> {
                   Holder<JailCell> cell = c.getArgument("jail", Holder.class);
-                  Registries.JAILS.remove(cell.getKey());
+
+                  Punishments.get().getCells()
+                      .remove(cell.getKey());
 
                   c.getSource().sendSuccess(
                       Component.text("Removed jail " + cell.getKey())

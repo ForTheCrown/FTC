@@ -10,12 +10,14 @@ import java.util.concurrent.CompletableFuture;
 import lombok.Getter;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.admin.JailCell;
+import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.core.challenge.Challenge;
 import net.forthecrown.core.challenge.ChallengeManager;
+import net.forthecrown.core.npc.Npcs;
 import net.forthecrown.core.npc.SimpleNpc;
 import net.forthecrown.core.registry.Holder;
-import net.forthecrown.core.registry.Registries;
 import net.forthecrown.core.registry.Registry;
+import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.dungeons.boss.KeyedBoss;
 import net.forthecrown.economy.Economy;
 import net.forthecrown.economy.sell.SellShopMenu;
@@ -26,6 +28,8 @@ import net.forthecrown.structure.Structures;
 import net.forthecrown.useables.UsageAction;
 import net.forthecrown.useables.UsageTest;
 import net.forthecrown.useables.UsageType;
+import net.forthecrown.useables.actions.UsageActions;
+import net.forthecrown.useables.test.UsageTests;
 import net.forthecrown.user.data.TimeField;
 import net.forthecrown.user.data.UserRank;
 import net.forthecrown.user.data.UserRanks;
@@ -42,13 +46,13 @@ public class RegistryArguments<T> implements ArgumentType<Holder<T>>, VanillaMap
       = new RegistryArguments<>(Structures.get().getRegistry(), "Structure");
 
   public static final RegistryArguments<KeyedBoss> DUNGEON_BOSS
-      = new RegistryArguments<>(Registries.DUNGEON_BOSSES, "Dungeon boss");
+      = new RegistryArguments<>(Bosses.REGISTRY, "Dungeon boss");
 
   public static final RegistryArguments<JailCell> JAIL_CELL
-      = new RegistryArguments<>(Registries.JAILS, "Jail Cell");
+      = new RegistryArguments<>(Punishments.get().getCells(), "Jail Cell");
 
   public static final RegistryArguments<SimpleNpc> NPC
-      = new RegistryArguments<>(Registries.NPCS, "NPC");
+      = new RegistryArguments<>(Npcs.REGISTRY, "NPC");
 
   public static final RegistryArguments<SellShopMenu> SELLS_SHOP
       = new RegistryArguments<>(Economy.get().getSellShop().getMenus(), "Menu");
@@ -68,10 +72,10 @@ public class RegistryArguments<T> implements ArgumentType<Holder<T>>, VanillaMap
       = new RegistryArguments<>(UserRanks.REGISTRY, "Rank");
 
   public static final RegistryArguments<UsageType<UsageAction>> USAGE_ACTION = new RegistryArguments<>(
-      ((Registry) Registries.USAGE_ACTIONS), "Usage action"
+      ((Registry) UsageActions.REGISTRY), "Usage action"
   );
   public static final RegistryArguments<UsageType<UsageTest>> USAGE_CHECK = new RegistryArguments<>(
-      ((Registry) Registries.USAGE_CHECKS), "Usage check"
+      ((Registry) UsageTests.REGISTRY), "Usage check"
   );
 
   private final Registry<T> registry;

@@ -6,13 +6,15 @@ import static net.forthecrown.nbt.BinaryTags.floatTag;
 import static net.forthecrown.nbt.BinaryTags.listTag;
 import static net.forthecrown.nbt.BinaryTags.stringTag;
 
+import com.mojang.datafixers.DSL;
+import com.mojang.serialization.Dynamic;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.IntFunction;
-import net.forthecrown.core.registry.Keys;
+import net.forthecrown.core.Keys;
 import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.nbt.CompoundTag;
@@ -26,6 +28,7 @@ import net.forthecrown.utils.inventory.ItemStacks;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.minecraft.util.datafix.DataFixers;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -185,5 +188,17 @@ public final class TagUtil {
 
   public static CompoundTag writeBlockData(BlockData data) {
     return PaperNbt.saveBlockData(data);
+  }
+
+  public static <T extends BinaryTag> T applyFixer(T base,
+                                                   DSL.TypeReference ref,
+                                                   int oldVersion,
+                                                   int newVersion
+  ) {
+    BinaryTag fixed = DataFixers.getDataFixer()
+        .update(ref, new Dynamic<>(TagOps.OPS, base), oldVersion, newVersion)
+        .getValue();
+
+    return (T) fixed;
   }
 }

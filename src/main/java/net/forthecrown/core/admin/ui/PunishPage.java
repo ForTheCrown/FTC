@@ -11,14 +11,13 @@ import net.forthecrown.core.admin.JailCell;
 import net.forthecrown.core.admin.PunishEntry;
 import net.forthecrown.core.admin.PunishType;
 import net.forthecrown.core.admin.Punishments;
-import net.forthecrown.core.registry.Registries;
 import net.forthecrown.user.User;
+import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.inventory.menu.MenuBuilder;
 import net.forthecrown.utils.inventory.menu.MenuNode;
 import net.forthecrown.utils.inventory.menu.MenuNodeItem;
 import net.forthecrown.utils.inventory.menu.Slot;
-import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.text.writer.TextWriters;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -129,14 +128,15 @@ class PunishPage extends AdminUiPage {
 
     @Override
     protected List<JailCell> getList(PunishEntry entry) {
-      return Lists.newArrayList(Registries.JAILS);
+      return Lists.newArrayList(Punishments.get().getCells());
     }
 
     @Override
     protected ItemStack getItem(JailCell entry, PunishEntry punishEntry) {
       var builder = ItemStacks.builder(Material.IRON_BARS)
           .setName(
-              Registries.JAILS.getKey(entry)
+              Punishments.get().getCells()
+                  .getKey(entry)
                   .orElse("UNKNOWN")
           );
 
@@ -151,7 +151,8 @@ class PunishPage extends AdminUiPage {
     @Override
     protected void onClick(JailCell entry, int index, User user, Context context) {
       context.get(PUNISHMENT).setExtra(
-          Registries.JAILS.getKey(entry)
+          Punishments.get().getCells()
+              .getKey(entry)
               .orElse("UNKNOWN")
       );
 

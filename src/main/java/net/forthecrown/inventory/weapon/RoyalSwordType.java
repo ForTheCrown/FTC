@@ -4,12 +4,12 @@ import static net.forthecrown.utils.text.Text.nonItalic;
 
 import java.util.UUID;
 import net.forthecrown.core.config.ConfigManager;
-import net.forthecrown.core.registry.Keys;
 import net.forthecrown.dungeons.enchantments.FtcEnchants;
 import net.forthecrown.inventory.ExtendedItemType;
 import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.utils.inventory.BaseItemBuilder;
 import net.forthecrown.utils.inventory.ItemStacks;
+import net.forthecrown.core.registry.Registries;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -47,7 +47,7 @@ public class RoyalSwordType implements ExtendedItemType<RoyalSword> {
     ConfigManager.get().registerConfig(SwordConfig.class);
   }
 
-  @Pattern(Keys.VALID_KEY_REGEX)
+  @Pattern(Registries.VALID_KEY_REGEX)
   @Override
   public String getKey() {
     return "royal_weapon";

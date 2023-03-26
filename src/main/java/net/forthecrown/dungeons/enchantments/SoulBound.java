@@ -1,7 +1,7 @@
 package net.forthecrown.dungeons.enchantments;
 
 import java.util.Set;
-import net.forthecrown.core.registry.Keys;
+import net.forthecrown.core.Keys;
 import net.minecraft.world.item.enchantment.Enchantments;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;

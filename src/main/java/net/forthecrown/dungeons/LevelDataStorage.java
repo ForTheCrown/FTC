@@ -15,7 +15,7 @@ import java.util.Date;
 import java.util.function.Function;
 import lombok.Getter;
 import net.forthecrown.core.logging.Loggers;
-import net.forthecrown.core.registry.Keys;
+import net.forthecrown.core.registry.Registries;
 import net.forthecrown.core.registry.Registry;
 import net.forthecrown.dungeons.level.DungeonLevel;
 import net.forthecrown.dungeons.level.PieceType;
@@ -135,7 +135,7 @@ public class LevelDataStorage {
       for (var e: wrapper.entrySet()) {
         var key = e.getKey();
 
-        if (!Keys.isValidKey(key)) {
+        if (!Registries.isValidKey(key)) {
           LOGGER.error("Cannot read piece type! Invalid key '{}'", key);
           continue;
         }

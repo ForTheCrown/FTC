@@ -5,7 +5,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.Pair;
 import java.util.EnumMap;
 import java.util.UUID;
-import net.forthecrown.core.registry.Registries;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.nbt.BinaryTags;
@@ -103,7 +102,7 @@ public class ActionUserMap extends UsageAction {
         });
 
     static void registerAll() {
-      var registry = Registries.USAGE_ACTIONS;
+      var registry = UsageActions.REGISTRY;
 
       for (var t : values()) {
         for (var e : t.typesByAction.entrySet()) {

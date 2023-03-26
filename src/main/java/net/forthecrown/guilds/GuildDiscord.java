@@ -276,16 +276,17 @@ public class GuildDiscord {
         .reason("FTC: Guild webhook")
         .submit()
         .whenComplete((webhook, throwable) -> {
-          if (throwable == null) {
-            return;
+          if (throwable != null) {
+            LOGGER.error("Error creating webhook for {}", guild, throwable);
           }
 
-          LOGGER.error("Error creating webhook for {}", guild, throwable);
+          webhookId = webhook.getIdLong();
+          LOGGER.debug("Created webhook for guild {}, id={}", guild, webhookId);
         });
   }
 
   public Optional<CompletableFuture<Webhook>> getWebhook() {
-    if (webhookId == NULL_ID || getChannel().isEmpty()) {
+    if (webhookId == NULL_ID) {
       return Optional.empty();
     }
 

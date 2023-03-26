@@ -10,8 +10,8 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.Getter;
 import net.forthecrown.core.logging.Loggers;
-import net.forthecrown.core.registry.Keys;
 import net.forthecrown.utils.io.JsonUtils;
+import net.forthecrown.core.registry.Registries;
 import org.apache.logging.log4j.Logger;
 
 public class StructurePool {
@@ -46,7 +46,7 @@ public class StructurePool {
         JsonUtils.stream(array)
             .map(JsonElement::getAsString)
             .filter(s -> {
-              if (!Keys.isValidKey(s)) {
+              if (!Registries.isValidKey(s)) {
                 LOGGER.warn("Invalid key for pool element: '{}'", s);
                 return false;
               }

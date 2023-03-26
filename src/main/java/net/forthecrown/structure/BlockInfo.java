@@ -1,6 +1,5 @@
 package net.forthecrown.structure;
 
-import com.mojang.serialization.Dynamic;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.nbt.BinaryTag;
@@ -8,9 +7,8 @@ import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.nbt.paper.PaperNbt;
 import net.forthecrown.nbt.paper.TagTranslators;
 import net.forthecrown.utils.VanillaAccess;
-import net.forthecrown.utils.io.TagOps;
+import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.math.Vectors;
-import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.util.datafix.fixes.References;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -76,15 +74,19 @@ public class BlockInfo {
       return this;
     }
 
-    return withTag(
-        (CompoundTag) DataFixers.getDataFixer()
-            .update(
-                References.BLOCK_ENTITY,
-                new Dynamic<>(TagOps.OPS, tag),
-                oldVersion, newVersion
-            )
-            .getValue()
+    var tag = this.tag.copy();
+
+    // 'id' tag required by datafixer, otherwise errors
+    tag.putString("id", data.getMaterial().getKey().asString());
+
+    var newTag = TagUtil.applyFixer(
+        tag,
+        References.BLOCK_ENTITY,
+        oldVersion, newVersion
     );
+
+    newTag.remove("id");
+    return withTag(newTag);
   }
 
   void place(StructurePlaceConfig config, Vector3i position) {

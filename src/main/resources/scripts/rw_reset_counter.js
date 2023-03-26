@@ -1,6 +1,6 @@
 import "@ftc.utils.stand.DynamicArmorStand";
 import "@ftc.core.config.ResourceWorldConfig";
-import "@ftc.core.registry.Keys";
+import "@ftc.core.Keys";
 
 import "@jlang.System";
 import "@jutil.concurrent.TimeUnit";

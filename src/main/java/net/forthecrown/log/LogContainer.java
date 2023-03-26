@@ -11,8 +11,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.registry.Holder;
-import net.forthecrown.core.registry.Keys;
 import net.forthecrown.utils.ArrayIterator;
+import net.forthecrown.core.registry.Registries;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -108,7 +108,7 @@ public class LogContainer {
     Map<String, Dynamic<S>> map = DataLogs.asMap(dynamic);
 
     for (var e : map.entrySet()) {
-      if (!Keys.isValidKey(e.getKey())) {
+      if (!Registries.isValidKey(e.getKey())) {
         LOGGER.warn("Invalid key found in log container: '{}'",
             e.getKey()
         );

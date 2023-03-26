@@ -46,6 +46,7 @@ public final class Holder<V> {
    * The registry this holder is bound to
    */
   @ToString.Exclude
+  @Exclude
   @Setter(AccessLevel.PACKAGE)
   Registry<V> registry;
 

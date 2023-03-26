@@ -11,8 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import lombok.experimental.UtilityClass;
-import net.forthecrown.core.registry.Keys;
 import net.forthecrown.utils.Util;
+import net.forthecrown.core.registry.Registries;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -22,7 +22,7 @@ public @UtilityClass class FtcCodecs {
   /* ----------------------------------------------------------- */
 
   public final Codec<String> KEY_CODEC = Codec.STRING.comapFlatMap(s -> {
-    if (!Keys.isValidKey(s)) {
+    if (!Registries.isValidKey(s)) {
       return Results.error("Invalid key '%s'", s);
     }
 

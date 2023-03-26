@@ -7,7 +7,7 @@ import "@bukkit.block.Chest";
 import "com.destroystokyo.paper.loottable.LootableInventory";
 import "@ftc.utils.math.WorldBounds3i";
 import "@ftc.core.Worlds";
-import "@ftc.core.registry.Keys";
+import "@ftc.core.Keys";
 import "@worldguard.WorldGuard";
 import "@worldedit.bukkit.BukkitAdapter";
 import "@worldedit.math.BlockVector3";

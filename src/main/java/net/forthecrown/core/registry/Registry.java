@@ -1,7 +1,5 @@
 package net.forthecrown.core.registry;
 
-import static net.forthecrown.core.registry.Keys.VALID_KEY_REGEX;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import com.google.gson.JsonElement;
@@ -44,7 +42,7 @@ import org.jetbrains.annotations.Nullable;
  * time.
  * <p>
  * Registry's provide a way of mapping a string key with a certain format, (See
- * {@link Keys#VALID_KEY_REGEX}), to a value and then assigning that value an integer id. That
+ * {@link Registries#VALID_KEY_REGEX}), to a value and then assigning that value an integer id. That
  * integer ID can be used then to index the value outside this registry, like in the case of
  * {@link UserProperty}, where the id given by the registry the property is registered into, is used
  * as the index of that property in the property value array in {@link PropertyMap}.
@@ -76,7 +74,7 @@ import org.jetbrains.annotations.Nullable;
  * @see #register(Holder)
  * @see #register(String, Object, int)
  * @see #register(String, Object)
- * @see Keys#VALID_KEY_REGEX
+ * @see Registries#VALID_KEY_REGEX
  * @see Registries
  * @see Holder
  */
@@ -186,7 +184,7 @@ public class Registry<V> implements Iterable<V> {
    * @throws NullPointerException     If the given value or key were null
    * @see #register(String, Object, int)
    */
-  public @NotNull Holder<V> register(@Pattern(VALID_KEY_REGEX) String key,
+  public @NotNull Holder<V> register(@Pattern(Registries.VALID_KEY_REGEX) String key,
                                      @NotNull V value
   ) throws IllegalArgumentException,
       NullPointerException {
@@ -220,7 +218,7 @@ public class Registry<V> implements Iterable<V> {
    * @throws NullPointerException     If the given value or key were null
    * @see #register(Holder)
    */
-  public @NotNull Holder<V> register(@Pattern(VALID_KEY_REGEX) String key,
+  public @NotNull Holder<V> register(@Pattern(Registries.VALID_KEY_REGEX) String key,
                                      @NotNull V value,
                                      @NonNegative int id
   ) throws IllegalArgumentException,
@@ -259,7 +257,7 @@ public class Registry<V> implements Iterable<V> {
     Objects.requireNonNull(holder.getKey(), "Key was null");
 
     // Ensure there's a valid key being used
-    Keys.ensureValid(holder.getKey());
+    Registries.ensureValidKey(holder.getKey());
 
     // Test for naming/ID conflicts
     if (contains(holder.getKey())) {
@@ -343,7 +341,7 @@ public class Registry<V> implements Iterable<V> {
    * @throws IllegalArgumentException If the registry is frozen
    * @see #removeHolder(Optional)
    */
-  public boolean remove(@Pattern(VALID_KEY_REGEX) String key)
+  public boolean remove(@Pattern(Registries.VALID_KEY_REGEX) String key)
       throws IllegalArgumentException {
     return removeHolder(getHolder(key));
   }
@@ -521,8 +519,7 @@ public class Registry<V> implements Iterable<V> {
     this.listener = listener;
 
     if (!isEmpty()) {
-      byKey.values()
-          .forEach(listener::onRegister);
+      byKey.values().forEach(listener::onRegister);
     }
   }
 
@@ -538,12 +535,12 @@ public class Registry<V> implements Iterable<V> {
    * @param key The key to get the entry of
    * @return An optional that's empty if this registry does not contain the given key, otherwise it
    * contains the entry associated with the given key
-   * @throws IllegalArgumentException If the key failed the {@link Keys#ensureValid(String)} test
+   * @throws IllegalArgumentException If the key failed the {@link Registries#ensureValidKey(String)} test
    */
-  public @NotNull Optional<Holder<V>> getHolder(@Pattern(VALID_KEY_REGEX) String key)
+  public @NotNull Optional<Holder<V>> getHolder(@Pattern(Registries.VALID_KEY_REGEX) String key)
       throws IllegalArgumentException {
     return Optional.ofNullable(byKey.get(
-        Keys.ensureValid(removeNamespace(key)).intern()
+        Registries.ensureValidKey(removeNamespace(key)).intern()
     ));
   }
 
@@ -582,9 +579,9 @@ public class Registry<V> implements Iterable<V> {
    * @param key The key to get the value of
    * @return An optional that has the key's value, or an empty optional, if the key this registry
    * doesn't contain the given key
-   * @throws IllegalArgumentException If the key failed the {@link Keys#ensureValid(String)} test
+   * @throws IllegalArgumentException If the key failed the {@link Registries#ensureValidKey(String)} test
    */
-  public @NotNull Optional<V> get(@Pattern(VALID_KEY_REGEX) String key)
+  public @NotNull Optional<V> get(@Pattern(Registries.VALID_KEY_REGEX) String key)
       throws IllegalArgumentException {
     return getHolder(key).map(Holder::getValue);
   }
@@ -606,7 +603,7 @@ public class Registry<V> implements Iterable<V> {
    * @param key The key to get the value of
    * @return The value of the key, or null, if not present
    */
-  public @Nullable V orNull(@Pattern(VALID_KEY_REGEX) String key) {
+  public @Nullable V orNull(@Pattern(Registries.VALID_KEY_REGEX) String key) {
     return get(key).orElse(null);
   }
 
@@ -626,9 +623,9 @@ public class Registry<V> implements Iterable<V> {
    * @param key The key to get the value of
    * @return The found value
    * @throws IllegalArgumentException If the key did not have an associated value, or if key failed
-   *                                  the {@link Keys#ensureValid(String)} test
+   *                                  the {@link Registries#ensureValidKey(String)} test
    */
-  public @NotNull V orThrow(@Pattern(VALID_KEY_REGEX) String key)
+  public @NotNull V orThrow(@Pattern(Registries.VALID_KEY_REGEX) String key)
       throws IllegalArgumentException {
     return get(key).orElseThrow(() -> unknownKey(key));
   }

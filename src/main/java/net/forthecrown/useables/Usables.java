@@ -5,7 +5,7 @@ import lombok.Getter;
 import net.forthecrown.core.module.OnEnable;
 import net.forthecrown.core.module.OnLoad;
 import net.forthecrown.core.module.OnSave;
-import net.forthecrown.core.registry.Keys;
+import net.forthecrown.core.Keys;
 import net.forthecrown.useables.actions.UsageActions;
 import net.forthecrown.useables.command.CmdUsables;
 import net.forthecrown.useables.command.Kit;

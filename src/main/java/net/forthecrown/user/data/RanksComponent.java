@@ -1,26 +1,33 @@
 package net.forthecrown.user.data;
 
+import static net.forthecrown.user.data.UserRanks.DEFAULT;
+import static net.forthecrown.user.data.UserRanks.DEFAULT_NAME;
+import static net.forthecrown.user.data.UserRanks.DEFAULT_REF;
+import static net.forthecrown.user.data.UserRanks.REGISTRY;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
 import lombok.Getter;
 import net.forthecrown.core.logging.Loggers;
+import net.forthecrown.core.registry.Ref;
+import net.forthecrown.core.registry.Ref.KeyRef;
+import net.forthecrown.core.registry.Registries;
 import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.user.ComponentType;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserComponent;
 import net.forthecrown.user.UserOfflineException;
+import net.forthecrown.utils.TransformingSet;
 import net.forthecrown.utils.Util;
+import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.Logger;
-import org.bukkit.Bukkit;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -39,11 +46,11 @@ public class RanksComponent extends UserComponent {
       KEY_TIER = "tier";
 
   /* ----------------------------- INSTANCE FIELDS ------------------------------ */
+
   /**
    * The user's currently active title
    */
-  @Getter
-  private UserRank title = UserRanks.DEFAULT;
+  private KeyRef<UserRank> title = DEFAULT_REF;
 
   /**
    * The user's current tier
@@ -54,7 +61,8 @@ public class RanksComponent extends UserComponent {
   /**
    * All non-default titles available to this user
    */
-  private final Set<UserRank> available = new ObjectOpenHashSet<>();
+  private final TransformingSet<String, UserRank> available
+      = Registries.keyBackedSet(REGISTRY);
 
   /* ----------------------------- CONSTRUCTORS ------------------------------ */
 
@@ -70,7 +78,11 @@ public class RanksComponent extends UserComponent {
    * @return The user's non-default titles
    */
   public Set<UserRank> getAvailable() {
-    return new ObjectOpenHashSet<>(available);
+    return available;
+  }
+
+  public UserRank getTitle() {
+    return title.orElse(DEFAULT);
   }
 
   /* ----------------------------- TITLES ------------------------------ */
@@ -188,7 +200,8 @@ public class RanksComponent extends UserComponent {
    * @param title The title to set
    */
   public void setTitle(UserRank title) {
-    this.title = title;
+    var titleKey = REGISTRY.getKey(title).orElseThrow();
+    this.title = Ref.key(REGISTRY, titleKey);
 
     if (!getUser().isOnline()) {
       return;
@@ -210,6 +223,8 @@ public class RanksComponent extends UserComponent {
    */
   public void demote(RankTier to) {
     setTier(to);
+
+    var title = getTitle();
 
     if (title.getTier().ordinal() > to.ordinal()) {
       setTitle(UserRanks.DEFAULT);
@@ -288,16 +303,14 @@ public class RanksComponent extends UserComponent {
 
     if (recalculatePermissions) {
       if (getTier() != RankTier.NONE) {
-        Bukkit.dispatchCommand(
-            Bukkit.getConsoleSender(),
-            "lp user " + user.getName() + " parent remove " + getTier().getLuckPermsGroup()
+        Util.consoleCommand("lp user %s parent remove %s",
+            user.getName(), getTier().getLuckPermsGroup()
         );
       }
 
       if (tier != RankTier.NONE) {
-        Bukkit.dispatchCommand(
-            Bukkit.getConsoleSender(),
-            "lp user " + user.getName() + " parent add " + tier.getLuckPermsGroup()
+        Util.consoleCommand("lp user %s parent add %s",
+            user.getName(), tier.getLuckPermsGroup()
         );
       }
     }
@@ -320,7 +333,7 @@ public class RanksComponent extends UserComponent {
 
     user.getDiscordMember().ifPresent(member -> {
       OffsetDateTime boostStart = member.getTimeBoosted();
-      Optional<UserRank> boostTitle = UserRanks.REGISTRY.get("booster");
+      Optional<UserRank> boostTitle = REGISTRY.get("booster");
 
       if (boostTitle.isEmpty()) {
         return;
@@ -342,11 +355,11 @@ public class RanksComponent extends UserComponent {
           continue;
         }
 
-        Loggers.getLogger().info("Adding tier {} to {}", tier, user.getName());
+        LOGGER.info("Adding tier {} to {}", tier, user.getName());
         setTier(tier, false);
         return;
       } else if (hasTier(tier)) {
-        Loggers.getLogger().info("Adding group {} to {}, due to title/group sync",
+        LOGGER.info("Adding group {} to {}, due to title/group sync",
             tier.getLuckPermsGroup(), user.getName()
         );
 
@@ -366,7 +379,7 @@ public class RanksComponent extends UserComponent {
    */
   public void clear() {
     available.clear();
-    title = UserRanks.DEFAULT;
+    title = DEFAULT_REF;
     tier = RankTier.NONE;
   }
 
@@ -385,15 +398,15 @@ public class RanksComponent extends UserComponent {
     tier = json.getEnum(KEY_TIER, RankTier.class, RankTier.NONE);
 
     if (json.has(KEY_TITLE)) {
-      deserializeRank(json.get(KEY_TITLE), rank -> this.title = rank);
+      this.title = Ref.key(REGISTRY, json.getString(KEY_TITLE));
     }
 
     if (json.has(KEY_AVAILABLE)) {
       JsonArray arr = json.getArray(KEY_AVAILABLE);
 
-      for (var e: arr) {
-        deserializeRank(e, available::add);
-      }
+      JsonUtils.stream(arr)
+          .map(JsonElement::getAsString)
+          .forEach(s -> available.getBackingSet().add(s));
     }
   }
 
@@ -405,16 +418,16 @@ public class RanksComponent extends UserComponent {
       json.addEnum(KEY_TIER, tier);
     }
 
-    if (title != UserRanks.DEFAULT) {
-      serializeRank(title, primitive -> json.add(KEY_TITLE, primitive));
+    if (!title.getKey().equalsIgnoreCase(DEFAULT_NAME)) {
+      json.add(KEY_TITLE, title.getKey());
     }
 
     if (!available.isEmpty()) {
-      JsonArray arr = new JsonArray();
-
-      for (var t: available) {
-        serializeRank(t, arr::add);
-      }
+      JsonArray arr = JsonUtils.ofStream(
+          available.getBackingSet()
+              .stream()
+              .map(JsonPrimitive::new)
+      );
 
       if (!arr.isEmpty()) {
         json.add(KEY_AVAILABLE, arr);
@@ -422,23 +435,5 @@ public class RanksComponent extends UserComponent {
     }
 
     return json.nullIfEmpty();
-  }
-
-  private void deserializeRank(JsonElement element,
-                               Consumer<UserRank> consumer
-  ) {
-    UserRanks.REGISTRY.readJson(element)
-        .ifPresentOrElse(consumer, () -> {
-          LOGGER.warn("Unknown user rank: {}", element);
-        });
-  }
-
-  private void serializeRank(UserRank rank,
-                             Consumer<JsonPrimitive> keyConsumer
-  ) {
-    UserRanks.REGISTRY.writeJson(rank)
-        .ifPresentOrElse(keyConsumer, () -> {
-          LOGGER.warn("Unregistered rank found {}, cannot serialize", rank);
-        });
   }
 }

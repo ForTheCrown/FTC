@@ -4,11 +4,11 @@ import static net.forthecrown.utils.text.Text.nonItalic;
 import static net.kyori.adventure.text.Component.text;
 
 import java.util.UUID;
-import net.forthecrown.core.registry.Keys;
 import net.forthecrown.dungeons.enchantments.FtcEnchants;
 import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.utils.inventory.BaseItemBuilder;
 import net.forthecrown.utils.inventory.ItemStacks;
+import net.forthecrown.core.registry.Registries;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -31,7 +31,7 @@ public class CrownType implements ExtendedItemType<RoyalCrown> {
       .append(text("-"))
       .build();
 
-  @Pattern(Keys.VALID_KEY_REGEX)
+  @Pattern(Registries.VALID_KEY_REGEX)
   @Override
   public String getKey() {
     return "royal_crown";

@@ -7,12 +7,18 @@ import static net.forthecrown.core.config.EndConfig.nextSize;
 import static net.forthecrown.core.config.EndConfig.open;
 import static net.forthecrown.core.config.EndConfig.openMessage;
 import static net.forthecrown.core.logging.Loggers.STAFF_LOG;
+import static net.forthecrown.utils.io.FtcJar.ALLOW_OVERWRITE;
+import static net.forthecrown.utils.io.FtcJar.OVERWRITE_IF_NEWER;
 
+import com.google.gson.JsonArray;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import net.forthecrown.core.config.EndConfig;
 import net.forthecrown.core.config.JoinInfo;
 import net.forthecrown.core.logging.Loggers;
@@ -20,6 +26,11 @@ import net.forthecrown.core.module.OnDayChange;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.VanillaAccess;
+import net.forthecrown.utils.io.FtcJar;
+import net.forthecrown.utils.io.JsonUtils;
+import net.forthecrown.utils.io.JsonWrapper;
+import net.forthecrown.utils.io.PathUtil;
+import net.forthecrown.utils.io.SerializationHelper;
 import net.forthecrown.utils.world.WorldLoader;
 import net.forthecrown.utils.world.WorldReCreator;
 import net.minecraft.core.BlockPos;
@@ -46,7 +57,9 @@ public class EndOpener {
   private static final Logger LOGGER = Loggers.getLogger();
   private static final EndOpener INSTANCE = new EndOpener();
 
-  private EndOpener() {}
+  private EndOpener() {
+    PortalRoad.saveDefaults();
+  }
 
   public static EndOpener get() {
     return INSTANCE;
@@ -161,7 +174,10 @@ public class EndOpener {
       border.setSize(1);
     }
 
-    LOGGER.info(STAFF_LOG, "End is now {}", open ? "open" : "closed");
+    String openClosed = open ? "open" : "closed";
+
+    LOGGER.info(STAFF_LOG, "End is now {}", openClosed);
+    DiscordBotAnnouncer.announce("The End is now %s", openClosed);
   }
 
   // Lever on = closed, lever off = open. AKA, flip the input
@@ -211,57 +227,90 @@ public class EndOpener {
 
   static class PortalRoad {
 
-    static final Material[] ROAD_MATERIALS = {
-        Material.COBBLESTONE,
-        Material.GRAVEL,
-        Material.STONE_BRICKS,
-        Material.CRACKED_STONE_BRICKS
-    };
+    static void saveDefaults() {
+      Path filePath = PathUtil.pluginPath("end_opener.json");
 
-    // Hardcoded road entry values, cuz I can't be arsed
-    // doing this in other, more dynamic, ways
-    public static final PortalRoadEntry[] ROAD_ENTRIES = {
-        //castle courtyard
-        new PortalRoadEntry(240, 77, 198),
-        new PortalRoadEntry(239, 77, 198),
-
-        new PortalRoadEntry(234, 77, 200),
-        new PortalRoadEntry(233, 77, 200),
-        new PortalRoadEntry(232, 77, 200),
-
-        new PortalRoadEntry(227, 77, 200),
-        new PortalRoadEntry(226, 77, 200),
-
-        new PortalRoadEntry(221, 77, 200),
-
-        //near pole
-        new PortalRoadEntry(207, 69, 200, Material.POLISHED_ANDESITE),
-        new PortalRoadEntry(206, 69, 200, Material.POLISHED_ANDESITE),
-
-        //stairs
-        new PortalRoadEntry(217, 75, 200, Material.POLISHED_ANDESITE),
-        new PortalRoadEntry(212, 71, 200, Material.POLISHED_ANDESITE),
-        new PortalRoadEntry(221, 77, 200, Material.POLISHED_ANDESITE)
-    };
+      try {
+        FtcJar.saveResources(
+            "end_opener.json",
+            filePath,
+            ALLOW_OVERWRITE | OVERWRITE_IF_NEWER
+        );
+      } catch (IOException exc) {
+        LOGGER.error("Error saving end_opener.json to disk", exc);
+        return;
+      }
+    }
 
     public static void set(World world, boolean glass) {
-      for (PortalRoadEntry e : ROAD_ENTRIES) {
+      saveDefaults();
+
+      Path filePath = PathUtil.pluginPath("end_opener.json");
+      JsonWrapper json = SerializationHelper.readJson(filePath)
+          .map(JsonWrapper::wrap)
+          .resultOrPartial(LOGGER::error)
+          .orElseThrow();
+
+      List<PortalRoadEntry> entries
+          = readEntries(json.getArray("path_positions"));
+
+      List<Material> pathMaterials
+          = readMaterials(json.getArray("road_materials"));
+
+      if (entries.isEmpty()) {
+        LOGGER.warn("No portal road entries found! Cannot replace path blocks");
+        return;
+      }
+
+      if (pathMaterials.isEmpty()) {
+        LOGGER.warn("No road_materials found, cannot replace");
+        return;
+      }
+
+      for (PortalRoadEntry e : entries) {
         Block b = world.getBlockAt(e.x, e.y, e.z);
 
-        b.setType(glass ? Material.PURPLE_STAINED_GLASS : e.material());
+        b.setType(
+            glass
+                ? Material.PURPLE_STAINED_GLASS
+                : e.material(pathMaterials)
+        );
       }
+    }
+
+    static List<PortalRoadEntry> readEntries(JsonArray array) {
+      return JsonUtils.stream(array)
+          .map(e -> {
+            JsonWrapper json = JsonWrapper.wrap(e.getAsJsonObject());
+            int x = json.getInt("x");
+            int y = json.getInt("y");
+            int z = json.getInt("z");
+
+            String matName = json.getString("material");
+            Material material = matName == null
+                ? null
+                : Material.matchMaterial(matName);
+
+            return new PortalRoadEntry(x, y, z, material);
+          })
+
+          .collect(Collectors.toList());
+    }
+
+    static List<Material> readMaterials(JsonArray array) {
+      return JsonUtils.stream(array)
+          .map(element -> Material.getMaterial(element.getAsString()))
+          .collect(Collectors.toList());
     }
 
     record PortalRoadEntry(int x, int y, int z, Material material) {
 
-      PortalRoadEntry(int x, int y, int z) {
-        this(x, y, z, null);
-      }
+      public Material material(List<Material> randoms) {
+        if (material != null) {
+          return material;
+        }
 
-      @Override
-      public Material material() {
-        return material == null ? ROAD_MATERIALS[Util.RANDOM.nextInt(ROAD_MATERIALS.length)]
-            : material;
+        return randoms.get(Util.RANDOM.nextInt(randoms.size()));
       }
     }
   }

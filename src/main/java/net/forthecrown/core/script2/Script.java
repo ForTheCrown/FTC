@@ -4,7 +4,6 @@ import com.google.gson.JsonElement;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.Reader;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
@@ -228,8 +227,7 @@ public class Script implements Closeable {
     }
 
     try {
-      Reader reader = source.openReader();
-      reader = JsPreProcessor.preprocess(reader);
+      String input = JsPreProcessor.preprocess(source.openReader());
 
       NashornScriptEngine engine
           = ScriptManager.getInstance().createEngine();
@@ -251,7 +249,7 @@ public class Script implements Closeable {
       this.mirror = (ScriptObjectMirror)
           engine.getBindings(ScriptContext.ENGINE_SCOPE);
 
-      this.compiledScript = engine.compile(reader);
+      this.compiledScript = engine.compile(input);
 
       ScriptsBuiltIn.populate(this);
     } catch (IOException | ScriptException exc) {
