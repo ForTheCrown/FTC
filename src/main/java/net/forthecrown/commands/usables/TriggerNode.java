@@ -72,6 +72,11 @@ class TriggerNode extends InteractableNode<UsableTrigger> {
   }
 
   @Override
+  public String getUsageName() {
+    return "trigger";
+  }
+
+  @Override
   protected void createNewUsableArguments(LiteralArgumentBuilder<CommandSource> command) {
     command
         .then(argument("name", Arguments.FTC_KEY)

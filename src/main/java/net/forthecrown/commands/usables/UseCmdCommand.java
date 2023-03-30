@@ -64,9 +64,14 @@ public abstract class UseCmdCommand<T extends CommandUsable> extends FtcCommand 
     factory.usage("")
         .addInfo("Lists all %ss", getName());
 
-    factory.usage("create <name>")
+    var create = factory.usage("create <name>")
         .setPermission(adminPermission)
         .addInfo("Creates a new %s", getName());
+
+    if (this instanceof WarpCommand) {
+      create.addInfo("By default, the %s will require players to", getName())
+          .addInfo("have the permission 'ftc.warps.<%s name>", getName());
+    }
 
     var prefixed = factory.withPrefix("<" + getName() + ">");
     prefixed.usage("")

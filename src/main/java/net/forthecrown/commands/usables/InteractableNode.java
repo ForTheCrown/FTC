@@ -28,6 +28,10 @@ abstract class InteractableNode<H extends Usable> extends FtcCommand {
     setPermission(Permissions.USABLES);
   }
 
+  public String getUsageName() {
+    return argumentName;
+  }
+
   @Override
   public void populateUsages(UsageFactory factory) {
     addCreateUsage(factory.withPrefix("-create"));
@@ -44,15 +48,15 @@ abstract class InteractableNode<H extends Usable> extends FtcCommand {
 
   protected void addUsages(UsageFactory factory) {
     factory.usage("remove")
-        .addInfo("Removes the %s", argumentName);
+        .addInfo("Removes the %s", getUsageName());
 
     factory.usage("info")
-        .addInfo("Displays admin information about the %s", argumentName);
+        .addInfo("Displays admin information about the %s", getUsageName());
 
-    DataCommands.addUsages(factory.withPrefix("data"), argumentName, null);
+    DataCommands.addUsages(factory.withPrefix("data"), getUsageName(), null);
 
-    UsableCommands.ACTION_NODE.populateUsages(factory, argumentName);
-    UsableCommands.CHECK_NODE.populateUsages(factory, argumentName);
+    UsableCommands.ACTION_NODE.populateUsages(factory, getUsageName());
+    UsableCommands.CHECK_NODE.populateUsages(factory, getUsageName());
   }
 
   @Override
