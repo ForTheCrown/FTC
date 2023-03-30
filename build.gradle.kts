@@ -12,9 +12,10 @@ val baseJarName = "ForTheCrown"
 ftc.jarBaseName = baseJarName
 
 // Dependency values, these are also used in processResources
-val grenadier = "net.forthecrown:grenadier:2.0.4"
-val nashorn = "org.openjdk.nashorn:nashorn-core:15.4"
-val mathlib = "org.spongepowered:math:2.1.0-SNAPSHOT"
+val grenadier = "net.forthecrown:grenadier:2.0.6"
+val nashorn   = "org.openjdk.nashorn:nashorn-core:15.4"
+val mathlib   = "org.spongepowered:math:2.1.0-SNAPSHOT"
+val toml      = "org.tomlj:tomlj:1.1.0"
 
 group = "net.forthecrown"
 version = "${minecraftVersion}-${ftc.buildId}-${if (ftc.isDebugBuild) "SNAPSHOT" else "RELEASE"}"
@@ -48,7 +49,7 @@ repositories {
 }
 
 dependencies {
-  testImplementation("org.junit.jupiter:junit-jupiter:5.9.0")
+  testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
 
   // Lombok
   compileOnly("org.projectlombok:lombok:1.18.26")
@@ -59,7 +60,7 @@ dependencies {
   testImplementation(grenadier)
 
   // Misc libraries
-  compileOnly("org.tomlj:tomlj:1.1.0")
+  compileOnly(toml)
   compileOnly(nashorn)
   compileOnly("org.apache.commons:commons-text:1.10.0")
   compileOnly(mathlib)
@@ -135,7 +136,8 @@ tasks {
         "buildID"    to ftc.buildId,
         "debugbuild" to ftc.isDebugBuild,
         "buildDate"  to Date().toString(),
-        "mathlib"    to mathlib
+        "mathlib"    to mathlib,
+        "toml"       to toml
       )
     }
 

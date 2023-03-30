@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.LoggerConfig;
 
 /** Utility class for loggers */
 public final class Loggers {
@@ -38,6 +39,9 @@ public final class Loggers {
 
     root.addAppender(new DiscordAppender(), getAppenderLevel(), null);
     root.addAppender(new StaffLogAppender(), Level.INFO, null);
+
+    LoggerConfig discordSRV = new LoggerConfig("DiscordSRV", Level.OFF, false);
+    config.addLogger("DiscordSRV", discordSRV);
 
     ctx.updateLoggers();
   }

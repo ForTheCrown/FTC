@@ -8,6 +8,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.context.StringRange;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
@@ -16,9 +17,11 @@ import net.forthecrown.commands.manager.Commands;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand.UsageFactory;
 import net.forthecrown.core.registry.Holder;
+import net.forthecrown.grenadier.CommandContexts;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Completions;
 import net.forthecrown.grenadier.Nodes;
+import net.forthecrown.grenadier.Readers;
 import net.forthecrown.useables.UsageInstance;
 import net.forthecrown.useables.UsageType;
 import net.forthecrown.useables.UsageTypeHolder;
@@ -192,7 +195,7 @@ public class UsableArgumentNode<T extends UsageInstance, H extends UsageTypeHold
       UsableSaveCallback<? extends H> saveCallback
   ) {
     return argument("add_type", accessor.getArgumentType())
-        .executes(c -> add(c, provider, saveCallback, Commands.EMPTY_READER, first))
+        .executes(c -> add(c, provider, saveCallback, Readers.EMPTY, first))
 
         .then(argument("type_input", StringArgumentType.greedyString())
             .suggests((context, builder) -> {
@@ -201,9 +204,17 @@ public class UsableArgumentNode<T extends UsageInstance, H extends UsageTypeHold
             })
 
             .executes(c -> {
-              var input = c.getArgument("type_input", String.class);
+              StringRange inputRange
+                  = CommandContexts.getNodeRange(c, "type_input");
 
-              return add(c, provider, saveCallback, new StringReader(input), first);
+              assert inputRange != null;
+
+              StringReader reader = Readers.create(
+                  c.getInput(),
+                  inputRange.getStart()
+              );
+
+              return add(c, provider, saveCallback, reader, first);
             })
         );
   }
@@ -219,8 +230,7 @@ public class UsableArgumentNode<T extends UsageInstance, H extends UsageTypeHold
                   UsableSaveCallback<? extends H> saveCallback,
                   StringReader reader,
                   boolean first
-  )
-      throws CommandSyntaxException {
+  ) throws CommandSyntaxException {
     var holder = provider.get(c);
     var list = accessor.getList(holder);
 

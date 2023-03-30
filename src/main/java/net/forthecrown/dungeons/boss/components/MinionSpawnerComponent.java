@@ -27,7 +27,9 @@ public class MinionSpawnerComponent implements BossComponent<DungeonBoss> {
   private final List<Entity> spawnedMinions = new ObjectArrayList<>();
   private int tick;
 
-  public MinionSpawnerComponent(MinionSpawner spawner, int spawnTickInterval, int maxMinions,
+  public MinionSpawnerComponent(MinionSpawner spawner,
+                                int spawnTickInterval,
+                                int maxMinions,
                                 Vector3d... spawns
   ) {
     this.spawns = spawns;
@@ -37,8 +39,10 @@ public class MinionSpawnerComponent implements BossComponent<DungeonBoss> {
   }
 
   // It's easier to type new 'double[][] { asdjkhaldsaa }' than to type 'new Vec3(asd, asd, asd)' a million times
-  public static MinionSpawnerComponent create(MinionSpawner spawner, int tickInterval,
-                                              int maxMinions, double[][] spawns
+  public static MinionSpawnerComponent create(MinionSpawner spawner,
+                                              int tickInterval,
+                                              int maxMinions,
+                                              double[][] spawns
   ) {
     Vector3d[] vecSpawns = new Vector3d[spawns.length];
 
@@ -56,8 +60,10 @@ public class MinionSpawnerComponent implements BossComponent<DungeonBoss> {
     return new MinionSpawnerComponent(spawner, tickInterval, maxMinions, vecSpawns);
   }
 
-  public static MinionSpawnerComponent create(MinionSpawner spawner, int tickInterval,
-                                              int maxMinions, Vector3d... spawns
+  public static MinionSpawnerComponent create(MinionSpawner spawner,
+                                              int tickInterval,
+                                              int maxMinions,
+                                              Vector3d... spawns
   ) {
     return new MinionSpawnerComponent(spawner, tickInterval, maxMinions, spawns);
   }
@@ -65,6 +71,8 @@ public class MinionSpawnerComponent implements BossComponent<DungeonBoss> {
   @Override
   public void onTick(DungeonBoss boss, BossContext context) {
     tick++;
+
+    spawnedMinions.removeIf(Entity::isDead);
 
     // If we've reached a spawning tick
     if (tick > spawnTickInterval) {

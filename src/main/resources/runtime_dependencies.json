@@ -10,7 +10,7 @@
     "${nashorn}",
     "${grenadier}",
     "${mathlib}",
-    "org.tomlj:tomlj:1.1.0",
+    "${toml}",
     "org.apache.commons:commons-text:1.10.0"
   ]
 }

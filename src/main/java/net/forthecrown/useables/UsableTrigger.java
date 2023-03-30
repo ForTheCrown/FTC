@@ -23,7 +23,7 @@ public class UsableTrigger extends Usable implements BoundsHolder {
    * The ID of this trigger
    */
   @Getter
-  private final String name;
+  private String name;
 
   /**
    * The area of effect of this trigger
@@ -53,6 +53,21 @@ public class UsableTrigger extends Usable implements BoundsHolder {
 
     if (tag.contains(TAG_TYPE)) {
       this.type = TagUtil.readEnum(TriggerType.class, tag.get(TAG_TYPE));
+    }
+  }
+
+  public void setName(String name) {
+    Objects.requireNonNull(name);
+
+    var manager = this.manager;
+    if (manager != null) {
+      manager.remove(this);
+    }
+
+     this.name = name;
+
+    if (manager != null) {
+      manager.add(this);
     }
   }
 

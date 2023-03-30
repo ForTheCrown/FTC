@@ -1,20 +1,27 @@
 package net.forthecrown.utils.inventory;
 
-import com.mojang.serialization.Dynamic;
+import com.google.common.base.Strings;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
+import java.util.Objects;
 import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.nbt.CompoundTag;
+import net.forthecrown.nbt.ListTag;
 import net.forthecrown.nbt.TagTypes;
 import net.forthecrown.nbt.paper.ItemNbtProvider;
 import net.forthecrown.nbt.paper.PaperNbt;
 import net.forthecrown.nbt.string.Snbt;
+import net.forthecrown.nbt.string.TagParseException;
 import net.forthecrown.utils.AbstractListIterator;
 import net.forthecrown.utils.Util;
-import net.forthecrown.utils.io.TagOps;
+import net.forthecrown.utils.text.Text;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.minecraft.util.datafix.DataFixers;
-import net.minecraft.util.datafix.fixes.References;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -54,9 +61,7 @@ import org.jetbrains.annotations.Nullable;
  * @see SkullItemBuilder
  */
 public final class ItemStacks {
-
-  private ItemStacks() {
-  }
+  private ItemStacks() {}
 
   /* ----------------------------- CONSTANTS ------------------------------ */
 
@@ -64,7 +69,8 @@ public final class ItemStacks {
    * The NBT tag of the item's data version, used for updating item data using Mojang's
    * {@link DataFixers}
    */
-  public static final String TAG_DATA_VERSION = "dataVersion";
+  public static final String LEGACY_TAG_DATA_VERSION = "dataVersion";
+  public static final String DATA_VERSION_TAG = "DataVersion";
 
   /* ------------------------------- TAGS --------------------------------- */
 
@@ -96,9 +102,7 @@ public final class ItemStacks {
    * @return The element
    */
   public static @NotNull CompoundTag getTagElement(ItemMeta meta, String key) {
-    return getUnhandledTags(meta)
-        .getOptional(key, TagTypes.compoundType())
-        .orElseGet(BinaryTags::compoundTag);
+    return getUnhandledTags(meta).getCompound(key);
   }
 
   /**
@@ -146,9 +150,7 @@ public final class ItemStacks {
    * @return The saved representation of the object
    */
   public static CompoundTag save(ItemStack item) {
-    CompoundTag tag = PaperNbt.saveItem(item);
-    tag.putInt(TAG_DATA_VERSION, Util.getDataVersion());
-    return tag;
+    return PaperNbt.saveItem(item);
   }
 
   /**
@@ -158,23 +160,67 @@ public final class ItemStacks {
    * @return The loaded item stack
    */
   public static ItemStack load(CompoundTag tag) {
-    if (tag.containsKey(TAG_DATA_VERSION)) {
-      int version = tag.getInt(TAG_DATA_VERSION);
-      int current = Util.getDataVersion();
+    if (tag.contains(LEGACY_TAG_DATA_VERSION)) {
+      BinaryTag legacyDataVersion = tag.remove(LEGACY_TAG_DATA_VERSION);
+      tag.put(DATA_VERSION_TAG, legacyDataVersion);
+    }
 
-      if (current != version) {
-        tag = (CompoundTag) DataFixers.getDataFixer()
-            .update(
-                References.ITEM_STACK,
-                new Dynamic<>(TagOps.OPS, tag),
-                version,
-                current
-            )
-            .getValue();
+    if (!tag.contains(DATA_VERSION_TAG)) {
+      tag.putInt(DATA_VERSION_TAG, Util.getDataVersion());
+    }
+
+    if (tag.contains("tag")) {
+      var display = tag.getCompound("tag").get("display");
+
+      if (display != null && display.isCompound()) {
+        fixDisplayTags(display.asCompound());
       }
     }
 
     return PaperNbt.loadItem(tag);
+  }
+
+  private static void fixDisplayTags(CompoundTag display) {
+    String name = display.getString("Name");
+
+    if (!Strings.isNullOrEmpty(name)) {
+      display.putString("Name", fixJsonString(name));
+    }
+
+    ListTag list = display.getList("Lore", TagTypes.stringType());
+
+    if (list.isEmpty()) {
+      return;
+    }
+
+    for (int i = 0; i < list.size(); i++) {
+      var n = list.get(i);
+
+      if (!n.isString()) {
+        continue;
+      }
+
+      String s = n.asString().value();
+      s = fixJsonString(s);
+
+      list.set(i, BinaryTags.stringTag(s));
+    }
+
+    display.put("Lore", list);
+  }
+
+  private static String fixJsonString(String json) {
+    Component text = GsonComponentSerializer.gson().deserialize(json);
+    String plain = Text.plain(text);
+
+    try {
+      JsonElement element = JsonParser.parseString(plain);
+      Objects.requireNonNull(element);
+
+      return plain;
+    } catch (JsonSyntaxException exc) {
+      return json;
+    }
   }
 
   /**
@@ -196,10 +242,10 @@ public final class ItemStacks {
    * Parses an item from a given NBT string.
    * @param nbt The NBT string to parse
    * @return The parsed item
-   * @throws IllegalStateException If the given string was not valid NBT.
+   * @throws TagParseException If the given string was not valid NBT.
    */
   public static ItemStack fromNbtString(String nbt)
-      throws IllegalStateException
+      throws TagParseException
   {
     return load(Snbt.parseCompound(nbt));
   }
@@ -243,12 +289,10 @@ public final class ItemStacks {
    * @param inventory The inventory to run the loop on
    * @param consumer  The consumer to apply to the inventory
    */
-  public static void forEachNonEmptyStack(Inventory inventory, Consumer<ItemStack> consumer) {
-    NonEmptyItemIterator it = nonEmptyIterator(inventory);
-
-    while (it.hasNext()) {
-      consumer.accept(it.next());
-    }
+  public static void forEachNonEmptyStack(Inventory inventory,
+                                          Consumer<ItemStack> consumer
+  ) {
+    nonEmptyIterator(inventory).forEachRemaining(consumer);
   }
 
   /**
@@ -262,7 +306,7 @@ public final class ItemStacks {
     return new NonEmptyItemIterator(inventory);
   }
 
-  /* ----------------------------- ITEM BUILDERS ------------------------------ */
+  /* --------------------------- ITEM BUILDERS ---------------------------- */
 
   /**
    * Creates a new item builder instance
@@ -343,7 +387,7 @@ public final class ItemStacks {
     }
   }
 
-  /* ----------------------------- NON EMPTY ITERATOR ------------------------------ */
+  /* ------------------------- NON EMPTY ITERATOR ------------------------- */
 
   @RequiredArgsConstructor
   public static class NonEmptyItemIterator extends AbstractListIterator<ItemStack> {

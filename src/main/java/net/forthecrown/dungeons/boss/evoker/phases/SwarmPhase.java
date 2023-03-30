@@ -16,6 +16,7 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Evoker;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vex;
+import org.bukkit.loot.LootTables;
 import org.spongepowered.math.imaginary.Quaterniond;
 import org.spongepowered.math.vector.Vector3d;
 
@@ -174,6 +175,8 @@ public class SwarmPhase implements AttackPhase {
         AttributeInstance maxHealth
             = vex.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 
+        assert maxHealth != null;
+
         Util.clearModifiers(maxHealth);
         maxHealth.setBaseValue(1D);
         maxHealth.addModifier(context.healthModifier());
@@ -181,6 +184,8 @@ public class SwarmPhase implements AttackPhase {
         double health = maxHealth.getValue();
         vex.setHealth(health);
         vex.setRemoveWhenFarAway(false);
+
+        vex.setLootTable(LootTables.EMPTY.getLootTable());
 
         if (target != null) {
           vex.lookAt(target);

@@ -169,6 +169,8 @@ public class InventoryStorage {
     }
 
     setInventoryContents(player, map);
+    map.clear();
+
     return true;
   }
 
@@ -195,13 +197,7 @@ public class InventoryStorage {
     InventoryMap map = inventories.get(player.getUniqueId());
 
     Int2ObjectMap<ItemStack> items = map.get(category);
-
-    var inventory = player.getInventory();
-    inventory.clear();
-
-    items.forEach((slot, item) -> {
-      inventory.setItem(slot, item.clone());
-    });
+    setInventoryContents(player, items);
 
     return true;
   }
@@ -235,7 +231,6 @@ public class InventoryStorage {
     map.forEach((slot, item) -> {
       inventory.setItem(slot, item.clone());
     });
-    map.clear();
   }
 
   public Collection<String> getExistingCategories(Player player) {

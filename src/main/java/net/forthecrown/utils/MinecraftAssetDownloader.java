@@ -155,6 +155,8 @@ public class MinecraftAssetDownloader {
   }
 
   private void downloadAssets(JsonObject objects) {
+    final int totalAssets = objects.size();
+
     for (var e: objects.entrySet()) {
       String hash = e.getValue().getAsJsonObject().get("hash").getAsString();
       String first2Chars = hash.substring(0, 2);
@@ -166,6 +168,12 @@ public class MinecraftAssetDownloader {
         downloadedFiles++;
 
         LOGGER.debug("Downloaded asset {}", e.getKey());
+
+        if (downloadedFiles % 100 == 0) {
+          LOGGER.info("MC asset download progress {}/{}",
+              downloadedFiles, totalAssets
+          );
+        }
       } catch (IOException exc) {
         failedDownloads++;
 

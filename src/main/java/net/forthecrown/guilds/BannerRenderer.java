@@ -65,8 +65,7 @@ public class BannerRenderer {
     assetsPath = Path.of("mc_assets");
 
     // Get the banner directory
-    this.bannerTextureDirectory = assetsPath.resolve("assets")
-        .resolve("minecraft")
+    this.bannerTextureDirectory = assetsPath.resolve("minecraft")
         .resolve("textures")
         .resolve("entity")
         .resolve("banner");

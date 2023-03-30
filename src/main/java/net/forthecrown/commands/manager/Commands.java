@@ -2,7 +2,6 @@ package net.forthecrown.commands.manager;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.context.StringRange;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.CommandAfk;
 import net.forthecrown.commands.CommandBack;
@@ -130,12 +129,12 @@ import net.forthecrown.commands.waypoint.CommandVisit;
 import net.forthecrown.commands.waypoint.CommandWaypoints;
 import net.forthecrown.core.FTC;
 import net.forthecrown.core.module.OnEnable;
+import net.forthecrown.grenadier.CommandContexts;
 import net.forthecrown.grenadier.Readers;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.text.format.page.PageEntryIterator;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.spongepowered.math.GenericMath;
 
 public final class Commands {
   private Commands() {}
@@ -339,21 +338,7 @@ public final class Commands {
   }
 
   public static String findInput(String argument, CommandContext<?> context) {
-    for (var parsedNode : context.getNodes()) {
-      if (parsedNode.getNode().getName().equals(argument)) {
-        var inputLength = context.getInput().length();
-        var range = parsedNode.getRange();
-
-        StringRange clamped = new StringRange(
-            GenericMath.clamp(range.getStart(), 0, inputLength),
-            GenericMath.clamp(range.getEnd(),   0, inputLength)
-        );
-
-        return clamped.get(context.getInput());
-      }
-    }
-
-    return null;
+    return CommandContexts.getInput(context, argument);
   }
 
   public static String optionallyQuote(String quote, String s) {

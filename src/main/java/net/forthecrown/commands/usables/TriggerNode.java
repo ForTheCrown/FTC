@@ -10,6 +10,7 @@ import com.sk89q.worldedit.regions.Region;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.Completions;
 import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.useables.TriggerType;
 import net.forthecrown.useables.UsableTrigger;
@@ -52,6 +53,15 @@ class TriggerNode extends InteractableNode<UsableTrigger> {
 
     factory.usage("type <type>")
         .addInfo("Sets a trigger's type to <type>");
+
+    factory.usage("set_area")
+        .addInfo("Sets a trigger's area to your WorldEdit selection");
+
+    factory.usage("set_area <pos1: x,y,z> <pos2: x,y,z>")
+        .addInfo("Sets a trigger's area to the specified 2 coordinates");
+
+    factory.usage("rename <name>")
+        .addInfo("Renames a trigger to <name>");
 
     super.addUsages(factory);
   }
@@ -149,6 +159,31 @@ class TriggerNode extends InteractableNode<UsableTrigger> {
               );
               return 0;
             })
+        )
+
+        .then(literal("rename")
+            .then(argument("newName", Arguments.FTC_KEY)
+                .suggests((context, builder) -> {
+                  UsableTrigger trigger = provider.get(context);
+                  return Completions.suggest(builder, trigger.getName());
+                })
+
+                .executes(c -> {
+                  UsableTrigger trigger = provider.get(c);
+
+                  var oldName = trigger.getName();
+
+                  String name = c.getArgument("newName", String.class);
+                  trigger.setName(name);
+
+                  c.getSource().sendSuccess(
+                      Text.format("Renamed trigger '{1}' to '{2}'",
+                          oldName, name
+                      )
+                  );
+                  return 0;
+                })
+            )
         )
 
         .then(literal("type")

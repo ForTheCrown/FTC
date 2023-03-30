@@ -14,7 +14,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
@@ -56,8 +55,6 @@ public interface SpawnTest {
         if (!inventory.containsAtLeast(i, i.getAmount())) {
           return false;
         }
-
-        PlayerMoveEvent.getHandlerList().bake();
 
         // I do not trust non cloned item stacks
         items.add(i.clone());
