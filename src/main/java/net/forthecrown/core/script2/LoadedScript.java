@@ -5,7 +5,11 @@ import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.utils.MonthDayPeriod;
 import org.apache.logging.log4j.Logger;
 
-record LoadedScript(MonthDayPeriod period, Script script, String[] args) {
+public record LoadedScript(
+    MonthDayPeriod period,
+    Script script,
+    String[] args
+) {
   private static final Logger LOGGER = Loggers.getLogger();
 
   public boolean shouldBeActive(LocalDate date) {

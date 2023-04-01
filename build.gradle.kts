@@ -12,7 +12,7 @@ val baseJarName = "ForTheCrown"
 ftc.jarBaseName = baseJarName
 
 // Dependency values, these are also used in processResources
-val grenadier = "net.forthecrown:grenadier:2.0.6"
+val grenadier = "net.forthecrown:grenadier:2.0.7"
 val nashorn   = "org.openjdk.nashorn:nashorn-core:15.4"
 val mathlib   = "org.spongepowered:math:2.1.0-SNAPSHOT"
 val toml      = "org.tomlj:tomlj:1.1.0"

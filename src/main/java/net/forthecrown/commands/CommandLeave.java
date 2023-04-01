@@ -1,8 +1,8 @@
 package net.forthecrown.commands;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import java.util.List;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import java.util.Map;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
@@ -11,7 +11,8 @@ import org.bukkit.entity.Player;
 
 public class CommandLeave extends FtcCommand {
 
-  public static final List<LeaveListener> LISTENERS = new ObjectArrayList<>();
+  public static final Map<String, LeaveListener> LISTENERS
+      = new Object2ObjectOpenHashMap<>();
 
   public CommandLeave() {
     super("leave");
@@ -28,7 +29,7 @@ public class CommandLeave extends FtcCommand {
     command.executes(c -> {
       Player player = c.getSource().asPlayer();
 
-      for (LeaveListener l : LISTENERS) {
+      for (LeaveListener l : LISTENERS.values()) {
         if (l.onCall(player)) {
           return 0;
         }
@@ -38,8 +39,12 @@ public class CommandLeave extends FtcCommand {
     });
   }
 
-  public static void addListener(LeaveListener listener) {
-    LISTENERS.add(listener);
+  public static void addListener(String id, LeaveListener listener) {
+    LISTENERS.put(id, listener);
+  }
+
+  public static void removeListener(String id) {
+    LISTENERS.remove(id);
   }
 
   public interface LeaveListener {

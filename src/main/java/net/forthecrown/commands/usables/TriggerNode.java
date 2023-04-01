@@ -157,7 +157,7 @@ class TriggerNode extends InteractableNode<UsableTrigger> {
               trigger.setBounds(area);
 
               c.getSource().sendSuccess(
-                  Text.format("Redefined trigger {1} to area {2}",
+                  Text.format("Redefined trigger {0} to area {1}",
                       trigger.getName(),
                       area
                   )
@@ -182,7 +182,7 @@ class TriggerNode extends InteractableNode<UsableTrigger> {
                   trigger.setName(name);
 
                   c.getSource().sendSuccess(
-                      Text.format("Renamed trigger '{1}' to '{2}'",
+                      Text.format("Renamed trigger '{0}' to '{1}'",
                           oldName, name
                       )
                   );

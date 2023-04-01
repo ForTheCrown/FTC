@@ -1,5 +1,7 @@
 package net.forthecrown.commands.economy;
 
+import static net.forthecrown.grenadier.types.options.ParsedOptions.EMPTY;
+
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.Commands;
@@ -14,7 +16,6 @@ import net.forthecrown.economy.shops.SignShops;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.grenadier.types.options.ArgumentOption;
-import net.forthecrown.grenadier.types.options.Option;
 import net.forthecrown.grenadier.types.options.Options;
 import net.forthecrown.grenadier.types.options.OptionsArgument;
 import net.forthecrown.grenadier.types.options.ParsedOptions;
@@ -29,8 +30,6 @@ import net.forthecrown.utils.text.format.page.PageFormat;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class CommandShopHistory extends FtcCommand {
 
@@ -108,18 +107,6 @@ public class CommandShopHistory extends FtcCommand {
 
     return format;
   });
-
-  public static final ParsedOptions EMPTY = new ParsedOptions() {
-    @Override
-    public @Nullable ParsedOption getParsedOption(@NotNull Option option) {
-      return null;
-    }
-
-    @Override
-    public @Nullable ParsedOption getParsedOption(@NotNull String label) {
-      return null;
-    }
-  };
 
   @Override
   public void createCommand(GrenadierCommand command) {

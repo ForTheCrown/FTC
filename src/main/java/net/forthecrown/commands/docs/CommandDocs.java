@@ -249,8 +249,10 @@ public class CommandDocs {
     document.usages.addAll(command.getUsages());
 
     document.clickId = command.getClass().getName()
-        .replaceAll("\\.", "_")
-        .replace("net_forthecrown_", "");
+        .replace("net.forthecrown.commands.", "")
+        .replace('.', '-')
+        .replace("-Command", "-")
+        .toLowerCase();
 
     var list = documents.computeIfAbsent(
         command.getClass().getPackage(),

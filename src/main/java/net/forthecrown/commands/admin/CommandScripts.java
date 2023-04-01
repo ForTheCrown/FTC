@@ -1,5 +1,7 @@
 package net.forthecrown.commands.admin;
 
+import static net.forthecrown.grenadier.types.options.ParsedOptions.EMPTY;
+
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -8,7 +10,6 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import net.forthecrown.commands.arguments.Arguments;
-import net.forthecrown.commands.economy.CommandShopHistory;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
@@ -109,7 +110,7 @@ public class CommandScripts extends FtcCommand {
         // /script run <script> [method]
         .then(literal("run")
             .then(argument("script", Arguments.SCRIPT)
-                .executes(c -> run(c, CommandShopHistory.EMPTY))
+                .executes(c -> run(c, EMPTY))
 
                 .then(argument("args", ARGS)
                     .executes(c -> run(c, c.getArgument("args", ParsedOptions.class)))

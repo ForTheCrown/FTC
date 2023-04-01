@@ -42,8 +42,8 @@ public class CommandGetPos extends FtcCommand {
 
                       user,
                       l.getX(), l.getY(), l.getZ(),
-                      l.getPitch(),
                       l.getYaw(),
+                      l.getPitch(),
                       l.getWorld().getName()
                   )
               );

@@ -1,6 +1,6 @@
 package net.forthecrown.commands.admin;
 
-import static net.forthecrown.commands.economy.CommandShopHistory.EMPTY;
+import static net.forthecrown.grenadier.types.options.ParsedOptions.EMPTY;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;

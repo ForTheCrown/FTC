@@ -56,8 +56,9 @@ class UsableEntityNode extends BukkitUsableNode<UsableEntity> {
   }
 
   @Override
-  protected void createRemoveArguments(LiteralArgumentBuilder<CommandSource> command,
-                                       UsageHolderProvider<UsableEntity> provider
+  protected void createRemoveArguments(
+      LiteralArgumentBuilder<CommandSource> command,
+      UsageHolderProvider<UsableEntity> provider
   ) {
     command
         .executes(c -> {
@@ -75,8 +76,9 @@ class UsableEntityNode extends BukkitUsableNode<UsableEntity> {
   }
 
   @Override
-  protected UsableEntity get(String argumentName, CommandContext<CommandSource> context)
-      throws CommandSyntaxException {
+  protected UsableEntity get(String argumentName,
+                             CommandContext<CommandSource> context
+  ) throws CommandSyntaxException {
     var entity = ArgumentTypes.getEntity(context, argumentName);
     var usables = Usables.getInstance();
 

@@ -24,6 +24,7 @@ public final class Main extends JavaPlugin implements Namespaced {
   @Override
   public void onEnable() {
     Grenadier.plugin(this);
+    FtcCommandErrorHandler.init();
 
     setDebugMode();
 
