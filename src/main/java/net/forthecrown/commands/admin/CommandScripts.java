@@ -2,7 +2,6 @@ package net.forthecrown.commands.admin;
 
 import static net.forthecrown.grenadier.types.options.ParsedOptions.EMPTY;
 
-import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -22,6 +21,7 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.grenadier.types.options.ArgumentOption;
+import net.forthecrown.grenadier.types.options.FlagOption;
 import net.forthecrown.grenadier.types.options.Options;
 import net.forthecrown.grenadier.types.options.OptionsArgument;
 import net.forthecrown.grenadier.types.options.ParsedOptions;
@@ -42,16 +42,12 @@ public class CommandScripts extends FtcCommand {
       .addLabel("method")
       .build();
 
-  public static final ArgumentOption<Boolean> CLOSE_AFTER
-      = Options.argument(BoolArgumentType.bool())
-      .addLabel("close_after")
-      .setDefaultValue(true)
-      .build();
+  public static final FlagOption KEEP_LOADED = Options.flag("keep-loaded");
 
   public static final OptionsArgument ARGS = OptionsArgument.builder()
       .addOptional(ARGS_ARRAY)
       .addOptional(METHOD_NAME)
-      .addOptional(CLOSE_AFTER)
+      .addFlag(KEEP_LOADED)
       .build();
 
   public CommandScripts() {
@@ -82,13 +78,15 @@ public class CommandScripts extends FtcCommand {
     factory.usage("eval <java script code>")
         .addInfo("Runs the given JavaScript code");
 
-    factory.usage("run <script file> [args=<args array>] [close_after=<true | false>] [method=<name>]")
+    factory.usage("run <script file> [args=<args array>] [-keep-loaded] [method=<name>]")
         .addInfo("Runs the given script file's global function")
         .addInfo("If the <args> argument is present, the set string array")
         .addInfo("is added into the script.")
 
-        .addInfo("If <close_after> is set to 'true' or not set at all, the")
-        .addInfo("script is closed after execution, else, it stays loaded")
+        .addInfo("If [-keep-loaded] is set the script will stay loaded after")
+        .addInfo("execution has finished, use this if the script has a")
+        .addInfo("scheduler or event listener that needs to run for longer")
+        .addInfo("than the script's initial lifetime")
 
         .addInfo("<method> specifies the name of the method to run after")
         .addInfo("the global scope has been executed");
@@ -153,11 +151,8 @@ public class CommandScripts extends FtcCommand {
   private int delete(CommandContext<CommandSource> c) {
     String script = c.getArgument("script", String.class);
 
-    Path path = ScriptManager.getInstance()
-        .getScriptFile(script);
-
-    PathUtil.safeDelete(path)
-        .resultOrPartial(Loggers.getLogger()::error);
+    Path path = ScriptManager.getInstance().getScriptFile(script);
+    PathUtil.safeDelete(path).resultOrPartial(Loggers.getLogger()::error);
 
     c.getSource().sendSuccess(
         Text.format("Deleting script '{0}'", script)
@@ -171,27 +166,29 @@ public class CommandScripts extends FtcCommand {
     String input = c.getArgument("input", String.class);
     Script script = Script.ofCode(input);
 
-    return runScript(c.getSource(), script, true, null);
+    return runScript(c.getSource(), script, false, null);
   }
 
-  private int run(CommandContext<CommandSource> c, ParsedOptions args
-  ) throws CommandSyntaxException {
+  private int run(CommandContext<CommandSource> c, ParsedOptions args)
+      throws CommandSyntaxException
+  {
     String scriptName = c.getArgument("script", String.class);
     Script script = Script.of(scriptName);
 
-    List<String> stringArgsList = args.getValue(ARGS_ARRAY);
+    List<String> stringArgsList
+        = args.getValueOptional(ARGS_ARRAY).orElseGet(List::of);
 
     String[] stringArgs = stringArgsList.toArray(String[]::new);
 
-    boolean closeAfter = args.getValue(CLOSE_AFTER);
+    boolean keepLoaded = args.has(KEEP_LOADED);
     String method = args.getValue(METHOD_NAME);
 
-    return runScript(c.getSource(), script, closeAfter, method, stringArgs);
+    return runScript(c.getSource(), script, keepLoaded, method, stringArgs);
   }
 
   private int runScript(CommandSource source,
                         Script script,
-                        boolean closeAfter,
+                        boolean keepLoaded,
                         String method,
                         String... args
   ) throws CommandSyntaxException {
@@ -261,9 +258,10 @@ public class CommandScripts extends FtcCommand {
       );
     }
 
-    if (closeAfter) {
+    if (!keepLoaded) {
       script.close();
     }
+
     return 0;
   }
 }
