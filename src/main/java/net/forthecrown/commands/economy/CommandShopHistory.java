@@ -145,8 +145,8 @@ public class CommandShopHistory extends FtcCommand {
       throw Exceptions.NOTHING_TO_LIST;
     }
 
-    int page = args.getValue(PAGE) - 1;
-    int pageSize = args.getValue(PAGE_SIZE);
+    int page = args.getValueOptional(PAGE).orElse(1) - 1;
+    int pageSize = args.getValueOptional(PAGE_SIZE).orElse(5);
 
     // Ensure the page is valid
     Commands.ensurePageValid(page, pageSize, history.size());

@@ -63,14 +63,14 @@ public class ScriptManager {
   /**
    * Factory to create script engines
    */
-  private final NashornScriptEngineFactory
-      factory = new NashornScriptEngineFactory();
+  private final NashornScriptEngineFactory factory
+      = new NashornScriptEngineFactory();
 
   /**
    * Currently loaded scripts, specified in <code>loader.toml</code>
    */
-  private final Registry<LoadedScript>
-      loadedScripts = Registries.newRegistry();
+  private final Registry<LoadedScript> loadedScripts
+      = Registries.newRegistry();
 
   public ScriptManager() {
     this.directory = PathUtil.getPluginDirectory("scripts");
