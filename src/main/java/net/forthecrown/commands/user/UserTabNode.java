@@ -3,6 +3,7 @@ package net.forthecrown.commands.user;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.forthecrown.commands.arguments.Arguments;
+import net.forthecrown.commands.help.UsageFactory;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.property.Properties;

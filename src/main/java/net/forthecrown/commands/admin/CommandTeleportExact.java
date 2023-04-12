@@ -2,6 +2,7 @@ package net.forthecrown.commands.admin;
 
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
+import net.forthecrown.commands.help.UsageFactory;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.GrenadierCommand;

@@ -5,6 +5,7 @@ import static net.forthecrown.utils.text.Text.format;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import it.unimi.dsi.fastutil.longs.Long2ObjectFunction;
 import net.forthecrown.commands.arguments.Arguments;
+import net.forthecrown.commands.help.UsageFactory;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;

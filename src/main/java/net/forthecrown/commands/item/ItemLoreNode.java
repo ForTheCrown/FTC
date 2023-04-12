@@ -9,6 +9,7 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import java.util.ArrayList;
 import net.forthecrown.commands.arguments.Arguments;
+import net.forthecrown.commands.help.UsageFactory;
 import net.forthecrown.commands.manager.Commands;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.Messages;

@@ -13,6 +13,7 @@ import com.sk89q.worldguard.commands.region.RegionPrintoutBuilder;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import net.forthecrown.commands.arguments.Arguments;
+import net.forthecrown.commands.help.UsageFactory;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;

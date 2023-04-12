@@ -7,6 +7,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.List;
+import net.forthecrown.commands.help.UsageFactory;
 import net.forthecrown.commands.manager.Commands;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;

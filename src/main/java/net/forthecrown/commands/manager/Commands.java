@@ -69,6 +69,8 @@ import net.forthecrown.commands.admin.CommandTop;
 import net.forthecrown.commands.admin.CommandVanish;
 import net.forthecrown.commands.admin.CommandWorld;
 import net.forthecrown.commands.admin.SaveReloadCommands;
+import net.forthecrown.commands.arguments.Arguments;
+import net.forthecrown.commands.arguments.ExpandedEntityArgument;
 import net.forthecrown.commands.click.CommandClickableText;
 import net.forthecrown.commands.docs.CommandDocGen;
 import net.forthecrown.commands.economy.CommandBecomeBaron;
@@ -84,6 +86,7 @@ import net.forthecrown.commands.emotes.EmotePog;
 import net.forthecrown.commands.guild.GuildCommands;
 import net.forthecrown.commands.help.CommandHelp;
 import net.forthecrown.commands.help.FtcHelpMap;
+import net.forthecrown.commands.help.FtcSyntaxConsumer;
 import net.forthecrown.commands.help.HelpCommand;
 import net.forthecrown.commands.home.CommandDeleteHome;
 import net.forthecrown.commands.home.CommandHome;
@@ -131,6 +134,9 @@ import net.forthecrown.core.FTC;
 import net.forthecrown.core.module.OnEnable;
 import net.forthecrown.grenadier.CommandContexts;
 import net.forthecrown.grenadier.Readers;
+import net.forthecrown.grenadier.annotations.AnnotatedCommandContext;
+import net.forthecrown.grenadier.annotations.CommandDataLoader;
+import net.forthecrown.grenadier.annotations.TypeRegistry;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.text.format.page.PageEntryIterator;
 import org.bukkit.entity.Player;
@@ -262,7 +268,6 @@ public final class Commands {
     new CommandTpDeny();
     new CommandTpCancel();
     new CommandBack();
-    new CommandTeleport();
 
     //message commands
     new CommandTell();
@@ -294,11 +299,43 @@ public final class Commands {
     new EmotePog();
     new EmotePet();
 
+    AnnotatedCommandContext ctx = AnnotatedCommandContext.create();
+    ctx.setDefaultPermissionFormat("ftc.commands.{command}");
+    ctx.setDefaultExecutes("execute");
+    ctx.setSyntaxConsumer(new FtcSyntaxConsumer());
+    ctx.setTypeRegistry(createFtcTypeRegistry());
+    ctx.addLoader(CommandDataLoader.resources(Commands.class.getClassLoader()));
+
+    registerAnnotationBased(ctx);
+
     //help commands
     HelpCommand.createCommands();
 
     new CommandHelp();
     FtcHelpMap.getInstance().update();
+  }
+
+  private static void registerAnnotationBased(AnnotatedCommandContext context) {
+    context.registerCommand(new CommandTeleport());
+  }
+
+  public static TypeRegistry createFtcTypeRegistry() {
+    var registry = TypeRegistry.newRegistry();
+    registry.register("user", () -> Arguments.USER);
+    registry.register("users", () -> Arguments.USERS);
+    registry.register("online_user", () -> Arguments.ONLINE_USER);
+    registry.register("online_users", () -> Arguments.ONLINE_USERS);
+    registry.register("chat", () -> Arguments.CHAT);
+    registry.register("message", () -> Arguments.MESSAGE);
+    registry.register("ftc_key", () -> Arguments.FTC_KEY);
+    registry.register("script", () -> Arguments.SCRIPT);
+
+    registry.register("f_player", () -> new ExpandedEntityArgument(false, true));
+    registry.register("f_players", () -> new ExpandedEntityArgument(true, true));
+    registry.register("f_entity", () -> new ExpandedEntityArgument(false, false));
+    registry.register("f_entities", () -> new ExpandedEntityArgument(true, false));
+
+    return registry;
   }
 
   /* ----------------------------- UTILITY ------------------------------ */

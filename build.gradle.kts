@@ -12,7 +12,8 @@ val baseJarName = "ForTheCrown"
 ftc.jarBaseName = baseJarName
 
 // Dependency values, these are also used in processResources
-val grenadier = "net.forthecrown:grenadier:2.0.7"
+val grenadierAnnotations = "net.forthecrown:grenadier-annotations:1.1.1"
+val grenadier = "net.forthecrown:grenadier:2.0.9"
 val nashorn   = "org.openjdk.nashorn:nashorn-core:15.4"
 val mathlib   = "org.spongepowered:math:2.1.0-SNAPSHOT"
 val toml      = "org.tomlj:tomlj:1.1.0"
@@ -57,6 +58,7 @@ dependencies {
 
   // FTC libraries
   compileOnly(grenadier)
+  compileOnly(grenadierAnnotations)
   testImplementation(grenadier)
 
   // Misc libraries
@@ -130,14 +132,15 @@ tasks {
 
     filesMatching(fileList) {
       expand(
-        "version"    to version,
-        "nashorn"    to nashorn,
-        "grenadier"  to grenadier,
-        "buildID"    to ftc.buildId,
-        "debugbuild" to ftc.isDebugBuild,
-        "buildDate"  to Date().toString(),
-        "mathlib"    to mathlib,
-        "toml"       to toml
+        "grenadier_annotations" to grenadierAnnotations,
+        "version"               to version,
+        "nashorn"               to nashorn,
+        "grenadier"             to grenadier,
+        "buildID"               to ftc.buildId,
+        "debugbuild"            to ftc.isDebugBuild,
+        "buildDate"             to Date().toString(),
+        "mathlib"               to mathlib,
+        "toml"                  to toml
       )
     }
 

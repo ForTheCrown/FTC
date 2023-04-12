@@ -13,9 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 import lombok.RequiredArgsConstructor;
+import net.forthecrown.commands.help.AbstractHelpEntry;
+import net.forthecrown.commands.help.CommandDisplayInfo;
 import net.forthecrown.commands.help.FtcHelpMap;
-import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.commands.manager.FtcCommand.Usage;
+import net.forthecrown.commands.help.Usage;
 import net.forthecrown.core.FTC;
 import net.forthecrown.utils.ArrayIterator;
 import net.forthecrown.utils.io.PathUtil;
@@ -221,8 +222,9 @@ public class CommandDocs {
   }
 
   public void fill() {
-    FtcHelpMap.getInstance()
-        .getExistingCommands()
+    FtcHelpMap.getInstance().getAllEntries().stream()
+        .filter(entry -> entry instanceof AbstractHelpEntry)
+        .map(entry -> (AbstractHelpEntry) entry)
         .forEach(this::createDocumentation);
 
     documents.forEach((key, value) -> {
@@ -230,29 +232,29 @@ public class CommandDocs {
     });
   }
 
-  public void createDocumentation(FtcCommand command) {
-    var pName = command.getClass().getPackageName();
+  public void createDocumentation(AbstractHelpEntry command) {
+    CommandDisplayInfo display = command.createDisplay();
 
-    if (pName.contains("test")
-        || pName.contains("click")
-        || pName.contains("docs")
+    var category = display.category();
+
+    if (category.contains("help")
+        || category.contains("test")
+        || category.contains("click")
     ) {
       return;
     }
 
-    String name = command.getHelpListName();
-    String perm = command.getPermission();
-    String desc = command.getDescription();
-    List<String> aliases = command.getAliases();
+    String name = display.label();
+    String perm = display.permission();
+    String desc = display.getDescription();
+    List<String> aliases = display.aliases();
 
     CommandDocument document = new CommandDocument(name, perm, aliases, desc);
     document.usages.addAll(command.getUsages());
 
-    document.clickId = command.getClass().getName()
-        .replace("net.forthecrown.commands.", "")
-        .replace('.', '-')
-        .replace("-Command", "-")
-        .toLowerCase();
+    document.clickId = category.toLowerCase()
+        .replace("_", ".")
+        .replace(".", "-");
 
     var list = documents.computeIfAbsent(
         command.getClass().getPackage(),

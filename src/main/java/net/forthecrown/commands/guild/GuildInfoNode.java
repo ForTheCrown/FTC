@@ -3,6 +3,7 @@ package net.forthecrown.commands.guild;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.commands.help.UsageFactory;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.guilds.menu.GuildMenus;
 

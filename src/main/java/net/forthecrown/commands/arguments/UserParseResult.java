@@ -18,6 +18,8 @@ import net.forthecrown.user.property.Properties;
 public class UserParseResult implements ParseResult<User> {
 
   private final User user;
+
+  @Getter
   private final EntitySelector selector;
 
   @Getter
@@ -38,7 +40,7 @@ public class UserParseResult implements ParseResult<User> {
   public User get(CommandSource source, boolean validate)
       throws CommandSyntaxException
   {
-    User result = isSelectorUsed()
+    User result = selector != null
         ? Users.get(selector.findPlayer(source))
         : user;
 
@@ -62,7 +64,7 @@ public class UserParseResult implements ParseResult<User> {
   public List<User> getUsers(CommandSource source, boolean checkVanished)
       throws CommandSyntaxException
   {
-    if (selector == null) {
+    if (user != null) {
       if (!offlineAllowed
           && checkVanished
           && !source.hasPermission(Permissions.VANISH_SEE)
@@ -73,6 +75,8 @@ public class UserParseResult implements ParseResult<User> {
 
       return new ArrayList<>(Collections.singletonList(user));
     }
+
+    assert selector != null;
 
     List<User> users = selector.findPlayers(source)
         .stream()

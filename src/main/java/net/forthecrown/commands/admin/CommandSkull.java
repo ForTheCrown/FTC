@@ -2,6 +2,7 @@ package net.forthecrown.commands.admin;
 
 import java.util.concurrent.CompletableFuture;
 import net.forthecrown.commands.arguments.Arguments;
+import net.forthecrown.commands.help.UsageFactory;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.GrenadierCommand;

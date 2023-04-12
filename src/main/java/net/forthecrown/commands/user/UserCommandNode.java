@@ -2,6 +2,7 @@ package net.forthecrown.commands.user;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import net.forthecrown.commands.arguments.Arguments;
+import net.forthecrown.commands.help.UsageFactory;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.GrenadierCommand;

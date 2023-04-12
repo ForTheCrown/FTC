@@ -4,6 +4,7 @@ import static net.forthecrown.core.Messages.STRUST_BLOCKED_SENDER;
 import static net.forthecrown.core.Messages.STRUST_BLOCKED_TARGET;
 
 import net.forthecrown.commands.arguments.Arguments;
+import net.forthecrown.commands.help.UsageFactory;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Messages;

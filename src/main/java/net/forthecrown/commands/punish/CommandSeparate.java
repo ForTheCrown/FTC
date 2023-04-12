@@ -3,6 +3,7 @@ package net.forthecrown.commands.punish;
 import static net.forthecrown.core.logging.Loggers.STAFF_LOG;
 
 import net.forthecrown.commands.arguments.Arguments;
+import net.forthecrown.commands.help.UsageFactory;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;

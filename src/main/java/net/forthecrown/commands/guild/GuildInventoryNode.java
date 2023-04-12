@@ -1,6 +1,7 @@
 package net.forthecrown.commands.guild;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
+import net.forthecrown.commands.help.UsageFactory;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 

@@ -1,6 +1,7 @@
 package net.forthecrown.commands.guild;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
+import net.forthecrown.commands.help.UsageFactory;
 import net.forthecrown.grenadier.CommandSource;
 import org.bukkit.Bukkit;
 

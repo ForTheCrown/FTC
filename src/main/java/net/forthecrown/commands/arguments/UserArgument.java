@@ -43,7 +43,8 @@ public class UserArgument
       return new UserParseResult(selector, allowOffline);
     }
 
-    int cursor = reader.getCursor();
+    final int cursor = reader.getCursor();
+
     String name = reader.readUnquotedString();
     UserLookupEntry entry = UserManager.get()
         .getUserLookup()

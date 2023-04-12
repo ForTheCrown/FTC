@@ -7,6 +7,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.List;
+import net.forthecrown.commands.help.UsageFactory;
 import net.forthecrown.commands.manager.Commands;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.guilds.Guild;

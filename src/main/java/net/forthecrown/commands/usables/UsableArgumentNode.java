@@ -15,7 +15,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.commands.manager.Commands;
 import net.forthecrown.commands.manager.Exceptions;
-import net.forthecrown.commands.manager.FtcCommand.UsageFactory;
+import net.forthecrown.commands.help.UsageFactory;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.grenadier.CommandContexts;
 import net.forthecrown.grenadier.CommandSource;

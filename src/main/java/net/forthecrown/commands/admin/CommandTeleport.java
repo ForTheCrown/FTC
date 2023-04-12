@@ -3,252 +3,219 @@ package net.forthecrown.commands.admin;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import java.util.Collection;
-import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.core.Permissions;
+import io.papermc.paper.entity.TeleportFlag.EntityState;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import net.forthecrown.commands.manager.Exceptions;
+import net.forthecrown.grenadier.CommandContexts;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Grenadier;
-import net.forthecrown.grenadier.GrenadierCommand;
-import net.forthecrown.grenadier.types.ArgumentTypes;
+import net.forthecrown.grenadier.Readers;
+import net.forthecrown.grenadier.annotations.Argument;
+import net.forthecrown.grenadier.annotations.CommandData;
+import net.forthecrown.grenadier.annotations.VariableInitializer;
+import net.forthecrown.grenadier.types.EntitySelector;
 import net.forthecrown.user.User;
-import net.forthecrown.user.UserTeleport;
+import net.forthecrown.user.UserTeleport.Type;
 import net.forthecrown.user.Users;
-import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.spongepowered.math.vector.Vector3d;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.util.Vector;
 
-public class CommandTeleport extends FtcCommand {
+@CommandData("file = 'commands/tp.gcn'")
+public class CommandTeleport {
 
-  public CommandTeleport() {
-    super("fteleport");
+  public static final String YAW_ARG = "yaw";
+  public static final String PITCH_ARG = "pitch";
 
-    setPermission(Permissions.CMD_TELEPORT);
-    setAliases("tp", "teleport", "eteleport", "etp");
-    setDescription("FTC's version of the vanilla /tp command");
-
-    register();
+  @VariableInitializer
+  private void initVars(Map<String, Object> variables) {
+    variables.put("yaw", FloatArgumentType.floatArg(-180, 180));
+    variables.put("pitch", FloatArgumentType.floatArg(-90, 90));
   }
 
-  @Override
-  public String getHelpListName() {
-    return "teleport";
+  public Location selectorToDestination(CommandSource source,
+                                         EntitySelector selector
+  ) throws CommandSyntaxException {
+    return selector.findEntity(source).getLocation();
   }
 
-  @Override
-  public void createCommand(GrenadierCommand command) {
-    command
-        .then(argument("entity", ArgumentTypes.entities())
-            .then(argument("entity_to", ArgumentTypes.player())
-                .executes(c -> {
-                  Entity entity = ArgumentTypes.getPlayer(c, "entity_to");
-                  Collection<Entity> entities = ArgumentTypes.getEntities(c, "entity");
+  public void teleportSelf(
+      CommandSource source,
+      @Argument("location") Location dest,
+      @Argument(value = YAW_ARG, optional = true) Float yaw,
+      @Argument(value = PITCH_ARG, optional = true) Float pitch
+  ) throws CommandSyntaxException {
+    applyRotations(dest, yaw, pitch);
+    teleportSource(source, dest);
 
-                  Component display = entity.teamDisplayName();
+    source.sendSuccess(
+        Text.format("Teleporting to &e{0, location, -c -w}&r.",
+            NamedTextColor.GRAY,
+            dest
+        ),
 
-                  if (entity.getType() == EntityType.PLAYER) {
-                    display = Users.get(entity.getUniqueId())
-                        .displayName();
-                  }
-
-                  return teleport(entities, entity.getLocation(), display, c.getSource());
-                })
-            )
-
-            .then(argument("location_to", ArgumentTypes.position())
-                .executes(c -> entityTeleport(c, false, false))
-
-                .then(argument("yaw", FloatArgumentType.floatArg(-180f, 180f))
-                    .executes(c -> entityTeleport(c, true, false))
-
-                    .then(argument("pitch", FloatArgumentType.floatArg(-90f, 90f))
-                        .executes(c -> entityTeleport(c, true, true))
-                    )
-                )
-
-                .then(literal("facing")
-                    .then(argument("facing_pos", ArgumentTypes.position())
-                        .executes(
-                            c -> teleportFacing(c, ArgumentTypes.getLocation(c, "facing_pos")))
-                    )
-
-                    .then(literal("facingEntity")
-                        .then(argument("facing_entity", ArgumentTypes.entity())
-                            .executes(c -> teleportFacing(c,
-                                ArgumentTypes.getEntity(c, "facing_entity").getLocation()))
-                        )
-                    )
-                )
-            )
-        )
-
-        .then(argument("entity", ArgumentTypes.entity())
-            .executes(c -> {
-              User user = getUserSender(c);
-              Entity entity = ArgumentTypes.getEntity(c, "entity");
-
-              Component display = entity.teamDisplayName();
-
-              if (entity instanceof Player) {
-                display = Users.get(entity.getUniqueId())
-                    .displayName();
-              }
-
-              if (!user.checkTeleporting()) {
-                return 0;
-              }
-
-              user.createTeleport(entity::getLocation, UserTeleport.Type.TELEPORT)
-                  .setAsync(false)
-                  .setDelayed(false)
-                  .setSilent(true)
-                  .start();
-
-              c.getSource().sendSuccess(
-                  Component.text("Teleported ")
-                      .append(user.displayName().color(NamedTextColor.YELLOW))
-                      .append(Component.text(" to "))
-                      .append(display.color(NamedTextColor.YELLOW))
-              );
-              return 0;
-            })
-        )
-
-        .then(argument("location", ArgumentTypes.position())
-            .executes(c -> teleport(c, false, false))
-
-            .then(argument("yaw", FloatArgumentType.floatArg(-180f, 180f))
-                .executes(c -> teleport(c, true, false))
-
-                .then(argument("pitch", FloatArgumentType.floatArg(-90f, 90f))
-                    .executes(c -> teleport(c, true, true))
-                )
-            )
-        );
-  }
-
-  private int teleportFacing(CommandContext<CommandSource> c, Location facing)
-      throws CommandSyntaxException {
-    Location location = ArgumentTypes.getLocation(c, "location_to");
-    Vector3d dif = Vectors.doubleFrom(location.clone().subtract(facing));
-
-    location.setYaw((float) Vectors.getYaw(dif));
-    location.setPitch((float) Vectors.getPitch(dif));
-
-    Collection<Entity> entities = ArgumentTypes.getEntities(c, "entity");
-
-    return teleport(entities, location, Text.clickableLocation(location, false), c.getSource());
-  }
-
-  private int entityTeleport(CommandContext<CommandSource> c, boolean yaw, boolean pitch)
-      throws CommandSyntaxException {
-    Location location = ArgumentTypes.getLocation(c, "location_to");
-    Collection<Entity> entities = ArgumentTypes.getEntities(c, "entity");
-
-    if (yaw) {
-      location.setYaw(c.getArgument("yaw", Float.class));
-    }
-
-    if (pitch) {
-      location.setPitch(c.getArgument("pitch", Float.class));
-    }
-
-    return teleport(entities, location, Text.clickableLocation(location, false), c.getSource());
-  }
-
-  private int teleport(CommandContext<CommandSource> c, boolean yawGiven, boolean pitchGiven)
-      throws CommandSyntaxException {
-    User user = getUserSender(c);
-    Location loc = ArgumentTypes.getLocation(c, "location");
-
-    if (yawGiven) {
-      loc.setYaw(c.getArgument("yaw", Float.class));
-    }
-
-    if (pitchGiven) {
-      loc.setPitch(c.getArgument("pitch", Float.class));
-    }
-
-    if (!user.checkTeleporting()) {
-      return 0;
-    }
-
-    user.createTeleport(() -> loc, UserTeleport.Type.TELEPORT)
-        .setAsync(false)
-        .setSilent(true)
-        .setDelayed(false)
-        .start();
-
-    c.getSource().sendSuccess(
-        Component.text("Teleported ")
-            .append(user.displayName().color(NamedTextColor.YELLOW))
-            .append(Component.text(" to "))
-            .append(Text.clickableLocation(loc, false).color(NamedTextColor.YELLOW))
+        // Don't announce
+        false
     );
-    return 0;
   }
 
-  private int teleport(Collection<Entity> entities, Location location, Component destDisplayName,
-                       CommandSource source
+  public void entitiesToLocation(
+      CommandSource source,
+      @Argument("from_entity") List<Entity> entities,
+      @Argument(value = "dest_entity", optional = true) Location destLocation,
+      @Argument(value = "location", optional = true) Location destEntity,
+      @Argument(value = YAW_ARG, optional = true) Float yaw,
+      @Argument(value = PITCH_ARG, optional = true) Float pitch,
+      @Argument(value = "facing", optional = true) Location facing
+  ) throws CommandSyntaxException {
+    Location dest = destLocation == null ? destEntity : destLocation;
+    Objects.requireNonNull(dest);
+
+    if (entities.isEmpty()) {
+      throw Grenadier.exceptions().noEntityFound();
+    }
+
+    if (facing == null) {
+      applyRotations(dest, yaw, pitch);
+    } else {
+      Vector direction = facing.toVector().subtract(dest.toVector());
+      dest.setDirection(direction);
+    }
+
+    int successes = 0;
+    int failed = 0;
+
+    for (Entity e: entities) {
+      if (e instanceof Player player) {
+        User user = Users.get(player);
+
+        user.createTeleport(dest::clone, Type.TELEPORT)
+            .setDelayed(false)
+            .start();
+
+        successes++;
+      } else {
+        boolean success = teleportTo(e, dest);
+
+        if (success) {
+          successes++;
+        } else {
+          failed++;
+        }
+      }
+    }
+
+    if (successes == 0 && failed >= 1) {
+      throw Exceptions.create("Failed to teleport any entities");
+    }
+
+    if (failed >= 1) {
+      source.sendMessage(
+          Text.format("Failed to teleport &e{0, number}&r entities",
+              NamedTextColor.GRAY,
+              failed
+          )
+      );
+    }
+
+    if (successes == 1) {
+      var only = entities.get(0);
+
+      Component displayName = only instanceof Player player
+          ? Users.get(player).displayName()
+          : only.teamDisplayName();
+
+      source.sendSuccess(
+          Text.format("Teleported &e{0}&r to &6{1, location, -c -w}&r.",
+              NamedTextColor.GRAY, displayName, dest
+          )
+      );
+    } else {
+      source.sendSuccess(
+          Text.format(
+              "Teleported &e{0, number}&r entities to &6{1, location, -c -w}&r.",
+              NamedTextColor.GRAY, successes, dest
+          )
+      );
+    }
+  }
+
+  public void teleportToEntity(
+      CommandContext<CommandSource> context,
+      CommandSource source,
+      @Argument("from_entity") List<Entity> entities
   ) throws CommandSyntaxException {
     if (entities.isEmpty()) {
       throw Grenadier.exceptions().noEntityFound();
     }
 
-    int amount = 0;
-    for (Entity e : entities) {
-      if (e.getType() != EntityType.PLAYER) {
-        e.teleport(location);
-        amount++;
-        continue;
-      }
+    if (entities.size() > 1) {
+      var range = CommandContexts.getNodeRange(context, "from_entity");
+      var reader = Readers.create(context.getInput(), range.getStart());
 
-      User user = Users.get(e.getUniqueId());
-      if (user.isTeleporting()) {
-        continue;
-      }
-
-      user.createTeleport(() -> location, UserTeleport.Type.TELEPORT)
-          .setSetReturn(true)
-          .setDelayed(false)
-          .setSilent(true)
-          .start();
-
-      amount++;
+      throw Grenadier.exceptions().selectorOnlyOneEntity(reader);
     }
 
-    Component entMsg =
-        entities.size() > 1 ? Component.text(amount + " entities").color(NamedTextColor.YELLOW)
-            : entDisplay(entities).color(NamedTextColor.YELLOW);
+    Entity target = entities.get(0);
+    Location location = target.getLocation();
+
+    teleportSource(source, location);
+
+    Component displayName = target instanceof Player player
+        ? Users.get(player).displayName()
+        : target.teamDisplayName();
 
     source.sendSuccess(
-        Component.text("Teleported ")
-            .append(entMsg)
-            .append(Component.text(" to "))
-            .append(destDisplayName.color(NamedTextColor.YELLOW))
+        Text.format("Teleported to &e{0}&r.",
+            NamedTextColor.GRAY,
+            displayName
+        ),
+
+        // Don't announce
+        false
     );
-    return 0;
   }
 
-  public Component entOrUserDisplayName(Entity entity) {
-    if (entity.getType() == EntityType.PLAYER) {
-      return Users.get(entity.getUniqueId())
-          .displayName();
-    }
+  private void teleportSource(CommandSource source, Location location)
+      throws CommandSyntaxException
+  {
+    if (source.isPlayer()) {
+      var user = Users.get(source.asPlayer());
 
-    return entity.teamDisplayName();
+      user.createTeleport(location::clone, Type.TELEPORT)
+          .setDelayed(false)
+          .start();
+    } else {
+      var entity = source.asEntity();
+      boolean success = teleportTo(entity, location);
+
+      if (!success) {
+        throw Exceptions.create("Failed to teleport");
+      }
+    }
   }
 
-  public Component entDisplay(Collection<Entity> entities) {
-    for (Entity entity : entities) {
-      return entOrUserDisplayName(entity);
+  private boolean teleportTo(Entity e, Location l) {
+    return e.teleport(l.clone(),
+        TeleportCause.COMMAND,
+        EntityState.RETAIN_PASSENGERS
+    );
+  }
+
+  private void applyRotations(Location l, Float yaw, Float pitch) {
+    if (yaw != null) {
+      l.setYaw(yaw);
     }
 
-    return null;
+    if (pitch != null) {
+      l.setPitch(pitch);
+    }
   }
 }

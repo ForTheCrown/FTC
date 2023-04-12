@@ -8,18 +8,16 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.sk89q.worldedit.util.function.LevenshteinDistance;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import lombok.Getter;
 import net.forthecrown.commands.manager.Commands;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.commands.manager.FtcCommand.Usage;
-import net.forthecrown.commands.manager.FtcCommand.UsageFactory;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Completions;
 import net.forthecrown.utils.context.Context;
@@ -50,13 +48,19 @@ public class FtcHelpMap {
   /** Map of all existing commands, mapped to their name */
   private final Map<String, FtcCommand> existingCommands = new HashMap<>();
 
-  private final LinkedList<HelpEntry> entries = new LinkedList<>();
+  private final List<HelpEntry> entries = new ObjectArrayList<>();
 
   // Context used to pass data onto the page formatter
   private final ContextSet contextSet = ContextSet.create();
-  private final ContextOption<CommandSource> sourceOption = contextSet.newOption();
-  private final ContextOption<String> inputOption = contextSet.newOption();
-  private final ContextOption<Integer> actualPageSize = contextSet.newOption(5);
+
+  private final ContextOption<CommandSource> sourceOption
+      = contextSet.newOption();
+
+  private final ContextOption<String> inputOption
+      = contextSet.newOption();
+
+  private final ContextOption<Integer> actualPageSize
+      = contextSet.newOption(5);
 
   // Page format used to format entries for list-based display
   private final PageFormat<HelpEntry> pageFormat = PageFormat.create();
@@ -163,7 +167,7 @@ public class FtcHelpMap {
                          int pageSize,
                          CommandSource source
   ) throws CommandSyntaxException {
-    List<HelpEntry> entries = new LinkedList<>();
+    List<HelpEntry> entries = new ObjectArrayList<>();
 
     if (Strings.isNullOrEmpty(tag) || tag.equalsIgnoreCase("all")) {
       entries.addAll(getAll());
@@ -214,10 +218,7 @@ public class FtcHelpMap {
 
   private Collection<HelpEntry> lookup(String tag, CommandSource source) {
     // Try just calling the keyword lookup
-    Collection<HelpEntry> result = keywordLookup.getOrDefault(
-        tag, Collections.emptyList()
-    );
-
+    Collection<HelpEntry> result = getEntries(tag);
     result.removeIf(entry -> !entry.test(source));
 
     if (!result.isEmpty()) {
@@ -269,6 +270,20 @@ public class FtcHelpMap {
     return Collections.unmodifiableCollection(existingCommands.values());
   }
 
+  public Collection<HelpEntry> getAllEntries() {
+    return Collections.unmodifiableCollection(entries);
+  }
+
+  public Collection<HelpEntry> getEntries(String keyword) {
+    var list = keywordLookup.getOrDefault(keyword, ObjectLists.emptyList());
+
+    if (list.isEmpty()) {
+      return list;
+    }
+
+    return new ObjectArrayList<>(list);
+  }
+
   public void addCommand(FtcCommand command) {
     existingCommands.put(command.getName(), command);
   }
@@ -280,19 +295,36 @@ public class FtcHelpMap {
    * properly index every keyword, alias and command label.
    */
   public void update() {
+    keywordLookup.clear();
+    entries.removeIf(entry -> entry instanceof CommandHelpEntry);
+
     existingCommands.forEach((s, command) -> {
+      CommandHelpEntry entry = new CommandHelpEntry(command);
+
       UsageFactory factory = arguments -> {
         Usage usage = new Usage(arguments);
-        command.getUsages().add(usage);
+        entry.getUsages().add(usage);
         return usage;
       };
+
+      if (command.isSimpleUsages()) {
+        factory.usage("").addInfo(command.getDescription());
+      }
+
       command.populateUsages(factory);
 
-      add(new CommandHelpEntry(command));
+      entries.add(new CommandHelpEntry(command));
     });
+
+    entries.forEach(this::placeInLookup);
   }
 
   public void add(HelpEntry entry) {
+    entries.add(entry);
+    placeInLookup(entry);
+  }
+
+  private void placeInLookup(HelpEntry entry) {
     entry.getKeywords().forEach(s -> {
       Collection<HelpEntry> entries = keywordLookup.computeIfAbsent(
           normalize(s), s1 -> new ObjectArrayList<>()
@@ -300,8 +332,6 @@ public class FtcHelpMap {
 
       entries.add(entry);
     });
-
-    entries.add(entry);
   }
 
   private static String normalize(String s) {

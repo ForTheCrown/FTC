@@ -4,5 +4,5 @@
     "launch_file": "run.bat"
   },
   "build_id": 1740,
-  "debug_build": false
+  "debug_build": true
 }

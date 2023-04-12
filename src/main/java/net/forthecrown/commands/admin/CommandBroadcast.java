@@ -1,6 +1,7 @@
 package net.forthecrown.commands.admin;
 
 import net.forthecrown.commands.arguments.Arguments;
+import net.forthecrown.commands.help.UsageFactory;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Announcer;
 import net.forthecrown.core.Permissions;

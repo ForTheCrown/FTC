@@ -313,6 +313,18 @@ public abstract class TextWriter implements ComponentLike {
     write(Text.format(format, color, args));
   }
 
+  /**
+   * Delegate method for {@link Text#format(String, Style, Object...)}. Writes a formatted
+   * message to this writer
+   *
+   * @param format The format to use
+   * @param style  The style to use
+   * @param args   The arguments to use
+   */
+  public void formatted(String format, Style style, Object... args) {
+    write(Text.format(format, style, args));
+  }
+
   public void formattedLine(String format, Object... args) {
     formattedLine(format, Style.empty(), args);
   }

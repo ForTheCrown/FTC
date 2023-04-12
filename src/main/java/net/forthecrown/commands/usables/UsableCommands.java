@@ -2,7 +2,7 @@ package net.forthecrown.commands.usables;
 
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import net.forthecrown.commands.manager.FtcCommand.UsageFactory;
+import net.forthecrown.commands.help.UsageFactory;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Nodes;
 import net.forthecrown.useables.CheckHolder;

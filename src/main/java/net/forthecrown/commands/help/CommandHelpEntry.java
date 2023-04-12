@@ -1,59 +1,44 @@
 package net.forthecrown.commands.help;
 
-import static net.kyori.adventure.text.Component.text;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import com.mojang.datafixers.util.Either;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.utils.text.writer.TextWriter;
-import net.kyori.adventure.text.Component;
 
 @Getter
 @RequiredArgsConstructor
-public class CommandHelpEntry implements HelpEntry {
+public class CommandHelpEntry extends AbstractHelpEntry {
+
   private final FtcCommand command;
 
   @Override
-  public void writeShort(TextWriter writer, CommandSource source) {
-    Component c = text()
-        .append(
-            text("/" + command.getName(), writer.getFieldStyle()),
-            writer.getFieldSeparator(),
-            text(command.getDescription(), writer.getFieldValueStyle())
-        )
-        .hoverEvent(command.asHoverEvent(source))
-        .build();
+  public CommandDisplayInfo createDisplay() {
+    var category = command.getClass()
+        .getPackageName()
+        .replace("net.forthecrown.commands.", "")
+        .replace("net.forthecrown.commands", "");
 
-    writer.write(c);
-  }
-
-  @Override
-  public void writeFull(TextWriter writer, CommandSource source) {
-    command.writeMetadata(writer, source);
-    command.writeUsages(writer, source, true);
-  }
-
-  @Override
-  public Collection<String> getKeywords() {
-    Set<String> strings = new HashSet<>();
-    strings.add(command.getHelpListName());
-    strings.add(command.getName());
-
-    if (command.getAliases() != null) {
-      strings.addAll(command.getAliases());
+    if (command.getBuiltNode() != null) {
+      return CommandDisplayInfo.create(
+          Either.right(command.getBuiltNode()),
+          getUsages(),
+          command.getHelpListName(),
+          category
+      );
     }
 
-    strings.addAll(command.createKeywords());
-    return strings;
+    return CommandDisplayInfo.create(
+        Either.left(command.getCommand()),
+        getUsages(),
+        command.getHelpListName(),
+        category
+    );
   }
 
   @Override
   public boolean test(CommandSource source) {
-    return command.test(source);
+    return command.canUse(source);
   }
 
   @Override

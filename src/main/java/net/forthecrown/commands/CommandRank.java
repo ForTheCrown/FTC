@@ -1,5 +1,6 @@
 package net.forthecrown.commands;
 
+import net.forthecrown.commands.help.UsageFactory;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.inventory.RankMenu;

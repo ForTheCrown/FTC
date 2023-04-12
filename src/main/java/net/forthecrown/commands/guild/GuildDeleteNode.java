@@ -3,6 +3,7 @@ package net.forthecrown.commands.guild;
 import static net.forthecrown.guilds.GuildRank.ID_LEADER;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
+import net.forthecrown.commands.help.UsageFactory;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;

@@ -1,12 +1,10 @@
 package net.forthecrown.commands.home;
 
-import static net.forthecrown.commands.home.CommandHome.HOME_KEYWORDS;
-
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.datafixers.util.Pair;
-import java.util.Collection;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.arguments.HomeParseResult;
+import net.forthecrown.commands.help.UsageFactory;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Messages;
@@ -29,11 +27,6 @@ public class CommandDeleteHome extends FtcCommand {
     setAliases("removehome", "remhome", "yeethome", "delhome");
 
     register();
-  }
-
-  @Override
-  public Collection<String> createKeywords() {
-    return HOME_KEYWORDS;
   }
 
   @Override
