@@ -46,7 +46,7 @@ argument("from_entity", f_entities) {
     executes = entitiesToLocation()
 
     label = "<pos: x,y,z>"
-    description = "Teleports all <entities> to a <location>"
+    description = "Teleports all <entities> to a <pos>"
 
     argument(YAW_ARG, @yaw) {
       label = "<yaw: -180..180>"
@@ -64,6 +64,7 @@ argument("from_entity", f_entities) {
     literal("facing") {
       literal("entity") {
         argument("facing", f_entity) {
+          label = "<facing: entity>"
           description = "Teleports <entities> to a <location> and makes them face an <entity>"
 
           map_result = selectorToDestination()
@@ -72,6 +73,7 @@ argument("from_entity", f_entities) {
       }
 
       argument("facing", vec3d) {
+        label = "<facing: x,y,z>"
         description = "Teleports <entities> to a <location> and makes them face a position"
         map_result = result.apply()
         executes = entitiesToLocation()

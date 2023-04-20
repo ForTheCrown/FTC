@@ -53,8 +53,7 @@ public interface FtcSuggestions {
         && token.length() >= 3
         && GeneralConfig.userCacheSuggestions
     ) {
-      return UserManager.get().getUserLookup()
-          .suggestNames(builder);
+      return UserManager.get().getUserLookup().suggestNames(builder);
     }
 
     boolean seeVanished = c == null || c.hasPermission(Permissions.VANISH_SEE);

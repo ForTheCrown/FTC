@@ -1,7 +1,5 @@
 package net.forthecrown.commands.arguments;
 
-import static net.forthecrown.commands.manager.Commands.EMPTY_READER;
-
 import com.mojang.brigadier.ImmutableStringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.datafixers.util.Pair;
@@ -9,6 +7,7 @@ import lombok.Getter;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.Readers;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserLookupEntry;
 import net.forthecrown.user.Users;
@@ -18,8 +17,8 @@ import org.bukkit.Location;
 @Getter
 public class HomeParseResult implements ParseResult<Pair<String, Location>> {
 
-  public static final HomeParseResult DEFAULT = new HomeParseResult(EMPTY_READER,
-      UserHomes.DEFAULT);
+  public static final HomeParseResult DEFAULT
+      = new HomeParseResult(Readers.EMPTY, UserHomes.DEFAULT);
 
   private final ImmutableStringReader reader;
   private final UserLookupEntry user;

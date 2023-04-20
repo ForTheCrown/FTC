@@ -1,7 +1,6 @@
 package net.forthecrown.core.challenge;
 
 import com.google.common.collect.ImmutableList;
-import it.unimi.dsi.fastutil.objects.ObjectIntPair;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.Objects;
 import java.util.Optional;
@@ -31,23 +30,18 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.profile.PlayerTextures;
 
+@Getter
 @RequiredArgsConstructor
 public class ItemChallenge implements Challenge {
 
   @Setter
   private ItemStack targetItem;
 
-  @Getter
   private final Slot menuSlot;
-
-  @Getter
   private final Reward reward;
-
-  @Getter
   private final ImmutableList<Component> description;
-
-  @Getter
   private final ResetInterval resetInterval;
+  private final boolean wildcardAllowed;
 
   /* ------------------------------ METHODS ------------------------------- */
 
@@ -172,16 +166,16 @@ public class ItemChallenge implements Challenge {
     var inventory = player.getInventory();
     var found = findContained(inventory);
 
-    if (found.rightInt() < targetAmount) {
+    if (found.totalFound() < targetAmount) {
       throw Util.newException(
           "Not enough items, required %s, found %s",
-          targetAmount, found.rightInt()
+          targetAmount, found.totalFound()
       );
     }
 
     int remaining = targetAmount;
 
-    for (ItemStack n : found.left()) {
+    for (ItemStack n : found.found()) {
       if (n.getAmount() < remaining) {
         remaining -= n.getAmount();
         n.setAmount(0);
@@ -279,7 +273,7 @@ public class ItemChallenge implements Challenge {
           var inventory = user.getInventory();
           var found = findContained(inventory);
 
-          if (found.rightInt() < targetItem.getAmount()) {
+          if (found.totalFound() < targetItem.getAmount()) {
             throw Exceptions.dontHaveItemForShop(targetItem);
           }
 
@@ -290,7 +284,7 @@ public class ItemChallenge implements Challenge {
         .build();
   }
 
-  private ObjectIntPair<Set<ItemStack>> findContained(Inventory inv) {
+  private ItemSearchResult findContained(Inventory inv) {
     Set<ItemStack> found = new ObjectOpenHashSet<>();
     int foundCount = 0;
 
@@ -307,7 +301,32 @@ public class ItemChallenge implements Challenge {
       found.add(n);
     }
 
-    return ObjectIntPair.of(found, foundCount);
+    if (wildcardAllowed && foundCount < targetItem.getAmount()) {
+      ItemStack wildcard = findWildcard(inv);
+
+      if (wildcard != null) {
+        Set<ItemStack> items = new ObjectOpenHashSet<>();
+        items.add(wildcard);
+        return new ItemSearchResult(items, wildcard.getAmount(), true);
+      }
+    }
+
+    return new ItemSearchResult(found, foundCount, false);
+  }
+
+  private ItemStack findWildcard(Inventory inventory) {
+    var it = ItemStacks.nonEmptyIterator(inventory);
+
+    while (it.hasNext()) {
+      var n = it.next();
+      var meta = n.getItemMeta();
+
+      if (ItemStacks.hasTagElement(meta, "shop_wildcard")) {
+        return n;
+      }
+    }
+
+    return null;
   }
 
   private boolean matches(ItemStack item) {
@@ -404,5 +423,14 @@ public class ItemChallenge implements Challenge {
         description,
         reward
     );
+  }
+
+  /* ---------------------------- SUB CLASSES ----------------------------- */
+
+  private record ItemSearchResult(Set<ItemStack> found,
+                                  int totalFound,
+                                  boolean wildcardUsed
+  ) {
+
   }
 }

@@ -10,7 +10,7 @@
     "${nashorn}",
     "${mathlib}",
     "${grenadier}",
-    "net.forthecrown:grenadier-annotations:1.1.1",
+    "${grenadier_annotations}",
     "${toml}",
     "org.apache.commons:commons-text:1.10.0"
   ]

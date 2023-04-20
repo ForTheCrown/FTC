@@ -16,7 +16,8 @@ public class ItemChallengeParser {
       KEY_REWARD = "reward",
       KEY_SLOT = "slot",
       KEY_DESCRIPTION = "description",
-      KEY_TYPE = "type";
+      KEY_TYPE = "type",
+      KEY_WILDCARD = "wildcard_allowed";
 
   public static DataResult<ItemChallenge> parse(JsonObject element) {
     JsonWrapper json = JsonWrapper.wrap(element);
@@ -44,8 +45,10 @@ public class ItemChallengeParser {
       reward = Reward.deserialize(json.get(KEY_REWARD));
     }
 
+    boolean wildcardAllowed = json.getBool(KEY_WILDCARD);
+
     return DataResult.success(
-        new ItemChallenge(slot, reward, desc.build(), interval)
+        new ItemChallenge(slot, reward, desc.build(), interval, wildcardAllowed)
     );
   }
 }

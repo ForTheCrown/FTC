@@ -145,8 +145,6 @@ import org.bukkit.inventory.ItemStack;
 public final class Commands {
   private Commands() {}
 
-  public static final StringReader EMPTY_READER = new StringReader("");
-
   //Command loading
   @OnEnable
   private static void init() {
