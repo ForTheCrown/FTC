@@ -30,7 +30,7 @@ public abstract class MenuPage implements MenuNode {
     this(null);
   }
 
-  protected final void initMenu(MenuBuilder builder, boolean parentButton) {
+  public final void initMenu(MenuBuilder builder, boolean parentButton) {
     addBorder(builder);
 
     if (parentButton && parent != null) {

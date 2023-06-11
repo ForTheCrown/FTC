@@ -46,7 +46,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Switch;
-import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlock;
 
 /**
  * The end opener should automatically close and open the end portal in Hazelguard. It should be
@@ -132,7 +132,7 @@ public class EndOpener {
           // Run sync
           Tasks.runSync(() -> {
             try {
-              EndDragonFight fight = VanillaAccess.getLevel(world).dragonFight();
+              EndDragonFight fight = VanillaAccess.getLevel(world).getDragonFight();
 
               // Create exit portal
               world.getEnderDragonBattle().generateEndPortal(true);

@@ -16,7 +16,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.TileState;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlockStates;
+import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlockStates;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.math.vector.Vector3i;
 

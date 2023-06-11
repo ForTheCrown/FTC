@@ -46,7 +46,7 @@ import net.kyori.adventure.util.HSVLike;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.Permissible;
 import org.intellij.lang.annotations.RegExp;

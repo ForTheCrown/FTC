@@ -157,7 +157,7 @@ class GuildChunkNode extends GuildCommandNode {
       int maxChunkClaims = rank.getMaxChunkClaims();
 
       if (maxChunkClaims != NOT_SET
-          && maxChunkClaims >= member.getClaimedChunks()
+          && member.getClaimedChunks() >= maxChunkClaims
       ) {
         throw Exceptions.format(
             "Cannot claim more chunks! (Over rank limit of {0, number})",

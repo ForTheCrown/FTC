@@ -62,7 +62,7 @@ public class MessageCreationMenu extends MenuPage {
                   );
 
                   ClientboundOpenSignEditorPacket
-                      packet = new ClientboundOpenSignEditorPacket(pos);
+                      packet = new ClientboundOpenSignEditorPacket(pos, true);
 
                   VanillaAccess.getPacketListener(user.getPlayer())
                       .send(packet);

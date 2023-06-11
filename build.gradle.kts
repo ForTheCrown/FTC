@@ -3,11 +3,11 @@ import java.util.Date
 plugins {
   java
 
-  id("io.papermc.paperweight.userdev") version "1.5.3"
+  id("io.papermc.paperweight.userdev") version "1.5.5"
   id("ftc_plugin")
 }
 
-val minecraftVersion = "1.19.4"
+val minecraftVersion = "1.20"
 val baseJarName = "ForTheCrown"
 ftc.jarBaseName = baseJarName
 
