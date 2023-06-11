@@ -11,8 +11,7 @@ import net.forthecrown.user.Users;
 
 public abstract class FtcCommand extends AbstractCommand {
 
-  public static final String DEFAULT_DESCRIPTION       = "An FTC command";
-  public static final String DEFAULT_PERMISSION_FORMAT = "ftc.commands.{command}";
+  public static final String DEFAULT_DESCRIPTION = "An FTC command";
 
   @Getter
   private boolean simpleUsages = false;
@@ -20,10 +19,10 @@ public abstract class FtcCommand extends AbstractCommand {
   public FtcCommand(String name) {
     super(name);
 
-    String perm = DEFAULT_PERMISSION_FORMAT.replace("{command}", name);
+    String perm = Commands.DEFAULT_PERMISSION_FORMAT.replace("{command}", name);
 
     setPermission(Permissions.register(perm));
-    getCommand().withDescription(DEFAULT_DESCRIPTION);
+    setDescription(DEFAULT_DESCRIPTION);
   }
 
   public String getHelpListName() {

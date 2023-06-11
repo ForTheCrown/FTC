@@ -18,10 +18,12 @@ import org.bukkit.inventory.ItemStack;
 public final class Commands {
   private Commands() {}
 
+  public static final String DEFAULT_PERMISSION_FORMAT = "ftc.commands.{command}";
+
   public static AnnotatedCommandContext createAnnotationContext() {
     AnnotatedCommandContext ctx = AnnotatedCommandContext.create();
 
-    ctx.setDefaultPermissionFormat("ftc.commands.{command}");
+    ctx.setDefaultPermissionFormat(DEFAULT_PERMISSION_FORMAT);
     ctx.setDefaultExecutes("execute");
     ctx.setTypeRegistry(createFtcTypeRegistry());
 
@@ -36,18 +38,19 @@ public final class Commands {
 
   public static TypeRegistry createFtcTypeRegistry() {
     var registry = TypeRegistry.newRegistry();
-    registry.register("user", () -> Arguments.USER);
-    registry.register("users", () -> Arguments.USERS);
-    registry.register("online_user", () -> Arguments.ONLINE_USER);
+    registry.register("user",         () -> Arguments.USER);
+    registry.register("users",        () -> Arguments.USERS);
+    registry.register("online_user",  () -> Arguments.ONLINE_USER);
     registry.register("online_users", () -> Arguments.ONLINE_USERS);
-    registry.register("chat", () -> Arguments.CHAT);
-    registry.register("message", () -> Arguments.MESSAGE);
-    registry.register("ftc_key", () -> Arguments.FTC_KEY);
+    registry.register("chat",         () -> Arguments.CHAT);
+    registry.register("message",      () -> Arguments.MESSAGE);
+    registry.register("ftc_key",      () -> Arguments.FTC_KEY);
+    registry.register("rhines",       () -> Arguments.RHINES);
 
-    registry.register("f_player", () -> new ExpandedEntityArgument(false, true));
-    registry.register("f_players", () -> new ExpandedEntityArgument(true, true));
-    registry.register("f_entity", () -> new ExpandedEntityArgument(false, false));
-    registry.register("f_entities", () -> new ExpandedEntityArgument(true, false));
+    registry.register("f_player",     () -> new ExpandedEntityArgument(false, true));
+    registry.register("f_players",    () -> new ExpandedEntityArgument(true, true));
+    registry.register("f_entity",     () -> new ExpandedEntityArgument(false, false));
+    registry.register("f_entities",   () -> new ExpandedEntityArgument(true, false));
 
     return registry;
   }

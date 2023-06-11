@@ -6,6 +6,10 @@ import org.bukkit.permissions.Permission;
 public final class Permissions {
   private Permissions() {}
 
+  /**
+   * General admin permission
+   * @deprecated Too broad, use permissions specific to use case
+   */
   @Deprecated
   public static final Permission ADMIN      = register("ftc.admin");
 

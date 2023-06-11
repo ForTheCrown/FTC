@@ -3,8 +3,8 @@ plugins {
   id("io.freefair.lombok") version "8.0.1"
 }
 
-val grenadier      = "net.forthecrown:grenadier:2.0.9"
-val grenadierAnnot = "net.forthecrown:grenadier-annotations:1.1.1"
+val grenadier      = "net.forthecrown:grenadier:2.1.0"
+val grenadierAnnot = "net.forthecrown:grenadier-annotations:1.2.0"
 val mathlib        = "org.spongepowered:math:2.1.0-SNAPSHOT"
 val toml           = "org.tomlj:tomlj:1.1.0"
 val apiVersion     = "1.20"
@@ -27,7 +27,7 @@ subprojects {
   }
 
   dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.20-R0.1-SNAPSHOT")
 
     compileOnly(grenadier)
     compileOnly(grenadierAnnot)

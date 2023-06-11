@@ -2,10 +2,14 @@ package net.forthecrown.command.arguments;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import net.forthecrown.command.arguments.chat.ChatArgument;
 import net.forthecrown.command.arguments.chat.MessageArgument;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.types.ArgumentTypes;
+import net.forthecrown.grenadier.types.SuffixedNumberArgument;
 import net.forthecrown.user.User;
 import net.kyori.adventure.text.Component;
 
@@ -21,6 +25,8 @@ public interface Arguments {
   UserArgument ONLINE_USER = new UserArgument(false, false);
 
   FtcKeyArgument FTC_KEY = new FtcKeyArgument();
+
+  SuffixedNumberArgument<Integer> RHINES = createRhineArgument();
 
   static List<User> getUsers(CommandContext<CommandSource> c, String argument)
       throws CommandSyntaxException
@@ -39,5 +45,16 @@ public interface Arguments {
   static Component getMessage(CommandContext<CommandSource> c, String arg) {
     var source = c.getSource();
     return c.getArgument(arg, MessageArgument.Result.class).format(source.asBukkit());
+  }
+
+  private static SuffixedNumberArgument<Integer> createRhineArgument() {
+    Map<String, Integer> units = new HashMap<>();
+    units.put("k",    1000);
+    units.put("m",    1_000_000);
+    units.put("mil",  1_000_000);
+    units.put("b",    1_000_000_000);
+    units.put("bil",  1_000_000_000);
+
+    return ArgumentTypes.suffixedInt(units);
   }
 }
