@@ -1,0 +1,15 @@
+name = "punching_bag"
+aliases = "punchingbag"
+        | "punching_bags"
+        | "punchingbags"
+
+description = "Creates an invincible punching bag"
+executes = createDummy()
+
+argument("location", vec3d) {
+  map_result = result.apply()
+  executes = createDummy()
+
+  label = "<location: x y z>"
+  description = "Creates an invincible punching bag at <location>"
+}

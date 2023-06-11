@@ -1,0 +1,4 @@
+name: "FTC-Core"
+main: "net.forthecrown.core.CorePlugin"
+version: "${version}"
+api-version: "${api_version}"

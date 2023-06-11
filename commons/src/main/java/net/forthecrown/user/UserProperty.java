@@ -1,0 +1,34 @@
+package net.forthecrown.user;
+
+import com.google.gson.JsonElement;
+import net.forthecrown.registry.RegistryBound;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+public interface UserProperty<T> extends RegistryBound<UserProperty<T>> {
+
+  @NotNull
+  T getDefaultValue();
+
+  @Nullable
+  PropertyEditCallback<T> getCallback();
+
+  JsonElement serialize(T value);
+
+  T deserialize(JsonElement element);
+
+  interface PropertyEditCallback<T> {
+    void onUpdate(User user, T value);
+  }
+
+  interface Builder<T> {
+
+    Builder<T> key(String key);
+
+    Builder<T> callback(PropertyEditCallback<T> callback);
+
+    Builder<T> defaultValue(@NotNull T value);
+
+    UserProperty<T> build();
+  }
+}

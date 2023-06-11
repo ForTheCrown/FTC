@@ -1,1 +1,17 @@
 rootProject.name = "FTC"
+
+include("commons")
+include("core")
+include("scripting")
+include("devtools")
+include("resource-world")
+include("end-opener")
+include("guilds")
+include("waypoints")
+include("challenges")
+include("dungeons")
+include("special-items")
+include("punishments")
+include("cosmetics")
+include("structures")
+include("menus")

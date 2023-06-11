@@ -1,0 +1,4 @@
+name: "FTC-MenuService"
+main: "net.forthecrown.menu.internal.MenusPlugin"
+version: "${version}"
+api-version: "${api_version}"

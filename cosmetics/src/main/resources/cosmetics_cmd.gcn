@@ -1,0 +1,33 @@
+name        = "cosmetics"
+aliases     = "cosmetic"
+permission  = PERMISSION
+
+executes = openMenu()
+
+literal('reload') {
+  requires = permission(ADMIN_PERMISSION)
+  executes = reloadPlugin()
+}
+
+literal('save') {
+  requires = permission(ADMIN_PERMISSION)
+  executes = savePlugin()
+}
+
+argument('player', user) {
+  requires = permission(ADMIN_PERMISSION)
+
+  executes = showPlayerData()
+
+  argument('type', @cosmetic_type) {
+    literal('active') {
+      executes = showActive()
+
+      argument('effect' @effect) {
+      }
+    }
+
+    literal('add').argument('effect', @effect) = addCosmetic()
+    literal('remove').argument('effect', @effect) = removeCosmetic()
+  }
+}

@@ -1,0 +1,22 @@
+name = "invstore"
+description = "Allows for inventories to be saved"
+
+literal("give").argument(player, f_player).argument('category', string) {
+  executes = giveItems()
+  suggests = suggestExistingCategories()
+}
+
+literal("return").argument(player, f_player).argument('category', string) {
+  executes = returnItems()
+  suggests = suggestExistingCategories()
+}
+
+literal("swap").argument(player, f_player).argument('category', string) {
+  executes = swapItems()
+  suggests = suggestExistingCategories()
+}
+
+literal("save").argument(player, f_player).argument('category', string) {
+  executes = saveItems()
+  suggests = suggestCategories()
+}

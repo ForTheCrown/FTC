@@ -1,0 +1,34 @@
+name = "dungeons"
+description = "General dungeons command"
+
+literal('giveapple') {
+  argument('boss_apple', @apple) {
+    label = "<boss>"
+    description = "Gives you a <boss>'s apple"
+
+    executes = giveApple()
+  }
+}
+
+argument('boss' @boss) {
+  map_result = result.getValue()
+
+  literal('kill') {
+    description = "Kills a <boss>"
+    executes = killBoss()
+  }
+
+  literal('force_spawn') {
+    description = "Forces a boss to spawn, ignoring the item check"
+    executes = forceSpawn()
+  }
+
+  literal("spawn") {
+    description = [
+      "Attempts to spawn a boss, checks that the executor",
+      "has all required items"
+    ]
+
+    executes = normalSpawn()
+  }
+}

@@ -1,0 +1,58 @@
+[metadata]
+price = 1000
+menu_slot = 20
+
+
+[cupids_arrows]
+displayName = "Cupid's arrows"
+description = "Time to do some matchmaking..."
+particle = "HEARTS"
+slot = 13
+
+[cupids_evil_twin]
+displayName = "Cupid's Evil Twin"
+description = "Time to undo some matchmaking..."
+particle = "DAMAGE_INDICATOR"
+slot = 14
+
+[firework]
+displayName = "Firework"
+description = "Almost as if you're using a crossbow"
+particle = "FIREWORKS_SPARK"
+slot = 20
+
+[flame]
+displayName = "Flame"
+description = "Works perfectly with flame arrows."
+particle = "FLAME"
+slot = 10
+
+[smoke]
+displayName = "Smoke"
+description = "Pretend to be a cannon."
+particle = "CAMPFIRE_COZY_SMOKE"
+slot = 16
+
+[sneeze]
+displayName = "Sneeze"
+description = "Cover the place in juicy snot."
+particle = "SNEEZE"
+slot = 12
+
+[snowy]
+displayName = "Snowy"
+description = "To stay in the Christmas spirit."
+particle = "SNOWBALL"
+slot = 11
+
+[souls]
+displayName = "Souls"
+description = "Scary souls escaping from your arrows"
+particle = "SOUL"
+slot = 19
+
+[sticky_trail]
+displayName = "Sticky Trail"
+description = "For those who enjoy looking at the trail lol"
+particle = "DRIPPING_HONEY"
+slot = 15
