@@ -1,0 +1,37 @@
+name = "usertitles"
+aliases = "user_titles"
+        | "titles"
+        | "userranks"
+        | "user_ranks"
+
+description = "Manages user titles and rank tiers"
+
+argument(ARG, user) {
+  label = "<user>"
+  description = "Displays a <user>'s titles and their rank tier"
+  executes = showTitlesInfo()
+
+  map_result = resultToUser()
+
+  literal("titles") {
+    literal("set").argument(TITLE, @title) {
+      executes = setTitle()
+      description = "Set's a <user>'s active title to <title>"
+    }
+
+    literal("add").argument(TITLE, @title) {
+      executes = addTitle()
+      description = "Adds a <title> to a <user>'s available titles"
+    }
+
+    literal("remove").argument(TITLE, @title) {
+      executes = removeTitle()
+      description = "Removes a <title> from a <user>'s available titles"
+    }
+  }
+
+  literal("tier").argument(TIER, @tier) {
+    executes = setTier()
+    description = "Sets a <user>'s rank tier to <tier>"
+  }
+}

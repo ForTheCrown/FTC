@@ -43,7 +43,7 @@ import org.jetbrains.annotations.Nullable;
  * anything that's like enchantments, attribute modifiers and display info. The rest is free game
  * for us to mess around with as we deem fit.
  * <p>
- * This class also provides static constructors for {@link BaseItemBuilder} implementations. Item
+ * This class also provides static constructors for {@link ItemBuilder} implementations. Item
  * builders are classes which provide an interface for constructing {@link ItemStack} objects bit by
  * bit. There are more specialized builders for specific types like {@link #headBuilder()} for a
  * {@link SkullItemBuilder} and {@link #potionBuilder(Material)} for {@link PotionItemBuilder}. If a
@@ -55,7 +55,7 @@ import org.jetbrains.annotations.Nullable;
  * @see #builder(Material)
  * @see #headBuilder()
  * @see #potionBuilder(Material)
- * @see BaseItemBuilder
+ * @see ItemBuilder
  * @see DefaultItemBuilder
  * @see PotionItemBuilder
  * @see SkullItemBuilder
@@ -379,7 +379,7 @@ public final class ItemStacks {
     return new PotionItemBuilder(material, amount);
   }
 
-  public static BaseItemBuilder<?> toBuilder(ItemStack stack) {
+  public static ItemBuilder<?> toBuilder(ItemStack stack) {
     var meta = stack.getItemMeta();
 
     if (meta instanceof PotionMeta) {

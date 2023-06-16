@@ -8,11 +8,12 @@ import java.time.chrono.ChronoZonedDateTime;
 import java.util.Date;
 import net.forthecrown.text.Text;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.NotNull;
 
 class DateFormatType implements TextFormatType {
 
   @Override
-  public Component resolveArgument(Object value, String style) {
+  public @NotNull Component resolveArgument(@NotNull Object value, @NotNull String style) {
     if (value instanceof Number number) {
       long timeStamp = number.longValue();
       return format(timeStamp, style);

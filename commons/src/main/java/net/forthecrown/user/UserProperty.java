@@ -1,11 +1,10 @@
 package net.forthecrown.user;
 
 import com.google.gson.JsonElement;
-import net.forthecrown.registry.RegistryBound;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface UserProperty<T> extends RegistryBound<UserProperty<T>> {
+public interface UserProperty<T> {
 
   @NotNull
   T getDefaultValue();

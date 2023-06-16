@@ -7,11 +7,12 @@ import java.text.DecimalFormat;
 import net.forthecrown.text.RomanNumeral;
 import net.forthecrown.text.Text;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.NotNull;
 
 class NumberType implements TextFormatType {
 
   @Override
-  public Component resolveArgument(Object value, String style) {
+  public @NotNull Component resolveArgument(@NotNull Object value, @NotNull String style) {
     if (!(value instanceof Number number)) {
       return Text.valueOf(value);
     }
@@ -30,8 +31,7 @@ class NumberType implements TextFormatType {
 
     if (style.contains("-floor")) {
       number = number.longValue();
-      style = style.replaceAll("-floor", "")
-          .trim();
+      style = style.replaceAll("-floor", "").trim();
     }
 
     return text(

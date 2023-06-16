@@ -5,8 +5,10 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.lang.StackWalker.Option;
 import net.forthecrown.command.arguments.Arguments;
 import net.forthecrown.command.arguments.ExpandedEntityArgument;
+import net.forthecrown.command.help.FtcSyntaxConsumer;
 import net.forthecrown.grenadier.Readers;
 import net.forthecrown.grenadier.annotations.AnnotatedCommandContext;
+import net.forthecrown.grenadier.annotations.AnnotatedCommandContext.DefaultExecutionRule;
 import net.forthecrown.grenadier.annotations.CommandDataLoader;
 import net.forthecrown.grenadier.annotations.TypeRegistry;
 import net.forthecrown.text.page.PageEntryIterator;
@@ -23,9 +25,11 @@ public final class Commands {
   public static AnnotatedCommandContext createAnnotationContext() {
     AnnotatedCommandContext ctx = AnnotatedCommandContext.create();
 
+    ctx.setDefaultRule(DefaultExecutionRule.IF_NO_CHILDREN);
     ctx.setDefaultPermissionFormat(DEFAULT_PERMISSION_FORMAT);
     ctx.setDefaultExecutes("execute");
     ctx.setTypeRegistry(createFtcTypeRegistry());
+    ctx.setSyntaxConsumer(new FtcSyntaxConsumer());
 
     Class<?> caller = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE)
         .getCallerClass();

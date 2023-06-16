@@ -7,7 +7,7 @@ import net.forthecrown.menu.ClickContext;
 import net.forthecrown.menu.Menu;
 import net.forthecrown.menu.MenuBuilder;
 import net.forthecrown.menu.MenuNode;
-import net.forthecrown.utils.inventory.Slot;
+import net.forthecrown.menu.Slot;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.context.Context;
 import org.bukkit.Sound;

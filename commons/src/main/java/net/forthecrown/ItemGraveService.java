@@ -31,8 +31,10 @@ public interface ItemGraveService {
    * Adds a filter with a set ID
    * @param id Filter ID
    * @param filter Item filter
+   * @throws IllegalArgumentException If a filter with the specified {@code id} has
+   *                                  already been registered
    */
-  void addFilter(@NotNull String id, @NotNull Filter filter);
+  void addFilter(@NotNull String id, @NotNull Filter filter) throws IllegalArgumentException;
 
   /**
    * Removes a filter with a specified ID

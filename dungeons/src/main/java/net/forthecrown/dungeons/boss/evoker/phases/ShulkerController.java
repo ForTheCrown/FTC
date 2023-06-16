@@ -235,7 +235,7 @@ public class ShulkerController {
   }
 
   Vector3d findTarget() {
-    Player target = PotionPhase.findTarget(boss);
+    Player target = PotionPhase.findTarget(boss, boss.getRandom());
 
     if (target == null) {
       return null;

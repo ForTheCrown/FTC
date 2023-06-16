@@ -11,7 +11,7 @@ public class DiscordRenderer extends AbstractFlattenerListener {
   String prefix = "";
 
   public String flatten(Component component) {
-    TextSplitter.FLATTENER.flatten(component, this);
+    Text.FLATTENER.flatten(component, this);
     return toString();
   }
 

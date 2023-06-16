@@ -21,7 +21,7 @@ import net.forthecrown.command.DataCommands;
 import net.forthecrown.command.DataCommands.DataAccessor;
 import net.forthecrown.command.Exceptions;
 import net.forthecrown.command.FtcCommand;
-import net.forthecrown.command.UsageFactory;
+import net.forthecrown.command.help.UsageFactory;
 import net.forthecrown.command.arguments.Arguments;
 import net.forthecrown.command.arguments.FtcKeyArgument;
 import net.forthecrown.grenadier.CommandSource;

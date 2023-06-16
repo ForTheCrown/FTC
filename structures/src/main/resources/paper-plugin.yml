@@ -1,4 +1,0 @@
-name: "FTC-Structures"
-main: "net.forthecrown.structure.StructuresPlugin"
-version: "${version}"
-api-version: "${api_version}"

@@ -1,6 +1,7 @@
 package net.forthecrown.scripts;
 
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 public abstract class ScriptExtension {
@@ -17,11 +18,11 @@ public abstract class ScriptExtension {
     this.script = script;
   }
 
-  protected void onBind(Script script) {
+  protected void onBind(@NotNull Script script) {
 
   }
 
-  protected void onUnbind(Script script) {
+  protected void onUnbind(@NotNull Script script) {
 
   }
 

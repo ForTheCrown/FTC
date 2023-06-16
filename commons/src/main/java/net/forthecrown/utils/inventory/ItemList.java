@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public interface ItemList extends List<ItemStack> {
+
   int REMOVE_ALL = -1;
 
   default void removeAllMatching(Collection<ItemStack> items) {
@@ -34,9 +35,7 @@ public interface ItemList extends List<ItemStack> {
     );
 
     int total = totalItemCount();
-    if ((removeAmount == REMOVE_ALL || removeAmount >= total)
-        && itemStack == null
-    ) {
+    if ((removeAmount == REMOVE_ALL || removeAmount >= total) && itemStack == null) {
       forEach(i -> i.setAmount(0));
       clear();
       return total;

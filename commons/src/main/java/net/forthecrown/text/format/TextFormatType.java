@@ -1,8 +1,10 @@
 package net.forthecrown.text.format;
 
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.NotNull;
 
 public interface TextFormatType {
 
-  Component resolveArgument(Object value, String style);
+  @NotNull
+  Component resolveArgument(@NotNull Object value, @NotNull String style);
 }

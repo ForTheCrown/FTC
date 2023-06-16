@@ -1,19 +1,31 @@
 package net.forthecrown.core.user;
 
 import com.google.common.base.Strings;
-import net.forthecrown.Loggers;
+import net.forthecrown.registry.Holder;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;
+import net.forthecrown.registry.RegistryListener;
 import net.forthecrown.user.ComponentName;
 import net.forthecrown.user.UserComponent;
-import org.slf4j.Logger;
 
 public final class Components {
   private Components() {}
 
-  private static final Logger LOGGER = Loggers.getLogger();
-
   public static final Registry<ComponentFactory<?>> REGISTRY = Registries.newRegistry();
+
+  static {
+    REGISTRY.setListener(new RegistryListener<>() {
+      @Override
+      public void onRegister(Holder<ComponentFactory<?>> value) {
+        value.getValue().id = value.getId();
+      }
+
+      @Override
+      public void onUnregister(Holder<ComponentFactory<?>> value) {
+        value.getValue().id = -1;
+      }
+    });
+  }
 
   public static <T extends UserComponent> ComponentFactory<T> getFactory(Class<T> type) {
     String name = findComponentName(type, true);

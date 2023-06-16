@@ -11,11 +11,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Spliterator;
+import java.util.UUID;
 import java.util.function.IntSupplier;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.forthecrown.text.page.PageEntryIterator;
+import net.forthecrown.user.UserLookup;
+import net.forthecrown.user.Users;
 import net.forthecrown.utils.ScoreIntMap.Entry;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -58,7 +61,7 @@ public class ScoreIntMap<K> implements Iterable<Entry<K>> {
   @Setter
   @Getter
   @Accessors(chain = true)
-  private KeyValidator validator;
+  private KeyValidator<K> validator;
 
   public ScoreIntMap() {
     this(() -> MINIMUM_VALUE);
@@ -262,6 +265,17 @@ public class ScoreIntMap<K> implements Iterable<Entry<K>> {
   }
 
   public interface KeyValidator<K> {
+
+    KeyValidator<UUID> IS_PLAYER = key -> {
+      UserLookup lookup = Users.getService().getLookup();
+      var entry = lookup.getEntry(key);
+
+      if (entry == null) {
+        return "No played named '%s' exists".formatted(key);
+      }
+
+      return null;
+    };
 
     /**
      * Tests the given UUID

@@ -9,7 +9,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 @Getter
-public class SkullItemBuilder extends BaseItemBuilder<SkullItemBuilder> {
+public class SkullItemBuilder extends ItemBuilder<SkullItemBuilder> {
 
   public SkullItemBuilder(int amount) {
     super(Material.PLAYER_HEAD, amount);

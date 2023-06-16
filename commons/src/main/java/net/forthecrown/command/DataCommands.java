@@ -7,6 +7,8 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.List;
 import java.util.function.Consumer;
+import net.forthecrown.command.help.Usage;
+import net.forthecrown.command.help.UsageFactory;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Nodes;
 import net.forthecrown.grenadier.types.ArgumentTypes;

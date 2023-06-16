@@ -11,3 +11,8 @@ dependencies {
 
   compileOnly(project(":commons"))
 }
+
+pluginYml {
+  name = "FTC-ScriptEngine"
+  main = "net.forthecrown.scripts.ScriptingPlugin"
+}

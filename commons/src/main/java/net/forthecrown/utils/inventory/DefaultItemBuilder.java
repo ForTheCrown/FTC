@@ -4,7 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-public class DefaultItemBuilder extends BaseItemBuilder<DefaultItemBuilder> {
+public class DefaultItemBuilder extends ItemBuilder<DefaultItemBuilder> {
 
   DefaultItemBuilder(Material material, int amount) {
     super(material, amount);

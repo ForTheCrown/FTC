@@ -1,74 +1,86 @@
 package net.forthecrown.cosmetics;
 
-import com.google.gson.JsonElement;
-import java.util.function.Supplier;
+import java.util.Objects;
+import java.util.function.IntSupplier;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.forthecrown.cosmetics.Cosmetic.AbstractBuilder;
 import net.forthecrown.registry.Holder;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;
-import net.forthecrown.registry.RegistryBound;
-import net.forthecrown.menu.Menu;
-import net.forthecrown.menu.MenuBuilder;
-import net.forthecrown.menu.Menus;
-import net.forthecrown.utils.io.JsonWrapper;
+import net.forthecrown.registry.RegistryListener;
 import net.kyori.adventure.text.Component;
+import org.bukkit.configuration.Configuration;
+import org.bukkit.plugin.java.JavaPlugin;
 
-public class CosmeticType<T extends Cosmetic> implements RegistryBound<CosmeticType<T>> {
+public class CosmeticType<T> {
 
   @Getter
-  private Menu menu;
-
-  @Getter
-  private final Registry<T> cosmetics = Registries.newRegistry();
-
-  @Getter @Setter
-  private Holder<CosmeticType<T>> holder;
-
-  private final Supplier<AbstractBuilder<T>> builderFactory;
+  private final Registry<Cosmetic<T>> cosmetics;
 
   @Getter
   private final Component displayName;
 
-  @Getter
-  @Accessors(fluent = true)
-  private boolean customRequirement;
+  @Getter @Setter
+  private CosmeticPredicate<T> predicate;
 
-  public CosmeticType(Component displayName, Supplier<AbstractBuilder<T>> builderFactory) {
-    this.displayName = displayName;
-    this.builderFactory = builderFactory;
+  @Getter @Setter
+  private MenuNodeFactory<T> menuNodeFactory;
+
+  @Getter
+  int id = -1;
+
+  public CosmeticType(Builder<T> builder) {
+    this.displayName = builder.displayName;
+    this.predicate = builder.predicate;
+    this.menuNodeFactory = builder.factory;
+
+    Objects.requireNonNull(displayName, "Null display name");
+    Objects.requireNonNull(predicate, "Null predicate");
+    Objects.requireNonNull(menuNodeFactory, "Null menu node factory");
+
+    this.cosmetics = Registries.newFreezable();
+    cosmetics.setListener(new RegistryListener<>() {
+      @Override
+      public void onRegister(Holder<Cosmetic<T>> value) {
+        value.getValue().setType(CosmeticType.this);
+      }
+
+      @Override
+      public void onUnregister(Holder<Cosmetic<T>> value) {
+        value.getValue().setType(null);
+      }
+    });
   }
 
-  public void load(JsonWrapper json) {
-    cosmetics.clear();
+  public static <T> Builder<T> builder() {
+    return new Builder<>();
+  }
 
-    int price = json.getInt("price");
-    json.remove("price");
+  @Getter @Setter
+  @Accessors(fluent = true, chain = true)
+  public static class Builder<T> {
 
-    this.customRequirement = json.getBool("custom_requirement");
-    json.remove("custom_requirement");
+    private Component displayName;
 
-    json.entrySet().forEach(entry -> {
-      String key = entry.getKey();
-      JsonElement element = entry.getValue();
+    private CosmeticPredicate<T> predicate = CosmeticPredicate.defaultPredicate();
 
-      JsonWrapper obj = JsonWrapper.wrap(element.getAsJsonObject());
+    private MenuNodeFactory<T> factory;
 
-      AbstractBuilder<T> builder = builderFactory.get();
-      builder.load(obj);
+    public Builder<T> defaultNodeFactory(String id) {
+      return defaultNodeFactory(() -> {
+        CosmeticsPlugin plugin = JavaPlugin.getPlugin(CosmeticsPlugin.class);
+        Configuration config = plugin.getConfig();
+        return config.getInt("prices." + id);
+      });
+    }
 
-      T cosmetic = builder.build();
-      cosmetic.setPrice(price);
-      cosmetic.setType((CosmeticType<Cosmetic>) this);
+    public Builder<T> defaultNodeFactory(IntSupplier price) {
+      return factory(MenuNodeFactory.defaultFactory(price));
+    }
 
-      cosmetics.register(key, cosmetic);
-    });
-
-    MenuBuilder builder = Menus.builder(Menus.sizeFromRows(4), getDisplayName()).addBorder();
-    cosmetics.forEach(t -> builder.add(t.getMenuSlot(), t.toMenuNode()));
-
-    menu = builder.build();
+    public CosmeticType<T> build() {
+      return new CosmeticType<>(this);
+    }
   }
 }

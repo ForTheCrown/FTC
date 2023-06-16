@@ -31,7 +31,7 @@ import net.forthecrown.utils.context.ContextSet;
 import net.forthecrown.utils.inventory.ItemArrayList;
 import net.forthecrown.utils.inventory.ItemList;
 import net.forthecrown.utils.inventory.ItemStacks;
-import net.forthecrown.utils.inventory.Slot;
+import net.forthecrown.menu.Slot;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;

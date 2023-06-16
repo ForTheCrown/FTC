@@ -1,4 +1,0 @@
-name: "FTC-Dungeons"
-main: "net.forthecrown.dungeons.DungeonsPlugin"
-version: "${version}"
-api-version: "${api_version}"

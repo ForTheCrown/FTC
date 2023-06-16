@@ -4,6 +4,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.Getter;
 import net.forthecrown.Permissions;
+import net.forthecrown.command.help.UsageFactory;
 import net.forthecrown.grenadier.AbstractCommand;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.User;

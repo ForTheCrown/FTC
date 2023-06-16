@@ -138,20 +138,6 @@ public final class Registries {
         || c == '+';
   }
 
-  /**
-   * Ensures a registry bound object is registered
-   *
-   * @param bound Registry bound object
-   * @throws IllegalStateException If the specified {@code bound} is not registered in any registry
-   */
-  public static void ensureRegistered(RegistryBound<?> bound) throws IllegalStateException {
-    Holder<?> holder = bound.getHolder();
-
-    if (holder == null) {
-      throw new IllegalStateException(bound + " is not registered");
-    }
-  }
-
   public static <V> TransformingSet<String, V> keyBackedSet(Registry<V> registry) {
     return new TransformingSet<>(
         new HashSet<>(),

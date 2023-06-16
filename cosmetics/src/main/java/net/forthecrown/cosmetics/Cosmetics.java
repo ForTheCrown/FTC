@@ -1,26 +1,60 @@
 package net.forthecrown.cosmetics;
 
-import java.util.function.Supplier;
-import net.forthecrown.cosmetics.Cosmetic.AbstractBuilder;
+import net.forthecrown.cosmetics.travel.TravelEffect;
+import net.forthecrown.cosmetics.travel.TravelEffects;
+import net.forthecrown.registry.Holder;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;
-import net.forthecrown.text.Text;
+import net.forthecrown.registry.RegistryListener;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Particle;
 
 public final class Cosmetics {
   private Cosmetics() {}
 
   public static final Registry<CosmeticType> TYPES = Registries.newFreezable();
 
-  public static CosmeticType<ArrowCosmetic> ARROW_EFFECTS
-      = create("arrow_effects", "Arrow Effects", ArrowCosmetic::builder);
+  public static final CosmeticType<Particle> ARROW_EFFECTS
+      = CosmeticType.<Particle>builder()
+      .defaultNodeFactory("arrow_effects")
+      .displayName(Component.text("Arrow Effects"))
+      .build();
 
-  private static <T extends Cosmetic> CosmeticType<T> create(
-      String key,
-      String displayName,
-      Supplier<AbstractBuilder<T>> builderFactory
-  ) {
-    CosmeticType<T> type = new CosmeticType<>(Text.renderString(displayName), builderFactory);
-    TYPES.register(key, type);
-    return type;
+  public static final CosmeticType<DeathEffect> DEATH_EFFECTS
+      = CosmeticType.<DeathEffect>builder()
+      .defaultNodeFactory("death_effects")
+      .displayName(Component.text("Death Effects"))
+      .build();
+
+  public static final CosmeticType<TravelEffect> TRAVEL_EFFECTS
+      = CosmeticType.<TravelEffect>builder()
+      .defaultNodeFactory("travel_effects")
+      .displayName(Component.text("Travel Effects"))
+      .build();
+
+  static {
+    TYPES.setListener(new RegistryListener<>() {
+      @Override
+      public void onRegister(Holder<CosmeticType> value) {
+        value.getValue().id = value.getId();
+      }
+
+      @Override
+      public void onUnregister(Holder<CosmeticType> value) {
+        value.getValue().id = -1;
+      }
+    });
+  }
+
+  static void init() {
+    // Register Types
+    TYPES.register("arrow_effects",  ARROW_EFFECTS);
+    TYPES.register("death_effects",  DEATH_EFFECTS);
+    TYPES.register("travel_effects", TRAVEL_EFFECTS);
+
+    // Register cosmetics
+    ArrowCosmetics.registerAll(ARROW_EFFECTS.getCosmetics());
+    DeathCosmetics.registerAll(DEATH_EFFECTS.getCosmetics());
+    TravelEffects.registerAll(TRAVEL_EFFECTS.getCosmetics());
   }
 }

@@ -10,9 +10,7 @@ dependencies {
   compileOnly(project(":commons"))
 }
 
-base {
-  archivesName.set("FTC-MenuService")
-}
-
-tasks {
+pluginYml {
+  name = "FTC-MenuService"
+  main = "net.forthecrown.menu.internal.MenusPlugin"
 }

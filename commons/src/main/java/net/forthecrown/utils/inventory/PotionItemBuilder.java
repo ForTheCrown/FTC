@@ -12,7 +12,7 @@ import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionType;
 
-public class PotionItemBuilder extends BaseItemBuilder<PotionItemBuilder> {
+public class PotionItemBuilder extends ItemBuilder<PotionItemBuilder> {
 
   public static final PotionData EMPTY = new PotionData(PotionType.UNCRAFTABLE, false, false);
 

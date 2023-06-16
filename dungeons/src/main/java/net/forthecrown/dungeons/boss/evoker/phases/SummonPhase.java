@@ -126,7 +126,7 @@ public class SummonPhase implements AttackPhase {
         rawPos[2] + zOffset
     );
 
-    Entity e = spawner.create(pos, boss.getWorld(), context);
+    Entity e = spawner.create(pos, boss.getWorld(), context, boss);
     spawned.add(e);
     TOTAL_SPAWNED.add(e);
 

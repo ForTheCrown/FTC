@@ -14,7 +14,7 @@ import net.forthecrown.text.Text;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.inventory.ItemStacks;
-import net.forthecrown.utils.inventory.Slot;
+import net.forthecrown.menu.Slot;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;

@@ -8,7 +8,7 @@ import net.forthecrown.command.Exceptions;
 import net.forthecrown.menu.ClickContext;
 import net.forthecrown.menu.MenuBuilder;
 import net.forthecrown.menu.MenuNode;
-import net.forthecrown.utils.inventory.Slot;
+import net.forthecrown.menu.Slot;
 import net.forthecrown.text.page.PageEntryIterator;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.context.Context;

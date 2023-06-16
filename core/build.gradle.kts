@@ -11,3 +11,8 @@ dependencies {
   implementation(project(":commons"))
   compileOnly("net.luckperms:api:5.4")
 }
+
+pluginYml {
+  name = "FTC-Core"
+  main = "net.forthecrown.core.CorePlugin"
+}

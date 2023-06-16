@@ -1,6 +1,7 @@
 plugins {
   java
   id("io.freefair.lombok") version "8.0.1"
+  id("ftc_plugin")
 }
 
 val grenadier      = "net.forthecrown:grenadier:2.1.0"
@@ -16,6 +17,10 @@ repositories {
 subprojects {
   apply(plugin = "java")
   apply(plugin = "io.freefair.lombok")
+
+  if (name != "commons") {
+    apply(plugin = "ftc_plugin")
+  }
 
   group = rootProject.group
   version = rootProject.version
@@ -54,15 +59,6 @@ subprojects {
     compileJava {
       options.encoding = Charsets.UTF_8.name()
       options.release.set(17)
-    }
-
-    processResources {
-      filesMatching(listOf("plugin.yml", "paper-plugin.yml")) {
-        expand(
-          "version" to version,
-          "api_version" to apiVersion,
-        )
-      }
     }
   }
 }

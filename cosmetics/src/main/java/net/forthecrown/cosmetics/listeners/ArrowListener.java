@@ -2,12 +2,12 @@ package net.forthecrown.cosmetics.listeners;
 
 import com.destroystokyo.paper.ParticleBuilder;
 import java.util.function.Consumer;
-import net.forthecrown.cosmetics.ArrowCosmetic;
 import net.forthecrown.cosmetics.CosmeticData;
 import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.Tasks;
+import org.bukkit.Particle;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Trident;
@@ -20,9 +20,7 @@ public class ArrowListener implements Listener {
 
   @EventHandler(ignoreCancelled = true)
   public void onProjectileLaunch(ProjectileLaunchEvent event) {
-    if (!(event.getEntity() instanceof AbstractArrow arrow)
-        || arrow instanceof Trident
-    ) {
+    if (!(event.getEntity() instanceof AbstractArrow arrow) || arrow instanceof Trident) {
       return;
     }
 
@@ -32,8 +30,7 @@ public class ArrowListener implements Listener {
 
     User user = Users.get(player);
     CosmeticData data = user.getComponent(CosmeticData.class);
-
-    ArrowCosmetic cosmetic = data.get(Cosmetics.ARROW_EFFECTS);
+    Particle cosmetic = data.getValue(Cosmetics.ARROW_EFFECTS);
 
     if (cosmetic == null) {
       return;
@@ -47,10 +44,10 @@ public class ArrowListener implements Listener {
     private final AbstractArrow arrow;
     private final ParticleBuilder builder;
 
-    public ArrowScheduler(AbstractArrow arrow, Player player, ArrowCosmetic effect) {
+    public ArrowScheduler(AbstractArrow arrow, Player player, Particle effect) {
       this.arrow = arrow;
 
-      builder = new ParticleBuilder(effect.getParticle())
+      builder = new ParticleBuilder(effect)
           .location(arrow.getLocation())
           .source(player)
           .extra(0);

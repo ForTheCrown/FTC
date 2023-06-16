@@ -4,10 +4,21 @@ import io.papermc.paper.plugin.provider.classloader.ConfiguredPluginClassLoader;
 import java.lang.StackWalker.Option;
 import java.util.Objects;
 import org.apache.logging.log4j.util.StackLocatorUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class PluginUtil {
   private PluginUtil() {}
+
+  /**
+   * Tests if a plugin with a specified {@code pluginName} is enabled
+   * @param pluginName Name of the plugin to test
+   * @return {@code true}, if the specified plugin both exists and is enabled,
+   *         {@code false} otherwise
+   */
+  public static boolean isEnabled(String pluginName) {
+    return Bukkit.getPluginManager().isPluginEnabled(pluginName);
+  }
 
   /**
    * Delegate for {@link #getCallingPlugin(int)} with an effective depth of 2 (actually 3, to

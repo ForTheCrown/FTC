@@ -287,10 +287,6 @@ public class Registry<V> implements Iterable<V> {
       listener.onRegister(holder);
     }
 
-    if (holder.getValue() instanceof RegistryBound bound) {
-      bound.setHolder(holder);
-    }
-
     if (existing != null) {
       LOGGER.warn(
           "Registry value hash collision! Entry '{}' replaced " +
@@ -413,10 +409,6 @@ public class Registry<V> implements Iterable<V> {
       listener.onUnregister(holder);
     }
 
-    if (holder.getValue() instanceof RegistryBound bound) {
-      bound.setHolder(null);
-    }
-
     holder.setRegistry(null);
     return true;
   }
@@ -462,15 +454,11 @@ public class Registry<V> implements Iterable<V> {
   public void clear() throws IllegalArgumentException {
     testFrozen();
 
-    byKey.values().forEach(holder -> {
-      if (holder.getValue() instanceof RegistryBound bound) {
-        bound.setHolder(null);
-      }
-
-      if (listener != null) {
+    if (listener != null) {
+      byKey.values().forEach(holder -> {
         listener.onUnregister(holder);
-      }
-    });
+      });
+    }
 
     byValue.clear();
     byKey.clear();

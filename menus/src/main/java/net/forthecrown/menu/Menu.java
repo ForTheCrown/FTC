@@ -14,7 +14,6 @@ import net.forthecrown.user.Users;
 import net.forthecrown.utils.PluginUtil;
 import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.inventory.ItemStacks;
-import net.forthecrown.utils.inventory.Slot;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;

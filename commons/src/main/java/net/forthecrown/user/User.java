@@ -251,6 +251,14 @@ public interface User extends ForwardingAudience.Single {
    */
   boolean isAfk();
 
+  /**
+   * Gets the reason a user is AFK
+   * @return user-defined AFK reason, or {@code null}, if a reason was not set or if the user
+   *         is not AFK
+   */
+  @Nullable
+  Component getAfkReason();
+
   /* ----------------------------- CURRENCIES ------------------------------ */
 
   int getGems();

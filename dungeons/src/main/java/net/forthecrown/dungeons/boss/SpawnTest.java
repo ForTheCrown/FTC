@@ -7,7 +7,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.utils.text.Text;
+import net.forthecrown.text.Text;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;

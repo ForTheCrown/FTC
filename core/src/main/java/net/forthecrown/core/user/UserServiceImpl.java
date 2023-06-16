@@ -1,5 +1,6 @@
 package net.forthecrown.core.user;
 
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.UUID;
 import lombok.Getter;
@@ -7,10 +8,12 @@ import net.forthecrown.registry.Registry;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserComponent;
 import net.forthecrown.user.UserLookup;
-import net.forthecrown.user.UserNameFactory;
 import net.forthecrown.user.UserProperty;
 import net.forthecrown.user.UserProperty.Builder;
 import net.forthecrown.user.UserService;
+import net.forthecrown.utils.ScoreIntMap;
+import net.forthecrown.utils.ScoreIntMap.KeyValidator;
+import net.forthecrown.utils.io.PathUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus.Internal;
@@ -18,18 +21,35 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @Internal
+@Getter
 public class UserServiceImpl implements UserService {
 
-  @Getter
+  private final UserDataStorage storage;
+
   private final UserLookupImpl lookup;
+  private final NameFactoryImpl nameFactory;
+
+  private final ScoreIntMap<UUID> balances;
+  private final ScoreIntMap<UUID> gems;
+  private final ScoreIntMap<UUID> playtime;
+  private final ScoreIntMap<UUID> votes;
 
   public UserServiceImpl() {
-    this.lookup = new UserLookupImpl();
-  }
+    Path dir = PathUtil.pluginPath();
+    this.storage = new UserDataStorage(dir);
 
-  @Override
-  public UserNameFactory getNameFactory() {
-    return null;
+    this.lookup = new UserLookupImpl();
+    this.nameFactory = new NameFactoryImpl();
+
+    this.balances = new ScoreIntMap<>();
+    this.gems     = new ScoreIntMap<>();
+    this.playtime = new ScoreIntMap<>();
+    this.votes    = new ScoreIntMap<>();
+
+    this.balances.setValidator(KeyValidator.IS_PLAYER);
+    this.gems.setValidator(KeyValidator.IS_PLAYER);
+    this.playtime.setValidator(KeyValidator.IS_PLAYER);
+    this.votes.setValidator(KeyValidator.IS_PLAYER);
   }
 
   @Override

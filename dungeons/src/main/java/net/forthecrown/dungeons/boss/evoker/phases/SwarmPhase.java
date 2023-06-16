@@ -105,7 +105,7 @@ public class SwarmPhase implements AttackPhase {
     spawnVexes(
         boss.getBossEntity(),
         boss.currentContext(),
-        PotionPhase.findTarget(boss)
+        PotionPhase.findTarget(boss, boss.getRandom())
     );
 
     // Adjust boss bar to display how many more vex waves

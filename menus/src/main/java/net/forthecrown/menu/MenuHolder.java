@@ -6,8 +6,10 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
+import org.jetbrains.annotations.ApiStatus.Internal;
 
 @Getter
+@Internal
 public class MenuHolder implements InventoryHolder {
 
   private final Inventory inventory;

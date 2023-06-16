@@ -6,25 +6,21 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import lombok.Getter;
 import lombok.Setter;
-import net.forthecrown.registry.Holder;
-import net.forthecrown.registry.RegistryBound;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserComponent;
 
-public class ComponentFactory<T extends UserComponent>
-    implements RegistryBound<ComponentFactory<T>>
-{
+public class ComponentFactory<T extends UserComponent> {
 
   private final ConstructorWrapper<T> constructor;
 
   @Getter
   private final Class<T> type;
 
-  @Getter @Setter
-  private Holder<ComponentFactory<T>> holder;
-
   @Setter @Getter
   private boolean redirectAlts;
+
+  @Getter
+  int id = -1;
 
   public ComponentFactory(Class<T> type) {
     this.type = type;

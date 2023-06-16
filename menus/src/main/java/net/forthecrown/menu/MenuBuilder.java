@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.forthecrown.text.Text;
-import net.forthecrown.utils.inventory.Slot;
 import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.ItemStack;
 

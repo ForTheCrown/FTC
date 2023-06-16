@@ -1,14 +1,14 @@
 package net.forthecrown.user;
 
-import com.google.common.base.Preconditions;
-import java.util.concurrent.atomic.AtomicInteger;
 import lombok.Getter;
+import net.forthecrown.registry.Holder;
+import net.forthecrown.registry.Registries;
+import net.forthecrown.registry.Registry;
 
 @Getter
 public final class TimeField {
 
-  private static final AtomicInteger idGenerator = new AtomicInteger();
-  private static boolean frozen;
+  public static final Registry<TimeField> REGISTRY = Registries.newRegistry();
 
   /**
    * Time stamp of when the user is next allowed to use a command like /home or /tpa
@@ -61,25 +61,21 @@ public final class TimeField {
 
   private TimeField(String key, boolean serialized) {
     this.key = key;
-    this.id = idGenerator.getAndIncrement();
     this.serialized = serialized;
+
+    Holder<TimeField> holder = REGISTRY.register(key, this);
+    this.id = holder.getId();
   }
 
   public static void freeze() {
-    frozen = true;
-  }
-
-  private static void ensureNotFrozen() {
-    Preconditions.checkState(!frozen, "Time field creation is frozen");
+    REGISTRY.freeze();
   }
 
   public static TimeField field(String key) {
-    ensureNotFrozen();
     return new TimeField(key, false);
   }
 
   public static TimeField transientField(String key) {
-    ensureNotFrozen();
     return new TimeField(key, true);
   }
 }

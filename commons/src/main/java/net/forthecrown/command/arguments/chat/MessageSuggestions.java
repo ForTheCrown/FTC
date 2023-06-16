@@ -15,7 +15,7 @@ import net.forthecrown.grenadier.Completions;
 import net.forthecrown.grenadier.Readers;
 import net.forthecrown.grenadier.Suggester;
 import net.forthecrown.text.ChatEmotes;
-import net.forthecrown.text.parse.ChatParser.ParseFlag;
+import net.forthecrown.text.parse.ChatParseFlag;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permission;
 import org.slf4j.Logger;
@@ -49,17 +49,17 @@ public class MessageSuggestions {
     );
 
     while (reader.canRead()) {
-      if (peekMatches('<', ParseFlag.GRADIENTS.getPermission())) {
+      if (peekMatches('<', ChatParseFlag.GRADIENTS.getPermission())) {
         suggestGradient();
         continue;
       }
 
-      if (peekMatches('&', ParseFlag.COLORS.getPermission())) {
+      if (peekMatches('&', ChatParseFlag.COLORS.getPermission())) {
         suggestColorCode();
         continue;
       }
 
-      if (peekMatches(':', ParseFlag.EMOJIS.getPermission())) {
+      if (peekMatches(':', ChatParseFlag.EMOJIS.getPermission())) {
         suggestEmote();
         continue;
       }
@@ -242,7 +242,7 @@ public class MessageSuggestions {
   }
 
   private void suggestEmotes(SuggestionsBuilder builder, CommandSource source) {
-    if (!source.hasPermission(ParseFlag.EMOJIS.getPermission()) && !override) {
+    if (!source.hasPermission(ChatParseFlag.EMOJIS.getPermission()) && !override) {
       return;
     }
 
@@ -250,7 +250,7 @@ public class MessageSuggestions {
   }
 
   private void suggestColorCodes(SuggestionsBuilder builder, CommandSource source) {
-    if (!source.hasPermission(ParseFlag.COLORS.getPermission()) && !override) {
+    if (!source.hasPermission(ChatParseFlag.COLORS.getPermission()) && !override) {
       return;
     }
 

@@ -6,7 +6,7 @@ import static net.forthecrown.inventory.ExtendedItems.TAG_TYPE;
 import java.util.UUID;
 import net.forthecrown.registry.FtcKeyed;
 import net.forthecrown.nbt.CompoundTag;
-import net.forthecrown.utils.inventory.BaseItemBuilder;
+import net.forthecrown.utils.inventory.ItemBuilder;
 import net.forthecrown.utils.inventory.ItemStacks;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +18,7 @@ public interface ExtendedItemType<T extends ExtendedItem> extends FtcKeyed {
 
   @NotNull T load(@NotNull CompoundTag item);
 
-  @NotNull BaseItemBuilder<?> createBaseItem();
+  @NotNull ItemBuilder<?> createBaseItem();
 
   default boolean shouldRemainInInventory() {
     return true;

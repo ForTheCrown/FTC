@@ -7,7 +7,7 @@ import java.util.UUID;
 import net.forthecrown.dungeons.enchantments.FtcEnchants;
 import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.registry.Registries;
-import net.forthecrown.utils.inventory.BaseItemBuilder;
+import net.forthecrown.utils.inventory.ItemBuilder;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -48,7 +48,7 @@ public class CrownType implements ExtendedItemType<RoyalCrown> {
   }
 
   @Override
-  public @NotNull BaseItemBuilder<?> createBaseItem() {
+  public @NotNull ItemBuilder<?> createBaseItem() {
     return ItemStacks.builder(Material.GOLDEN_HELMET)
         .setNameRaw(CROWN_TITLE)
         .setModelData(MODEL_DATA)

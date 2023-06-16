@@ -3,6 +3,8 @@ package net.forthecrown.utils;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
+import org.jetbrains.annotations.NotNull;
 
 public class Result<V> {
 
@@ -62,6 +64,21 @@ public class Result<V> {
    */
   public boolean isError() {
     return error != null;
+  }
+
+  /**
+   * Transforms the result's error message
+   * @param mapper Error transformation function
+   * @return Result with a transformed error message, or {@code this}, if the result has no error
+   */
+  public Result<V> mapError(@NotNull UnaryOperator<String> mapper) {
+    Objects.requireNonNull(mapper);
+
+    if (isError()) {
+      return Result.error(mapper.apply(error));
+    }
+
+    return this;
   }
 
   /**

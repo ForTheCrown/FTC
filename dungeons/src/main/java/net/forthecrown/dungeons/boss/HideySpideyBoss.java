@@ -8,11 +8,17 @@ import net.forthecrown.dungeons.DungeonAreas;
 import net.forthecrown.dungeons.DungeonUtils;
 import net.forthecrown.dungeons.boss.components.BossComponent;
 import net.forthecrown.dungeons.boss.components.MinionSpawnerComponent;
+import net.forthecrown.text.Text;
+import net.forthecrown.titles.RankTier;
+import net.forthecrown.titles.UserRanks;
+import net.forthecrown.titles.UserTitles;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
+import net.forthecrown.utils.PluginUtil;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.math.Vectors;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -114,17 +120,22 @@ public class HideySpideyBoss extends SimpleBoss {
         BossItems.HIDEY_SPIDEY.item()
     );
 
+    if (!PluginUtil.isEnabled("FTC-UserTitles")) {
+      return;
+    }
+
     // Final boss of the first 3 levels,
     // Rewards the free rank tier
     User user = Users.get(p);
 
     // Don't give the tier if you already
     // have the tier lol
-    if (user.getTitles().hasTier(RankTier.FREE)) {
+    UserTitles titles = user.getComponent(UserTitles.class);
+    if (titles.hasTier(RankTier.FREE)) {
       return;
     }
 
-    user.getTitles().addTier(RankTier.FREE);
-    user.sendMessage(Messages.GOT_KNIGHT_RANK);
+    titles.addTier(RankTier.FREE);
+    user.sendMessage(Text.format("Got {0} rank", NamedTextColor.GOLD, UserRanks.KNIGHT));
   }
 }

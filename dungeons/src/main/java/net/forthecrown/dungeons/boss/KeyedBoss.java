@@ -2,19 +2,16 @@ package net.forthecrown.dungeons.boss;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
-import net.forthecrown.core.logging.Loggers;
+import net.forthecrown.Loggers;
 import net.forthecrown.registry.FtcKeyed;
-import net.forthecrown.core.Keys;
-import net.forthecrown.utils.JsonSerializable;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.advancement.AdvancementProgress;
 import org.bukkit.entity.Player;
 
-public interface KeyedBoss extends DungeonBoss, FtcKeyed, JsonSerializable {
+public interface KeyedBoss extends DungeonBoss, FtcKeyed {
 
-  @Override
   default JsonElement serialize() {
     return new JsonPrimitive(getKey());
   }
@@ -25,7 +22,7 @@ public interface KeyedBoss extends DungeonBoss, FtcKeyed, JsonSerializable {
    * @return The boss' advancement key
    */
   default NamespacedKey advancementKey() {
-    return Keys.forthecrown("dungeons/" + getKey());
+    return NamespacedKey.fromString("forthecrown:dungeons/" + getKey());
   }
 
   /**

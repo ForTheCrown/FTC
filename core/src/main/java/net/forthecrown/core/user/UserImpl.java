@@ -32,6 +32,7 @@ import net.forthecrown.user.UserTeleport.Type;
 import net.forthecrown.user.Users;
 import net.forthecrown.user.event.UserAfkEvent;
 import net.forthecrown.utils.ArrayIterator;
+import net.forthecrown.utils.Locations;
 import net.forthecrown.utils.Time;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -47,6 +48,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.permissions.Permission;
 import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.Nullable;
@@ -77,16 +79,22 @@ final class UserImpl implements User {
   private Location entityLocation;
   private Location returnLocation;
 
-  // Lazily initialized in setTime
+  // Lazily initialized in setTime(TimeField, long)
+  @Getter @Setter
   private long[] timeFields;
 
+  @Getter
   private boolean afk;
+
+  @Getter
   private Component afkReason;
 
   @Getter @Setter
   private boolean online;
 
   private UserComponent[] components;
+
+  private Player player;
 
   public UserImpl(UserServiceImpl service, UUID uniqueId) {
     Objects.requireNonNull(uniqueId);
@@ -98,7 +106,15 @@ final class UserImpl implements User {
 
   @Override
   public Player getPlayer() {
-    return Bukkit.getPlayer(getUniqueId());
+    if (!isOnline()) {
+      return null;
+    }
+
+    if (player == null) {
+      player = Bukkit.getPlayer(getUniqueId());
+    }
+
+    return player;
   }
 
   @Override
@@ -135,16 +151,18 @@ final class UserImpl implements User {
   }
 
   @Override
+  public Inventory getInventory() throws UserOfflineException {
+    ensureOnline();
+    return getPlayer().getInventory();
+  }
+
+  @Override
   public Location getLocation() {
     if (isOnline()) {
       return getPlayer().getLocation();
     }
 
-    if (entityLocation == null) {
-      return null;
-    }
-
-    return entityLocation.clone();
+    return Locations.clone(entityLocation);
   }
 
   @Override
@@ -168,7 +186,7 @@ final class UserImpl implements User {
 
   @Override
   public Location getReturnLocation() {
-    return returnLocation == null ? null : returnLocation.clone();
+    return Locations.clone(returnLocation);
   }
 
   @Override
@@ -197,7 +215,7 @@ final class UserImpl implements User {
       ComponentFactory<T> factory,
       boolean redirectAlts
   ) {
-    int id = factory.getHolderId();
+    int id = factory.getId();
 
     if (service.isAltAccount(uniqueId) && redirectAlts) {
       UserImpl main = (UserImpl) Users.get(service.getMainAccount(uniqueId));
@@ -374,48 +392,43 @@ final class UserImpl implements User {
   }
 
   @Override
-  public boolean isAfk() {
-    return afk;
-  }
-
-  @Override
   public int getGems() {
-    return 0;
+    return service.getGems().get(uniqueId);
   }
 
   @Override
   public void setGems(int gems) {
-
+    service.getGems().set(uniqueId, gems);
   }
 
   @Override
   public void addGems(int gems) {
-
+    service.getGems().add(uniqueId, gems);
   }
 
   @Override
   public void removeGems(int gems) {
-
+    addGems(-gems);
   }
 
   @Override
   public int getBalance() {
-    return 0;
+    return service.getBalances().get(uniqueId);
   }
 
   @Override
   public void setBalance(int balance) {
-
+    service.getBalances().set(uniqueId, balance);
   }
 
   @Override
   public void addBalance(int balance) {
-
+    service.getBalances().add(uniqueId, balance);
   }
 
   @Override
   public void removeBalance(int balance) {
-
+    addBalance(-balance);
   }
 
   @Override

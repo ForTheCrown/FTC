@@ -6,7 +6,7 @@ import java.util.UUID;
 import net.forthecrown.dungeons.enchantments.FtcEnchants;
 import net.forthecrown.inventory.ExtendedItemType;
 import net.forthecrown.nbt.CompoundTag;
-import net.forthecrown.utils.inventory.BaseItemBuilder;
+import net.forthecrown.utils.inventory.ItemBuilder;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.registry.Registries;
 import net.kyori.adventure.text.Component;
@@ -63,7 +63,7 @@ public class RoyalSwordType implements ExtendedItemType<RoyalSword> {
   }
 
   @Override
-  public @NotNull BaseItemBuilder<?> createBaseItem() {
+  public @NotNull ItemBuilder<?> createBaseItem() {
     return ItemStacks.builder(Material.WOODEN_SWORD)
         .setNameRaw(RANK_1_NAME)
         .setUnbreakable(true)

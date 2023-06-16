@@ -3,11 +3,12 @@ package net.forthecrown.text.format;
 import net.forthecrown.text.Text;
 import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 public class ItemFormatType implements TextFormatType {
 
   @Override
-  public Component resolveArgument(Object value, String style) {
+  public @NotNull Component resolveArgument(@NotNull Object value, @NotNull String style) {
     // Make sure we're given an item stack
     // If not, just return a default value
     if (!(value instanceof ItemStack item)) {

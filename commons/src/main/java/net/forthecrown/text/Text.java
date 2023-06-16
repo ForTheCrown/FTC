@@ -13,18 +13,19 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Pattern;
-import net.forthecrown.utils.WorldChunkMap.BukkitServices;
 import net.forthecrown.Worlds;
 import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.nbt.paper.PaperNbt;
 import net.forthecrown.text.format.ComponentFormat;
-import net.forthecrown.text.parse.ChatParseService;
+import net.forthecrown.text.parse.ChatParser;
+import net.forthecrown.text.parse.TextContext;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.KeybindComponent;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.flattener.ComponentFlattener;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
@@ -32,11 +33,12 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.format.TextDecoration.State;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.kyori.adventure.translation.GlobalTranslator;
 import net.kyori.adventure.translation.Translatable;
 import net.kyori.adventure.util.HSVLike;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.Permissible;
 import org.intellij.lang.annotations.RegExp;
@@ -86,19 +88,21 @@ public final class Text {
 
   private static final Component NULL = text("null");
 
-  public static final PlainTextComponentSerializer PLAIN = PlainTextComponentSerializer.builder()
-      .flattener(TextSplitter.FLATTENER)
+  public static final ComponentFlattener FLATTENER = ComponentFlattener.basic()
+      .toBuilder()
+      .complexMapper(TranslatableComponent.class, (component, consumer) -> {
+        consumer.accept(GlobalTranslator.render(component, Locale.ENGLISH));
+      })
+      .unknownMapper(component -> {
+        throw new IllegalArgumentException(
+            String.format("Don't know how to split: %s", component)
+        );
+      })
       .build();
 
-  private static ChatParseService parseService;
-
-  /* ------------------------------------------------------------- */
-
-  public static ChatParseService getParser() {
-    return parseService == null
-        ? (parseService = BukkitServices.loadOrThrow(ChatParseService.class))
-        : parseService;
-  }
+  public static final PlainTextComponentSerializer PLAIN = PlainTextComponentSerializer.builder()
+      .flattener(FLATTENER)
+      .build();
 
   /* ----------------------------- UTILITY METHODS ------------------------------ */
 
@@ -179,7 +183,7 @@ public final class Text {
    * @return The rendered message
    */
   public static Component renderString(String s) {
-    return getParser().defaultParser().parse(s);
+    return ChatParser.parsers().parse(s, TextContext.totalRender());
   }
 
   /**
@@ -190,7 +194,7 @@ public final class Text {
    * @return The formatted message
    */
   public static Component renderString(Permissible permissible, String s) {
-    return getParser().parser(permissible).parse(s);
+    return ChatParser.parsers().parse(s, TextContext.create(permissible, null));
   }
 
   /**

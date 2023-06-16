@@ -37,7 +37,7 @@ public class WorldBounds3i extends AbstractBounds3i<WorldBounds3i> implements It
   }
 
   public static WorldBounds3i ofPlayerSelection(Player player) {
-
+    return null;
   }
 
   public static WorldBounds3i of(Location l1, Location l2) {

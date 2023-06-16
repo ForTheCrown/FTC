@@ -1,13 +1,14 @@
 package net.forthecrown.menu;
 
-import static net.forthecrown.utils.inventory.Slot.COLUMN_SIZE;
-import static net.forthecrown.utils.inventory.Slot.ROW_SIZE;
+import static net.forthecrown.menu.Slot.COLUMN_SIZE;
+import static net.forthecrown.menu.Slot.ROW_SIZE;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.inventory.ItemStacks;
-import net.forthecrown.utils.inventory.Slot;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Material;
@@ -78,6 +79,37 @@ public final class Menus {
   }
 
   /**
+   * Gets a menu from an inventory.
+   * <p>
+   * This method requires the specified {@code inventory} return a {@link MenuHolder} via its
+   * {@link Inventory#getHolder()} method
+   *
+   * @param inventory Inventory to get the menu from
+   * @return Inventory menu
+   */
+  public static Menu inventoryMenu(@NotNull Inventory inventory) {
+    return getHolder(inventory).getMenu();
+  }
+
+  /**
+   * Gets a context from an inventory
+   * <p>
+   * This method requires the specified {@code inventory} return a {@link MenuHolder} via its
+   * {@link Inventory#getHolder()} method
+   *
+   * @param inventory Inventory to get the context from
+   * @return Inventory context
+   */
+  public static Context inventoryContext(@NotNull Inventory inventory) {
+    return getHolder(inventory).getContext();
+  }
+
+  static MenuHolder getHolder(Inventory inventory) {
+    Objects.requireNonNull(inventory, "Null inventory");
+    return (MenuHolder) inventory.getHolder();
+  }
+
+  /**
    * Gets an inventory size from the given amount of rows
    *
    * @param rows The amount of rows the size should have
@@ -120,6 +152,15 @@ public final class Menus {
     return size;
   }
 
+  /**
+   * Places an item in every border slot in the inventory. Border slots are slots that are on the
+   * outer edge of the inventory
+   * <p>
+   * This method will not override any existing items in the inventory
+   *
+   * @param in Inventory to place items into
+   * @param item Item to place in the border
+   */
   public static void placeBorder(Inventory in, ItemStack item) {
     var finalRow = in.getSize() - COLUMN_SIZE - 1;
 
@@ -234,7 +275,8 @@ public final class Menus {
    * @see MenuBuilder#setTitle(Component)
    */
   public static MenuBuilder builder(int size, @Nullable Component title)
-      throws IllegalArgumentException {
+      throws IllegalArgumentException
+  {
     return builder(size).setTitle(title);
   }
 
@@ -250,7 +292,8 @@ public final class Menus {
    * @see MenuBuilder#setTitle(String)
    */
   public static MenuBuilder builder(int size, @NotNull String title)
-      throws IllegalArgumentException {
+      throws IllegalArgumentException
+  {
     return builder(size).setTitle(title);
   }
 

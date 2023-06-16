@@ -12,3 +12,8 @@ dependencies {
   compileOnly(project(":scripting"))
   compileOnly(project(":menus"))
 }
+
+pluginYml {
+  name = "FTC-ExtendedItems"
+  main = "net.forthecrown.inventory.ItemsPlugin"
+}
