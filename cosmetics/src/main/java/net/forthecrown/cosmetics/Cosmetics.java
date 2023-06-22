@@ -1,5 +1,6 @@
 package net.forthecrown.cosmetics;
 
+import net.forthecrown.cosmetics.emotes.Emotes;
 import net.forthecrown.cosmetics.travel.TravelEffect;
 import net.forthecrown.cosmetics.travel.TravelEffects;
 import net.forthecrown.registry.Holder;
@@ -7,6 +8,7 @@ import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.registry.RegistryListener;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 
 public final class Cosmetics {
@@ -51,10 +53,16 @@ public final class Cosmetics {
     TYPES.register("arrow_effects",  ARROW_EFFECTS);
     TYPES.register("death_effects",  DEATH_EFFECTS);
     TYPES.register("travel_effects", TRAVEL_EFFECTS);
+    TYPES.register("emotes",         Emotes.TYPE);
 
     // Register cosmetics
     ArrowCosmetics.registerAll(ARROW_EFFECTS.getCosmetics());
     DeathCosmetics.registerAll(DEATH_EFFECTS.getCosmetics());
     TravelEffects.registerAll(TRAVEL_EFFECTS.getCosmetics());
+    Emotes.registerAll(Emotes.TYPE.getCosmetics());
+  }
+
+  public static Material getCosmeticMaterial(boolean owned) {
+    return owned ? Material.ORANGE_DYE : Material.GRAY_DYE;
   }
 }

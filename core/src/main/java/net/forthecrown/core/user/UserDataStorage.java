@@ -5,17 +5,18 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.UUID;
 import lombok.Getter;
 import net.forthecrown.Loggers;
+import net.forthecrown.core.user.UserLookupImpl.UserLookupEntry;
 import net.forthecrown.user.TimeField;
 import net.forthecrown.user.UserComponent;
+import net.forthecrown.utils.ScoreIntMap;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
+import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.utils.io.SerializationHelper;
 import org.slf4j.Logger;
 
@@ -24,49 +25,156 @@ public class UserDataStorage {
 
   private static final Logger LOGGER = Loggers.getLogger();
 
-  public static final String
-      KEY_LAST_NAME = "lastOnlineName",
-      KEY_PREVIOUS_NAMES = "previousNames",
-      KEY_IP = "ip",
-      KEY_LAST_LOC = "lastLocation",
-      KEY_LOCATION = "location",
-      KEY_TIMESTAMPS = "timeStamps";
+  public static final String KEY_LAST_NAME = "lastOnlineName";
+  public static final String KEY_PREVIOUS_NAMES = "previousNames";
+  public static final String KEY_IP = "ip";
+  public static final String KEY_LAST_LOC = "lastLocation";
+  public static final String KEY_LOCATION = "location";
+  public static final String KEY_TIMESTAMPS = "timeStamps";
 
   private final Path directory;
   private final Path userDirectory;
 
+  private final Path balances;
+  private final Path gems;
+  private final Path playtime;
+  private final Path votes;
+
+  private final Path userLookup;
+
   public UserDataStorage(Path dir) {
     this.directory = dir;
     this.userDirectory = directory.resolve("data");
+
+    this.balances = directory.resolve("balances.json");
+    this.gems = directory.resolve("gems.json");
+    this.playtime = directory.resolve("playtime.json");
+    this.votes = directory.resolve("votes.json");
+
+    this.userLookup = directory.resolve("profiles.json");
   }
 
-  public void serialize(UserImpl user) {
+  public Path file(String first, String... others) {
+    return this.directory.resolve(directory.getFileSystem().getPath(first, others));
+  }
+
+  public void saveMap(ScoreIntMap<UUID> map, Path file) {
+    SerializationHelper.writeJsonFile(file, json -> {
+      map.forEach(entry -> {
+        json.add(entry.key().toString(), entry.value());
+      });
+    });
+  }
+
+  public void loadMap(ScoreIntMap<UUID> map, Path file) {
+    map.clear();
+
+    SerializationHelper.readJsonFile(file, json -> {
+      for (var e: json.entrySet()) {
+        UUID uuid = UUID.fromString(e.getKey());
+        int value = e.getValue().getAsInt();
+
+        map.set(uuid, value);
+      }
+    });
+  }
+
+  public void loadProfiles(UserLookupImpl lookup) {
+    SerializationHelper.readFile(
+        userLookup,
+        file -> JsonUtils.readFile(file).getAsJsonArray(),
+
+        array -> {
+          for (var e: array) {
+            UserLookupEntry entry = loadEntry(e);
+            lookup.addEntry(entry);
+          }
+
+          lookup.setUnsaved(false);
+        }
+    );
+  }
+
+  public void saveProfiles(UserLookupImpl lookup) {
+    if (!lookup.isUnsaved()) {
+      return;
+    }
+
+    JsonArray arr = new JsonArray();
+    lookup.stream().forEach(entry -> {
+      JsonElement element = saveEntry(entry);
+      arr.add(element);
+    });
+
+    if (SerializationHelper.writeJson(userLookup, arr)) {
+      lookup.setUnsaved(false);
+    }
+  }
+
+  private JsonElement saveEntry(UserLookupEntry entry) {
+    JsonWrapper json = JsonWrapper.create();
+    json.addUUID("uuid", entry.getUniqueId());
+    json.add("name", entry.getName());
+
+    if (!Strings.isNullOrEmpty(entry.getNickname())) {
+      json.add("nick", entry.getNickname());
+    }
+
+    if (!Strings.isNullOrEmpty(entry.getLastName())) {
+      json.add("lastName", entry.getLastName());
+      json.add("lastNameChange", entry.getLastNameChange());
+    }
+
+    return json.getSource();
+  }
+
+  private UserLookupEntry loadEntry(JsonElement element) {
+    JsonWrapper json = JsonWrapper.wrap(element.getAsJsonObject());
+    UUID uuid = json.getUUID("uuid");
+    String name = json.getString("name");
+
+    UserLookupEntry entry = new UserLookupEntry(uuid);
+    entry.setName(name);
+
+    if (json.has("nick")) {
+      entry.setNickname(json.getString("nick"));
+    }
+
+    if (json.has("lastName")) {
+      entry.setLastName(json.getString("lastName"));
+      entry.setLastNameChange(json.getLong("lastNameChange"));
+    }
+
+    return entry;
+  }
+
+  public void saveUser(UserImpl user) {
     user.setTimeToNow(TimeField.LAST_LOADED);
 
     try {
       SerializationHelper.writeJsonFile(
           getUserFile(user.getUniqueId()),
-          json -> _serialize(user, json)
+          json -> saveUserInternal(user, json)
       );
     } catch (Throwable t) {
       LOGGER.error("Error serializing user: " + user.getUniqueId() + " or " + user.getName(), t);
     }
   }
 
-  public void deserialize(UserImpl user) {
+  public void loadUser(UserImpl user) {
     user.setTimeToNow(TimeField.LAST_LOADED);
 
     try {
       SerializationHelper.readJsonFile(
           getUserFile(user.getUniqueId()),
-          json -> _deserialize(user, json)
+          json -> loadUserInternal(user, json)
       );
     } catch (Throwable t) {
       LOGGER.error("Error deserializing user: " + user.getUniqueId() + " or " + user.getName(), t);
     }
   }
 
-  private void _deserialize(UserImpl user, JsonWrapper json) {
+  private void loadUserInternal(UserImpl user, JsonWrapper json) {
     user.setLastOnlineName(json.getString(KEY_LAST_NAME));
 
     user.getPreviousNames().addAll(json.getList(KEY_PREVIOUS_NAMES, JsonElement::getAsString));
@@ -87,7 +195,7 @@ public class UserDataStorage {
     loadComponents(json, user);
   }
 
-  private void _serialize(UserImpl user, JsonWrapper json) {
+  private void saveUserInternal(UserImpl user, JsonWrapper json) {
     json.add("name", user.getName());
     json.add(KEY_LAST_NAME, user.getLastOnlineName());
 
@@ -185,7 +293,7 @@ public class UserDataStorage {
     });
   }
 
-  public void loadComponents(JsonWrapper json, UserImpl user) {
+  private void loadComponents(JsonWrapper json, UserImpl user) {
     for (var e: json.entrySet()) {
       String id = e.getKey();
       JsonElement element = e.getValue();
@@ -203,11 +311,7 @@ public class UserDataStorage {
   }
 
   public void delete(UUID id) {
-    try {
-      Files.delete(getUserFile(id));
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    PathUtil.safeDelete(getUserFile(id));
   }
 
   private Path getUserFile(UUID uuid) {

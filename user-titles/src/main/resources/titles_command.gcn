@@ -6,6 +6,11 @@ aliases = "user_titles"
 
 description = "Manages user titles and rank tiers"
 
+literal("reload") {
+  description = "Reloads the plugin"
+  executes = reloadPlugin()
+}
+
 argument(ARG, user) {
   label = "<user>"
   description = "Displays a <user>'s titles and their rank tier"

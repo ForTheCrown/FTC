@@ -3,7 +3,7 @@ package net.forthecrown.dungeons.level;
 import java.util.Set;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.Events;
+import net.forthecrown.events.Events;
 import net.forthecrown.dungeons.DungeonWorld;
 import net.forthecrown.dungeons.level.room.RoomPiece;
 import net.forthecrown.utils.math.Bounds;

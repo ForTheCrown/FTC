@@ -7,6 +7,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -27,17 +28,23 @@ public class UserLookupImpl implements UserLookup {
   public static final long NO_NAME_CHANGE = -1;
 
   // Primary lookup maps
-  private final Map<UUID, UserLookupEntry> identified = new Object2ObjectOpenHashMap<>(EXPECTED_SIZE);
-  private final Map<String, UserLookupEntry> named = new Object2ObjectOpenHashMap<>(EXPECTED_SIZE);
+  private final Map<UUID, UserLookupEntry> identified
+      = new Object2ObjectOpenHashMap<>(EXPECTED_SIZE);
+
+  private final Map<String, UserLookupEntry> named
+      = new Object2ObjectOpenHashMap<>(EXPECTED_SIZE);
 
   // Secondary lookup maps
-  private final Map<String, UserLookupEntry> oldNamed = new Object2ObjectOpenHashMap<>(30);
-  private final Map<String, UserLookupEntry> nicknamed = new Object2ObjectOpenHashMap<>(20);
+  private final Map<String, UserLookupEntry> oldNamed
+      = new Object2ObjectOpenHashMap<>(30);
+
+  private final Map<String, UserLookupEntry> nicknamed
+      = new Object2ObjectOpenHashMap<>(20);
 
   /**
    * If the changes have been made to this map and the map has not been saved.
    */
-  @Getter
+  @Getter @Setter
   private boolean unsaved;
 
   @Override
@@ -69,7 +76,6 @@ public class UserLookupImpl implements UserLookup {
     return oldNamed.get(string);
   }
 
-
   /**
    * Creates an entry, which is added to the cache, with the given name and UUID
    *
@@ -90,7 +96,7 @@ public class UserLookupImpl implements UserLookup {
    *
    * @param entry The entry to add.
    */
-  private synchronized void addEntry(UserLookupEntry entry) {
+  public synchronized void addEntry(UserLookupEntry entry) {
     identified.put(entry.getUniqueId(), entry);
     named.put(entry.getName().toLowerCase(), entry);
 
@@ -225,6 +231,11 @@ public class UserLookupImpl implements UserLookup {
     }
 
     return Completions.matches(token, s);
+  }
+
+  @Override
+  public Stream<UserLookupEntry> stream() {
+    return identified.values().parallelStream();
   }
 
   @Getter @Setter

@@ -8,6 +8,7 @@ import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.ForwardingAudience;
 import net.kyori.adventure.text.Component;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
@@ -126,6 +127,20 @@ public interface User extends ForwardingAudience.Single {
   Inventory getInventory() throws UserOfflineException;
 
   /**
+   * Gets the user's game mode, identical to {@link Player#getGameMode()}
+   * @return User's game mode
+   * @throws UserOfflineException If the user is offline
+   */
+  GameMode getGameMode() throws UserOfflineException;
+
+  /**
+   * Sets the user's game mode, identical to {@link Player#setGameMode(GameMode)}
+   * @param gameMode Game mode to set
+   * @throws UserOfflineException If the user is offline
+   */
+  void setGameMode(GameMode gameMode) throws UserOfflineException;
+
+  /**
    * Gets the world the user is currently in.
    * <p>
    * If the user is offline, returns the world in which the user logged out in
@@ -207,6 +222,8 @@ public interface User extends ForwardingAudience.Single {
   Component nickname();
 
   String getNickname();
+
+  String getNickOrName();
 
   void setNickname(String nickname);
 

@@ -5,18 +5,13 @@ import it.unimi.dsi.fastutil.objects.ObjectDoublePair;
 import it.unimi.dsi.fastutil.objects.ObjectSets;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import net.forthecrown.utils.math.AbstractBounds3i;
 import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.utils.math.WorldBounds3i;
 import net.forthecrown.utils.math.WorldVec3i;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.ServicePriority;
-import org.bukkit.plugin.ServicesManager;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
@@ -142,32 +137,4 @@ public class WorldChunkMap<T extends BoundsHolder> {
     return worldMap;
   }
 
-  public static final class BukkitServices {
-    private BukkitServices() {}
-
-    public static ServicesManager getManager() {
-      return Bukkit.getServicesManager();
-    }
-
-    public static <T> Optional<T> load(Class<T> type) {
-      return Optional.ofNullable(getManager().load(type));
-    }
-
-    public static <T> T loadOrThrow(Class<T> type) {
-      return load(type).orElseThrow(() -> {
-        throw new IllegalStateException(
-            "Missing implementation for service: " + type
-        );
-      });
-    }
-
-    public static <T> void register(Class<T> type, T value) {
-      Plugin plugin = PluginUtil.getCallingPlugin();
-      register(type, value, plugin);
-    }
-
-    public static <T> void register(Class<T> type, T value, Plugin plugin) {
-      getManager().register(type, value, plugin, ServicePriority.Normal);
-    }
-  }
 }

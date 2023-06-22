@@ -17,12 +17,15 @@ import net.forthecrown.text.Text;
 import net.forthecrown.text.TextJoiner;
 import net.forthecrown.text.TextWriters;
 import net.forthecrown.titles.RankTier;
+import net.forthecrown.titles.TitlesPlugin;
 import net.forthecrown.titles.UserRank;
 import net.forthecrown.titles.UserRanks;
 import net.forthecrown.titles.UserTitles;
 import net.forthecrown.user.User;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
+import org.bukkit.plugin.java.JavaPlugin;
 
 @CommandData("file = titles_command.gcn")
 public class TitlesCommand {
@@ -43,6 +46,13 @@ public class TitlesCommand {
 
   User resultToUser(CommandSource source, UserParseResult result) throws CommandSyntaxException {
     return result.get(source, false);
+  }
+
+  void reloadPlugin(CommandSource source) {
+    TitlesPlugin plugin = JavaPlugin.getPlugin(TitlesPlugin.class);
+    plugin.loadTitles();
+
+    source.sendSuccess(Component.text("Reloaded user ranks"));
   }
 
   void showTitlesInfo(CommandSource source, @Argument(ARG) User user) {
@@ -78,7 +88,7 @@ public class TitlesCommand {
 
     titles.setTitle(rank);
 
-    source.sendMessage(
+    source.sendSuccess(
         Text.format("Set &f{0}&r as &e{1, user}&r's active title.",
             NamedTextColor.GRAY,
             rank, user
@@ -98,7 +108,7 @@ public class TitlesCommand {
 
     titles.addTitle(rank);
 
-    source.sendMessage(
+    source.sendSuccess(
         Text.format("Gave &e{0, user}&r the &f{1}&r title.",
             user, rank
         )
@@ -117,7 +127,7 @@ public class TitlesCommand {
 
     titles.removeTitle(rank);
 
-    source.sendMessage(
+    source.sendSuccess(
         Text.format("Removed the &f{1}&r title from &e{0, user}&r.",
             user, rank
         )
@@ -135,7 +145,7 @@ public class TitlesCommand {
 
     titles.setTier(tier);
 
-    source.sendMessage(
+    source.sendSuccess(
         Text.format("Set &e{0, user}&r's rank tier to {1}",
             user, tier.getDisplayName()
         )

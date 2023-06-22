@@ -1,0 +1,19 @@
+
+# If true, punishments will be announcce in general chat, if false they will only be announced in
+# staff chat
+announcePunishments = false
+
+# Interval in which the plugin auto-saves its data
+autosaveInterval = "30m"
+
+# Default reasons for certain types of punishments,
+# valid values are:
+# - ban
+# - ip_ban
+# - jail
+# - kick (Only visible in punishments UI)
+# - mute (Only visible in punishments UI)
+# - softmute (Only visible in punishments UI)
+[defaultReasons]
+ban = "This server is not for you"
+ip_ban = "This server is not for you"

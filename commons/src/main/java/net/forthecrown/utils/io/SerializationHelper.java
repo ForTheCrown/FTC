@@ -149,35 +149,37 @@ public final class SerializationHelper {
     return readFile(file, JSON_READER, object -> loadCallback.accept(JsonWrapper.wrap(object)));
   }
 
-  public static void writeFile(Path file, IoWriter writer) {
+  public static boolean writeFile(Path file, IoWriter writer) {
     try {
       ensureParentExists(file);
       writer.apply(file);
+      return true;
     } catch (IOException e) {
       LOGGER.error("Error writing file: '" + file + "'", e);
+      return false;
     }
   }
 
-  public static void writeTag(Path f, CompoundTag tag) {
-    writeFile(f, file -> {
+  public static boolean writeTag(Path f, CompoundTag tag) {
+    return writeFile(f, file -> {
       BinaryTags.writeCompressed(Files.newOutputStream(file), tag);
     });
   }
 
-  public static void writeTagFile(Path f, Consumer<CompoundTag> saveCallback) {
-    writeFile(f, file -> {
+  public static boolean writeTagFile(Path f, Consumer<CompoundTag> saveCallback) {
+    return writeFile(f, file -> {
       var tag = BinaryTags.compoundTag();
       saveCallback.accept(tag);
       BinaryTags.writeCompressed(Files.newOutputStream(file), tag);
     });
   }
 
-  public static void writeJson(Path f, JsonElement element) {
-    writeFile(f, file -> JsonUtils.writeFile(element, file));
+  public static boolean writeJson(Path f, JsonElement element) {
+    return writeFile(f, file -> JsonUtils.writeFile(element, file));
   }
 
-  public static void writeEon(Path file, JsonElement element) {
-    writeFile(file, file1 -> {
+  public static boolean writeEon(Path file, JsonElement element) {
+    return writeFile(file, file1 -> {
       var writer = Files.newBufferedWriter(file1, CHARSET);
       EonWriter eonWriter = new EonWriter(writer);
       eonWriter.write(element);
@@ -185,8 +187,8 @@ public final class SerializationHelper {
     });
   }
 
-  public static void writeJsonFile(Path f, Consumer<JsonWrapper> saveCallback) {
-    writeFile(f, file -> {
+  public static boolean writeJsonFile(Path f, Consumer<JsonWrapper> saveCallback) {
+    return writeFile(f, file -> {
       var json = JsonWrapper.create();
       saveCallback.accept(json);
       JsonUtils.writeFile(json.getSource(), file);

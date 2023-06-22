@@ -2,7 +2,7 @@ package net.forthecrown.dungeons.boss.evoker.phases;
 
 import net.forthecrown.dungeons.boss.BossContext;
 import net.forthecrown.dungeons.boss.evoker.EvokerBoss;
-import net.forthecrown.Events;
+import net.forthecrown.events.Events;
 import org.bukkit.boss.BossBar;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;

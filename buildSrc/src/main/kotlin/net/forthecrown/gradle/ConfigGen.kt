@@ -20,6 +20,10 @@ internal fun createPluginYml(it: Task) {
     .append("version: '${getVersion(configYml, it.project)}'\n")
     .append("api-version: '$API_VERSION'\n")
 
+  if (configYml.prefix != null) {
+    builder.append("prefix: '${configYml.prefix}'\n")
+  }
+
   if (configYml.description != null) {
     builder.append("description: '${configYml.description}'\n")
   }

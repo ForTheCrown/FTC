@@ -1,9 +1,12 @@
 package net.forthecrown.command.help;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
 import net.forthecrown.command.FtcCommand;
-import net.forthecrown.utils.WorldChunkMap.BukkitServices;
+import net.forthecrown.BukkitServices;
 import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.text.Component;
 
@@ -29,7 +32,10 @@ public interface FtcHelpList {
    * @throws CommandSyntaxException If the query was invalid, or if the page
    * number was invalid, relative to the amount of query results
    */
-  Component query(CommandSource source, String tag, int page, int pageSize);
+  Component query(CommandSource source, String tag, int page, int pageSize)
+      throws CommandSyntaxException;
+
+  CompletableFuture<Suggestions> suggest(CommandSource source, SuggestionsBuilder builder);
 
   void addEntry(HelpEntry entry);
 

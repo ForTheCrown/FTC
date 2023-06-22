@@ -16,6 +16,10 @@ public interface UserProperty<T> {
 
   T deserialize(JsonElement element);
 
+  int getId();
+
+  String getKey();
+
   interface PropertyEditCallback<T> {
     void onUpdate(User user, T value);
   }

@@ -14,11 +14,13 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Pattern;
 import net.forthecrown.Worlds;
+import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.nbt.paper.PaperNbt;
 import net.forthecrown.text.format.ComponentFormat;
 import net.forthecrown.text.parse.ChatParser;
 import net.forthecrown.text.parse.TextContext;
+import net.forthecrown.user.Users;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.KeybindComponent;
@@ -577,6 +579,13 @@ public final class Text {
     return value == null
         || Objects.equals(value.asComponent(), Component.empty())
         || plain(value.asComponent()).isEmpty();
+  }
+
+  public static Component sourceDisplayName(CommandSource source) {
+    if (source.isPlayer()) {
+      return Users.get(source.asPlayerOrNull()).displayName();
+    }
+    return source.displayName();
   }
 
   /* ----------------------------- FORMATTERS ------------------------------ */

@@ -43,6 +43,7 @@ import net.luckperms.api.query.Flag;
 import net.luckperms.api.query.QueryMode;
 import net.luckperms.api.query.QueryOptions;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
@@ -62,7 +63,7 @@ final class UserImpl implements User {
   @Getter
   private final UUID uniqueId;
 
-  private final UserServiceImpl service;
+  UserServiceImpl service;
 
   private String currentName;
 
@@ -102,6 +103,19 @@ final class UserImpl implements User {
 
     this.uniqueId = uniqueId;
     this.service = service;
+
+    // Determine initial 'online' state
+    Player player = Bukkit.getPlayer(uniqueId);
+    if (player != null) {
+      online = true;
+      this.player = player;
+    } else {
+      online = false;
+    }
+  }
+
+  public void ensureValid() {
+    Objects.requireNonNull(service, "User object has been invalidated :(");
   }
 
   @Override
@@ -157,6 +171,18 @@ final class UserImpl implements User {
   }
 
   @Override
+  public GameMode getGameMode() throws UserOfflineException {
+    ensureOnline();
+    return getPlayer().getGameMode();
+  }
+
+  @Override
+  public void setGameMode(GameMode gameMode) throws UserOfflineException {
+    ensureOnline();
+    getPlayer().setGameMode(gameMode);
+  }
+
+  @Override
   public Location getLocation() {
     if (isOnline()) {
       return getPlayer().getLocation();
@@ -191,7 +217,8 @@ final class UserImpl implements User {
 
   @Override
   public void setReturnLocation(@Nullable Location location) {
-    this.returnLocation = location;
+    ensureValid();
+    this.returnLocation = Locations.clone(location);
   }
 
   @Override
@@ -215,6 +242,7 @@ final class UserImpl implements User {
       ComponentFactory<T> factory,
       boolean redirectAlts
   ) {
+    ensureValid();
     int id = factory.getId();
 
     if (service.isAltAccount(uniqueId) && redirectAlts) {
@@ -259,6 +287,8 @@ final class UserImpl implements User {
 
   @Override
   public void setTime(TimeField field, long value) {
+    ensureValid();
+
     int id = field.getId();
 
     if (timeFields == null) {
@@ -301,6 +331,12 @@ final class UserImpl implements User {
   }
 
   @Override
+  public String getNickOrName() {
+    var nick = getNickname();
+    return Strings.isNullOrEmpty(nick) ? getName() : nick;
+  }
+
+  @Override
   public String getNickname() {
     var entry = lookupEntry();
     return entry.getNickname();
@@ -308,6 +344,8 @@ final class UserImpl implements User {
 
   @Override
   public void setNickname(String nickname) {
+    ensureValid();
+
     UserLookupImpl lookup = service.getLookup();
     UserLookupEntry entry = lookup.getEntry(uniqueId);
 
@@ -315,6 +353,8 @@ final class UserImpl implements User {
   }
 
   public UserLookupEntry lookupEntry() {
+    ensureValid();
+
     UserLookupImpl lookup = service.getLookup();
     UserLookupEntry entry = lookup.getEntry(getUniqueId());
 
@@ -328,6 +368,8 @@ final class UserImpl implements User {
   @Override
   public void setAfk(boolean afk, @Nullable Component reason) throws UserOfflineException {
     ensureOnline();
+    ensureValid();
+
     this.afk = afk;
 
     if (afk) {
@@ -351,6 +393,7 @@ final class UserImpl implements User {
   public void afk(@Nullable Component reason) throws IllegalStateException, UserOfflineException {
     ensureOnline();
     Preconditions.checkState(!isAfk(), "User is already AFK");
+    ensureValid();
 
     UserAfkEvent event = new UserAfkEvent(this, reason);
     event.callEvent();
@@ -387,6 +430,7 @@ final class UserImpl implements User {
   public void unafk() throws IllegalStateException, UserOfflineException {
     ensureOnline();
     Preconditions.checkState(afk, "User is not AFK");
+    ensureValid();
 
     setAfk(false, null);
   }
@@ -398,11 +442,13 @@ final class UserImpl implements User {
 
   @Override
   public void setGems(int gems) {
+    ensureValid();
     service.getGems().set(uniqueId, gems);
   }
 
   @Override
   public void addGems(int gems) {
+    ensureValid();
     service.getGems().add(uniqueId, gems);
   }
 
@@ -418,11 +464,13 @@ final class UserImpl implements User {
 
   @Override
   public void setBalance(int balance) {
+    ensureValid();
     service.getBalances().set(uniqueId, balance);
   }
 
   @Override
   public void addBalance(int balance) {
+    ensureValid();
     service.getBalances().add(uniqueId, balance);
   }
 
@@ -443,6 +491,7 @@ final class UserImpl implements User {
 
   @Override
   public <T> void set(UserProperty<T> property, T value) {
+    ensureValid();
     getComponent(PropertyMap.class).set(property, value);
   }
 
@@ -494,21 +543,22 @@ final class UserImpl implements User {
 
   @Override
   public void updateVanished() {
-
+    ensureValid();
   }
 
   @Override
   public void updateGodMode() {
-
+    ensureValid();
   }
 
   @Override
   public void updateFlying() {
-
+    ensureValid();
   }
 
   @Override
   public void updateTabName() {
+    ensureValid();
 
   }
 
@@ -521,6 +571,7 @@ final class UserImpl implements User {
   public UserTeleport createTeleport(Supplier<Location> destination, Type type)
       throws UserOfflineException
   {
+    ensureValid();
     return null;
   }
 

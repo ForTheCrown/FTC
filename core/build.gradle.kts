@@ -15,4 +15,9 @@ dependencies {
 pluginYml {
   name = "FTC-Core"
   main = "net.forthecrown.core.CorePlugin"
+  loader = "net.forthecrown.core.CoreLoader"
+
+  depends {
+    required("LuckPerms")
+  }
 }

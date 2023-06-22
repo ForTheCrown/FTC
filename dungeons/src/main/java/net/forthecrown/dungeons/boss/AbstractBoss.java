@@ -8,7 +8,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.function.Consumer;
 import lombok.Getter;
-import net.forthecrown.Events;
+import net.forthecrown.events.Events;
 import net.forthecrown.Loggers;
 import net.forthecrown.dungeons.boss.components.BossComponent;
 import net.forthecrown.utils.Tasks;

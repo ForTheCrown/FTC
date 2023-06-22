@@ -1,6 +1,6 @@
 package net.forthecrown.menu.internal;
 
-import net.forthecrown.Events;
+import net.forthecrown.events.Events;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class MenusPlugin extends JavaPlugin {

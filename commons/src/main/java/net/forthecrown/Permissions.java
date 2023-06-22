@@ -29,4 +29,8 @@ public final class Permissions {
 
     return permission;
   }
+
+  public static Permission registerPrefixed(Permission parent, String suffix) {
+    return register(parent.getName() + "." + suffix);
+  }
 }

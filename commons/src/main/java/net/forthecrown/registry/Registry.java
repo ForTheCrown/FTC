@@ -6,22 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrays;
-import it.unimi.dsi.fastutil.objects.ObjectCollection;
-import it.unimi.dsi.fastutil.objects.ObjectCollections;
-import it.unimi.dsi.fastutil.objects.ObjectSet;
-import it.unimi.dsi.fastutil.objects.ObjectSets;
-import java.util.Arrays;
-import java.util.ListIterator;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.OptionalInt;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
+import it.unimi.dsi.fastutil.objects.*;
 import lombok.Getter;
 import net.forthecrown.Loggers;
 import net.forthecrown.nbt.BinaryTag;
@@ -34,6 +19,11 @@ import org.intellij.lang.annotations.Pattern;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
+
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * A registry is a map of string keys to entries and an array of entry id 2 entries at the same
@@ -488,7 +478,7 @@ public class Registry<V> implements Iterable<V> {
    *
    * @throws IllegalArgumentException If the registry is frozen
    */
-  private void testFrozen() throws IllegalArgumentException {
+  public void testFrozen() throws IllegalArgumentException {
     if (isFrozen() && isFreezingAllowed()) {
       throw newException("This registry is frozen and cannot be modified");
     }

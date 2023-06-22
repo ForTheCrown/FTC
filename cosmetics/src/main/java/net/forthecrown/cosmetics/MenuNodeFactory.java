@@ -25,9 +25,7 @@ public interface MenuNodeFactory<T> {
             boolean active = data.isActive(cosmetic);
             int price = priceGetter.getAsInt();
 
-            Material material = owned
-                ? Material.ORANGE_DYE
-                : Material.GRAY_DYE;
+            Material material = Cosmetics.getCosmeticMaterial(owned);
 
             ItemBuilder builder = ItemStacks.builder(material)
                 .setNameRaw(cosmetic.getDisplayName());

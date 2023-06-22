@@ -1,0 +1,15 @@
+{
+  "repositories": {
+    "central": "https://repo1.maven.org/maven2/",
+    "minecraft-libraries": "https://libraries.minecraft.net/",
+    "sponge-powered": "https://repo.spongepowered.org/repository/maven-public"
+  },
+  "dependencies": [
+    "${grenadier}",
+    "${grenadierAnnotations}",
+    "${toml}",
+    "${mathLib}",
+    "${configurate}",
+    "${tomlConfig}"
+  ]
+}

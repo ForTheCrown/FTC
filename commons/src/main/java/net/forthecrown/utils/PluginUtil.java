@@ -79,8 +79,7 @@ public final class PluginUtil {
   }
 
   /**
-   * Gets the first plugin to appear in the current stack frame, will 100% return the plugin
-   * that loaded this utility class lol
+   * Gets the first plugin to appear in the current stack frame
    *
    * @return Current context plugin
    */
@@ -99,6 +98,11 @@ public final class PluginUtil {
     return walker.walk(stream -> {
       return stream.filter(stackFrame -> {
         var clazz = stackFrame.getDeclaringClass();
+
+        if (clazz == PluginUtil.class) {
+          return false;
+        }
+
         return clazz.getClassLoader() instanceof ConfiguredPluginClassLoader;
       })
           .map(stackFrame -> JavaPlugin.getProvidingPlugin(stackFrame.getDeclaringClass()))

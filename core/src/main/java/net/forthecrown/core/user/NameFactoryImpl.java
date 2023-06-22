@@ -74,7 +74,7 @@ public class NameFactoryImpl implements UserNameFactory {
 
   @Override
   public Component formatProfileDisplay(User user, Audience viewer) {
-    DisplayContext context = createContext(user, viewer, 0);
+    DisplayContext context = createContext(user, viewer, FOR_HOVER);
     return createProfileText(user, context, false);
   }
 

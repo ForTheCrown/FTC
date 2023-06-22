@@ -58,7 +58,7 @@ public final class Components {
     return null;
   }
 
-  private static <T extends UserComponent> ComponentFactory<T> createFactory(Class<T> type) {
+  public static <T extends UserComponent> ComponentFactory<T> createFactory(Class<T> type) {
     String name = findComponentName(type, false);
     ComponentFactory<T> factory = new ComponentFactory<>(type);
 

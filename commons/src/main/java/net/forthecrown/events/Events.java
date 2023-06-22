@@ -1,4 +1,4 @@
-package net.forthecrown;
+package net.forthecrown.events;
 
 import net.forthecrown.utils.PluginUtil;
 import org.bukkit.Bukkit;

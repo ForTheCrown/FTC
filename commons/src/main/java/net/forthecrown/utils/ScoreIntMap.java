@@ -60,7 +60,6 @@ public class ScoreIntMap<K> implements Iterable<Entry<K>> {
 
   @Setter
   @Getter
-  @Accessors(chain = true)
   private KeyValidator<K> validator;
 
   public ScoreIntMap() {

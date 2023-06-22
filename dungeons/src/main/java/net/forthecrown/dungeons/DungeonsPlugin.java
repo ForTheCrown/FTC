@@ -1,6 +1,6 @@
 package net.forthecrown.dungeons;
 
-import net.forthecrown.Events;
+import net.forthecrown.events.Events;
 import net.forthecrown.ItemGraveService;
 import net.forthecrown.command.Commands;
 import net.forthecrown.dungeons.commands.CommandDungeons;

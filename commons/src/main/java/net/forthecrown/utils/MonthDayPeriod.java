@@ -32,7 +32,7 @@ public class MonthDayPeriod {
       .appendValue(ChronoField.MONTH_OF_YEAR, 1, 2, SignStyle.NORMAL)
       .toFormatter();
 
-  public static MonthDayPeriod ALL = between(MonthDay.of(01, 01), MonthDay.of(12, 31));
+  public static MonthDayPeriod ALL = between(MonthDay.of(1, 1), MonthDay.of(12, 31));
 
   /**
    * The start date of this period.

@@ -12,7 +12,7 @@ public class CosmeticsPlugin extends JavaPlugin {
     reloadConfig();
 
     UserService service = Users.getService();
-    service.registerComponentType(CosmeticData.class);
+    service.registerComponent(CosmeticData.class);
 
     Cosmetics.init();
   }

@@ -19,7 +19,7 @@ public class TitlesPlugin extends JavaPlugin {
   @Override
   public void onEnable() {
     UserService service = Users.getService();
-    service.registerComponentType(UserTitles.class);
+    service.registerComponent(UserTitles.class);
 
     loadTitles();
 

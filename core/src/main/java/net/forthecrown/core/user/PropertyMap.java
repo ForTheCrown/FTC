@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.ObjectArrays;
 import net.forthecrown.Loggers;
+import net.forthecrown.registry.Holder;
 import net.forthecrown.user.ComponentName;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserComponent;
@@ -26,7 +27,7 @@ public class PropertyMap implements UserComponent {
 
   /**
    * The backing object array that stores property values. What index corresponds to what property
-   * is determined by {@link UserProperty#getHolderId()} ()}, which is generated during runtime.
+   * is determined by {@link UserProperty#getId()}, which is generated during runtime.
    * <p>
    * Because the indexes only affect the runtime value array, the order the properties are
    * initialized in shouldn't matter in the slightest as all it determines is what order this array
@@ -59,7 +60,7 @@ public class PropertyMap implements UserComponent {
       return property.getDefaultValue();
     }
 
-    return (T) values[property.getHolderId()];
+    return (T) values[property.getId()];
   }
 
   /**
@@ -90,7 +91,7 @@ public class PropertyMap implements UserComponent {
     if (value == null || property.getDefaultValue().equals(value)) {
       remove(property);
     } else {
-      int index = property.getHolderId();
+      int index = property.getId();
       values = ObjectArrays.ensureCapacity(values, index + 1);
 
       // Set the value
@@ -135,7 +136,7 @@ public class PropertyMap implements UserComponent {
       return false;
     }
 
-    values[property.getHolderId()] = null;
+    values[property.getId()] = null;
     return true;
   }
 
@@ -146,11 +147,11 @@ public class PropertyMap implements UserComponent {
    * @return True, if the given property has a set value in this map.
    */
   public boolean contains(@NotNull UserProperty<?> property) {
-    if (values.length <= property.getHolderId()) {
+    if (values.length <= property.getId()) {
       return false;
     }
 
-    var val = values[property.getHolderId()];
+    var val = values[property.getId()];
     return val != null && !property.getDefaultValue().equals(val);
   }
 
@@ -215,9 +216,10 @@ public class PropertyMap implements UserComponent {
 
     for (int i = values.length - 1; i >= 0; i--) {
       // Get the property by the current index
-      UserProperty<Object> property = (UserProperty<Object>) registry.orNull(i);
+      Holder<UserProperty<Object>> holder
+          = (Holder) registry.getHolder(i).orElse(null);
 
-      if (property == null) {
+      if (holder == null) {
         LOGGER.warn("Found unregistered property {} in {}", i, user);
         continue;
       }
@@ -225,13 +227,13 @@ public class PropertyMap implements UserComponent {
       // contains() check here to test if the
       // set value is null or the default, if
       // it is, then don't serialize
-      if (!contains(property)) {
+      if (!contains(holder.getValue())) {
         continue;
       }
 
       // Serialize and add to JSON
-      var val = get(property);
-      json.add(property.getHolderKey(), property.serialize(val));
+      var val = values[i];
+      json.add(holder.getKey(), holder.getValue().serialize(val));
     }
 
     return json.size() <= 0 ? null : json;

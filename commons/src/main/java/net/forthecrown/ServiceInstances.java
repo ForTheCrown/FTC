@@ -1,6 +1,6 @@
 package net.forthecrown;
 
-import static net.forthecrown.utils.WorldChunkMap.BukkitServices.loadOrThrow;
+import static net.forthecrown.BukkitServices.loadOrThrow;
 
 final class ServiceInstances {
 

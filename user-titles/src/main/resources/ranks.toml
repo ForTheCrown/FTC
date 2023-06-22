@@ -89,12 +89,12 @@
 tier = "free"
 prefix = "&7[<gradient=#BE91FD,#E1A5CA:Booster>&7]"
 description = [
-    "Earned by boosting the Discord server."
+  "Earned by boosting the Discord server."
 ]
 
 [streaming]
 tier = "free"
 prefix = "&f[<gradient=#AA64FF,#C882FF:Streaming>&f]"
 description = [
-    "Given to verified content creators."
+  "Given to verified content creators."
 ]

@@ -5,11 +5,20 @@ import org.gradle.api.Action
 class FtcPaperYml {
 
   // Basic plugin details
-  var name: String
   var version: String
   var main: String? = null
   var description: String? = null;
   var authors: MutableList<String>? = null;
+  var prefix: String? = null;
+
+  var name: String
+  set(value) {
+    if (prefix == null) {
+      prefix = value.replace("FTC-", "")
+    }
+
+    field = value
+  }
 
   // Class loading/bootstrap info
   var bootstrapper: String? = null

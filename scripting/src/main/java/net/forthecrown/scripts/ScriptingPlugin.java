@@ -4,7 +4,7 @@ import java.nio.file.Path;
 import net.forthecrown.command.Commands;
 import net.forthecrown.grenadier.annotations.AnnotatedCommandContext;
 import net.forthecrown.scripts.commands.ScriptingCommand;
-import net.forthecrown.utils.WorldChunkMap.BukkitServices;
+import net.forthecrown.BukkitServices;
 import org.bukkit.plugin.java.JavaPlugin;
 
 class ScriptingPlugin extends JavaPlugin {
