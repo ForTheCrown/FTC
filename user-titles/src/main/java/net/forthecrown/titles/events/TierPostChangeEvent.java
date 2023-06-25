@@ -8,7 +8,7 @@ import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
-public class TierChangeEvent extends UserEvent {
+public class TierPostChangeEvent extends UserEvent {
 
   @Getter
   private static final HandlerList handlerList = new HandlerList();
@@ -16,7 +16,7 @@ public class TierChangeEvent extends UserEvent {
   private final RankTier from;
   private final RankTier to;
 
-  public TierChangeEvent(User user, RankTier from, RankTier to) {
+  public TierPostChangeEvent(User user, RankTier from, RankTier to) {
     super(user);
     this.from = from;
     this.to = to;

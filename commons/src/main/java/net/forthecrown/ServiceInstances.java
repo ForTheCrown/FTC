@@ -7,6 +7,7 @@ final class ServiceInstances {
   static Cooldowns cooldown;
   static InventoryStorage inventoryStorage;
   static ItemGraveService grave;
+  static FtcServer server;
 
   public static Cooldowns getCooldown() {
     return cooldown == null
@@ -24,5 +25,11 @@ final class ServiceInstances {
     return grave == null
         ? (grave = loadOrThrow(ItemGraveService.class))
         : grave;
+  }
+
+  public static FtcServer getServer() {
+    return server == null
+        ? (server = loadOrThrow(FtcServer.class))
+        : server;
   }
 }

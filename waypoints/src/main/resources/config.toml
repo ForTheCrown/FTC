@@ -1,0 +1,28 @@
+# Waypoint marked as the 'spawn' region
+spawnWaypoint      = "Hazelguard"
+
+# Waypoint sizes
+adminWaypointSize  = { x = 5, y = 5, z = 5 }
+playerWaypointSize = { x = 5, y = 5, z = 5 }
+
+# Worlds in which waypoints cannot be created
+disabledPlayerWorlds = [ "world_void", "world_resource", "world_the_end", "world_the_end" ]
+
+# Hulksmashing poles global enabled/disabled state.
+hulkSmashPoles = true
+
+# Delay between a waypoint being marked for deletion, and
+# the actual deletion of the waypoint
+waypointDeletionDelay = "3d"
+
+# Cooldown between users being able to do moveins
+moveInCooldown = "1h"
+
+# Duration for which a waypoint invite is valid
+validCooldownTime = "10m"
+
+# Whether the move-in cooldown is enabled
+moveInHasCooldown = false
+
+# Plugin data auto save interval
+autoSaveInterval = "30m"

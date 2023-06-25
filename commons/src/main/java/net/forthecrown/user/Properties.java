@@ -1,5 +1,6 @@
 package net.forthecrown.user;
 
+import java.util.UUID;
 import net.kyori.adventure.text.Component;
 
 public final class Properties {
@@ -48,5 +49,9 @@ public final class Properties {
 
   public static <E extends Enum<E>> UserProperty.Builder<E> enumProperty(Class<E> type) {
     return Users.getService().createEnumProperty(type);
+  }
+
+  public static UserProperty.Builder<UUID> uuidProperty() {
+    return Users.getService().createUuidProperty();
   }
 }

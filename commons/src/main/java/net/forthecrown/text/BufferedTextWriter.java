@@ -11,16 +11,16 @@ import net.kyori.adventure.text.format.TextDecoration;
 
 public class BufferedTextWriter extends DefaultTextWriter {
 
-  private List<Component> lore;
+  private List<Component> buf;
   private TextComponent.Builder line;
 
-  public BufferedTextWriter(List<Component> lore) {
+  public BufferedTextWriter(List<Component> buf) {
     super(
         Component.text()
             .color(NamedTextColor.WHITE)
             .decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE)
     );
-    this.lore = lore;
+    this.buf = buf;
     line = createBuilder();
   }
 
@@ -28,7 +28,7 @@ public class BufferedTextWriter extends DefaultTextWriter {
   protected void onNewLine() {
     super.onNewLine();
 
-    lore.add(line.build());
+    buf.add(line.build());
     line = createBuilder();
   }
 
@@ -41,17 +41,17 @@ public class BufferedTextWriter extends DefaultTextWriter {
   @Override
   protected void onClear() {
     super.onClear();
-    lore.clear();
+    buf.clear();
     line = createBuilder();
   }
 
-  public List<Component> getLore() {
+  public List<Component> getBuffer() {
     if (!lineEmpty) {
-      lore.add(line.build());
+      buf.add(line.build());
       line = createBuilder();
     }
 
-    return lore;
+    return buf;
   }
 
   private TextComponent.Builder createBuilder() {
@@ -71,7 +71,7 @@ public class BufferedTextWriter extends DefaultTextWriter {
   public void setColor(TextColor color) {
     super.setColor(color);
 
-    lore = lore.stream()
+    buf = buf.stream()
         .map(component -> component.color(color))
         .collect(Collectors.toList());
   }
@@ -80,7 +80,7 @@ public class BufferedTextWriter extends DefaultTextWriter {
   public void setStyle(Style style) {
     super.setStyle(style);
 
-    lore = lore.stream()
+    buf = buf.stream()
         .map(component -> component.style(style))
         .collect(Collectors.toList());
   }

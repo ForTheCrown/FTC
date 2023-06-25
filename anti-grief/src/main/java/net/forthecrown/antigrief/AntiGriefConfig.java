@@ -4,8 +4,10 @@ import java.time.Duration;
 import java.util.Map;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 
 @Getter
+@ConfigSerializable
 public class AntiGriefConfig {
 
   private boolean announcePunishments = false;

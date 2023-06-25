@@ -4,9 +4,12 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.List;
 import net.forthecrown.antigrief.GExceptions;
+import net.forthecrown.antigrief.GriefPermissions;
 import net.forthecrown.antigrief.PunishEntry;
 import net.forthecrown.antigrief.Punishments;
+import net.forthecrown.antigrief.StaffNote;
 import net.forthecrown.command.Commands;
 import net.forthecrown.command.FtcCommand;
 import net.forthecrown.command.arguments.Arguments;
@@ -14,7 +17,6 @@ import net.forthecrown.command.help.UsageFactory;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.text.Text;
-import net.forthecrown.text.TextWriter;
 import net.forthecrown.text.TextWriters;
 import net.kyori.adventure.text.Component;
 
@@ -23,7 +25,7 @@ public class CommandNotes extends FtcCommand {
   public CommandNotes() {
     super("Notes");
 
-    setPermission(Permissions.PUNISH_NOTES);
+    setPermission(GriefPermissions.PUNISH_NOTES);
     setDescription("Shows all admin notes of a player");
 
     register();
@@ -67,10 +69,10 @@ public class CommandNotes extends FtcCommand {
                 throw GExceptions.noNotes(entry);
               }
 
-              List<EntryNote> notes = entry.getNotes();
-              TextWriter writer = TextWriters.newWriter();
+              List<StaffNote> notes = entry.getNotes();
+              var writer = TextWriters.newWriter();
 
-              EntryNote.writeNotes(notes, writer, entry.getUser());
+              StaffNote.writeNotes(notes, writer, entry.getUser());
 
               c.getSource().sendMessage(writer);
               return 0;
@@ -82,7 +84,7 @@ public class CommandNotes extends FtcCommand {
                       PunishEntry entry = entry(c);
 
                       String msg = c.getArgument("str", String.class);
-                      EntryNote note = EntryNote.of(msg, c.getSource());
+                      StaffNote note = StaffNote.of(msg, c.getSource());
 
                       entry.getNotes().add(0, note);
 

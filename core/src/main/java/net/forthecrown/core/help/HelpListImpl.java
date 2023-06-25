@@ -196,7 +196,7 @@ public class HelpListImpl implements FtcHelpList {
       loreWriter.setFieldStyle(Style.style(NamedTextColor.YELLOW));
       entry.writeFull(loreWriter, source);
 
-      var text = loreWriter.getLore();
+      var text = loreWriter.getBuffer();
 
       // Ensure list isn't empty and page number is valid
       Commands.ensurePageValid(page, pageSize, text.size());

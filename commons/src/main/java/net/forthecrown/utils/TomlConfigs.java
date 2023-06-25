@@ -5,6 +5,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.lang.reflect.Type;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import me.lucko.configurate.toml.TOMLConfigurationLoader;
 import net.forthecrown.grenadier.types.ArgumentTypes;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -14,6 +16,23 @@ import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.loader.HeaderMode;
 import org.spongepowered.configurate.serialize.SerializationException;
 import org.spongepowered.configurate.serialize.TypeSerializer;
+import org.spongepowered.configurate.serialize.TypeSerializerCollection;
+import org.spongepowered.math.vector.Vector2d;
+import org.spongepowered.math.vector.Vector2f;
+import org.spongepowered.math.vector.Vector2i;
+import org.spongepowered.math.vector.Vector2l;
+import org.spongepowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3f;
+import org.spongepowered.math.vector.Vector3i;
+import org.spongepowered.math.vector.Vector3l;
+import org.spongepowered.math.vector.Vector4d;
+import org.spongepowered.math.vector.Vector4f;
+import org.spongepowered.math.vector.Vector4i;
+import org.spongepowered.math.vector.Vector4l;
+import org.spongepowered.math.vector.VectorNd;
+import org.spongepowered.math.vector.VectorNf;
+import org.spongepowered.math.vector.VectorNi;
+import org.spongepowered.math.vector.VectorNl;
 
 public final class TomlConfigs {
   private TomlConfigs() {}
@@ -43,14 +62,34 @@ public final class TomlConfigs {
     return TOMLConfigurationLoader.builder()
         .path(path)
         .defaultOptions(configurationOptions -> {
-          return configurationOptions.serializers(builder -> {
-            builder.registerExact(Duration.class, createDurationSerializer());
-          });
+          return configurationOptions.serializers(TomlConfigs::registerTypeSerializers);
         })
         .setTableIndent(2)
         .setKeyIndent(2)
         .headerMode(HeaderMode.PRESERVE)
         .build();
+  }
+
+  private static void registerTypeSerializers(TypeSerializerCollection.Builder builder) {
+    builder.registerExact(Duration.class, createDurationSerializer());
+
+    // Auto generated via a TypeScript script
+    builder.registerExact(Vector2f.class, new Vector2fSerializer());
+    builder.registerExact(Vector2d.class, new Vector2dSerializer());
+    builder.registerExact(Vector2i.class, new Vector2iSerializer());
+    builder.registerExact(Vector2l.class, new Vector2lSerializer());
+    builder.registerExact(Vector3f.class, new Vector3fSerializer());
+    builder.registerExact(Vector3d.class, new Vector3dSerializer());
+    builder.registerExact(Vector3i.class, new Vector3iSerializer());
+    builder.registerExact(Vector3l.class, new Vector3lSerializer());
+    builder.registerExact(Vector4f.class, new Vector4fSerializer());
+    builder.registerExact(Vector4d.class, new Vector4dSerializer());
+    builder.registerExact(Vector4i.class, new Vector4iSerializer());
+    builder.registerExact(Vector4l.class, new Vector4lSerializer());
+    builder.registerExact(VectorNf.class, new VectorNfSerializer());
+    builder.registerExact(VectorNd.class, new VectorNdSerializer());
+    builder.registerExact(VectorNi.class, new VectorNiSerializer());
+    builder.registerExact(VectorNl.class, new VectorNlSerializer());
   }
 
   public static TypeSerializer<Duration> createDurationSerializer() {
@@ -90,3 +129,542 @@ public final class TomlConfigs {
     };
   }
 }
+
+
+// Auto generated via a TypeScript script
+
+class Vector2fSerializer implements TypeSerializer<Vector2f> {
+
+  @Override
+  public Vector2f deserialize(Type type, ConfigurationNode node) throws SerializationException {
+
+    float x = node.node("x").getFloat();
+    float y = node.node("y").getFloat();
+    return new Vector2f(x, y);
+
+  }
+
+  @Override
+  public void serialize(Type type, @Nullable Vector2f vec, ConfigurationNode node) throws SerializationException {
+    if (vec == null) {
+      node.set(null);
+      return;
+    }
+    node.node("x").set(vec.x());
+    node.node("y").set(vec.y());
+  }
+}
+
+class Vector2dSerializer implements TypeSerializer<Vector2d> {
+
+  @Override
+  public Vector2d deserialize(Type type, ConfigurationNode node) throws SerializationException {
+
+    double x = node.node("x").getDouble();
+    double y = node.node("y").getDouble();
+    return new Vector2d(x, y);
+
+  }
+
+  @Override
+  public void serialize(Type type, @Nullable Vector2d vec, ConfigurationNode node) throws SerializationException {
+    if (vec == null) {
+      node.set(null);
+      return;
+    }
+    node.node("x").set(vec.x());
+    node.node("y").set(vec.y());
+  }
+}
+
+class Vector2iSerializer implements TypeSerializer<Vector2i> {
+
+  @Override
+  public Vector2i deserialize(Type type, ConfigurationNode node) throws SerializationException {
+
+    int x = node.node("x").getInt();
+    int y = node.node("y").getInt();
+    return new Vector2i(x, y);
+
+  }
+
+  @Override
+  public void serialize(Type type, @Nullable Vector2i vec, ConfigurationNode node) throws SerializationException {
+    if (vec == null) {
+      node.set(null);
+      return;
+    }
+    node.node("x").set(vec.x());
+    node.node("y").set(vec.y());
+  }
+}
+
+class Vector2lSerializer implements TypeSerializer<Vector2l> {
+
+  @Override
+  public Vector2l deserialize(Type type, ConfigurationNode node) throws SerializationException {
+
+    long x = node.node("x").getLong();
+    long y = node.node("y").getLong();
+    return new Vector2l(x, y);
+
+  }
+
+  @Override
+  public void serialize(Type type, @Nullable Vector2l vec, ConfigurationNode node) throws SerializationException {
+    if (vec == null) {
+      node.set(null);
+      return;
+    }
+    node.node("x").set(vec.x());
+    node.node("y").set(vec.y());
+  }
+}
+
+class Vector3fSerializer implements TypeSerializer<Vector3f> {
+
+  @Override
+  public Vector3f deserialize(Type type, ConfigurationNode node) throws SerializationException {
+
+    float x = node.node("x").getFloat();
+    float y = node.node("y").getFloat();
+    float z = node.node("z").getFloat();
+    return new Vector3f(x, y, z);
+
+  }
+
+  @Override
+  public void serialize(Type type, @Nullable Vector3f vec, ConfigurationNode node) throws SerializationException {
+    if (vec == null) {
+      node.set(null);
+      return;
+    }
+    node.node("x").set(vec.x());
+    node.node("y").set(vec.y());
+    node.node("z").set(vec.z());
+  }
+}
+
+class Vector3dSerializer implements TypeSerializer<Vector3d> {
+
+  @Override
+  public Vector3d deserialize(Type type, ConfigurationNode node) throws SerializationException {
+
+    double x = node.node("x").getDouble();
+    double y = node.node("y").getDouble();
+    double z = node.node("z").getDouble();
+    return new Vector3d(x, y, z);
+
+  }
+
+  @Override
+  public void serialize(Type type, @Nullable Vector3d vec, ConfigurationNode node) throws SerializationException {
+    if (vec == null) {
+      node.set(null);
+      return;
+    }
+    node.node("x").set(vec.x());
+    node.node("y").set(vec.y());
+    node.node("z").set(vec.z());
+  }
+}
+
+class Vector3iSerializer implements TypeSerializer<Vector3i> {
+
+  @Override
+  public Vector3i deserialize(Type type, ConfigurationNode node) throws SerializationException {
+
+    int x = node.node("x").getInt();
+    int y = node.node("y").getInt();
+    int z = node.node("z").getInt();
+    return new Vector3i(x, y, z);
+
+  }
+
+  @Override
+  public void serialize(Type type, @Nullable Vector3i vec, ConfigurationNode node) throws SerializationException {
+    if (vec == null) {
+      node.set(null);
+      return;
+    }
+    node.node("x").set(vec.x());
+    node.node("y").set(vec.y());
+    node.node("z").set(vec.z());
+  }
+}
+
+class Vector3lSerializer implements TypeSerializer<Vector3l> {
+
+  @Override
+  public Vector3l deserialize(Type type, ConfigurationNode node) throws SerializationException {
+
+    long x = node.node("x").getLong();
+    long y = node.node("y").getLong();
+    long z = node.node("z").getLong();
+    return new Vector3l(x, y, z);
+
+  }
+
+  @Override
+  public void serialize(Type type, @Nullable Vector3l vec, ConfigurationNode node) throws SerializationException {
+    if (vec == null) {
+      node.set(null);
+      return;
+    }
+    node.node("x").set(vec.x());
+    node.node("y").set(vec.y());
+    node.node("z").set(vec.z());
+  }
+}
+
+class Vector4fSerializer implements TypeSerializer<Vector4f> {
+
+  @Override
+  public Vector4f deserialize(Type type, ConfigurationNode node) throws SerializationException {
+
+    float x = node.node("x").getFloat();
+    float y = node.node("y").getFloat();
+    float z = node.node("z").getFloat();
+    float w = node.node("w").getFloat();
+    return new Vector4f(x, y, z, w);
+
+  }
+
+  @Override
+  public void serialize(Type type, @Nullable Vector4f vec, ConfigurationNode node) throws SerializationException {
+    if (vec == null) {
+      node.set(null);
+      return;
+    }
+    node.node("x").set(vec.x());
+    node.node("y").set(vec.y());
+    node.node("z").set(vec.z());
+    node.node("w").set(vec.w());
+  }
+}
+
+class Vector4dSerializer implements TypeSerializer<Vector4d> {
+
+  @Override
+  public Vector4d deserialize(Type type, ConfigurationNode node) throws SerializationException {
+
+    double x = node.node("x").getDouble();
+    double y = node.node("y").getDouble();
+    double z = node.node("z").getDouble();
+    double w = node.node("w").getDouble();
+    return new Vector4d(x, y, z, w);
+
+  }
+
+  @Override
+  public void serialize(Type type, @Nullable Vector4d vec, ConfigurationNode node) throws SerializationException {
+    if (vec == null) {
+      node.set(null);
+      return;
+    }
+    node.node("x").set(vec.x());
+    node.node("y").set(vec.y());
+    node.node("z").set(vec.z());
+    node.node("w").set(vec.w());
+  }
+}
+
+class Vector4iSerializer implements TypeSerializer<Vector4i> {
+
+  @Override
+  public Vector4i deserialize(Type type, ConfigurationNode node) throws SerializationException {
+
+    int x = node.node("x").getInt();
+    int y = node.node("y").getInt();
+    int z = node.node("z").getInt();
+    int w = node.node("w").getInt();
+    return new Vector4i(x, y, z, w);
+
+  }
+
+  @Override
+  public void serialize(Type type, @Nullable Vector4i vec, ConfigurationNode node) throws SerializationException {
+    if (vec == null) {
+      node.set(null);
+      return;
+    }
+    node.node("x").set(vec.x());
+    node.node("y").set(vec.y());
+    node.node("z").set(vec.z());
+    node.node("w").set(vec.w());
+  }
+}
+
+class Vector4lSerializer implements TypeSerializer<Vector4l> {
+
+  @Override
+  public Vector4l deserialize(Type type, ConfigurationNode node) throws SerializationException {
+
+    long x = node.node("x").getLong();
+    long y = node.node("y").getLong();
+    long z = node.node("z").getLong();
+    long w = node.node("w").getLong();
+    return new Vector4l(x, y, z, w);
+
+  }
+
+  @Override
+  public void serialize(Type type, @Nullable Vector4l vec, ConfigurationNode node) throws SerializationException {
+    if (vec == null) {
+      node.set(null);
+      return;
+    }
+    node.node("x").set(vec.x());
+    node.node("y").set(vec.y());
+    node.node("z").set(vec.z());
+    node.node("w").set(vec.w());
+  }
+}
+
+class VectorNfSerializer implements TypeSerializer<VectorNf> {
+
+  @Override
+  public VectorNf deserialize(Type type, ConfigurationNode node) throws SerializationException {
+    List<Float> list = node.getList(Float.class, List.of());
+    if (list.isEmpty()) {
+      return new VectorNf();
+    }
+
+    float[] arr = new float[list.size()];
+    for (int i = 0; i < arr.length; i++) {
+      arr[i] = list.get(i);
+    }
+    return new VectorNf(arr);
+  }
+
+  @Override
+  public void serialize(Type type, @Nullable VectorNf vec, ConfigurationNode node) throws SerializationException {
+    if (vec == null) {
+      node.set(null);
+      return;
+    }
+
+    List<Float> list = new ArrayList<>(vec.size());
+    for (int i = 0; i < vec.size(); i++) {
+      list.add(vec.get(i));
+    }
+    node.setList(Float.class, list);
+  }
+}
+
+class VectorNdSerializer implements TypeSerializer<VectorNd> {
+
+  @Override
+  public VectorNd deserialize(Type type, ConfigurationNode node) throws SerializationException {
+    List<Double> list = node.getList(Double.class, List.of());
+    if (list.isEmpty()) {
+      return new VectorNd();
+    }
+
+    double[] arr = new double[list.size()];
+    for (int i = 0; i < arr.length; i++) {
+      arr[i] = list.get(i);
+    }
+    return new VectorNd(arr);
+  }
+
+  @Override
+  public void serialize(Type type, @Nullable VectorNd vec, ConfigurationNode node) throws SerializationException {
+    if (vec == null) {
+      node.set(null);
+      return;
+    }
+
+    List<Double> list = new ArrayList<>(vec.size());
+    for (int i = 0; i < vec.size(); i++) {
+      list.add(vec.get(i));
+    }
+    node.setList(Double.class, list);
+  }
+}
+
+class VectorNiSerializer implements TypeSerializer<VectorNi> {
+
+  @Override
+  public VectorNi deserialize(Type type, ConfigurationNode node) throws SerializationException {
+    List<Integer> list = node.getList(Integer.class, List.of());
+    if (list.isEmpty()) {
+      return new VectorNi();
+    }
+
+    int[] arr = new int[list.size()];
+    for (int i = 0; i < arr.length; i++) {
+      arr[i] = list.get(i);
+    }
+    return new VectorNi(arr);
+  }
+
+  @Override
+  public void serialize(Type type, @Nullable VectorNi vec, ConfigurationNode node) throws SerializationException {
+    if (vec == null) {
+      node.set(null);
+      return;
+    }
+
+    List<Integer> list = new ArrayList<>(vec.size());
+    for (int i = 0; i < vec.size(); i++) {
+      list.add(vec.get(i));
+    }
+    node.setList(Integer.class, list);
+  }
+}
+
+class VectorNlSerializer implements TypeSerializer<VectorNl> {
+
+  @Override
+  public VectorNl deserialize(Type type, ConfigurationNode node) throws SerializationException {
+    List<Long> list = node.getList(Long.class, List.of());
+    if (list.isEmpty()) {
+      return new VectorNl();
+    }
+
+    long[] arr = new long[list.size()];
+    for (int i = 0; i < arr.length; i++) {
+      arr[i] = list.get(i);
+    }
+    return new VectorNl(arr);
+  }
+
+  @Override
+  public void serialize(Type type, @Nullable VectorNl vec, ConfigurationNode node) throws SerializationException {
+    if (vec == null) {
+      node.set(null);
+      return;
+    }
+
+    List<Long> list = new ArrayList<>(vec.size());
+    for (int i = 0; i < vec.size(); i++) {
+      list.add(vec.get(i));
+    }
+    node.setList(Long.class, list);
+  }
+}
+
+// Generation script
+/*
+interface VectorType {
+  primitive: string;
+  object: string;
+}
+
+const N_DIM = 999;
+
+const DIMENSIONS = [ 2, 3, 4, N_DIM  ];
+const DIM_NAMES  = [ 'x', 'y', 'z', 'w' ];
+
+const TYPE_NAMES = {
+  f: {
+    primitive: 'float',
+    object: 'Float'
+  },
+  d: {
+    primitive: 'double',
+    object: 'Double'
+  },
+  i: {
+    primitive: 'int',
+    object: 'Integer'
+  },
+  l: {
+    primitive: 'long',
+    object: 'Long'
+  }
+}
+
+let out: string = "";
+let registerMethods: string[] = [];
+
+for (let dimIndex = 0; dimIndex < DIMENSIONS.length; dimIndex++) {
+  let dimension = DIMENSIONS[dimIndex];
+
+  for (const suffix in TYPE_NAMES) {
+    let vectorType: any = TYPE_NAMES[suffix];
+    genVector(dimension, suffix, vectorType);
+  }
+}
+
+console.log(out);
+console.log(registerMethods.join("\n"));
+
+function genVector(dimensions: number, suffix: string, vType: VectorType) {
+  let dimensionsString = dimensions == N_DIM ? "N" : dimensions.toString();
+  let vectorType = `Vector${dimensionsString}${suffix}`;
+
+  let serializeBody = "";
+  let deserializeBody = "";
+
+  let className = `${vectorType}Serializer`;
+  let reg = `//builder.registerExact(${vectorType}.class, new ${className}());`
+  registerMethods.push(reg);
+
+  if (dimensions == N_DIM) {
+    deserializeBody =
+`List<${vType.object}> list = node.getList(${vType.object}.class, List.of());
+    if (list.isEmpty()) {
+      return new ${vectorType}();
+    }
+
+    ${vType.primitive}[] arr = new ${vType.primitive}[list.size()];
+    for (int i = 0; i < arr.length; i++) {
+      arr[i] = list.get(i);
+    }
+    return new ${vectorType}(arr);`
+
+    serializeBody = `
+    List<${vType.object}> list = new ArrayList<>(vec.size());
+    for (int i = 0; i < vec.size(); i++) {
+      list.add(vec.get(i));
+    }
+    node.setList(${vType.object}.class, list);`
+  } else {
+    let prim = vType.primitive;
+    let methodSuffix = prim.substring(0, 1).toUpperCase() + prim.substring(1);
+
+    let getters: string[] = Array(dimensions);
+    let setters: string[] = Array(dimensions);
+    let ctor: string[] = Array(dimensions);
+
+    for (let i = 0; i < dimensions; i++) {
+      let name = DIM_NAMES[i];
+      getters[i] = `${vType.primitive} ${name} = node.node("${name}").get${methodSuffix}();`;
+      setters[i] = `node.node("${name}").set(vec.${name}());`
+      ctor[i] = name;
+    }
+
+    let getterString = getters.join("\n    ");
+    let setterString = setters.join("\n    ");
+    let ctorString = ctor.join(", ");
+
+    deserializeBody = `
+${getterString}
+return new ${vectorType}(${ctorString});
+    `
+
+    serializeBody = setterString
+  }
+
+out += `
+class ${className} implements TypeSerializer<${vectorType}> {
+
+  @Override
+  public ${vectorType} deserialize(Type type, ConfigurationNode node) throws SerializationException {
+    ${deserializeBody}
+  }
+
+  @Override
+  public void serialize(Type type, @Nullable ${vectorType} vec, ConfigurationNode node) throws SerializationException {
+    if (vec == null) {
+      node.set(null);
+      return;
+    }
+    ${serializeBody}
+  }
+}
+`
+}
+ */

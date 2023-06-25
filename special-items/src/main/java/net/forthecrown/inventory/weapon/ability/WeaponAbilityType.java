@@ -215,7 +215,7 @@ public class WeaponAbilityType {
     writer.setFieldValueStyle(Style.style(NamedTextColor.GRAY));
 
     writeHover(writer, user);
-    builder.addLore(writer.getLore());
+    builder.addLore(writer.getBuffer());
 
     builder.addFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
 

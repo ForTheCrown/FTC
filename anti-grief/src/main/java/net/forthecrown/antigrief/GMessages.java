@@ -19,13 +19,11 @@ public interface GMessages {
   /**
    * Message saying that commands cannot be used while jailed
    */
-  Component JAIL_NO_COMMANDS = text("Cannot use commands while jailed",
-      NamedTextColor.RED
-  );
+  Component JAIL_NO_COMMANDS = text("Cannot use commands while jailed", NamedTextColor.RED);
 
   /**
    * Message used to warn users when they fail
-   * {@link net.forthecrown.core.admin.BannedWords#checkAndWarn(CommandSender, Component)}
+   * {@link BannedWords#checkAndWarn(CommandSender, Component)}
    */
   Component BAD_LANGUAGE = text("Mind your tongue, you wench", NamedTextColor.RED);
 

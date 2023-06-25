@@ -80,7 +80,7 @@ class NotesPage extends ListPage<StaffNote> {
     }
 
     writer.newLine();
-    builder.setLore(writer.getLore());
+    builder.setLore(writer.getBuffer());
 
     return builder.build();
   }

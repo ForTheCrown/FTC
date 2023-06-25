@@ -52,6 +52,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.permissions.Permission;
 import org.jetbrains.annotations.ApiStatus.Internal;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
@@ -485,7 +486,7 @@ final class UserImpl implements User {
   }
 
   @Override
-  public <T> T get(UserProperty<T> property) {
+  public <T> @NotNull T get(UserProperty<T> property) {
     return getComponent(PropertyMap.class).get(property);
   }
 

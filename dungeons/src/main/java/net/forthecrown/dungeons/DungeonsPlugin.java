@@ -24,9 +24,9 @@ public class DungeonsPlugin extends JavaPlugin {
     ItemGraveService grave = ItemGraveService.grave();
     grave.addFilter("ftc_enchants", new FtcEnchantGraveFilter());
 
-    AnnotatedCommandContext commandContext = Commands.createAnnotationContext();
-    commandContext.registerCommand(new CommandPunchingBag());
-    commandContext.registerCommand(new CommandDungeons());
+    AnnotatedCommandContext ctx = Commands.createAnnotationContext();
+    ctx.registerCommand(new CommandPunchingBag());
+    ctx.registerCommand(new CommandDungeons());
   }
 
   @Override

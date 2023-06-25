@@ -54,12 +54,14 @@ public final class Cosmetics {
     TYPES.register("death_effects",  DEATH_EFFECTS);
     TYPES.register("travel_effects", TRAVEL_EFFECTS);
     TYPES.register("emotes",         Emotes.TYPE);
+    TYPES.register("login_effects",  LoginEffects.TYPE);
 
     // Register cosmetics
     ArrowCosmetics.registerAll(ARROW_EFFECTS.getCosmetics());
     DeathCosmetics.registerAll(DEATH_EFFECTS.getCosmetics());
     TravelEffects.registerAll(TRAVEL_EFFECTS.getCosmetics());
     Emotes.registerAll(Emotes.TYPE.getCosmetics());
+    LoginEffects.registerAll(LoginEffects.TYPE.getCosmetics());
   }
 
   public static Material getCosmeticMaterial(boolean owned) {

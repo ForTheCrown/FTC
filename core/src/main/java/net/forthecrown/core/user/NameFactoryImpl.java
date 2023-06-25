@@ -14,7 +14,6 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.Style;
 import org.jetbrains.annotations.Nullable;
 
 public class NameFactoryImpl implements UserNameFactory {
@@ -66,7 +65,7 @@ public class NameFactoryImpl implements UserNameFactory {
       builder.append(suffix);
     }
 
-    Component hover = createProfileText(user, ctx, true);
+    Component hover = createHoverText(user, ctx);
     builder.hoverEvent(hover);
 
     return builder.build();
@@ -74,16 +73,29 @@ public class NameFactoryImpl implements UserNameFactory {
 
   @Override
   public Component formatProfileDisplay(User user, Audience viewer) {
-    DisplayContext context = createContext(user, viewer, FOR_HOVER);
-    return createProfileText(user, context, false);
+    var writer = TextWriters.newWriter();
+    writeProfileDisplay(writer, user, viewer);
+    return writer.asComponent();
   }
 
-  private Component createProfileText(User user, DisplayContext context, boolean formattingHover) {
-    TextComponent.Builder builder = Component.text();
+  @Override
+  public void writeProfileDisplay(TextWriter writer, User user, Audience viewer) {
+    DisplayContext context = createContext(user, viewer, 0);
+    createProfileText(writer, user, context, false);
+  }
 
-    TextWriter writer = TextWriters.wrap(builder);
-    writer.setFieldStyle(Style.style(NamedTextColor.YELLOW));
+  private Component createHoverText(User user, DisplayContext context) {
+    var writer = TextWriters.newWriter();
+    createProfileText(writer, user, context, true);
+    return writer.asComponent();
+  }
 
+  private void createProfileText(
+      TextWriter writer,
+      User user,
+      DisplayContext context,
+      boolean formattingHover
+  ) {
     boolean showAdmin = context.viewerHasPermission("ftc.profiles.admin");
 
     Stream<ProfileDisplayElement> elementStream;
@@ -116,8 +128,6 @@ public class NameFactoryImpl implements UserNameFactory {
     elementStream.forEach(element -> {
       element.write(writer, user, context);
     });
-
-    return builder.build();
   }
 
   @Override

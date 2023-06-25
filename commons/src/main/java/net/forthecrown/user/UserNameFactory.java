@@ -58,6 +58,17 @@ public interface UserNameFactory {
   Component formatProfileDisplay(User user, Audience viewer);
 
   /**
+   * Formats the profile display.
+   * <p>
+   * This method assumes the viewer is allowed to view the specified {@code user}'s profile
+   *
+   * @param writer The writer to write the profile display to
+   * @param user User whose profile to format
+   * @param viewer The audience viewing the profile
+   */
+  void writeProfileDisplay(TextWriter writer, User user, Audience viewer);
+
+  /**
    * Creates a display context
    *
    * @param user User

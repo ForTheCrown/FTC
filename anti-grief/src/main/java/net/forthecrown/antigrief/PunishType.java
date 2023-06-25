@@ -5,8 +5,8 @@ import static net.forthecrown.antigrief.Punishment.INDEFINITE_EXPIRY;
 import java.util.Date;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.forthecrown.FtcServer;
 import net.forthecrown.Loggers;
-import net.forthecrown.ServerSpawn;
 import net.forthecrown.text.Text;
 import net.forthecrown.user.User;
 import net.kyori.adventure.text.Component;
@@ -63,7 +63,7 @@ public enum PunishType {
     public void onPunishmentEnd(User user, PunishEntry entry, Punishment punishment) {
       // If user is online, move them out of jail
       if (user.isOnline()) {
-        var location = ServerSpawn.spawn().get();
+        Location location = FtcServer.server().getServerSpawn();
         user.getPlayer().teleport(location);
       }
 

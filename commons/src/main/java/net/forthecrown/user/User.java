@@ -298,6 +298,7 @@ public interface User extends ForwardingAudience.Single {
 
   <T> boolean has(UserProperty<T> property);
 
+  @NotNull
   <T> T get(UserProperty<T> property);
 
   <T> void set(UserProperty<T> property, T value);

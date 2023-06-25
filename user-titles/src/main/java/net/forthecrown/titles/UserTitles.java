@@ -17,7 +17,7 @@ import net.forthecrown.command.Commands;
 import net.forthecrown.registry.Ref;
 import net.forthecrown.registry.Ref.KeyRef;
 import net.forthecrown.registry.Registries;
-import net.forthecrown.titles.events.TierChangeEvent;
+import net.forthecrown.titles.events.TierPostChangeEvent;
 import net.forthecrown.user.ComponentName;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserComponent;
@@ -258,10 +258,11 @@ public class UserTitles implements UserComponent {
       setTitle(DEFAULT);
     }
 
-    TierChangeEvent event = new TierChangeEvent(user, this.tier, tier);
-    event.callEvent();
-
+    // This is a sin, but it has to fire after the tier has been changed
     this.tier = tier;
+
+    TierPostChangeEvent event = new TierPostChangeEvent(user, this.tier, tier);
+    event.callEvent();
   }
 
   /**

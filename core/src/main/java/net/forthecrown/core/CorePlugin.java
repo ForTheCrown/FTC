@@ -3,8 +3,8 @@ package net.forthecrown.core;
 import lombok.Getter;
 import net.forthecrown.BukkitServices;
 import net.forthecrown.Cooldowns;
+import net.forthecrown.FtcServer;
 import net.forthecrown.InventoryStorage;
-import net.forthecrown.ServerSpawn;
 import net.forthecrown.command.help.FtcHelpList;
 import net.forthecrown.core.grave.GraveImpl;
 import net.forthecrown.core.help.HelpListImpl;
@@ -19,17 +19,17 @@ public class CorePlugin extends JavaPlugin {
 
   private UserServiceImpl userService;
   private HelpListImpl helpList;
-  private ServerSpawnImpl spawn;
+  private FtcServerImpl server;
 
   @Override
   public void onEnable() {
     GraveImpl.init();
 
     helpList = new HelpListImpl();
-    spawn = new ServerSpawnImpl();
     userService = new UserServiceImpl();
+    server = new FtcServerImpl();
 
-    BukkitServices.register(ServerSpawn.class, spawn);
+    BukkitServices.register(FtcServer.class, server);
     BukkitServices.register(FtcHelpList.class, helpList);
     BukkitServices.register(InventoryStorage.class, InventoryStorageImpl.getStorage());
     BukkitServices.register(Cooldowns.class, CooldownsImpl.getCooldowns());

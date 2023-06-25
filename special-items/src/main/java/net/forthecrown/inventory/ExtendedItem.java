@@ -94,7 +94,7 @@ public abstract class ExtendedItem {
 
     ItemStacks.setTagElement(meta, TAG_CONTAINER, topTag);
 
-    meta.lore(loreWriter.getLore());
+    meta.lore(loreWriter.getBuffer());
     item.setItemMeta(meta);
     finished = true;
   }

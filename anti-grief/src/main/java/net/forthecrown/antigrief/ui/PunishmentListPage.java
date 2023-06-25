@@ -85,7 +85,7 @@ class PunishmentListPage extends ListPage<Punishment> {
     var writer = TextWriters.buffered();
     punish.writeDisplay(writer);
 
-    builder.addLoreRaw(writer.getLore());
+    builder.addLoreRaw(writer.getBuffer());
 
     return builder.build();
   }

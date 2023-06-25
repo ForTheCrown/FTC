@@ -11,10 +11,12 @@ import com.mojang.serialization.Encoder;
 import com.mojang.serialization.JsonOps;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 import lombok.experimental.UtilityClass;
 import net.forthecrown.registry.Registries;
 import net.kyori.adventure.text.Component;
+import net.minecraft.core.UUIDUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -120,8 +122,10 @@ public @UtilityClass class FtcCodecs {
       }
   );
 
-  public static final Codec<Component> COMPONENT
-      = ofJson(JsonUtils::writeText, JsonUtils::readText);
+  public static final Codec<Component> COMPONENT = ofJson(JsonUtils::writeText, JsonUtils::readText);
+
+  public static final Codec<UUID> INT_ARRAY_UUID = UUIDUtil.CODEC;
+  public static final Codec<UUID> STRING_UUID = UUIDUtil.STRING_CODEC;
 
   /* ----------------------------------------------------------- */
 

@@ -104,7 +104,8 @@ public class PropertyMap implements UserComponent {
       if (callback != null) {
         callback.onUpdate(
             user,
-            value == null ? property.getDefaultValue() : value
+            value == null ? property.getDefaultValue() : value,
+            existing
         );
       }
     }

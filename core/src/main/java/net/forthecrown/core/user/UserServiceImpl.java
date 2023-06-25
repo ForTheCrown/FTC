@@ -186,6 +186,12 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  public Builder<UUID> createUuidProperty() {
+    ensureNotFrozen();
+    return new BuilderImpl<>(FtcCodecs.STRING_UUID);
+  }
+
+  @Override
   public Builder<Boolean> createBooleanProperty() {
     ensureNotFrozen();
     return new BuilderImpl<>(Codec.BOOL);

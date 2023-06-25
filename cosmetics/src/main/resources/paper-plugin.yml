@@ -1,4 +1,0 @@
-name: 'FTC-Cosmetics'
-version: '${version}'
-main: 'net.forthecrown.cosmetics.CosmeticsPlugin'
-api-version: '${api_version}'

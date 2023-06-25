@@ -32,31 +32,33 @@ public class EventsExtension extends ScriptExtension {
     register(eventClass, mirror, true, EventPriority.NORMAL);
   }
 
-  public <E extends Event> void register(Class<E> eventClass,
-                                         Consumer<E> mirror,
-                                         EventPriority priority
+  public <E extends Event> void register(
+      Class<E> eventClass,
+      Consumer<E> mirror,
+      EventPriority priority
   ) {
     register(eventClass, mirror, true, priority);
   }
 
-  public <E extends Event> void register(Class<E> eventClass,
-                                         Consumer<E> mirror,
-                                         boolean ignoreCancelled
+  public <E extends Event> void register(
+      Class<E> eventClass,
+      Consumer<E> mirror,
+      boolean ignoreCancelled
   ) {
     register(eventClass, mirror, ignoreCancelled, EventPriority.NORMAL);
   }
 
-  public <E extends Event> void register(Class<E> eventClass,
-                                         Consumer<E> mirror,
-                                         boolean ignoreCancelled,
-                                         EventPriority priority
+  public <E extends Event> void register(
+      Class<E> eventClass,
+      Consumer<E> mirror,
+      boolean ignoreCancelled,
+      EventPriority priority
   ) {
     Objects.requireNonNull(eventClass, "Null event class");
     Objects.requireNonNull(mirror, "Null function");
     Objects.requireNonNull(priority, "Null priority");
 
-    ExecutorWrapper<E> wrapper
-        = new ExecutorWrapper<>(eventClass, mirror, ignoreCancelled);
+    ExecutorWrapper<E> wrapper = new ExecutorWrapper<>(eventClass, mirror, ignoreCancelled);
 
     var manager = Bukkit.getPluginManager();
     manager.registerEvent(eventClass, wrapper, priority, wrapper, plugin, ignoreCancelled);
@@ -98,9 +100,7 @@ public class EventsExtension extends ScriptExtension {
     private final boolean ignoreCancelled;
 
     @Override
-    public void execute(@NotNull Listener listener, @NotNull Event event)
-        throws EventException
-    {
+    public void execute(@NotNull Listener listener, @NotNull Event event) throws EventException {
       if (!type.isInstance(event)) {
         return;
       }

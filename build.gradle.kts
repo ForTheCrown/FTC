@@ -1,3 +1,7 @@
+import net.forthecrown.gradle.API_VERSION
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+
 plugins {
   java
   id("io.freefair.lombok") version "8.0.1"
@@ -13,10 +17,36 @@ val mathlib        = "org.spongepowered:math:2.1.0-SNAPSHOT"
 val toml           = "org.tomlj:tomlj:1.1.0"
 val tomlConfig     = "me.lucko.configurate:configurate-toml:4.1"
 val configurate    = "org.spongepowered:configurate-core:4.1.2"
-val apiVersion     = "1.20"
+val apiVersion     = API_VERSION
 
 repositories {
   mavenCentral()
+}
+
+task("build-all") {
+  description = "Builds all modules"
+  group = "build"
+
+  subprojects {
+    dependsOn(":${this.name}:build")
+  }
+
+  doLast {
+    childProjects.values.forEach {
+      val base = it.extensions.findByType(BasePluginExtension::class.java)!!
+      val jarName = "libs/${base.archivesName.get()}-${it.version}.jar"
+
+      val buildFile = it.file("${it.buildDir}/$jarName")
+      val path = buildFile.toPath();
+      val outPath = buildDir.toPath().resolve(jarName)
+
+      if (Files.notExists(path)) {
+        return@forEach
+      }
+
+      Files.copy(path, outPath, StandardCopyOption.REPLACE_EXISTING)
+    }
+  }
 }
 
 subprojects {

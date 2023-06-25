@@ -6,6 +6,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.user.UserLookup.LookupEntry;
+import net.forthecrown.user.UserProperty.Builder;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -50,6 +51,8 @@ public interface UserService {
    * @return User property registry
    */
   Registry<UserProperty<?>> getUserProperties();
+
+  Builder<UUID> createUuidProperty();
 
   UserProperty.Builder<Boolean> createBooleanProperty();
 

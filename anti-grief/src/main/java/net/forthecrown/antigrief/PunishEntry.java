@@ -103,12 +103,11 @@ public class PunishEntry {
     // list, to ensure we're returning a correct
     // result, we need to check these maps as well.
     if (type == PunishType.BAN) {
-      return Bukkit.getBanList(BanList.Type.NAME)
-          .isBanned(getHolder().toString());
+      return Bukkit.getBanList(BanList.Type.NAME).isBanned(getHolder().toString());
     }
+
     if (type == PunishType.IP_BAN) {
-      return Bukkit.getBanList(BanList.Type.IP)
-          .isBanned(getUser().getIp());
+      return Bukkit.getBanList(BanList.Type.IP).isBanned(getUser().getIp());
     }
 
     return false;

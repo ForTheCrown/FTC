@@ -165,7 +165,7 @@ class PunishPage extends MenuPage {
       var loreWriter = TextWriters.buffered();
       entry.writeDisplay(loreWriter);
 
-      builder.setLore(loreWriter.getLore());
+      builder.setLore(loreWriter.getBuffer());
 
       return builder.build();
     }
