@@ -80,6 +80,11 @@ public final class Waypoints {
       .defaultValue(true)
       .build();
 
+  public static final UserProperty<Boolean> HULK_SMASHING = Properties.booleanProperty()
+      .key("hulkSmash_active")
+      .defaultValue(false)
+      .build();
+
   /**
    * The required center column for guild waypoints
    */
@@ -500,8 +505,7 @@ public final class Waypoints {
    * is set to the created waypoint.
    *
    * @param source   The source attempting to create the waypoint.
-   * @param provider The guild provider to get the source's guild or to access the guild the (staff)
-   *                 source is moving the waypoint for.
+   *
    * @return The created waypoint
    * @throws CommandSyntaxException If the waypoint creation fails at any stage
    */

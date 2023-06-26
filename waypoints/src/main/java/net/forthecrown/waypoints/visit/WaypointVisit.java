@@ -1,7 +1,7 @@
 package net.forthecrown.waypoints.visit;
 
 import static net.forthecrown.McConstants.MAX_Y;
-import static net.forthecrown.waypoints.listeners.HulkSmashListener.GAME_TICKS_PER_COSMETIC_TICK;
+import static net.forthecrown.waypoints.listeners.HulkSmash.GAME_TICKS_PER_COSMETIC_TICK;
 import static net.kyori.adventure.util.Ticks.TICKS_PER_SECOND;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -24,7 +24,7 @@ import net.forthecrown.waypoints.Waypoint;
 import net.forthecrown.waypoints.WaypointManager;
 import net.forthecrown.waypoints.WaypointProperties;
 import net.forthecrown.waypoints.Waypoints;
-import net.forthecrown.waypoints.listeners.HulkSmashListener;
+import net.forthecrown.waypoints.listeners.HulkSmash;
 import net.forthecrown.waypoints.type.WaypointTypes;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -348,13 +348,8 @@ public class WaypointVisit implements Runnable {
           );
 
           user.playSound(Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
-
           runTpHandlers();
-
-          HulkSmashListener listener = new HulkSmashListener(
-              user, getActiveEffect()
-          );
-          listener.beginListening();
+          HulkSmash.startHulkSmash(user, activeEffect);
         }
       } catch (Exception e) {
         task.cancel();

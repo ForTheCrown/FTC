@@ -1,36 +1,14 @@
 package net.forthecrown.user;
 
 import java.util.Optional;
-import net.forthecrown.grenadier.CommandSource;
+import java.util.Set;
 import net.forthecrown.text.TextWriter;
+import net.forthecrown.utils.Audiences;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 public interface UserNameFactory {
-
-  /* ----------------------------- FLAGS ------------------------------ */
-
-  /**
-   * Flag for {@link #formatDisplayName(User, Audience, int)} to allow for nicknames to be used
-   */
-  int ALLOW_NICKNAME  = 0b0000001;
-
-  /**
-   * Flag for {@link #formatDisplayName(User, Audience, int)} which specifies that the name is
-   * being formatted for a hover text context.
-   * <p>
-   * Required to prevent formatting the hover text for users in the resulting user display name,
-   * as this behaviour can cause recursive name formatting that causes a stack overflow exception
-   */
-  int FOR_HOVER       = 0b0000010;
-
-  /**
-   * Flag for {@link #formatDisplayName(User, Audience, int)} which specifies that the name is
-   * being formatted for a join/leave message
-   */
-  int JOIN_MESSAGE    = 0b0000100;
 
   /* ----------------------------- METHODS ------------------------------ */
 
@@ -43,7 +21,7 @@ public interface UserNameFactory {
    *
    * @return Fully formatted display name
    */
-  Component formatDisplayName(User user, @Nullable Audience viewer, int flags);
+  Component formatDisplayName(User user, @Nullable Audience viewer, Set<NameRenderFlags> flags);
 
   /**
    * Formats the profile display.
@@ -77,18 +55,16 @@ public interface UserNameFactory {
    *
    * @return Created context
    */
-  DisplayContext createContext(User user, Audience viewer, int flags);
+  DisplayContext createContext(User user, Audience viewer, Set<NameRenderFlags> flags);
 
   /**
    * Adds a prefix name element
-   * @param id Element ID
    * @param element Name element
    */
   void addPrefix(NameElement element);
 
   /**
    * Adds a suffix name element
-   * @param id Element ID
    * @param element Name element
    */
   void addSuffix(NameElement element);
@@ -176,7 +152,7 @@ public interface UserNameFactory {
       Audience viewer,
       boolean useNickName,
       boolean forHover,
-      boolean joinMessage,
+      boolean userOnline,
       boolean self
   ) {
 
@@ -195,15 +171,8 @@ public interface UserNameFactory {
         return Optional.of(user);
       }
 
-      if (viewer instanceof Player player) {
-        return Optional.of(Users.get(player));
-      }
-
-      if (viewer instanceof CommandSource source) {
-        return userFromAudience(source.audience());
-      }
-
-      return Optional.empty();
+      return Optional.ofNullable(Audiences.getPlayer(viewer))
+          .map(Users::get);
     }
   }
 }

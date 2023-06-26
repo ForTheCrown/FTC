@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import net.forthecrown.user.TimeField;
 import net.forthecrown.user.UserLookup.LookupEntry;
 
 public class UserMaps implements Iterable<UserImpl> {
@@ -52,8 +53,12 @@ public class UserMaps implements Iterable<UserImpl> {
       return false;
     }
 
-    online.remove(user.getUniqueId());
     user.service = null;
+    user.setTimeToNow(TimeField.LAST_LOADED);
+
+    online.remove(user.getUniqueId());
+    service.getStorage().saveUser(user);
+
     return true;
   }
 

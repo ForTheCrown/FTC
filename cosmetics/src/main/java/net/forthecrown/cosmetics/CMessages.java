@@ -5,7 +5,7 @@ import static net.forthecrown.text.Text.format;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
-interface Messages {
+interface CMessages {
 
   static Component setCosmetic(Cosmetic<?> cosmetic) {
     return format(

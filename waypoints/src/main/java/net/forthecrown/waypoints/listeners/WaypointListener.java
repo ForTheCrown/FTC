@@ -21,7 +21,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.spongepowered.math.vector.Vector3i;
 
-public class WaypointListener implements Listener {
+class WaypointListener implements Listener {
   /* ----------------------------- REGULAR BLOCK EVENTS ------------------------------ */
 
   @EventHandler(ignoreCancelled = true)

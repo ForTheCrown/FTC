@@ -6,7 +6,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class ServerLoadListener implements Listener {
+class ServerLoadListener implements Listener {
 
   @EventHandler(ignoreCancelled = true)
   public void onServerLoad(ServerLoadEvent event) {

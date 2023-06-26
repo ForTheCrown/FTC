@@ -7,8 +7,10 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import me.lucko.configurate.toml.TOMLConfigurationLoader;
 import net.forthecrown.grenadier.types.ArgumentTypes;
+import net.forthecrown.grenadier.types.TimeArgument;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.configurate.ConfigurateException;
@@ -93,7 +95,7 @@ public final class TomlConfigs {
   }
 
   public static TypeSerializer<Duration> createDurationSerializer() {
-    return new TypeSerializer<>() {
+    return new TypeSerializer<Duration>() {
       @Override
       public Duration deserialize(Type type, ConfigurationNode node) throws SerializationException {
         var strValue = node.getString();
@@ -109,8 +111,20 @@ public final class TomlConfigs {
         }
 
         StringReader reader = new StringReader(strValue);
+        TimeArgument parser = ArgumentTypes.time();
+        Duration result;
+
         try {
-          return ArgumentTypes.time().parse(reader);
+          result = parser.parse(reader);
+
+          while (reader.canRead() && reader.peek() == ':') {
+            reader.skip();
+
+            Duration dur = parser.parse(reader);
+            result = result.plus(dur);
+          }
+
+          return result;
         } catch (CommandSyntaxException exc) {
           throw new SerializationException(exc);
         }
@@ -122,9 +136,45 @@ public final class TomlConfigs {
       {
         if (obj == null) {
           node.set(null);
-        } else {
-          node.set(obj.toMillis());
+          return;
         }
+
+        long millis = obj.toMillis();
+
+        long days = TimeUnit.MILLISECONDS.toDays(millis);
+        millis -= TimeUnit.DAYS.toMillis(millis);
+
+        long hours = TimeUnit.MILLISECONDS.toHours(millis);
+        millis -= TimeUnit.HOURS.toMillis(hours);
+
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
+        millis -= TimeUnit.MINUTES.toMillis(hours);
+
+        long seconds = TimeUnit.SECONDS.toHours(millis);
+        millis -= TimeUnit.HOURS.toMillis(hours);
+
+        StringBuilder builder = new StringBuilder();
+
+        boolean valueWritten = writeOpt(builder, days, "d")
+            | writeOpt(builder, hours, "h")
+            | writeOpt(builder, minutes, "m")
+            | writeOpt(builder, seconds, "s")
+            | writeOpt(builder, millis, "");
+
+        if (!valueWritten) {
+          builder.append("0ms");
+        }
+
+        node.set(builder.toString());
+      }
+
+      boolean writeOpt(StringBuilder builder, long val, String suffix) {
+        if (val < 1) {
+          return false;
+        }
+
+        builder.append(val).append(suffix);
+        return true;
       }
     };
   }

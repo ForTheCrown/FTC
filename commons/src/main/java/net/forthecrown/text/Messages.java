@@ -175,6 +175,12 @@ public interface Messages {
 
   String BLOCKED_TARGET = "{0, user} has blocked you!";
 
+  String BASE_JOIN_MESSAGE = "{0, user} joined the game";
+
+  String BASE_JOIN_MESSAGE_NEW_NAME = "{0, user} (formerly known as {1}) joined the game";
+
+  String BASE_LEAVE_MESSAGE = "{0, user} left the game";
+
   static Component createButton(Component text, String cmd, Object... args) {
     return text.clickEvent(runCommand(String.format(cmd, args)));
   }
@@ -395,5 +401,19 @@ public interface Messages {
         !state ? "Disabled" : "Enabled",
         display, user
     );
+  }
+
+  static Component joinMessage(Component displayName) {
+    return Text.format(BASE_JOIN_MESSAGE, NamedTextColor.YELLOW, displayName);
+  }
+
+  static Component newNameJoinMessage(Component displayName, Object previousName) {
+    return Text.format(BASE_JOIN_MESSAGE_NEW_NAME, NamedTextColor.YELLOW,
+        displayName, previousName
+    );
+  }
+
+  static Component leaveMessage(Component displayName) {
+    return Text.format(BASE_LEAVE_MESSAGE, NamedTextColor.YELLOW, displayName);
   }
 }

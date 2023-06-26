@@ -7,8 +7,11 @@ import net.forthecrown.command.Exceptions;
 import net.forthecrown.menu.MenuNode;
 import net.forthecrown.menu.Slot;
 import net.forthecrown.registry.Registry;
+import net.forthecrown.text.Messages;
 import net.forthecrown.titles.RankTier;
+import net.forthecrown.user.User;
 import net.forthecrown.utils.inventory.ItemStacks;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -69,6 +72,14 @@ public final class LoginEffects {
     r.register("booster", BOOSTER);
   }
 
+  public static Component getDisplayName(LoginEffect effect, User user, Audience viewer) {
+    return Component.text()
+        .append(effect.prefix())
+        .append(user.displayName(viewer))
+        .append(effect.suffix())
+        .build();
+  }
+
   private static MenuNodeFactory<LoginEffect> createFactory() {
     return cosmetic -> {
       return MenuNode.builder()
@@ -77,12 +88,7 @@ public final class LoginEffects {
                 .setName(cosmetic.getDisplayName())
                 .addLore("&7Join/Leave decoration")
                 .addLore("&7Example:")
-                .addLore(
-                    Messages.joinMessage(
-                        LoginEffects.getDisplayName(user, user),
-                        this
-                    )
-                );
+                .addLore(Messages.joinMessage(getDisplayName(cosmetic.getValue(), user, user)));
 
             boolean active = cosmetic.equals(user.getComponent(CosmeticData.class).get(TYPE));
 
@@ -112,7 +118,7 @@ public final class LoginEffects {
               );
             }
 
-            user.sendMessage(Messages.setCosmetic(cosmetic));
+            user.sendMessage(CMessages.setCosmetic(cosmetic));
             cosmetics.set(TYPE, cosmetic);
             context.shouldReloadMenu(true);
           })

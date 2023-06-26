@@ -42,6 +42,8 @@ public interface UserService {
    */
   void executeOnAllUsers(Consumer<User> operation);
 
+  void executeOnAllUsersAsync(Consumer<User> operation);
+
   /**
    * Gets the user property registry.
    * <p>
@@ -60,6 +62,21 @@ public interface UserService {
 
   <E extends Enum<E>> UserProperty.Builder<E> createEnumProperty(Class<E> type);
 
+  /**
+   * Registers a user component type.
+   * <p>
+   * The name the component will be registered under and will be used when the user is serialized
+   * can be automatically inferred or directly set by placing the {@link ComponentName} annotation
+   * on the registered class.
+   * <p>
+   * If the annotation is not present, then the component's ID string will be inferred. This means
+   * if the class name starts with "User" it will be removed, and the class' first character will
+   * be converted to lowercase
+   * <p>
+   * Additionally, the class given here cannot be a synthetic class or an interface class
+   *
+   * @param componentType Type to register
+   */
   void registerComponent(Class<? extends UserComponent> componentType);
 
   @NotNull

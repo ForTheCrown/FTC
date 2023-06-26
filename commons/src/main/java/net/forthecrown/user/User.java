@@ -1,7 +1,9 @@
 package net.forthecrown.user;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
 import net.forthecrown.grenadier.CommandSource;
@@ -177,6 +179,18 @@ public interface User extends ForwardingAudience.Single {
 
   /* ----------------------------- COMPONENTS ------------------------------ */
 
+  /**
+   * Gets or creates a component with the specified {@code componentType}
+   * <p>
+   * All component types must first be registered with {@link UserService#registerComponent(Class)}
+   * for them to be usable with this method.
+   * <p>
+   * If the specified {@code componentType} component doesn't exist for this user, it will
+   * be created
+   *
+   * @param componentType User Component class
+   * @return Component value
+   */
   <T extends UserComponent> T getComponent(Class<T> componentType);
 
   /* ----------------------------- TIME DATA ------------------------------ */
@@ -210,10 +224,30 @@ public interface User extends ForwardingAudience.Single {
   }
 
   default Component displayName(@Nullable Audience viewer) {
-    return displayName(viewer, true);
+    return displayName(viewer, defaultRenderFlags());
   }
 
-  Component displayName(@Nullable Audience viewer, boolean useNickname);
+  default Component displayName(@Nullable Audience viewer, NameRenderFlags... flags) {
+    if (flags.length == 0) {
+      return displayName(viewer, Set.of());
+    } else if (flags.length == 1) {
+      return displayName(viewer, EnumSet.of(flags[0]));
+    } else {
+      return displayName(viewer, EnumSet.of(flags[0], flags));
+    }
+  }
+
+  default EnumSet<NameRenderFlags> defaultRenderFlags() {
+    EnumSet<NameRenderFlags> flags = EnumSet.of(NameRenderFlags.ALLOW_NICKNAME);
+
+    if (isOnline()) {
+      flags.add(NameRenderFlags.USER_ONLINE);
+    }
+
+    return flags;
+  }
+
+  Component displayName(@Nullable Audience viewer, Set<NameRenderFlags> flags);
 
   Component nickOrName();
 

@@ -3,39 +3,52 @@ package net.forthecrown.core.user;
 import com.google.common.reflect.Reflection;
 import com.mojang.serialization.Codec;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import java.lang.management.ManagementFactory;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import lombok.Getter;
+import net.forthecrown.Loggers;
 import net.forthecrown.core.user.PropertyImpl.BuilderImpl;
 import net.forthecrown.registry.Holder;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.registry.RegistryListener;
 import net.forthecrown.user.Properties;
+import net.forthecrown.user.TimeField;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserComponent;
 import net.forthecrown.user.UserLookup;
 import net.forthecrown.user.UserProperty;
 import net.forthecrown.user.UserProperty.Builder;
 import net.forthecrown.user.UserService;
+import net.forthecrown.user.event.UserLeaveEvent;
+import net.forthecrown.user.event.UserLogEvent;
+import net.forthecrown.utils.Result;
 import net.forthecrown.utils.ScoreIntMap;
 import net.forthecrown.utils.ScoreIntMap.KeyValidator;
+import net.forthecrown.utils.Time;
 import net.forthecrown.utils.io.FtcCodecs;
 import net.forthecrown.utils.io.PathUtil;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerQuitEvent.QuitReason;
 import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 @Internal
 @Getter
 public class UserServiceImpl implements UserService {
+
+  public static final Logger LOGGER = Loggers.getLogger();
 
   private final UserDataStorage storage;
 
@@ -99,7 +112,10 @@ public class UserServiceImpl implements UserService {
 
   public void shutdown() {
     save();
-    // TODO: Force an 'onLeave' call for all users that were online at time of shutdown
+
+    userMaps.getOnline().forEach(user -> {
+      onUserLeave(user, QuitReason.DISCONNECTED, false);
+    });
   }
 
   public void save() {
@@ -135,9 +151,62 @@ public class UserServiceImpl implements UserService {
   }
 
   public void unloadUser(UserImpl user) {
-    if (userMaps.remove(user)) {
-      storage.saveUser(user);
+    userMaps.remove(user);
+  }
+
+  public void onUserLeave(UserImpl user, QuitReason reason, boolean announce) {
+    Player player = Bukkit.getPlayer(user.getUniqueId());
+    Objects.requireNonNull(player, "Player not online: " + user.getName());
+
+    UserLeaveEvent userEvent = new UserLeaveEvent(user, reason);
+    userEvent.callEvent();
+
+    if (announce) {
+      UserLogEvent.maybeAnnounce(userEvent);
     }
+
+    user.setEntityLocation(player.getLocation());
+    user.setLastOnlineName(player.getName());
+
+    // Log play time
+    logTime(user).apply(LOGGER::error, seconds -> {
+      long uptimeMillis = ManagementFactory.getRuntimeMXBean().getUptime();
+
+      // Prevent excessive playtime bug
+      if (TimeUnit.SECONDS.toMillis(seconds) > uptimeMillis) {
+        LOGGER.warn(
+            "Playtime bug in user {}, online for {} seconds ({} hours)???",
+            user, seconds, TimeUnit.SECONDS.toHours(seconds)
+        );
+
+        return;
+      } else {
+        LOGGER.info(
+            "Adding {} seconds or {} hours to {}'s playtime",
+            seconds, TimeUnit.SECONDS.toHours(seconds), user
+        );
+      }
+
+      playtime.add(user.getUniqueId(), seconds);
+    });
+
+    unloadUser(user);
+  }
+
+  /**
+   * Logs the player's playtime
+   */
+  private Result<Integer> logTime(UserImpl user) {
+    long join = user.getTime(TimeField.LAST_LOGIN);
+
+    if (join == -1) {
+      return Result.error("Join time not set");
+    }
+
+    var played = Time.timeSince(join) - user.getAfkTime();
+    var timeSeconds = (int) TimeUnit.MILLISECONDS.toSeconds(played);
+
+    return Result.success(timeSeconds);
   }
 
   public void freezeRegistries() {
@@ -157,6 +226,11 @@ public class UserServiceImpl implements UserService {
   @Override
   public void executeOnAllUsers(Consumer<User> operation) {
     executeOnAllUserInternal(operation, true);
+  }
+
+  @Override
+  public void executeOnAllUsersAsync(Consumer<User> operation) {
+    CompletableFuture.runAsync(() -> executeOnAllUserInternal(operation, true));
   }
 
   private void executeOnAllUserInternal(Consumer<User> operation, boolean unload) {
@@ -215,7 +289,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public @NotNull User getUser(@NotNull UserLookup.LookupEntry entry) {
+  public @NotNull UserImpl getUser(@NotNull UserLookup.LookupEntry entry) {
     return userMaps.getUser(entry);
   }
 

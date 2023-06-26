@@ -8,5 +8,6 @@ public final class WaypointsListeners {
   public static void registerAll() {
     register(new WaypointDestroyListener());
     register(new WaypointListener());
+    register(new PlayerJoinListener());
   }
 }

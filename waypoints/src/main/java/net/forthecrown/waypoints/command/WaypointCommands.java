@@ -12,6 +12,12 @@ public class WaypointCommands {
       = new RegistryArguments<>(WaypointProperties.REGISTRY, "Waypoint property");
 
   public static void createCommands() {
-
+    new CommandCreateWaypoint();
+    new CommandHomeWaypoint();
+    new CommandInvite();
+    new CommandListWaypoints();
+    new CommandMoveIn();
+    new CommandVisit();
+    new CommandWaypoints();
   }
 }

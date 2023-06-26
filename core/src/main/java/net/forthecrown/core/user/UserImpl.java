@@ -1,7 +1,5 @@
 package net.forthecrown.core.user;
 
-import static net.forthecrown.user.UserNameFactory.ALLOW_NICKNAME;
-
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -12,6 +10,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
@@ -21,10 +20,10 @@ import net.forthecrown.Loggers;
 import net.forthecrown.core.user.UserLookupImpl.UserLookupEntry;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Grenadier;
+import net.forthecrown.user.NameRenderFlags;
 import net.forthecrown.user.TimeField;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserComponent;
-import net.forthecrown.user.UserNameFactory;
 import net.forthecrown.user.UserOfflineException;
 import net.forthecrown.user.UserProperty;
 import net.forthecrown.user.UserTeleport;
@@ -57,7 +56,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 @Internal
-final class UserImpl implements User {
+public final class UserImpl implements User {
 
   private static final Logger LOGGER = Loggers.getLogger();
 
@@ -77,7 +76,6 @@ final class UserImpl implements User {
   @Getter
   private final List<String> previousNames = new ArrayList<>();
 
-  @Setter
   private Location entityLocation;
   private Location returnLocation;
 
@@ -222,6 +220,10 @@ final class UserImpl implements User {
     this.returnLocation = Locations.clone(location);
   }
 
+  public void setEntityLocation(Location entityLocation) {
+    this.entityLocation = Locations.clone(entityLocation);
+  }
+
   @Override
   public void playSound(Sound uiButtonClick, float volume, float pitch) {
     playSound(
@@ -308,9 +310,10 @@ final class UserImpl implements User {
   }
 
   @Override
-  public Component displayName(@Nullable Audience viewer, boolean useNickname) {
-    UserNameFactory factory = service.getNameFactory();
-    return factory.formatDisplayName(this, viewer, useNickname ? ALLOW_NICKNAME : 0);
+  public Component displayName(@Nullable Audience viewer, Set<NameRenderFlags> flags) {
+    ensureValid();
+    NameFactoryImpl factory = service.getNameFactory();
+    return factory.formatDisplayName(this, viewer, flags);
   }
 
   @Override
@@ -584,5 +587,26 @@ final class UserImpl implements User {
   @Override
   public boolean canTeleport() {
     return false;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
+    if (!(obj instanceof User user)) {
+      return false;
+    }
+    return Objects.equals(getUniqueId(), user.getUniqueId());
+  }
+
+  @Override
+  public int hashCode() {
+    return uniqueId.hashCode();
+  }
+
+  @Override
+  public String toString() {
+    return "User(id=" + getUniqueId() + ",name=" + getName() + ")";
   }
 }

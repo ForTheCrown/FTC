@@ -21,6 +21,7 @@ public interface UserProperty<T> {
   String getKey();
 
   interface PropertyEditCallback<T> {
+
     void onUpdate(User user, @NotNull T value, @NotNull T oldValue);
   }
 

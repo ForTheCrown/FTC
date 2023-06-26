@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.permissions.Permission;
 
 public final class Permissions {
+
   private Permissions() {}
 
   /**
@@ -12,6 +13,8 @@ public final class Permissions {
    */
   @Deprecated
   public static final Permission ADMIN      = register("ftc.admin");
+
+  public static final Permission DEFAULT    = register("ftc.default");
 
   public static final Permission VANISH     = register("ftc.vanish");
 

@@ -2,18 +2,19 @@ package net.forthecrown.core.user;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 import net.forthecrown.text.Text;
 import net.forthecrown.text.TextWriter;
 import net.forthecrown.text.TextWriters;
 import net.forthecrown.user.NameElements;
+import net.forthecrown.user.NameRenderFlags;
 import net.forthecrown.user.Properties;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserNameFactory;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.Nullable;
 
 public class NameFactoryImpl implements UserNameFactory {
@@ -29,7 +30,11 @@ public class NameFactoryImpl implements UserNameFactory {
   }
 
   @Override
-  public Component formatDisplayName(User user, @Nullable Audience viewer, int flags) {
+  public Component formatDisplayName(
+      User user,
+      @Nullable Audience viewer,
+      Set<NameRenderFlags> flags
+  ) {
     DisplayContext ctx = createContext(user, viewer, flags);
 
     Component name;
@@ -46,11 +51,6 @@ public class NameFactoryImpl implements UserNameFactory {
     }
 
     TextComponent.Builder builder = Component.text();
-
-    if (ctx.joinMessage()) {
-      builder.color(NamedTextColor.YELLOW);
-    }
-
     Component prefix = this.prefix.createDisplay(user, ctx);
 
     if (!Text.isEmpty(prefix)) {
@@ -80,7 +80,7 @@ public class NameFactoryImpl implements UserNameFactory {
 
   @Override
   public void writeProfileDisplay(TextWriter writer, User user, Audience viewer) {
-    DisplayContext context = createContext(user, viewer, 0);
+    DisplayContext context = createContext(user, viewer, user.defaultRenderFlags());
     createProfileText(writer, user, context, false);
   }
 
@@ -97,7 +97,6 @@ public class NameFactoryImpl implements UserNameFactory {
       boolean formattingHover
   ) {
     boolean showAdmin = context.viewerHasPermission("ftc.profiles.admin");
-
     Stream<ProfileDisplayElement> elementStream;
 
     if (showAdmin) {
@@ -131,13 +130,13 @@ public class NameFactoryImpl implements UserNameFactory {
   }
 
   @Override
-  public DisplayContext createContext(User user, Audience viewer, int flags) {
+  public DisplayContext createContext(User user, Audience viewer, Set<NameRenderFlags> flags) {
     return new DisplayContext(
         viewer,
 
-        (flags & ALLOW_NICKNAME) == ALLOW_NICKNAME,
-        (flags & FOR_HOVER)      == FOR_HOVER,
-        (flags & JOIN_MESSAGE)   == JOIN_MESSAGE,
+        flags.contains(NameRenderFlags.ALLOW_NICKNAME),
+        flags.contains(NameRenderFlags.FOR_HOVER),
+        flags.contains(NameRenderFlags.USER_ONLINE),
 
         DisplayContext.userFromAudience(viewer)
             .map(user1 -> user1.equals(user))

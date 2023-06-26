@@ -9,34 +9,34 @@ public final class Properties {
   public static UserProperty<Boolean> VANISHED = booleanProperty()
       .key("vanished")
       .defaultValue(false)
-      .callback((user, value) -> user.updateVanished())
+      .callback((user, value, oldValue) -> user.updateVanished())
       .build();
 
   public static UserProperty<Boolean> FLYING = booleanProperty()
       .key("flying")
       .defaultValue(false)
-      .callback((user, value) -> user.updateFlying())
+      .callback((user, value, oldValue) -> user.updateFlying())
       .build();
 
   public static UserProperty<Boolean> GODMODE = booleanProperty()
       .key("godMode")
       .defaultValue(false)
-      .callback((user, value) -> user.updateGodMode())
+      .callback((user, value, oldValue) -> user.updateGodMode())
       .build();
 
   public static UserProperty<Component> PREFIX = textProperty()
       .key("prefix")
-      .callback((user, value) -> user.updateTabName())
+      .callback((user, value, oldValue) -> user.updateTabName())
       .build();
 
   public static UserProperty<Component> SUFFIX = textProperty()
       .key("suffix")
-      .callback((user, value) -> user.updateTabName())
+      .callback((user, value, oldValue) -> user.updateTabName())
       .build();
 
   public static UserProperty<Component> TAB_NAME = textProperty()
       .key("tabName")
-      .callback((user, value) -> user.updateTabName())
+      .callback((user, value, oldValue) -> user.updateTabName())
       .build();
 
   public static UserProperty.Builder<Boolean> booleanProperty() {

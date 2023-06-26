@@ -1,0 +1,6 @@
+
+# Plugin data autosave interval
+autosaveInterval = "30m"
+
+# Worlds people cannot set their homes to or
+illegalWorlds = [ "world_void", "world_test" ]

@@ -1,10 +1,18 @@
 package net.forthecrown.waypoints.listeners;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+import javax.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
+import net.forthecrown.cosmetics.CosmeticData;
+import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.cosmetics.travel.TravelEffect;
 import net.forthecrown.events.Events;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.Tasks;
+import net.forthecrown.waypoints.Waypoints;
 import net.kyori.adventure.util.Ticks;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -15,19 +23,50 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.scheduler.BukkitTask;
 
 @RequiredArgsConstructor
-public class HulkSmashListener implements Listener {
+public class HulkSmash implements Listener {
 
   /**
    * Determines the amount of game ticks between cosmetic effect tick
    */
-  public static final byte GAME_TICKS_PER_COSMETIC_TICK = 1; //Nice name, I know
+  public static final byte GAME_TICKS_PER_COSMETIC_TICK = 1;
+
+  private static final Map<UUID, HulkSmash> listeners = new HashMap<>();
 
   private final User user;
   private final TravelEffect effect;
 
+  private boolean active = false;
+
+  public static void startHulkSmash(User user, @Nullable TravelEffect effect) {
+    HulkSmash listener = listeners.computeIfAbsent(
+        user.getUniqueId(),
+        uuid -> {
+          TravelEffect eff;
+
+          if (effect != null) {
+            eff = effect;
+          } else {
+            eff = user.getComponent(CosmeticData.class).getValue(Cosmetics.TRAVEL_EFFECTS);
+          }
+
+          return new HulkSmash(user, eff);
+        }
+    );
+
+    if (!listener.active) {
+      listener.beginListening();
+    }
+  }
+
+  public static void interrupt(User user) {
+    Objects.requireNonNull(user);
+    var smash = listeners.get(user.getUniqueId());
+    smash.unregister(false);
+  }
+
   public void beginListening() {
-    user.setVisitListener(this);
-    user.hulkSmashing = true;
+    user.set(Waypoints.HULK_SMASHING, true);
+    active = true;
 
     Events.register(this);
 
@@ -62,7 +101,7 @@ public class HulkSmashListener implements Listener {
 
     // If below max fall tick, stop
     if (--ticks < 1) {
-      unregister();
+      unregister(true);
       return;
     }
 
@@ -71,21 +110,25 @@ public class HulkSmashListener implements Listener {
         effect.onHulkTickDown(user, user.getLocation());
       }
     } catch (Exception e) {
-      unregister();
+      unregister(true);
     }
   }
 
-  public void unregister() {
+  public void unregister(boolean unsetProperty) {
     HandlerList.unregisterAll(this);
 
-    user.setVisitListener(null);
-    user.hulkSmashing = false;
+    if (unsetProperty) {
+      user.set(Waypoints.HULK_SMASHING, false);
+    }
+
+    listeners.remove(user.getUniqueId());
+    active = false;
 
     tickTask = Tasks.cancel(tickTask);
   }
 
   private void end() {
-    unregister();
+    unregister(true);
     user.playSound(Sound.ENTITY_GENERIC_EXPLODE, 0.7F, 1);
 
     Particle.EXPLOSION_LARGE.builder()

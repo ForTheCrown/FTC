@@ -80,7 +80,7 @@ public interface MenuNodeFactory<T> {
               }
 
               data.set(cosmetic.getType(), cosmetic);
-              user.sendMessage(Messages.setCosmetic(cosmetic));
+              user.sendMessage(CMessages.setCosmetic(cosmetic));
             } else {
               if (user.getGems() < price) {
                 user.sendMessage(

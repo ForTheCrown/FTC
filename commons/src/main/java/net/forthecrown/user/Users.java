@@ -210,8 +210,7 @@ public final class Users {
     UserBlockList userInter = sender.getComponent(UserBlockList.class);
     UserBlockList targetInter = target.getComponent(UserBlockList.class);
 
-    return userInter.isBlocked(target)
-        || targetInter.testIgnored(sender) == IgnoreResult.BLOCKED;
+    return userInter.isBlocked(target) || targetInter.isBlocked(sender);
   }
 
   public static Optional<Component> filterPlayers(
@@ -225,7 +224,7 @@ public final class Users {
       Objects.requireNonNull(propertyFailMessage, "propertyFailMessage missing");
     }
 
-    // Only remove self is a self-removal message is set
+    // Only remove self if a self-removal message is set
     boolean selfRemoved = users.size() == 1 && users.remove(sender);
     if (selfRemovedMessage != null && selfRemoved) {
       return Optional.of(selfRemovedMessage);
