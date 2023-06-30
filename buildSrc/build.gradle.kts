@@ -15,6 +15,10 @@ dependencies {
   implementation("com.google.guava:guava:31.1-jre")
 }
 
+java {
+  toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+}
+
 gradlePlugin {
   plugins {
     create("ftc_plugin") {

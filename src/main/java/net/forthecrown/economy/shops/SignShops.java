@@ -9,6 +9,7 @@ import net.forthecrown.utils.math.WorldVec3i;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -169,13 +170,10 @@ public final class SignShops {
    * @param amount The amount to get the text for
    * @return The created text
    */
-  public static Component priceLine(int amount) {
+  public static Component priceLine(int amount, TextColor priceColor) {
     // Take the price line prefix and just append the price
     // onto it lol
-    return SignShops.PRICE_LINE
-        .append(Component.text("$" + amount)
-            .color(NamedTextColor.BLACK)
-        );
+    return SignShops.PRICE_LINE.append(Component.text("$" + amount, priceColor));
   }
 
   /**

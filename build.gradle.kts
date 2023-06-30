@@ -7,7 +7,7 @@ plugins {
   id("ftc_plugin")
 }
 
-val minecraftVersion = "1.20"
+val minecraftVersion = "1.20.1"
 val baseJarName = "ForTheCrown"
 ftc.jarBaseName = baseJarName
 

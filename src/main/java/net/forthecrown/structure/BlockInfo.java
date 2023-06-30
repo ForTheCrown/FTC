@@ -70,23 +70,8 @@ public class BlockInfo {
   }
 
   BlockInfo fixData(int oldVersion, int newVersion) {
-    if (tag == null || tag.isEmpty()) {
-      return this;
-    }
-
-    var tag = this.tag.copy();
-
-    // 'id' tag required by datafixer, otherwise errors
-    tag.putString("id", data.getMaterial().getKey().asString());
-
-    var newTag = TagUtil.applyFixer(
-        tag,
-        References.BLOCK_ENTITY,
-        oldVersion, newVersion
-    );
-
-    newTag.remove("id");
-    return withTag(newTag);
+    // This causes errors
+    return this;
   }
 
   void place(StructurePlaceConfig config, Vector3i position) {

@@ -24,10 +24,14 @@ import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.inventory.menu.Menus;
 import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.math.WorldVec3i;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
+import org.bukkit.block.HangingSign;
 import org.bukkit.block.Sign;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -442,10 +446,22 @@ public class SignShop implements InventoryHolder {
             ? getType().getStockedLabel()
             : getType().getUnStockedLabel()
     );
-    s.line(
-        LINE_PRICE,
-        SignShops.priceLine(price)
-    );
+
+    TextColor priceColor = derivePriceColor(s);
+
+    if (s instanceof HangingSign) {
+      s.line(
+          LINE_PRICE,
+          Component.text(getPrice() + "$", priceColor)
+      );
+    } else {
+      s.line(
+          LINE_PRICE,
+          SignShops.priceLine(price, priceColor)
+      );
+    }
+
+    s.setWaxed(true);
 
     // Save the shop into the sign's persistent data
     // container
@@ -455,6 +471,10 @@ public class SignShop implements InventoryHolder {
     // calling bukkit's update method here.
     // what did I just say???
     s.update();
+  }
+
+  private static TextColor derivePriceColor(Sign sign) {
+    return NamedTextColor.WHITE;
   }
 
   /* ----------------------------- SERIALIZATION ------------------------------ */

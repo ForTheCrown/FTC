@@ -148,6 +148,10 @@ public class ResourceWorld {
       BiomeTags.HAS_VILLAGE_SNOWY
   );
 
+  public static Set<ResourceKey<Biome>> REQUIRED_BIOMES = ObjectSet.of(
+      Biomes.CHERRY_GROVE
+  );
+
   // The height maps for NMS and Bukkit that are used for height
   // calculation... shocking ik
   public static final Heightmap.Types HEIGHT_MAP_TYPE
@@ -610,6 +614,7 @@ public class ResourceWorld {
     int min = QuartPos.fromBlock(-halfSize);
 
     Set<TagKey<Biome>> requiredTags = new ObjectOpenHashSet<>(REQUIRED_TAGS);
+    Set<ResourceKey<Biome>> requiredBiomes = new ObjectOpenHashSet<>(REQUIRED_BIOMES);
 
     // Go through the world area and find the biome at every
     // cord. For the sake of speed, it only gets every 8th biome.
@@ -621,8 +626,7 @@ public class ResourceWorld {
       for (int z = min; z < max; z += 8) {
         // Remove all this biome's tags from the set of
         // tags that haven't been found yet
-        var holder = gen.getBiomeSource()
-            .getNoiseBiome(x, y, z, randomState.sampler());
+        Holder<Biome> holder = gen.getBiomeSource().getNoiseBiome(x, y, z, randomState.sampler());
 
         if (holder.kind() == Holder.Kind.DIRECT) {
           LOGGER.warn(
@@ -634,15 +638,16 @@ public class ResourceWorld {
         }
 
         holder.tags().forEach(requiredTags::remove);
+        holder.unwrapKey().ifPresent(requiredBiomes::remove);
 
         // set is empty, means we've found biomes with
         // all the required tags
-        if (requiredTags.isEmpty()) {
+        if (requiredTags.isEmpty() && requiredBiomes.isEmpty()) {
           return true;
         }
       }
     }
 
-    return requiredTags.isEmpty();
+    return requiredTags.isEmpty() && requiredBiomes.isEmpty();
   }
 }

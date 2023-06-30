@@ -51,20 +51,8 @@ public class EntityInfo {
   /* ----------------------------- METHODS ------------------------------ */
 
   EntityInfo fixData(int oldVersion, int newVersion) {
-    var tag = this.tag == null
-        ? BinaryTags.compoundTag()
-        : this.tag.copy();
-
-    tag.putString("id", type.asString());
-
-    var newTag = TagUtil.applyFixer(
-        tag,
-        References.ENTITY_TREE,
-        oldVersion, newVersion
-    );
-
-    newTag.remove("id");
-    return withTag(newTag);
+    // This causes errors
+    return this;
   }
 
   void place(StructurePlaceConfig config) {

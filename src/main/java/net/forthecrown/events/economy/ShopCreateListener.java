@@ -19,6 +19,7 @@ import net.forthecrown.economy.shops.SignShops;
 import net.forthecrown.events.Events;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.text.Text;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -146,7 +147,7 @@ public class ShopCreateListener implements Listener {
       event.line(0, shopType.getStockedLabel());
     }
 
-    event.line(3, SignShops.priceLine(price));
+    event.line(3, SignShops.priceLine(price, NamedTextColor.WHITE));
   }
 
   @RequiredArgsConstructor

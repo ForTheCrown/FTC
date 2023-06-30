@@ -98,6 +98,7 @@ public final class Events {
     register(new DurabilityListener());
 
     register(new CommandBroadcastListener());
+    register(new SignOwnershipListener());
 
     GuildEvents.registerAll();
 

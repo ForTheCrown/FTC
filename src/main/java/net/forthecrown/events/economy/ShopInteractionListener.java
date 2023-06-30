@@ -26,6 +26,7 @@ public class ShopInteractionListener implements Listener {
       return;
     }
 
+    event.setCancelled(true); // Sign editing
     var player = event.getPlayer();
 
     //Can't use in spectator lol
