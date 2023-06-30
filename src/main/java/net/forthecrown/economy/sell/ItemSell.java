@@ -1,9 +1,6 @@
 package net.forthecrown.economy.sell;
 
-import co.aikar.timings.Timing;
-import co.aikar.timings.Timings;
 import lombok.Getter;
-import net.forthecrown.core.FTC;
 import net.forthecrown.user.data.UserShopData;
 import org.bukkit.Material;
 
@@ -24,14 +21,6 @@ import org.bukkit.Material;
  */
 @Getter
 public class ItemSell {
-
-  /* ----------------------------- TIMINGS ------------------------------- */
-
-  private static final Timing SELL_CALCULATION
-      = Timings.of(FTC.getPlugin(), "ItemSell_Calculation");
-
-  private static final Timing SINGLE_PRICE_CALCULATION
-      = Timings.of(FTC.getPlugin(), "ItemSell_SingleItem");
 
   /* ----------------------------- CONSTANTS ------------------------------ */
 
@@ -214,8 +203,6 @@ public class ItemSell {
       return cachedResult = SellResult.notEnoughItems(this);
     }
 
-    SELL_CALCULATION.startTiming();
-
     while (!hasReachedTarget()) {
       // Get the amount of rhines we can earn from
       // a single item stack's 1 quantity
@@ -226,7 +213,6 @@ public class ItemSell {
       // sell anymore, so return a failed
       // result
       if (singleEarnings == 0) {
-        SELL_CALCULATION.stopTiming();
         return cachedResult = SellResult.cannotSellMore(this);
       }
 
@@ -236,7 +222,6 @@ public class ItemSell {
       totalEarned += singleEarnings;
     }
 
-    SELL_CALCULATION.stopTiming();
     return cachedResult = SellResult.success(this);
   }
 
@@ -258,20 +243,16 @@ public class ItemSell {
     final int earned = this.totalEarned;
     int result = 0;
 
-    SINGLE_PRICE_CALCULATION.startTiming();
-
     for (int i = 0; i < scalar; i++) {
       int single = itemData.calculatePrice(earned + result);
 
       if (single <= 0) {
-        SINGLE_PRICE_CALCULATION.stopTiming();
         return 0;
       }
 
       result += single;
     }
 
-    SINGLE_PRICE_CALCULATION.stopTiming();
     return result;
   }
 }

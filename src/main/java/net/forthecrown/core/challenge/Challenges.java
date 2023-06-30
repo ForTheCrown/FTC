@@ -11,7 +11,6 @@ import static net.forthecrown.core.challenge.ChallengeLogs.STREAK_SCHEMA;
 import static net.forthecrown.core.challenge.ChallengeLogs.S_CATEGORY;
 import static net.forthecrown.core.challenge.ChallengeLogs.S_PLAYER;
 
-import co.aikar.timings.Timing;
 import com.google.common.base.Strings;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -20,7 +19,6 @@ import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.UUID;
 import java.util.function.Consumer;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.core.registry.Registry;
@@ -57,12 +55,6 @@ public final class Challenges {
       METHOD_ON_EVENT = "onEvent",
 
       METHOD_STREAK_INCREASE = "onStreakIncrease";
-
-  public static final Timing COMPLETION_QUERY
-      = FTC.timing("Challenge Completion Query");
-
-  public static final Timing STREAK_QUERY
-      = FTC.timing("Challenge Streak Query");
 
   public static void logActivation(Holder<Challenge> challenge, String extra) {
     LogEntry entry = LogEntry.of(ACTIVE)
@@ -104,7 +96,6 @@ public final class Challenges {
       case MANUAL -> LocalDate.MIN;
     };
 
-    COMPLETION_QUERY.startTiming();
     var result = !DataLogs.query(
         LogQuery.builder(COMPLETED)
             .maxResults(1)
@@ -118,7 +109,6 @@ public final class Challenges {
 
             .build()
     ).isEmpty();
-    COMPLETION_QUERY.stopTiming();
 
     return result;
   }
@@ -265,8 +255,6 @@ public final class Challenges {
 
     int streak = 0;
 
-    STREAK_QUERY.startTiming();
-
     // Iterate backwards through date ranges
     // defined by the category
     while (streak < ChallengeConfig.maxStreak) {
@@ -294,8 +282,6 @@ public final class Challenges {
         break;
       }
     }
-
-    STREAK_QUERY.stopTiming();
 
     return streak == 0
         ? OptionalInt.empty()

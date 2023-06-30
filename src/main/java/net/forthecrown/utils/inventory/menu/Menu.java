@@ -1,7 +1,5 @@
 package net.forthecrown.utils.inventory.menu;
 
-import co.aikar.timings.Timing;
-import co.aikar.timings.Timings;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
@@ -70,11 +68,6 @@ public class Menu implements InventoryHolder, MenuCloseConsumer {
 
   private final EnumSet<MenuFlag> flags;
 
-  private final Timing clickTiming;
-  private final Timing openTiming;
-  private final Timing externalClickTiming;
-  private final Timing nodeRunTiming;
-
   /* ----------------------------- CONSTRUCTOR ------------------------------ */
 
   Menu(MenuBuilder builder) {
@@ -92,12 +85,6 @@ public class Menu implements InventoryHolder, MenuCloseConsumer {
 
     String title = Text.plain(this.title);
     var p = FTC.getPlugin();
-
-    this.clickTiming = Timings.of(p, title + " Click");
-    this.nodeRunTiming = Timings.of(p, title + " Click.NodeRuntime", clickTiming);
-
-    this.openTiming = Timings.of(p, title + " InvCreate");
-    this.externalClickTiming = Timings.of(p, title + " ExternalClick");
   }
 
   /* ----------------------------- FUNCTIONS ------------------------------ */
@@ -111,19 +98,13 @@ public class Menu implements InventoryHolder, MenuCloseConsumer {
   }
 
   public void open(User user, Context context) {
-    getOpenTiming().startTiming();
+    var inventory = createInventory(user, context);
 
-    try {
-      var inventory = createInventory(user, context);
-
-      if (openCallback != null) {
-        openCallback.onOpen(user, context, inventory);
-      }
-
-      user.getPlayer().openInventory(inventory);
-    } finally {
-      getOpenTiming().stopTiming();
+    if (openCallback != null) {
+      openCallback.onOpen(user, context, inventory);
     }
+
+    user.getPlayer().openInventory(inventory);
   }
 
   public MenuInventory createInventory(User user, Context context) {
@@ -216,15 +197,12 @@ public class Menu implements InventoryHolder, MenuCloseConsumer {
       }
 
       click.node = node;
-
-      getNodeRunTiming().startTiming();
       node.onClick(user, context, click);
     } catch (CommandSyntaxException exc) {
       Exceptions.handleSyntaxException(user, exc);
     } catch (Throwable t) {
       Loggers.getLogger().error("Error running menu click!", t);
     } finally {
-      getNodeRunTiming().stopTiming();
 
       if (click.cancelEvent()) {
         event.setCancelled(true);
