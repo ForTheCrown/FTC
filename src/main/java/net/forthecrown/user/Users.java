@@ -146,7 +146,14 @@ public final class Users {
   public static void unloadOffline() {
     var loaded = UserManager.get().getLoaded();
     loaded.forEach((uuid, user) -> user.save());
-    loaded.values().removeIf(user -> !user.isOnline());
+
+    try {
+      loaded.values().removeIf(user -> !user.isOnline());
+    } catch (NullPointerException exc) {
+      // Happens randomly :shrug:
+      // Some bug in the ValueIterator used in the map, randomly makes an internal list
+      // object null, and it throws an exception
+    }
   }
 
   public static void updateVanished() {
