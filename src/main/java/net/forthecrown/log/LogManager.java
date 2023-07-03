@@ -1,13 +1,11 @@
 package net.forthecrown.log;
 
-import co.aikar.timings.Timing;
 import it.unimi.dsi.fastutil.objects.ObjectLists;
 import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
 import lombok.Getter;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnDayChange;
 import net.forthecrown.core.module.OnLoad;
@@ -33,14 +31,11 @@ public class LogManager {
 
   private DateRange logRange;
 
-  private final Timing queryTiming;
-
   /* ---------------------------- CONSTRUCTOR ----------------------------- */
 
   private LogManager() {
     storage = new DataStorage(PathUtil.getPluginDirectory("data"));
     logRange = DateRange.exact(date);
-    queryTiming = FTC.timing("Log Query");
   }
 
   /* ------------------------------ METHODS ------------------------------- */
@@ -63,7 +58,6 @@ public class LogManager {
     }
 
     QueryResultBuilder builder = new QueryResultBuilder(query);
-    queryTiming.startTiming();
     searchRange = logRange.overlap(searchRange);
 
     // While within search range, query logs of specific day
@@ -93,7 +87,6 @@ public class LogManager {
       }
     }
 
-    queryTiming.stopTiming();
     return builder.build();
   }
 

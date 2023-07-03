@@ -1,6 +1,5 @@
 package net.forthecrown.user;
 
-import co.aikar.timings.Timing;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.mojang.brigadier.suggestion.Suggestions;
@@ -13,7 +12,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 import lombok.Getter;
 import net.forthecrown.commands.manager.FtcSuggestions;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.grenadier.Completions;
 import net.forthecrown.utils.Util;
@@ -38,9 +36,6 @@ import org.bukkit.OfflinePlayer;
 public class UserLookup extends SerializableObject.AbstractSerializer<JsonArray> {
 
   private static final Logger LOGGER = Loggers.getLogger();
-
-  private static final Timing LOAD_TIMING = FTC.timing("User Lookup load");
-  private static final Timing QUERY_TIMING = FTC.timing("User Lookup Query");
 
   /**
    * Expected size of the 2 primary maps for tracking names and UUIDs
@@ -114,7 +109,6 @@ public class UserLookup extends SerializableObject.AbstractSerializer<JsonArray>
   }
 
   protected void load(JsonArray array) {
-    LOAD_TIMING.startTiming();
     clear();
 
     for (JsonElement e : array) {
@@ -132,8 +126,6 @@ public class UserLookup extends SerializableObject.AbstractSerializer<JsonArray>
 
       addEntry(entry);
     }
-
-    LOAD_TIMING.stopTiming();
     unsaved = false;
   }
 
@@ -412,14 +404,6 @@ public class UserLookup extends SerializableObject.AbstractSerializer<JsonArray>
    * @return The cache entry for the given string
    */
   public UserLookupEntry get(String str) {
-    var t = QUERY_TIMING.startTiming();
-    var entry = _get(str);
-    t.stopTiming();
-
-    return entry;
-  }
-
-  private UserLookupEntry _get(String str) {
     UserLookupEntry entry;
 
     // Attempt to parse String into UUID

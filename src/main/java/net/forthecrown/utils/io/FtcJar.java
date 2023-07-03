@@ -16,7 +16,6 @@ import java.util.Map;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.core.logging.Loggers;
-import org.apache.commons.io.file.PathUtils;
 import org.apache.logging.log4j.Logger;
 
 public class FtcJar {
@@ -186,18 +185,9 @@ public class FtcJar {
       return FileVisitResult.CONTINUE;
     }
 
-    private boolean maySaveResource(BasicFileAttributes sourceAttr,
-                                    Path dest
-    ) throws IOException {
-      if (!Files.exists(dest)) {
-        return true;
-      }
-
-      if ((flags & ALLOW_OVERWRITE) == 0) {
-        return false;
-      }
-
-      if ((flags & OVERWRITE_IF_NEWER) == 0) {
+    private boolean maySaveResource(BasicFileAttributes sourceAttr, Path dest) throws IOException {
+      return !Files.exists(dest);
+      /*if ((flags & OVERWRITE_IF_NEWER) == 0) {
         return true;
       }
 
@@ -206,7 +196,7 @@ public class FtcJar {
       var sLastModified = sourceAttr.lastModifiedTime().toInstant();
       var dLastModified = destAttr.lastModifiedTime().toInstant();
 
-      return sLastModified.isAfter(dLastModified);
+      return sLastModified.isAfter(dLastModified);*/
     }
   }
 }
