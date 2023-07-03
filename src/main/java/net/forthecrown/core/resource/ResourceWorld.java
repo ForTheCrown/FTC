@@ -30,7 +30,6 @@ import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import net.forthecrown.core.Announcer;
 import net.forthecrown.core.DiscordBotAnnouncer;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.Worlds;
 import net.forthecrown.core.logging.Loggers;
 import net.forthecrown.core.module.OnDayChange;
@@ -68,7 +67,6 @@ import net.minecraft.world.level.levelgen.WorldDimensions;
 import net.minecraft.world.level.levelgen.presets.WorldPresets;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Axis;
-import org.bukkit.Bukkit;
 import org.bukkit.HeightMap;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -202,12 +200,6 @@ public class ResourceWorld {
 
     LOGGER.info(STAFF_LOG, "Starting RW reset");
 
-    World original = Worlds.resource();
-
-    // Kick players out and close gates
-    WorldReCreator.kickPlayers(original);
-    setGatesOpen(false);
-
     // Attempt to announce closing
     if (resetStart == null) {
       LOGGER.warn("resetStart message is null, cannot announce");
@@ -225,12 +217,23 @@ public class ResourceWorld {
         return;
       }
 
+      if (seed == null) {
+        LOGGER.error(STAFF_LOG, "Failed to find seed to reset RW");
+        return;
+      }
+
       if (WorldLoader.isLoading(Worlds.resource())) {
         LOGGER.warn("Resource world is already loading????");
         return;
       }
 
-      Bukkit.getScheduler().runTask(FTC.getPlugin(), () -> {
+      World original = Worlds.resource();
+
+      // Kick players out and close gates
+      WorldReCreator.kickPlayers(original);
+      setGatesOpen(false);
+
+      Tasks.runSync(() -> {
         // Re-create world
         WorldReCreator creator = WorldReCreator.of(original)
             .seed(seed)
@@ -243,8 +246,7 @@ public class ResourceWorld {
 
         lastSeed = newWorld.getSeed();
 
-        WorldLoader.loadAsync(newWorld)
-            .whenComplete(this::onWorldLoadedAsync);
+        WorldLoader.loadAsync(newWorld).whenComplete(this::onWorldLoadedAsync);
       });
 
       // Purge RW sections
@@ -516,7 +518,7 @@ public class ResourceWorld {
 
         if (safeGuard > MAX_SEED_ATTEMPTS) {
           LOGGER.warn("Couldn't find good seed for ResourceWorld, returning unfit one");
-          break;
+          return null;
         }
       }
 
