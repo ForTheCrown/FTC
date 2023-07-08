@@ -8,5 +8,6 @@ public final class CoreListeners {
   public static void registerAll() {
     register(new ServerLoadListener());
     register(new PlayerLoggingListener());
+    register(new PlayerTeleportListener());
   }
 }

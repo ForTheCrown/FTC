@@ -29,11 +29,12 @@ class FtcPaperYml {
   var load: PluginLoadOrder = PluginLoadOrder.POSTWORLD
   val loadBefore: LoadOrderList = LoadOrderList()
   val loadAfter: LoadOrderList = LoadOrderList()
-  val depends: DependsList = DependsList()
+  val depends: DependsList = DependsList(loadAfter)
 
   constructor(name: String, version: String) {
     this.name = name
     this.version = version
+    this.prefix = null
   }
 
   fun depends(act: DependsList.() -> Unit) {
@@ -62,24 +63,37 @@ enum class PluginLoadOrder {
   POSTWORLD
 }
 
-class DependsList {
+class DependsList(private val loadAfter: LoadOrderList) {
   val map: MutableMap<String, PluginDependency> = HashMap()
 
   fun optional(name: String, act: Action<PluginDependency>? = null) {
     val dep = PluginDependency(true)
     act?.execute(dep)
-    map[name] = dep
+    add(name, dep)
   }
 
   fun required(name: String, act: Action<PluginDependency>? = null) {
     val dep = PluginDependency(false)
     act?.execute(dep)
+    add(name, dep)
+  }
+
+  private fun add(name: String, dep: PluginDependency) {
+    if (dep.loadbefore) {
+      if (dep.bootstrap) {
+        loadAfter.bootstrap(name)
+      } else {
+        loadAfter.regular(name)
+      }
+    }
+
     map[name] = dep
   }
 }
 
 data class PluginDependency(val optional: Boolean) {
   var bootstrap: Boolean = false
+  var loadbefore: Boolean = true
 }
 
 class LoadOrderList {

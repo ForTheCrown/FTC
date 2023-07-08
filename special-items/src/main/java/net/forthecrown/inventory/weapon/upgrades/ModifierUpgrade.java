@@ -8,7 +8,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SwordItem;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.craftbukkit.v1_19_R3.util.CraftNamespacedKey;
+import org.bukkit.craftbukkit.v1_20_R1.util.CraftNamespacedKey;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -18,7 +18,7 @@ public record ModifierUpgrade(double speed, double attack) implements WeaponUpgr
   @Override
   public void apply(RoyalSword sword, ItemStack item, ItemMeta meta) {
 
-    // Thank you Bukkit, for not providing an API for this
+    // Thank you, Bukkit, for not providing an API for this
     // Good lord, all this for some base attribute values
     // This was a pain to figure out btw
     Item type = BuiltInRegistries.ITEM.get(

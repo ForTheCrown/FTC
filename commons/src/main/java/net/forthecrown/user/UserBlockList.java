@@ -1,5 +1,7 @@
 package net.forthecrown.user;
 
+import java.util.Collection;
+import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -58,6 +60,10 @@ public interface UserBlockList extends UserComponent {
    * @param other Other user
    */
   void removeSeparated(@NotNull User other);
+
+  Collection<UUID> getBlocked();
+
+  Collection<UUID> getSeparated();
 
   /**
    * Value returned by {@link #testIgnored(User)}

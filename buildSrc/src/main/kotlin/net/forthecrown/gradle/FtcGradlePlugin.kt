@@ -11,7 +11,7 @@ const val NMS_DEPENDENCY = "io.papermc.paper:dev-bundle:${API_VERSION}-R0.1-SNAP
 const val NMS_CONFIG_NAME = "paperweightDevelopmentBundle"
 
 const val GENERATE_CONFIG_DIR = "build/generated-sources/"
-const val GENERATED_CONFIG_PATH = "$GENERATE_CONFIG_DIR/paper-config.yml"
+const val GENERATED_CONFIG_PATH = "$GENERATE_CONFIG_DIR/paper-plugin.yml"
 
 const val CREATE_PLUGIN_YML = "createPluginYml"
 
@@ -24,7 +24,7 @@ class FtcGradlePlugin: Plugin<Project> {
     val ftcExtension = FtcExtension()
 
     yml.authors {
-      add("JulieWoolie") // :*
+      add("JulieWoolie") // :3
     }
 
     target.extensions.run {

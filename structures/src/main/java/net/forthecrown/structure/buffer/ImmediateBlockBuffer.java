@@ -38,7 +38,7 @@ public class ImmediateBlockBuffer implements BlockBuffer {
     if (block == null) {
       b.setType(Material.AIR, false);
     } else {
-      block.apply(b, false);
+      block.applyTo(b, false);
     }
   }
 

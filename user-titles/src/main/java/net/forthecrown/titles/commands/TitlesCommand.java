@@ -140,7 +140,7 @@ public class TitlesCommand {
     UserTitles titles = user.getComponent(UserTitles.class);
 
     if (titles.getTier() == tier) {
-      throw Exceptions.format("{0} is already {1, user}'s rank tier", tier.getDisplayName());
+      throw Exceptions.format("{0} is already {1, user}'s rank tier", tier.getDisplayName(), user);
     }
 
     titles.setTier(tier);

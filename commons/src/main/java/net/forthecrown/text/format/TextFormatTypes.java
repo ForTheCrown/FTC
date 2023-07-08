@@ -6,12 +6,15 @@ import static net.kyori.adventure.text.Component.text;
 
 import java.time.Duration;
 import java.util.Date;
+import java.util.EnumSet;
+import java.util.Set;
 import java.util.UUID;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.text.PeriodFormat;
 import net.forthecrown.text.Text;
+import net.forthecrown.user.NameRenderFlags;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.Time;
@@ -189,7 +192,13 @@ public class TextFormatTypes {
       return Text.valueOf(value);
     }
 
-    return user.displayName(null, nickname);
+    Set<NameRenderFlags> flags = EnumSet.noneOf(NameRenderFlags.class);
+
+    if (nickname) {
+      flags.add(NameRenderFlags.ALLOW_NICKNAME);
+    }
+
+    return user.displayName(null, flags);
   };
 
   /**

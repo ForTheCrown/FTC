@@ -54,6 +54,8 @@ public class UserLookupImpl implements UserLookup {
 
   @Override
   public UserLookupEntry query(String string) {
+    string = string.toLowerCase();
+
     try {
       UUID uuid = UUID.fromString(string);
       return getEntry(uuid);

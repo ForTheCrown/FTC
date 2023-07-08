@@ -42,12 +42,12 @@ class ExecResultImpl<T> implements ExecResult<T> {
   }
 
   static ExecResult<Object> wrap(Throwable t, Script script) {
-    var message = ScriptImpl.getMessage(t);
+    var message = RhinoScript.getMessage(t);
     return new ExecResultImpl<>(null, message, null, script, t);
   }
 
   static ExecResult<Object> wrap(Throwable t, String methodName, Script script) {
-    var message = ScriptImpl.getMessage(t);
+    var message = RhinoScript.getMessage(t);
     return new ExecResultImpl<>(null, message, methodName, script, t);
   }
 

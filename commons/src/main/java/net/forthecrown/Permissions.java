@@ -1,10 +1,10 @@
 package net.forthecrown;
 
+import net.forthecrown.command.Commands;
 import org.bukkit.Bukkit;
 import org.bukkit.permissions.Permission;
 
 public final class Permissions {
-
   private Permissions() {}
 
   /**
@@ -20,6 +20,10 @@ public final class Permissions {
 
   public static final Permission VANISH_SEE = register(VANISH.getName() + ".see");
 
+  public static final Permission HELP       = registerCmd("help");
+
+  public static final Permission WORLD_BYPASS = register("ftc.worldbypass");
+
   public static Permission register(String key) {
     var manager = Bukkit.getPluginManager();
 
@@ -31,6 +35,10 @@ public final class Permissions {
     }
 
     return permission;
+  }
+
+  public static Permission registerCmd(String name) {
+    return register(Commands.DEFAULT_PERMISSION_FORMAT.replace("{command}", name));
   }
 
   public static Permission registerPrefixed(Permission parent, String suffix) {

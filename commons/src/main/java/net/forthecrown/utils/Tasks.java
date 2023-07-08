@@ -3,6 +3,8 @@ package net.forthecrown.utils;
 import static net.forthecrown.utils.PluginUtil.getCallingPlugin;
 import static org.bukkit.Bukkit.getScheduler;
 
+import io.papermc.paper.util.Tick;
+import java.time.Duration;
 import java.util.function.Consumer;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
@@ -36,6 +38,17 @@ public final class Tasks {
   }
 
   /**
+   * Runs a given task in sync after a tick delay
+   *
+   * @param task  The task to run
+   * @param delay The amount of ticks to delay execution by
+   * @return The created task
+   */
+  public static BukkitTask runLater(Runnable task, Duration delay) {
+    return getScheduler().runTaskLater(getCallingPlugin(), task, toTicks(delay));
+  }
+
+  /**
    * Runs a sync task in regular intervals
    *
    * @param runnable The task to run
@@ -53,9 +66,33 @@ public final class Tasks {
    * @param runnable The task to run
    * @param delay    The initial execution delay
    * @param interval The tick interval at which to run the task
+   * @return The created task
+   */
+  public static BukkitTask runTimer(Runnable runnable, Duration delay, Duration interval) {
+    return getScheduler()
+        .runTaskTimer(getCallingPlugin(), runnable, toTicks(delay), toTicks(interval));
+  }
+
+  /**
+   * Runs a sync task in regular intervals
+   *
+   * @param runnable The task to run
+   * @param delay    The initial execution delay
+   * @param interval The tick interval at which to run the task
    */
   public static void runTimer(Consumer<BukkitTask> runnable, long delay, long interval) {
     getScheduler().runTaskTimer(getCallingPlugin(), runnable, delay, interval);
+  }
+
+  /**
+   * Runs a sync task in regular intervals
+   *
+   * @param runnable The task to run
+   * @param delay    The initial execution delay
+   * @param interval The tick interval at which to run the task
+   */
+  public static void runTimer(Consumer<BukkitTask> runnable, Duration delay, Duration interval) {
+    getScheduler().runTaskTimer(getCallingPlugin(), runnable, toTicks(delay), toTicks(interval));
   }
 
   /**
@@ -80,6 +117,17 @@ public final class Tasks {
   }
 
   /**
+   * Runs a given task asynchronously after a delay
+   *
+   * @param task  The task to run
+   * @param delay The amount of ticks to delay execution by
+   * @return The created task
+   */
+  public static BukkitTask runLaterAsync(Runnable task, Duration delay) {
+    return getScheduler().runTaskLaterAsynchronously(getCallingPlugin(), task, toTicks(delay));
+  }
+
+  /**
    * Runs a task asynchronously at regular intervals
    *
    * @param task     The task to run
@@ -97,9 +145,35 @@ public final class Tasks {
    * @param task     The task to run
    * @param delay    The initial tick delay
    * @param interval The tick interval between executions
+   * @return The created task
+   */
+  public static BukkitTask runTimerAsync(Runnable task, Duration delay, Duration interval) {
+    return getScheduler()
+        .runTaskTimerAsynchronously(getCallingPlugin(), task, toTicks(delay), toTicks(interval));
+  }
+
+  /**
+   * Runs a task asynchronously at regular intervals
+   *
+   * @param task     The task to run
+   * @param delay    The initial tick delay
+   * @param interval The tick interval between executions
    */
   public static void runTimerAsync(Consumer<BukkitTask> task, long delay, long interval) {
     getScheduler().runTaskTimerAsynchronously(getCallingPlugin(), task, delay, interval);
+  }
+
+
+  /**
+   * Runs a task asynchronously at regular intervals
+   *
+   * @param task     The task to run
+   * @param delay    The initial tick delay
+   * @param interval The tick interval between executions
+   */
+  public static void runTimerAsync(Consumer<BukkitTask> task, Duration delay, Duration interval) {
+    getScheduler()
+        .runTaskTimerAsynchronously(getCallingPlugin(), task, toTicks(delay), toTicks(interval));
   }
 
   /**
@@ -123,5 +197,9 @@ public final class Tasks {
       task.cancel();
     }
     return null;
+  }
+
+  private static long toTicks(Duration dur) {
+    return Tick.tick().fromDuration(dur);
   }
 }

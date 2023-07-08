@@ -399,4 +399,6 @@ public interface User extends ForwardingAudience.Single {
    * @return True if the user can teleport, false otherwise
    */
   boolean canTeleport();
+
+  UserTeleport getCurrentTeleport();
 }

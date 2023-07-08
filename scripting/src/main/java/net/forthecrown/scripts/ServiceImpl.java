@@ -25,7 +25,7 @@ class ServiceImpl implements ScriptService {
   @Getter
   private final List<Class<?>> autoImportedClasses = new ObjectArrayList<>();
 
-  private final List<ScriptImpl> active = new ArrayList<>();
+  private final List<RhinoScript> active = new ArrayList<>();
 
   public ServiceImpl(Path scriptsDirectory, Plugin scriptPlugin) {
     this.scriptsDirectory = scriptsDirectory;
@@ -44,7 +44,7 @@ class ServiceImpl implements ScriptService {
 
   @Override
   public @NotNull Script newScript(@NotNull Source source) {
-    Script script = new ScriptImpl(source);
+    Script script = new RhinoScript(source);
 
     script.setWorkingDirectory(scriptsDirectory);
     autoImportedClasses.forEach(script::importClass);
@@ -57,11 +57,11 @@ class ServiceImpl implements ScriptService {
 
   @Override
   public void addActiveScript(Script script) {
-    active.add((ScriptImpl) script);
+    active.add((RhinoScript) script);
   }
 
   public void close() {
-    active.forEach(ScriptImpl::close);
+    active.forEach(RhinoScript::close);
     active.clear();
 
 

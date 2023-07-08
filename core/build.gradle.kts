@@ -8,7 +8,9 @@ repositories {
 }
 
 dependencies {
-  implementation(project(":commons"))
+  compileOnly(project(":commons"))
+  implementation(project(":commons", "reobf"))
+  implementation(project(":class-loader-tools"))
   compileOnly("net.luckperms:api:5.4")
 }
 

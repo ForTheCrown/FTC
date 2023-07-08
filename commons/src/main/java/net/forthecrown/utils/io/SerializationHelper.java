@@ -1,7 +1,5 @@
 package net.forthecrown.utils.io;
 
-import static net.forthecrown.utils.io.source.Sources.CHARSET;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.DataResult;
@@ -13,10 +11,6 @@ import java.util.function.Consumer;
 import net.forthecrown.Loggers;
 import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.nbt.CompoundTag;
-import net.forthecrown.utils.io.eon.Eon;
-import net.forthecrown.utils.io.eon.EonWriter;
-import net.forthecrown.utils.io.parse.CharReader;
-import net.forthecrown.utils.io.parse.CharReaders;
 import org.slf4j.Logger;
 import org.tomlj.Toml;
 import org.tomlj.TomlTable;
@@ -125,20 +119,10 @@ public final class SerializationHelper {
     });
   }
 
-  public static boolean readEon(Path file, Consumer<JsonWrapper> callback) {
-    return readFile(file, file1 -> {
-      CharReader reader = CharReaders.fromPath(file1);
-      JsonObject object = Eon.parse(reader);
-      return JsonWrapper.wrap(object);
-    }, callback);
-  }
-
   public static boolean readAsJson(Path file, Consumer<JsonWrapper> callback) {
     String fName = file.getFileName().toString();
 
-    if (fName.endsWith(".eon")) {
-      return readEon(file, callback);
-    } else if (fName.endsWith(".toml")) {
+    if (fName.endsWith(".toml")) {
       return readTomlAsJson(file, callback);
     } else {
       return readJsonFile(file, callback);
@@ -176,15 +160,6 @@ public final class SerializationHelper {
 
   public static boolean writeJson(Path f, JsonElement element) {
     return writeFile(f, file -> JsonUtils.writeFile(element, file));
-  }
-
-  public static boolean writeEon(Path file, JsonElement element) {
-    return writeFile(file, file1 -> {
-      var writer = Files.newBufferedWriter(file1, CHARSET);
-      EonWriter eonWriter = new EonWriter(writer);
-      eonWriter.write(element);
-      writer.close();
-    });
   }
 
   public static boolean writeJsonFile(Path f, Consumer<JsonWrapper> saveCallback) {

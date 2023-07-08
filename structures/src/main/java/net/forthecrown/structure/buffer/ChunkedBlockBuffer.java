@@ -22,8 +22,7 @@ public class ChunkedBlockBuffer implements BlockBuffer {
   static final int SECTION_BITS = 4;
   static final int SECTION_SIZE = 1 << SECTION_BITS;
 
-  static final int SECTION_SIZE_CUBED
-      = SECTION_SIZE * SECTION_SIZE * SECTION_SIZE;
+  static final int SECTION_SIZE_CUBED = SECTION_SIZE * SECTION_SIZE * SECTION_SIZE;
 
   @Getter
   private final Bounds3i bounds;
@@ -99,12 +98,12 @@ public class ChunkedBlockBuffer implements BlockBuffer {
   }
 
   @Override
-  public CompletableFuture<Void> place(World world,
-                                       Transform transform,
-                                       boolean updatePhysics
+  public CompletableFuture<Void> place(
+      World world,
+      Transform transform,
+      boolean updatePhysics
   ) {
-    return new ChunkedBufferPlacement(world, this, transform, updatePhysics)
-        .start();
+    return new ChunkedBufferPlacement(world, this, transform, updatePhysics).start();
   }
 
   @Override
@@ -177,7 +176,7 @@ public class ChunkedBlockBuffer implements BlockBuffer {
 
         Vector3i pos = transform.apply(origin.add(fromIndex(i)));
         Block bukkit = Vectors.getBlock(pos, world);
-        block.apply(bukkit, update);
+        block.applyTo(bukkit, update);
       }
     }
 

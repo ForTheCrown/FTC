@@ -25,7 +25,7 @@ public record BufferBlock(BlockData data, CompoundTag tag) {
     return tag == null ? null : tag.copy();
   }
 
-  public void apply(Block block, boolean update) {
+  public void applyTo(Block block, boolean update) {
     block.setBlockData(data, update);
     var state = block.getState();
 

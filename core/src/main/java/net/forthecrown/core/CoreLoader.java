@@ -2,7 +2,7 @@ package net.forthecrown.core;
 
 import io.papermc.paper.plugin.loader.PluginClasspathBuilder;
 import io.papermc.paper.plugin.loader.PluginLoader;
-import net.forthecrown.utils.Libraries;
+import net.forthecrown.classloader.Libraries;
 import org.jetbrains.annotations.NotNull;
 
 public class CoreLoader implements PluginLoader {

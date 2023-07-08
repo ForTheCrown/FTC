@@ -294,6 +294,19 @@ public class UserDataStorage {
   }
 
   private void loadComponents(JsonWrapper json, UserImpl user) {
+    json.remove(KEY_IP);
+    json.remove(KEY_LAST_NAME);
+    json.remove(KEY_PREVIOUS_NAMES);
+    json.remove(KEY_LOCATION);
+    json.remove(KEY_LAST_LOC);
+    json.remove(KEY_TIMESTAMPS);
+
+    JsonWrapper componentsJson = json;
+
+    if (componentsJson.isEmpty()) {
+      return;
+    }
+
     for (var e: json.entrySet()) {
       String id = e.getKey();
       JsonElement element = e.getValue();

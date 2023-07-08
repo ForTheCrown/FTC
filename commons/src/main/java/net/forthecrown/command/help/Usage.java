@@ -18,7 +18,7 @@ public class Usage {
   private String[] info;
 
   @Setter
-  private Predicate<CommandSource> condition;
+  private Predicate<CommandSource> condition = commandSource -> true;
 
   public Usage(String arguments) {
     this.arguments = arguments;

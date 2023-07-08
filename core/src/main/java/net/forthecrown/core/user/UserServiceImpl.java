@@ -14,6 +14,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import lombok.Getter;
 import net.forthecrown.Loggers;
+import net.forthecrown.core.CoreConfig;
+import net.forthecrown.core.CorePlugin;
 import net.forthecrown.core.user.PropertyImpl.BuilderImpl;
 import net.forthecrown.registry.Holder;
 import net.forthecrown.registry.Registries;
@@ -50,6 +52,8 @@ public class UserServiceImpl implements UserService {
 
   public static final Logger LOGGER = Loggers.getLogger();
 
+  private final CorePlugin plugin;
+
   private final UserDataStorage storage;
 
   private final UserLookupImpl lookup;
@@ -64,7 +68,9 @@ public class UserServiceImpl implements UserService {
 
   private final Registry<UserProperty<?>> propertyRegistry;
 
-  public UserServiceImpl() {
+  public UserServiceImpl(CorePlugin plugin) {
+    this.plugin = plugin;
+
     Path dir = PathUtil.pluginPath();
     this.storage     = new UserDataStorage(dir);
 
@@ -100,6 +106,10 @@ public class UserServiceImpl implements UserService {
       }
     });
 
+  }
+
+  public CoreConfig getConfig() {
+    return plugin.getFtcConfig();
   }
 
   public void initialize() {
@@ -138,12 +148,12 @@ public class UserServiceImpl implements UserService {
   }
 
   public void load() {
+    storage.loadProfiles(lookup);
+
     storage.loadMap(balances, storage.getBalances());
     storage.loadMap(gems,     storage.getGems());
     storage.loadMap(playtime, storage.getPlaytime());
     storage.loadMap(votes,    storage.getVotes());
-
-    storage.loadProfiles(lookup);
 
     for (UserImpl user : userMaps) {
       storage.loadUser(user);
@@ -211,7 +221,6 @@ public class UserServiceImpl implements UserService {
 
   public void freezeRegistries() {
     propertyRegistry.freeze();
-    Components.REGISTRY.freeze();
   }
 
   @Override

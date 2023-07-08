@@ -32,7 +32,6 @@ public final class Commands {
     ctx.setSyntaxConsumer(new FtcSyntaxConsumer());
 
     Class<?> caller = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE).getCallerClass();
-
     CommandDataLoader loader = CommandDataLoader.resources(caller.getClassLoader());
     ctx.addLoader(loader);
 

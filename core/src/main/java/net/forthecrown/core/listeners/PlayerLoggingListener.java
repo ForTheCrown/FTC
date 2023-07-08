@@ -2,6 +2,7 @@ package net.forthecrown.core.listeners;
 
 import com.google.common.base.Strings;
 import java.util.UUID;
+import net.forthecrown.FtcServer;
 import net.forthecrown.Loggers;
 import net.forthecrown.core.CorePlugin;
 import net.forthecrown.core.user.UserImpl;
@@ -12,6 +13,7 @@ import net.forthecrown.user.UserLookup.LookupEntry;
 import net.forthecrown.user.event.UserJoinEvent;
 import net.forthecrown.user.event.UserLogEvent;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -46,6 +48,9 @@ class PlayerLoggingListener implements Listener {
     if (player.hasPlayedBefore()) {
       entry = lookup.createEntry(id, name);
       firstJoin = true;
+
+      Location serverSpawn = FtcServer.server().getServerSpawn();
+      player.teleport(serverSpawn);
     } else {
       entry = lookup.getEntry(id);
       firstJoin = false;

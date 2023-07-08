@@ -6,7 +6,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.user.UserLookup.LookupEntry;
-import net.forthecrown.user.UserProperty.Builder;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -14,8 +13,16 @@ import org.jetbrains.annotations.Nullable;
 
 public interface UserService {
 
+  /**
+   * Gets the user lookup
+   * @return User lookup
+   */
   UserLookup getLookup();
 
+  /**
+   * Gets the username factory. This factory produces user display names and profiles
+   * @return Name factory
+   */
   UserNameFactory getNameFactory();
 
   /**
@@ -42,6 +49,14 @@ public interface UserService {
    */
   void executeOnAllUsers(Consumer<User> operation);
 
+  /**
+   * Executes a specified {@code operation} on ALL users known to the FTC plugin, both offline and
+   * online. The iteration is executed on an async thread
+   * <p>
+   * Once all users have been iterated through, all offline users are unloaded
+   *
+   * @param operation Operation to execute
+   */
   void executeOnAllUsersAsync(Consumer<User> operation);
 
   /**
@@ -51,15 +66,32 @@ public interface UserService {
    * registering of any properties that might be required during runtime
    *
    * @return User property registry
+   * @see UserProperty User Properties
    */
   Registry<UserProperty<?>> getUserProperties();
 
-  Builder<UUID> createUuidProperty();
+  /**
+   * Creates a UUID user property builder
+   * @return Created builder
+   */
+  UserProperty.Builder<UUID> createUuidProperty();
 
+  /**
+   * Creates a boolean user property builder
+   * @return Created builder
+   */
   UserProperty.Builder<Boolean> createBooleanProperty();
 
+  /**
+   * Creates a text component user property builder
+   * @return Created builder
+   */
   UserProperty.Builder<Component> createTextProperty();
 
+  /**
+   * Creates an enum user property builder
+   * @return Created builder
+   */
   <E extends Enum<E>> UserProperty.Builder<E> createEnumProperty(Class<E> type);
 
   /**
@@ -71,7 +103,9 @@ public interface UserService {
    * <p>
    * If the annotation is not present, then the component's ID string will be inferred. This means
    * if the class name starts with "User" it will be removed, and the class' first character will
-   * be converted to lowercase
+   * be converted to lowercase.
+   * <br>
+   * For example, the class name "UserShopData" will become "shopData"
    * <p>
    * Additionally, the class given here cannot be a synthetic class or an interface class
    *

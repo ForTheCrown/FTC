@@ -6,6 +6,7 @@ import com.mojang.brigadier.context.StringRange;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,11 +24,26 @@ class PreProcessor {
       new SelectiveImportProcessor()
   };
 
+  static Map<String, String> importPlaceholders;
+
   private final StringBuffer source;
   private final List<PreProcessorCallback> callbacks = new ArrayList<>();
 
   public PreProcessor(StringBuffer source) {
     this.source = source;
+  }
+
+  static String replacePlaceholders(String jsImport) {
+    if (importPlaceholders == null || importPlaceholders.isEmpty()) {
+      return jsImport;
+    }
+
+    String result = jsImport;
+    for (var e: importPlaceholders.entrySet()) {
+      result = result.replace("@" + e.getKey(), e.getValue());
+    }
+
+    return result;
   }
 
   public String run() {
@@ -38,7 +54,7 @@ class PreProcessor {
     return source.toString();
   }
 
-  public void runCallbacks(ScriptImpl script) {
+  public void runCallbacks(RhinoScript script) {
     for (int i = 0; i < callbacks.size(); i++) {
       PreProcessorCallback callback = callbacks.get(i);
       callback.postProcess(script);
@@ -48,7 +64,7 @@ class PreProcessor {
 
 interface PreProcessorCallback {
 
-  void postProcess(ScriptImpl script);
+  void postProcess(RhinoScript script);
 }
 
 interface Processor {
@@ -97,7 +113,7 @@ class SimpleImportProcessor extends RegexProcessor {
       MatchResult result,
       List<PreProcessorCallback> callbacks
   ) {
-    String importName = result.group(1);
+    String importName = PreProcessor.replacePlaceholders(result.group(1));
     writer.deleteInput();
 
     if (importName.endsWith(".js")) {
@@ -126,7 +142,7 @@ class ImportFromProcessor extends RegexProcessor {
       List<PreProcessorCallback> callbacks
   ) {
     String alias = result.group(1);
-    String path = result.group(2);
+    String path = PreProcessor.replacePlaceholders(result.group(2));
 
     writer.deleteInput();
 
@@ -155,7 +171,7 @@ class SelectiveImportProcessor extends RegexProcessor {
       MatchResult result,
       List<PreProcessorCallback> callbacks
   ) {
-    String path = result.group(2);
+    String path = PreProcessor.replacePlaceholders(result.group(2));
     String rawValues = result.group(1);
 
     String[] values = rawValues.trim().split("\\s*,+\\s*");
@@ -220,7 +236,7 @@ class FileImport implements PreProcessorCallback {
   }
 
   @Override
-  public void postProcess(ScriptImpl script) {
+  public void postProcess(RhinoScript script) {
     String bindingName = getBindingName();
 
     Path dir = script.getWorkingDirectory();
@@ -272,7 +288,7 @@ class ClassImport implements PreProcessorCallback {
   }
 
   @Override
-  public void postProcess(ScriptImpl script) {
+  public void postProcess(RhinoScript script) {
     if (methodNames.isEmpty()) {
       String binding = getBindingName();
       script.runtimeImport(binding, importedClass);

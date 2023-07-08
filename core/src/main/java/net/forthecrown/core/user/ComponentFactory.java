@@ -64,6 +64,7 @@ public class ComponentFactory<T extends UserComponent> {
 
       if (paramCount < 1) {
         empty = ctor;
+        continue;
       }
 
       if (paramCount > 1) {

@@ -53,7 +53,7 @@ subprojects {
   apply(plugin = "java")
   apply(plugin = "io.freefair.lombok")
 
-  if (name != "commons") {
+  if (name != "commons" && name != "class-loader-tools") {
     apply(plugin = "ftc_plugin")
   }
 
@@ -100,6 +100,10 @@ subprojects {
     }
 
     processResources {
+      if (this.project.name != "core") {
+        return@processResources
+      }
+
       filesMatching("runtime_libraries.json") {
         expand(
           "grenadier" to grenadier,

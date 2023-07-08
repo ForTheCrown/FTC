@@ -15,8 +15,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 public class RoomPiece extends DungeonPiece {
-  public static final String
-      TAG_SPAWNERS = "spawners";
+  public static final String TAG_SPAWNERS = "spawners";
 
   @Getter
   private final List<DungeonSpawner> spawners = new ObjectArrayList<>();

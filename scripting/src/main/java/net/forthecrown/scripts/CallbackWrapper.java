@@ -1,6 +1,6 @@
 package net.forthecrown.scripts;
 
-import static net.forthecrown.scripts.ScriptImpl.EMPTY_OBJECT_ARRAY;
+import static net.forthecrown.scripts.RhinoScript.EMPTY_OBJECT_ARRAY;
 
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
@@ -26,7 +26,7 @@ class CallbackWrapper extends BaseFunction {
       jArgs = new Object[args.length];
 
       for (int i = 0; i < args.length; i++) {
-        jArgs[i] = ScriptImpl.toJava(args[i]);
+        jArgs[i] = RhinoScript.toJava(args[i]);
       }
     }
 

@@ -1,0 +1,83 @@
+// Class: net.forthecrown.commands.admin.CommandTeleport
+
+name            = "teleport"
+aliases         = "tp"
+description     = "Teleports yourself or other entities"
+
+// Has to be true, otherwise suggestions just break :((
+// I hate commands
+translate_plain = true
+
+argument("location", vec3d) {
+  map_result = result.apply()
+  executes = teleportSelf()
+
+  label = "<location: x,y,z> [<yaw: -180..180>] [<pitch: -90..90>]"
+  description = "Teleports you to a <location>"
+
+  argument(YAW_ARG, @yaw) {
+    suggests = [ "-180", "-90", "-45", "0", "45", "90", "180" ]
+    executes = teleportSelf()
+
+    argument(PITCH_ARG, @pitch) {
+      suggests = [ "-90", "-45", "0", "45", "90" ]
+      executes = teleportSelf()
+    }
+  }
+}
+
+argument("from_entity", f_entities) {
+  map_result = result.findEntities()
+  label = "<entities>"
+
+  executes = teleportToEntity()
+  description = "Teleports to an <entity>"
+
+  argument("dest_entity", f_entity) {
+    map_result = selectorToDestination()
+    executes = entitiesToLocation()
+
+    label = "<entity>"
+    description = "Teleports all <entities> to an <entity>"
+  }
+
+  argument("location", vec3d) {
+    map_result = result.apply()
+    executes = entitiesToLocation()
+
+    label = "<pos: x,y,z>"
+    description = "Teleports all <entities> to a <pos>"
+
+    argument(YAW_ARG, @yaw) {
+      label = "<yaw: -180..180>"
+      suggests = [ "-180", "-90", "-45", "0", "45", "90", "180" ]
+
+      argument(PITCH_ARG, @pitch) {
+        label = "<pitch: -90..90>"
+        description = "Teleports all <entities> to a <location> with a set <yaw> and <pitch>"
+
+        suggests = [ "-90", "-45", "0", "45", "90" ]
+        executes = entitiesToLocation()
+      }
+    }
+
+    literal("facing") {
+      literal("entity") {
+        argument("facing", f_entity) {
+          label = "<facing: entity>"
+          description = "Teleports <entities> to a <location> and makes them face an <entity>"
+
+          map_result = selectorToDestination()
+          executes = entitiesToLocation()
+        }
+      }
+
+      argument("facing", vec3d) {
+        label = "<facing: x,y,z>"
+        description = "Teleports <entities> to a <location> and makes them face a position"
+        map_result = result.apply()
+        executes = entitiesToLocation()
+      }
+    }
+  }
+}

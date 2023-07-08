@@ -13,6 +13,10 @@ dependencies {
 
 }
 
+java {
+  toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+}
+
 gradlePlugin {
   plugins {
     register("ftc_plugin") {

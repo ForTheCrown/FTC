@@ -53,11 +53,11 @@ public class UserMaps implements Iterable<UserImpl> {
       return false;
     }
 
-    user.service = null;
     user.setTimeToNow(TimeField.LAST_LOADED);
+    service.getStorage().saveUser(user);
 
     online.remove(user.getUniqueId());
-    service.getStorage().saveUser(user);
+    user.service = null;
 
     return true;
   }

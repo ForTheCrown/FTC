@@ -50,14 +50,18 @@ internal fun createPluginYml(it: Task) {
   builder.append("\n# Dependency and load order details\n")
   builder.append("load: '${configYml.load}'\n")
 
-  printOrderList("load-after", builder, configYml.loadAfter)
-  printOrderList("load-before", builder, configYml.loadBefore)
+  printOrderList("load-after", builder, configYml.loadAfter, it.project)
+  printOrderList("load-before", builder, configYml.loadBefore, it.project)
 
   val dependsMap = configYml.depends.map
   if (dependsMap.isNotEmpty()) {
     builder.append("dependencies:\n")
 
     dependsMap.forEach { (key, value) ->
+      if (shouldSkipDependency(key, it.project)) {
+        return@forEach
+      }
+
       builder
         .append("  - name: '${formatDependencyName(it.project, key)}'\n")
         .append("    required: ${!value.optional}\n")
@@ -83,6 +87,25 @@ internal fun createPluginYml(it: Task) {
   Files.writeString(path, builder.toString(), StandardCharsets.UTF_8)
 }
 
+fun shouldSkipDependency(name: String, project: Project): Boolean {
+  if (project.name == "commons" || project.name == "core") {
+    return true
+  }
+
+  if (name.startsWith("project:")) {
+    val projName = name.replace("project:", "")
+
+    if (projName == project.name) {
+      return true
+    }
+  }
+
+  return when (name) {
+    "project:class-loader-tools" -> true
+    else -> false
+  }
+}
+
 fun formatDependencyName(project: Project, name: String): String {
   val prefix = "project:"
 
@@ -103,7 +126,12 @@ fun formatDependencyName(project: Project, name: String): String {
   return ext.name
 }
 
-fun printOrderList(name: String, builder: StringBuilder, orderList: LoadOrderList) {
+fun printOrderList(
+    name: String,
+    builder: StringBuilder,
+    orderList: LoadOrderList,
+    project: Project
+) {
   if (orderList.list.isEmpty()) {
     return
   }
@@ -111,8 +139,14 @@ fun printOrderList(name: String, builder: StringBuilder, orderList: LoadOrderLis
   builder.append("$name:\n")
 
   orderList.list.forEach {
+    if (shouldSkipDependency(it.key, project)) {
+      return@forEach
+    }
+
+    val depName = formatDependencyName(project, it.key)
+
     builder
-      .append("  - name: '${it.key}'\n")
+      .append("  - name: '$depName'\n")
       .append("    bootstrap: ${it.value}\n")
   }
 }

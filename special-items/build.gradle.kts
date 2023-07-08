@@ -1,5 +1,7 @@
 plugins {
   java
+
+  id("io.papermc.paperweight.userdev") version "1.5.5"
 }
 
 repositories {
@@ -13,6 +15,8 @@ dependencies {
   compileOnly(project(":menus"))
 
   compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.1.0-SNAPSHOT")
+
+  paperweight.paperDevBundle("1.20-R0.1-SNAPSHOT")
 }
 
 pluginYml {
@@ -21,5 +25,11 @@ pluginYml {
 
   depends {
     required("WorldGuard")
+  }
+}
+
+tasks {
+  assemble {
+    dependsOn(reobfJar)
   }
 }

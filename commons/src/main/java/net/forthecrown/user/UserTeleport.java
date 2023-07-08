@@ -1,5 +1,6 @@
 package net.forthecrown.user;
 
+import java.time.Duration;
 import java.util.function.Supplier;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -32,18 +33,59 @@ public interface UserTeleport {
    */
   void complete();
 
+  /**
+   * Gets the user being teleported
+   * @return User being teleported
+   */
   User getUser();
 
+  /**
+   * Gets the teleport's destination supplier.
+   * <p>
+   * This is a supplier because often times when someone requests a TPA/Tpa here, they move around
+   * and a supplier makes sure that the destination returned is always that of the player, and not
+   * where the teleport began.
+   *
+   * @return Teleport destination supplier
+   */
   Supplier<Location> getDestination();
 
-  boolean isDelayed();
+  /**
+   * Determines if the teleport's delay should be bypassed or not
+   */
+  default boolean isDelayed() {
+    return getDelay() != null && !getDelay().isZero();
+  }
 
+  /**
+   * Gets the teleportation delay
+   * <p>
+   * This is the delay between {@link #start()} being called and the teleport being completed
+   *
+   * @return Teleport delay
+   */
+  Duration getDelay();
+
+  /**
+   * The teleport's type
+   */
   Type getType();
 
+  /**
+   * Determines if the teleport should occurr in async, note that a config option in the core plugin
+   * is also checked before an async teleport is initiated
+   */
   boolean isAsync();
 
+  /**
+   * Determines if when the teleport finishes, if the teleporting user should have their last
+   * location set to the teleport destination
+   */
   boolean isSetReturn();
 
+  /**
+   * Determines if this teleport instance is silent, meaning it will not send any messages
+   */
   boolean isSilent();
 
   Component getStartMessage();
@@ -52,11 +94,11 @@ public interface UserTeleport {
 
   Component getInterruptMessage();
 
-  UserTeleport setDelayed(boolean delayed);
-
   UserTeleport setAsync(boolean async);
 
   UserTeleport setSetReturn(boolean setReturn);
+
+  UserTeleport setDelay(Duration delay);
 
   UserTeleport setSilent(boolean silent);
 

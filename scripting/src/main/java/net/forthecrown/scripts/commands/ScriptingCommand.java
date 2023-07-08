@@ -49,7 +49,7 @@ public class ScriptingCommand {
   @VariableInitializer
   void initVars(Map<String, Object> vars) {
     vars.put("script_argument", ScriptArgument.SCRIPT);
-    vars.put("script_options", OPTIONS);
+    vars.put("run_options", OPTIONS);
   }
 
   void evaluate(CommandSource source, @Argument("js_code") String code)
@@ -61,7 +61,7 @@ public class ScriptingCommand {
 
   void runScript(
       CommandSource source,
-      @Argument("script") Source script,
+      @Argument("script_name") Source script,
       @Argument(value = "options", optional = true) ParsedOptions options
   ) throws CommandSyntaxException {
     options = Objects.requireNonNullElse(options, ParsedOptions.EMPTY);

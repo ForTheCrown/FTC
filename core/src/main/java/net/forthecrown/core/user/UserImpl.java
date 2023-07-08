@@ -5,6 +5,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import it.unimi.dsi.fastutil.longs.LongArrays;
 import it.unimi.dsi.fastutil.objects.ObjectArrays;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -17,6 +18,9 @@ import java.util.function.Supplier;
 import lombok.Getter;
 import lombok.Setter;
 import net.forthecrown.Loggers;
+import net.forthecrown.core.CoreConfig;
+import net.forthecrown.core.commands.tpa.TpMessages;
+import net.forthecrown.core.commands.tpa.TpPermissions;
 import net.forthecrown.core.user.UserLookupImpl.UserLookupEntry;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Grenadier;
@@ -95,6 +99,9 @@ public final class UserImpl implements User {
   private UserComponent[] components;
 
   private Player player;
+
+  @Getter
+  public UserTeleportImpl currentTeleport;
 
   public UserImpl(UserServiceImpl service, UUID uniqueId) {
     Objects.requireNonNull(uniqueId);
@@ -251,6 +258,13 @@ public final class UserImpl implements User {
     if (service.isAltAccount(uniqueId) && redirectAlts) {
       UserImpl main = (UserImpl) Users.get(service.getMainAccount(uniqueId));
       return main.getComponent(factory, true);
+    }
+
+    if (components == null) {
+      components = new UserComponent[id + 1];
+      T comp = factory.newComponent(this);
+      components[id] = comp;
+      return comp;
     }
 
     if (id >= components.length) {
@@ -568,7 +582,17 @@ public final class UserImpl implements User {
 
   @Override
   public boolean checkTeleporting() {
-    return false;
+    if (!canTeleport()) {
+      if (isTeleporting()) {
+        sendMessage(TpMessages.ALREADY_TELEPORTING);
+        return false;
+      }
+
+      sendMessage(TpMessages.canTeleportIn(getTime(TimeField.NEXT_TELEPORT)));
+      return false;
+    }
+
+    return true;
   }
 
   @Override
@@ -576,17 +600,52 @@ public final class UserImpl implements User {
       throws UserOfflineException
   {
     ensureValid();
-    return null;
+
+    if (currentTeleport != null) {
+      currentTeleport.stop();
+      currentTeleport = null;
+    }
+
+    currentTeleport = new UserTeleportImpl(this, destination, type);
+    currentTeleport.setDelay(getInitialTeleportDelay());
+
+    return currentTeleport;
+  }
+
+  private Duration getInitialTeleportDelay() {
+    var perm = TpPermissions.TP_DELAY;
+
+    if (perm.hasUnlimited(this)) {
+      return null;
+    }
+
+    int seconds = perm.getTier(this).orElse(perm.getMaxTier());
+    return Duration.ofSeconds(seconds);
+  }
+
+  public void onTpComplete() {
+    if (currentTeleport.isDelayed()) {
+      CoreConfig config = service.getConfig();
+      long cooldownMillis = config.getTpCooldown().toMillis();
+      setTime(TimeField.NEXT_TELEPORT, System.currentTimeMillis() + cooldownMillis);
+    }
+
+    currentTeleport.stop();
+    currentTeleport = null;
   }
 
   @Override
   public boolean isTeleporting() {
-    return false;
+    return currentTeleport != null;
   }
 
   @Override
   public boolean canTeleport() {
-    return false;
+    if (isTeleporting()) {
+      return false;
+    }
+
+    return Time.isPast(getTime(TimeField.NEXT_TELEPORT));
   }
 
   @Override

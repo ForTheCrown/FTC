@@ -2,5 +2,12 @@
 # Plugin data autosave interval
 autosaveInterval = "30m"
 
+# Cooldown that's started after a player teleports
+# before they can teleport again
+tpCooldown = "3s"
+
+# Time it takes for a TPA request to expire
+tpaExpireTime = "3m"
+
 # Worlds people cannot set their homes to or
 illegalWorlds = [ "world_void", "world_test" ]

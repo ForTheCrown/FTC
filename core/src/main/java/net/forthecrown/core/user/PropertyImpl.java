@@ -35,13 +35,13 @@ public class PropertyImpl<T> implements UserProperty<T> {
   }
 
   @Override
-  public JsonElement serialize(T value) {
+  public @NotNull JsonElement serialize(@NotNull T value) {
     var result = codec.encodeStart(JsonOps.INSTANCE, value);
     return result.getOrThrow(false, s -> {});
   }
 
   @Override
-  public T deserialize(JsonElement element) {
+  public @NotNull T deserialize(@NotNull JsonElement element) {
     var result = codec.decode(JsonOps.INSTANCE, element);
     return result.getOrThrow(false, s -> {}).getFirst();
   }
@@ -74,6 +74,9 @@ public class PropertyImpl<T> implements UserProperty<T> {
 
     @Override
     public UserProperty<T> build() {
+      Objects.requireNonNull(key, "No key set");
+      Objects.requireNonNull(defaultValue, "No default value set");
+
       PropertyImpl<T> property = new PropertyImpl<>(defaultValue, callback, codec);
       Registry<UserProperty<?>> registry = Users.getService().getUserProperties();
       registry.register(key, property);

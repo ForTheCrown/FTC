@@ -85,6 +85,10 @@ public class ComponentFormat implements ComponentLike {
     String name = result.group(2);
     String style = result.group(3);
 
+    if (style == null) {
+      style = "";
+    }
+
     TextFormatType type;
 
     if (Strings.isNullOrEmpty(name)) {
