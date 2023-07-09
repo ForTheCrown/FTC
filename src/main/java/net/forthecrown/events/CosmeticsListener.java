@@ -9,7 +9,7 @@ import net.forthecrown.user.Users;
 import net.forthecrown.user.data.CosmeticData;
 import net.forthecrown.utils.Tasks;
 import org.bukkit.Location;
-import org.bukkit.entity.Arrow;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
@@ -57,7 +57,7 @@ public class CosmeticsListener implements Listener {
 
     Tasks.runTimer(
         new ArrowScheduler(
-            (Arrow) event.getProjectile(),
+            (AbstractArrow) event.getProjectile(),
             user.getPlayer(),
             data.get(Cosmetics.ARROWS)
         ),
@@ -67,10 +67,14 @@ public class CosmeticsListener implements Listener {
 
   public static class ArrowScheduler implements Consumer<BukkitTask> {
 
-    private final Arrow arrow;
+    private final AbstractArrow arrow;
     private final ParticleBuilder builder;
 
-    public ArrowScheduler(Arrow arrow, Player player, ArrowEffect effect) {
+    public ArrowScheduler(
+        AbstractArrow arrow,
+        Player player,
+        ArrowEffect effect
+    ) {
       this.arrow = arrow;
 
       builder = new ParticleBuilder(effect.getParticle())
