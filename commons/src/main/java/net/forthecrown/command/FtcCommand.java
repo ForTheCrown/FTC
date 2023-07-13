@@ -4,6 +4,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.Getter;
 import net.forthecrown.Permissions;
+import net.forthecrown.command.help.FtcHelpList;
 import net.forthecrown.command.help.UsageFactory;
 import net.forthecrown.grenadier.AbstractCommand;
 import net.forthecrown.grenadier.CommandSource;
@@ -20,10 +21,13 @@ public abstract class FtcCommand extends AbstractCommand {
   public FtcCommand(String name) {
     super(name);
 
-    String perm = Commands.DEFAULT_PERMISSION_FORMAT.replace("{command}", name);
+    String perm = Commands.getDefaultPermission(name);
 
     setPermission(Permissions.register(perm));
     setDescription(DEFAULT_DESCRIPTION);
+
+    FtcHelpList helpList = FtcHelpList.helpList();
+    helpList.addCommand(this);
   }
 
   public String getHelpListName() {

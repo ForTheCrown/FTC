@@ -26,23 +26,6 @@ public final class SerializationHelper {
   public static final IoReader<JsonObject>
       JSON_READER = JsonUtils::readFileObject;
 
-  public static void ensureParentExists(Path file) throws IOException {
-    if (Files.exists(file)) {
-      return;
-    }
-
-    var parent = file.getParent();
-
-    // File exists in top level directory with no parent folder
-    if (parent != null) {
-      if (Files.exists(parent) && !Files.isDirectory(parent)) {
-        Files.delete(parent);
-      }
-
-      Files.createDirectories(parent);
-    }
-  }
-
   public static <T> DataResult<T> readFileObject(Path file, IoReader<T> reader) {
     if (!Files.exists(file)) {
       return Results.error("File '%s' doesn't exist", file);
@@ -135,7 +118,7 @@ public final class SerializationHelper {
 
   public static boolean writeFile(Path file, IoWriter writer) {
     try {
-      ensureParentExists(file);
+      PathUtil.ensureParentExists(file);
       writer.apply(file);
       return true;
     } catch (IOException e) {

@@ -29,6 +29,11 @@ public final class Properties {
       .key("tpa")
       .build();
 
+  public static final UserProperty<Boolean> PROFILE_PRIVATE = booleanProperty()
+      .defaultValue(false)
+      .key("profilePrivate")
+      .build();
+
   public static UserProperty<Component> PREFIX = textProperty()
       .key("prefix")
       .callback((user, value, oldValue) -> user.updateTabName())

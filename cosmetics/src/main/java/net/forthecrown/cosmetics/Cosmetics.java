@@ -1,6 +1,7 @@
 package net.forthecrown.cosmetics;
 
 import net.forthecrown.cosmetics.emotes.Emotes;
+import net.forthecrown.cosmetics.menu.CosmeticMenus;
 import net.forthecrown.cosmetics.travel.TravelEffect;
 import net.forthecrown.cosmetics.travel.TravelEffects;
 import net.forthecrown.registry.Holder;
@@ -39,11 +40,13 @@ public final class Cosmetics {
       @Override
       public void onRegister(Holder<CosmeticType> value) {
         value.getValue().id = value.getId();
+        value.getValue().name = value.getKey();
       }
 
       @Override
       public void onUnregister(Holder<CosmeticType> value) {
         value.getValue().id = -1;
+        value.getValue().name = null;
       }
     });
   }
@@ -62,6 +65,8 @@ public final class Cosmetics {
     TravelEffects.registerAll(TRAVEL_EFFECTS.getCosmetics());
     Emotes.registerAll(Emotes.TYPE.getCosmetics());
     LoginEffects.registerAll(LoginEffects.TYPE.getCosmetics());
+
+    CosmeticMenus.createMenus();
   }
 
   public static Material getCosmeticMaterial(boolean owned) {

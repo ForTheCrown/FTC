@@ -7,13 +7,14 @@ import java.text.SimpleDateFormat;
 import java.time.chrono.ChronoZonedDateTime;
 import java.util.Date;
 import net.forthecrown.text.Text;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
 class DateFormatType implements TextFormatType {
 
   @Override
-  public @NotNull Component resolveArgument(@NotNull Object value, @NotNull String style) {
+  public @NotNull Component resolve(Object value, String style, Audience audience) {
     if (value instanceof Number number) {
       long timeStamp = number.longValue();
       return format(timeStamp, style);

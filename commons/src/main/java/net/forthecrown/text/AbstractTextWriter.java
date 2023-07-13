@@ -5,9 +5,12 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 import lombok.Getter;
 import lombok.Setter;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.format.Style;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A Chat Writer is a common interface for writing multi-line components, blocks of texts, formatted
@@ -63,20 +66,34 @@ public abstract class AbstractTextWriter implements ComponentLike, TextWriter {
   @Setter
   protected Component fieldSeparator = DEF_FIELD_SEPARATOR;
 
+  protected Audience viewer;
+
   /**
    * Empty constructor
    */
   public AbstractTextWriter() {
   }
 
-  /**
-   * Copy constructor
-   */
-  public AbstractTextWriter(AbstractTextWriter other) {
+  public void copyStyle(TextWriter other) {
     this.fieldSeparator = other.getFieldSeparator();
     this.fieldStyle = other.getFieldStyle();
     this.lineEmpty = other.isLineEmpty();
     this.fieldValueStyle = other.getFieldValueStyle();
+  }
+
+  @Override
+  public @Nullable Audience viewer() {
+    return viewer;
+  }
+
+  @Override
+  public void viewer(@Nullable Audience audience) {
+    this.viewer = audience;
+  }
+
+  @Override
+  public @NotNull Component asComponent() {
+    return null;
   }
 
   protected abstract void onNewLine();

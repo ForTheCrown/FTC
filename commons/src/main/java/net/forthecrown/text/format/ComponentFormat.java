@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.Loggers;
 import net.forthecrown.text.Text;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.TextReplacementConfig;
@@ -38,8 +39,7 @@ public class ComponentFormat implements ComponentLike {
 
   private final Component format;
   private final Object[] args;
-
-  private Component formattedResult;
+  private final Audience audience;
 
   /* ----------------------------- METHODS ------------------------------ */
 
@@ -54,13 +54,9 @@ public class ComponentFormat implements ComponentLike {
    */
   @Override
   public @NotNull Component asComponent() throws IllegalStateException {
-    if (formattedResult != null) {
-      return formattedResult;
-    }
-
     // Create a replacement config and then
     // apply it to the given base format
-    return formattedResult = format.replaceText(
+    return format.replaceText(
         TextReplacementConfig.builder()
             .match(REPLACE_PATTERN)
 
@@ -110,6 +106,6 @@ public class ComponentFormat implements ComponentLike {
     }
 
     Object value = args[index];
-    return type.resolveArgument(value, style);
+    return type.resolve(value, style, audience);
   }
 }

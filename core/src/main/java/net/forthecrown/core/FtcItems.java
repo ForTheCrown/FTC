@@ -1,4 +1,4 @@
-package net.forthecrown.inventory;
+package net.forthecrown.core;
 
 import static net.forthecrown.text.Text.nonItalic;
 import static net.kyori.adventure.text.Component.text;

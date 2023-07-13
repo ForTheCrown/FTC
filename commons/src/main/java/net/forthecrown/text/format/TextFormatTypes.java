@@ -2,6 +2,7 @@ package net.forthecrown.text.format;
 
 import static net.forthecrown.text.UnitFormat.UNIT_GEM;
 import static net.forthecrown.text.UnitFormat.UNIT_RHINE;
+import static net.kyori.adventure.text.Component.blockNBT;
 import static net.kyori.adventure.text.Component.text;
 
 import java.time.Duration;
@@ -18,12 +19,13 @@ import net.forthecrown.user.NameRenderFlags;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.Time;
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
 
 public class TextFormatTypes {
 
-  public static final TextFormatType DEFAULT = (value, style) -> Text.valueOf(value);
+  public static final TextFormatType DEFAULT = (value, style, viewer) -> Text.valueOf(value);
 
   /**
    * Formats the given <code>arg</code> input into a rhines message.
@@ -76,7 +78,7 @@ public class TextFormatTypes {
    * <p>
    * If the arg is null, then {@link Text#valueOf(Object)} is returned instead
    */
-  public static final TextFormatType CLASS = (value, style) -> {
+  public static final TextFormatType CLASS = (value, style, audience) -> {
     if (value == null) {
       return Text.valueOf(null);
     }
@@ -119,7 +121,7 @@ public class TextFormatTypes {
    * If the given argument is not a number or is null, {@link Text#valueOf(Object)} is returned
    * instead.
    */
-  public static final TextFormatType TIME = (value, style) -> {
+  public static final TextFormatType TIME = (value, style, audience) -> {
     long time;
 
     if (value instanceof Duration duration) {
@@ -172,7 +174,7 @@ public class TextFormatTypes {
    * If the given argument is invalid or null, it calls {@link Text#valueOf(Object)} for the given
    * argument
    */
-  public static TextFormatType USER = (value, style) -> {
+  public static TextFormatType USER = (value, style, audience) -> {
     boolean nickname = style.isBlank() || !style.contains("-realName");
     User user;
 
@@ -198,7 +200,7 @@ public class TextFormatTypes {
       flags.add(NameRenderFlags.ALLOW_NICKNAME);
     }
 
-    return user.displayName(null, flags);
+    return user.displayName(audience, flags);
   };
 
   /**
@@ -218,7 +220,7 @@ public class TextFormatTypes {
    * If the item is not an {@link ItemStack} or is null, this will call
    * {@link Text#valueOf(Object)}
    */
-  public static TextFormatType ITEM = (value, style) -> {
+  public static TextFormatType ITEM = (value, style, audience) -> {
     // Make sure we're given an item stack
     // If not, just return a default value
     if (!(value instanceof ItemStack item)) {
@@ -231,6 +233,26 @@ public class TextFormatTypes {
     return withAmount ? Text.itemAndAmount(item) : Text.itemDisplayName(item);
   };
 
+  /**
+   * Formats a <code>arg</code> to be a pretty location message.
+   * <p>
+   * Style: <pre>
+   * - If the style is empty, the returned format will
+   *   not show the location's world, and will not have
+   *   a '/tp_exact' click event.
+   *
+   * - The '-w' or '-world' argument tells the formatter
+   *   to show the location's world.
+   * - The '-c' or '-clickable' tells the formatter to
+   *   add a click event to the result.
+   * </pre>
+   * <p>
+   * If the given argument is not a {@link Location} or
+   * {@link net.forthecrown.utils.math.WorldVec3i} object, or is null, then
+   * {@link Text#valueOf(Object)} is returned
+   */
+  public static final TextFormatType LOCATION = new LocationFormatType();
+
   public static final String DEFAULT_NAME = "default";
   public static final Registry<TextFormatType> formatTypes;
 
@@ -239,13 +261,14 @@ public class TextFormatTypes {
 
     formatTypes.register(DEFAULT_NAME, DEFAULT);
 
-    formatTypes.register("rhines",  RHINES);
-    formatTypes.register("gems",    GEMS);
-    formatTypes.register("date",    DATE);
-    formatTypes.register("class",   CLASS);
-    formatTypes.register("time",    TIME);
-    formatTypes.register("user",    USER);
-    formatTypes.register("item",    ITEM);
+    formatTypes.register("location",  LOCATION);
+    formatTypes.register("rhines",    RHINES);
+    formatTypes.register("gems",      GEMS);
+    formatTypes.register("date",      DATE);
+    formatTypes.register("class",     CLASS);
+    formatTypes.register("time",      TIME);
+    formatTypes.register("user",      USER);
+    formatTypes.register("item",      ITEM);
   }
 
   static TextFormatType unitFormatter(String unit) {

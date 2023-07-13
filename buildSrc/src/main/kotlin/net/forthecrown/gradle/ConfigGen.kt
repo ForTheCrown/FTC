@@ -88,22 +88,19 @@ internal fun createPluginYml(it: Task) {
 }
 
 fun shouldSkipDependency(name: String, project: Project): Boolean {
-  if (project.name == "commons" || project.name == "core") {
-    return true
-  }
-
   if (name.startsWith("project:")) {
     val projName = name.replace("project:", "")
 
-    if (projName == project.name) {
+    if (project.name == "core" && projName == "commons") {
+      return true
+    }
+
+    if (projName == project.name || projName == "class-loader-tools") {
       return true
     }
   }
 
-  return when (name) {
-    "project:class-loader-tools" -> true
-    else -> false
-  }
+  return false
 }
 
 fun formatDependencyName(project: Project, name: String): String {

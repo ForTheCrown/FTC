@@ -1,9 +1,8 @@
 package net.forthecrown.inventory.weapon.ability;
 
-import static net.forthecrown.inventory.weapon.SwordConfig.swordAnim_initialDistance;
-
 import io.papermc.paper.entity.LookAnchor;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import lombok.Getter;
@@ -11,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.forthecrown.Loggers;
 import net.forthecrown.Worlds;
-import net.forthecrown.inventory.weapon.SwordConfig;
+import net.forthecrown.inventory.ItemsPlugin;
 import net.forthecrown.text.PeriodFormat;
 import net.forthecrown.text.Text;
 import net.forthecrown.user.User;
@@ -71,9 +70,9 @@ public class AbilityAnimation {
     animation.setLocation(location.clone());
     animation.itemTaken = false;
 
-    var points = TravelUtil.getCirclePoints(
+    List<Vector3d> points = TravelUtil.getCirclePoints(
         PARTICLE_Y_OFFSET,
-        swordAnim_initialDistance,
+        ItemsPlugin.config().swordAnim_initialDistance,
         CIRCLE_POINTS
     );
 
@@ -111,7 +110,6 @@ public class AbilityAnimation {
     });
   }
 
-  @OnDisable
   public void onDisable() {
     if (ongoing == null || ongoing.itemTaken) {
       return;
@@ -180,7 +178,7 @@ public class AbilityAnimation {
         return;
       }
 
-      var dump = SwordConfig.swordPostAnimDump;
+      var dump = ItemsPlugin.config().swordPostAnimDump;
 
       if (dump == null) {
         LOGGER.error(
@@ -271,6 +269,7 @@ public class AbilityAnimation {
 
   @RequiredArgsConstructor
   public enum Phase {
+
     STARTING (10) {
       @Override
       public void onTick(Animation animation) {
@@ -332,10 +331,10 @@ public class AbilityAnimation {
         entity.cancelVanilla(true);
         entity.setSilent(false);
 
-        var action = new ActionScript(SwordConfig.swordAnim_claimScript);
+        var action = new ActionScript(ItemsPlugin.config().swordAnim_claimScript);
         entity.getActions().add(action);
 
-        var check = new TestScript(SwordConfig.swordAnim_claimTest);
+        var check = new TestScript(ItemsPlugin.config().swordAnim_claimTest);
         entity.getChecks().add(check);
 
         entity.save(holder.getPersistentDataContainer());

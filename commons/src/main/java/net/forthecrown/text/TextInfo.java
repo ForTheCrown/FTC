@@ -1,6 +1,9 @@
 package net.forthecrown.text;
 
 import javax.annotation.Nonnegative;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.map.MinecraftFont;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,6 +31,11 @@ public final class TextInfo {
 
   public static int getPxWidth(String s) {
     return s.chars().reduce(0, (val, c) -> val + getCharPxWidth((char) c) + 1);
+  }
+
+  public static int length(Component c) {
+    String s = Text.plain(c);
+    return getPxWidth(s);
   }
 
   public static @NotNull String getFiller(@Nonnegative int pixels) {

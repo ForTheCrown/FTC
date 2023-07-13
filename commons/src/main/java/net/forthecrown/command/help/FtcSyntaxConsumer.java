@@ -1,5 +1,7 @@
 package net.forthecrown.command.help;
 
+import static net.forthecrown.command.help.AbstractHelpEntry.packageNameToCategory;
+
 import com.google.common.base.Joiner;
 import java.util.function.Predicate;
 import net.forthecrown.Loggers;
@@ -18,7 +20,7 @@ public class FtcSyntaxConsumer implements SyntaxConsumer {
 
   @Override
   public void accept(GrenadierCommandNode node,
-                     Object commandObject,
+                     Object command,
                      String argument,
                      Component info,
                      @Nullable Predicate<CommandSource> condition
@@ -63,9 +65,7 @@ public class FtcSyntaxConsumer implements SyntaxConsumer {
 
     String[] args = argument.split("\\s+");
     entry.setLabel(args[0]);
-    String category = commandObject.getClass().getPackageName()
-        .replace("net.forthecrown.commands.", "")
-        .replace("net.forthecrown.commands", "");
+    String category = packageNameToCategory(command.getClass().getPackageName());
 
     entry.setCategory(category);
 

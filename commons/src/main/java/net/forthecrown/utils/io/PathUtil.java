@@ -10,6 +10,8 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 import java.util.UUID;
@@ -20,6 +22,7 @@ import java.util.zip.ZipOutputStream;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.Loggers;
 import net.forthecrown.utils.PluginUtil;
+import org.apache.commons.io.file.PathUtils;
 import org.bukkit.plugin.Plugin;
 
 public final class PathUtil {
@@ -51,10 +54,12 @@ public final class PathUtil {
    */
   public static Path pluginPath(String first, String... others) {
     Plugin caller = PluginUtil.getCallingPlugin();
+    return pluginPath(caller, first, others);
+  }
 
+  public static Path pluginPath(Plugin plugin, String first, String... others) {
     Path path = Path.of(first, others);
-    Path directory = caller.getDataFolder().toPath();
-
+    Path directory = plugin.getDataFolder().toPath();
     return directory.resolve(path);
   }
 
@@ -237,11 +242,7 @@ public final class PathUtil {
    * @throws IOException If an IO error occurs
    */
   public static void archive(Path source, Path dest) throws IOException {
-    var parent = dest.getParent();
-
-    if (!Files.exists(parent)) {
-      Files.createDirectories(parent);
-    }
+    ensureParentExists(dest);
 
     try (var stream = new ZipOutputStream(Files.newOutputStream(dest))) {
       try (var pStream = Files.walk(source)) {
@@ -261,6 +262,36 @@ public final class PathUtil {
               }
             });
       }
+    }
+  }
+
+  public static void move(Path source, Path destination) throws IOException {
+    if (!Files.exists(source)) {
+      return;
+    }
+
+    safeDelete(destination);
+    copyFiles(source, destination);
+    safeDelete(source);
+  }
+
+  public static void copy(Path source, Path destination) throws IOException {
+    if (!Files.exists(source)) {
+      return;
+    }
+
+    safeDelete(destination);
+    copyFiles(source, destination);
+  }
+
+  private static void copyFiles(Path source, Path destination) throws IOException {
+    ensureParentExists(destination);
+
+    if (Files.isDirectory(source)) {
+      ensureDirectoryExists(destination);
+      PathUtils.copyDirectory(source, destination);
+    } else {
+      Files.copy(source, destination);
     }
   }
 
@@ -309,6 +340,23 @@ public final class PathUtil {
     }
 
     return DataResult.success(arr[0]);
+  }
+
+  public static void ensureParentExists(Path file) throws IOException {
+    if (Files.exists(file)) {
+      return;
+    }
+
+    var parent = file.getParent();
+
+    // File exists in top level directory with no parent folder
+    if (parent != null) {
+      if (Files.exists(parent) && !Files.isDirectory(parent)) {
+        Files.delete(parent);
+      }
+
+      Files.createDirectories(parent);
+    }
   }
 
   /* ---------------------------- SUB CLASSES ----------------------------- */

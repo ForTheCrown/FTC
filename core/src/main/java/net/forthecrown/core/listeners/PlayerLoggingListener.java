@@ -45,7 +45,7 @@ class PlayerLoggingListener implements Listener {
     LookupEntry entry;
     boolean firstJoin;
 
-    if (player.hasPlayedBefore()) {
+    if (!player.hasPlayedBefore()) {
       entry = lookup.createEntry(id, name);
       firstJoin = true;
 
@@ -67,6 +67,7 @@ class PlayerLoggingListener implements Listener {
 
     UserImpl user = service.getUser(entry);
     user.setOnline(true);
+    user.setIp(player.getAddress().getHostName());
 
     String lastOnlineName = user.getLastOnlineName();
     boolean nameUpdated = updateOnlineName(user, name);
@@ -86,6 +87,11 @@ class PlayerLoggingListener implements Listener {
     }
 
     user.setTimeToNow(TimeField.LAST_LOGIN);
+
+    user.updateTabName();
+    user.updateFlying();
+    user.updateGodMode();
+    user.updateVanished();
 
     UserJoinEvent userEvent = new UserJoinEvent(user, lastOnlineName, firstJoin);
     userEvent.callEvent();

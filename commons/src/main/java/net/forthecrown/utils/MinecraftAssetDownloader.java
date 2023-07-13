@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.DataResult;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -14,8 +15,8 @@ import java.nio.file.Path;
 import java.util.Optional;
 import lombok.Getter;
 import net.forthecrown.Loggers;
+import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.utils.io.Results;
-import net.forthecrown.utils.io.SerializationHelper;
 import org.slf4j.Logger;
 
 /**
@@ -186,7 +187,7 @@ public class MinecraftAssetDownloader {
     URL url = new URL(stringUrl);
     Path destination = directory.resolve(name);
 
-    SerializationHelper.ensureParentExists(destination);
+    PathUtil.ensureParentExists(destination);
 
     try (var stream = url.openStream()) {
       var out = Files.newOutputStream(destination);
@@ -197,6 +198,9 @@ public class MinecraftAssetDownloader {
   }
 
   private JsonElement downloadJson(URL url) throws IOException {
-    return JsonParser.parseReader(new InputStreamReader(url.openStream()));
+    InputStreamReader reader = new InputStreamReader(url.openStream());
+    JsonElement element = JsonParser.parseReader(reader);
+    reader.close();
+    return element;
   }
 }

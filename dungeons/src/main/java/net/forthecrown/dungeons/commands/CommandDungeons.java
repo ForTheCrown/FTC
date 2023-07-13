@@ -17,7 +17,7 @@ import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.text.Text;
 import org.bukkit.entity.Player;
 
-@CommandData("file = commands/dungeons.gcn")
+@CommandData("file = 'commands/dungeons.gcn'")
 public class CommandDungeons {
 
   @VariableInitializer
@@ -28,7 +28,7 @@ public class CommandDungeons {
     variables.put("boss", argument);
   }
 
-  void giveApple(CommandSource source, @Argument("apple") BossItems apple)
+  void giveApple(CommandSource source, @Argument("boss_apple") BossItems apple)
       throws CommandSyntaxException
   {
     Player player = source.asPlayer();
@@ -67,5 +67,16 @@ public class CommandDungeons {
     }
 
     throw Exceptions.format("Boss {0} has already been summoned", boss.name());
+  }
+
+  void killBoss(CommandSource source, @Argument("boss") DungeonBoss boss)
+      throws CommandSyntaxException
+  {
+    if (boss.isAlive()) {
+      throw Exceptions.format("Boss '{0}' is alive", boss.name());
+    }
+
+    boss.kill(false);
+    source.sendSuccess(Text.format("Killing {0}", boss.name()));
   }
 }

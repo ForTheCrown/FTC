@@ -10,7 +10,7 @@ literal('giveapple') {
   }
 }
 
-argument('boss' @boss) {
+argument('boss', @boss) {
   map_result = result.getValue()
 
   literal('kill') {

@@ -31,4 +31,8 @@ tasks {
       exclude(dependency(rhinoDependency))
     }
   }
+
+  buildAndCopyToRoot {
+    dependsOn(shadowJar)
+  }
 }

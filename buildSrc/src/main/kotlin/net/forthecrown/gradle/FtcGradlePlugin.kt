@@ -5,6 +5,9 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.plugins.BasePluginExtension
 import org.gradle.api.plugins.JavaPluginExtension
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.StandardCopyOption
 
 const val API_VERSION = "1.20"
 const val NMS_DEPENDENCY = "io.papermc.paper:dev-bundle:${API_VERSION}-R0.1-SNAPSHOT"
@@ -14,14 +17,19 @@ const val GENERATE_CONFIG_DIR = "build/generated-sources/"
 const val GENERATED_CONFIG_PATH = "$GENERATE_CONFIG_DIR/paper-plugin.yml"
 
 const val CREATE_PLUGIN_YML = "createPluginYml"
+const val FTC_GROUP = "ForTheCrown"
 
 class FtcGradlePlugin: Plugin<Project> {
 
   override fun apply(target: Project) {
+    if (target == target.rootProject) {
+      return
+    }
+
     addGeneratedToSourceSet(target)
 
     val yml = FtcPaperYml(target.name, target.version.toString())
-    val ftcExtension = FtcExtension()
+    val ftcExtension = FtcExtension(target)
 
     yml.authors {
       add("JulieWoolie") // :3
@@ -32,17 +40,58 @@ class FtcGradlePlugin: Plugin<Project> {
       add("ftc", ftcExtension)
     }
 
-    target.afterEvaluate {
-      if (ftcExtension.useVanilla) {
-        val dependencies = it.dependencies
+    createPluginYmlTask(target, yml)
+    createRootBuildTask(target, yml)
+  }
 
-        val dep = dependencies.create(NMS_DEPENDENCY)
-        dependencies.add(NMS_CONFIG_NAME, dep)
+  private fun createRootBuildTask(target: Project, yml: FtcPaperYml) {
+    val task = target.task("buildAndCopyToRoot")
+    task.group = FTC_GROUP
+    task.description = "Builds the project, and then moves the jar file to the root build directory"
+
+    task.dependsOn("build")
+
+    task.doLast {
+      val proj = it.project;
+      val root = proj.rootProject;
+
+      val projLibs = proj.buildDir.toPath().resolve("libs")
+      val rootLibs = root.buildDir.toPath().resolve("libs")
+
+      val jarName = "${yml.name}-${proj.version}"
+
+      if (moveJar(projLibs, rootLibs, "$jarName-all.jar")) {
+        return@doLast
       }
+
+      moveJar(projLibs, rootLibs, "$jarName.jar")
+    }
+  }
+
+  private fun moveJar(sourceDir: Path, destDir: Path, fileName: String): Boolean {
+    val sourceFile = sourceDir.resolve(fileName)
+    val destFile = destDir.resolve(fileName)
+
+    if (!Files.exists(sourceFile)) {
+      return false
     }
 
+    if (!Files.exists(destDir)) {
+      Files.createDirectories(destDir)
+    }
+
+    Files.copy(
+        sourceFile,
+        destFile,
+        StandardCopyOption.COPY_ATTRIBUTES,
+        StandardCopyOption.REPLACE_EXISTING
+    )
+    return true
+  }
+
+  private fun createPluginYmlTask(target: Project, yml: FtcPaperYml) {
     val task = target.task(CREATE_PLUGIN_YML)
-    task.group = "ForTheCrown"
+    task.group = FTC_GROUP
     task.description = "Creates a paper-plugin.yml"
 
     task.doFirst {

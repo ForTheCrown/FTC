@@ -1,6 +1,7 @@
 package net.forthecrown.core.user;
 
 import com.google.common.base.Strings;
+import it.unimi.dsi.fastutil.objects.ObjectBooleanPair;
 import net.forthecrown.registry.Holder;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;
@@ -28,7 +29,7 @@ public final class Components {
   }
 
   public static <T extends UserComponent> ComponentFactory<T> getFactory(Class<T> type) {
-    String name = findComponentName(type, true);
+    String name = findComponentName(type, true).left();
     ComponentFactory<T> factory = null;
 
     if (name != null) {
@@ -59,23 +60,25 @@ public final class Components {
   }
 
   public static <T extends UserComponent> ComponentFactory<T> createFactory(Class<T> type) {
-    String name = findComponentName(type, false);
-    ComponentFactory<T> factory = new ComponentFactory<>(type);
+    ObjectBooleanPair<String> metadataPair = findComponentName(type, false);
 
-    REGISTRY.register(name, factory);
+    ComponentFactory<T> factory = new ComponentFactory<>(type);
+    factory.setRedirectAlts(metadataPair.rightBoolean());
+
+    REGISTRY.register(metadataPair.left(), factory);
     return factory;
   }
 
-  public static String findComponentName(Class<?> type, boolean allowNull) {
+  public static ObjectBooleanPair<String> findComponentName(Class<?> type, boolean allowNull) {
     ComponentName name = type.getAnnotation(ComponentName.class);
-    String result = "";
 
     if (name != null) {
-      result = name.value();
+      String nameValue = name.value();
+      boolean redirectAlts = name.redirectAlts();
 
-      if (Strings.isNullOrEmpty(result)) {
+      if (Strings.isNullOrEmpty(nameValue)) {
         if (allowNull) {
-          return null;
+          return ObjectBooleanPair.of(null, false);
         }
 
         throw new IllegalStateException(
@@ -83,13 +86,16 @@ public final class Components {
         );
       }
 
-      return result;
+      return ObjectBooleanPair.of(nameValue, redirectAlts);
     }
 
-    result = type.getSimpleName().replace("User", "");
+    String result = type.getSimpleName().replace("User", "");
     char first = result.charAt(0);
 
-    return Character.toLowerCase(first) + result.substring(1);
+    return ObjectBooleanPair.of(
+        Character.toLowerCase(first) + result.substring(1),
+        true
+    );
   }
 
   @SuppressWarnings({"rawtypes", "unchecked"})

@@ -1,10 +1,10 @@
 package net.forthecrown.cosmetics;
 
+import net.forthecrown.cosmetics.commands.CommandCosmetics;
 import net.forthecrown.cosmetics.listeners.ArrowListener;
 import net.forthecrown.cosmetics.listeners.DeathListener;
 import net.forthecrown.cosmetics.listeners.DemotionListener;
 import net.forthecrown.cosmetics.listeners.PlayerJoinLeaveListener;
-import net.forthecrown.cosmetics.menu.CosmeticMenus;
 import net.forthecrown.events.Events;
 import net.forthecrown.user.UserService;
 import net.forthecrown.user.Users;
@@ -21,9 +21,9 @@ public class CosmeticsPlugin extends JavaPlugin {
     service.registerComponent(CosmeticData.class);
 
     Cosmetics.init();
-    CosmeticMenus.createMenus();
-
     registerListeners();
+
+    new CommandCosmetics();
   }
 
   void registerListeners() {

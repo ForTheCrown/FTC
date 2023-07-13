@@ -1,6 +1,5 @@
 package net.forthecrown.inventory.weapon.goals;
 
-import net.forthecrown.core.config.GeneralConfig;
 import net.kyori.adventure.text.Component;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +31,7 @@ public interface WeaponGoal {
    * @return The amount to increase
    */
   default int getIncrementAmount(EntityDamageByEntityEvent event) {
-    return GeneralConfig.swordGoalGainPerKill;
+    return 1;
   }
 
   /**

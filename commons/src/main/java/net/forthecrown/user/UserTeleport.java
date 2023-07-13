@@ -2,6 +2,7 @@ package net.forthecrown.user;
 
 import java.time.Duration;
 import java.util.function.Supplier;
+import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
@@ -98,7 +99,7 @@ public interface UserTeleport {
 
   UserTeleport setSetReturn(boolean setReturn);
 
-  UserTeleport setDelay(Duration delay);
+  UserTeleport setDelay(@Nullable Duration delay);
 
   UserTeleport setSilent(boolean silent);
 

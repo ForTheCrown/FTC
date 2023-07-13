@@ -8,6 +8,8 @@ repositories {
 
 dependencies {
   compileOnly(project(":commons"))
+  compileOnly(project(":user-titles"))
+
   api("com.discordsrv:discordsrv:1.26.0")
   compileOnly("org.apache.logging.log4j:log4j-core:2.19.0")
 }
@@ -18,5 +20,6 @@ pluginYml {
 
   depends {
     required("DiscordSRV")
+    optional("project:user-titles")
   }
 }

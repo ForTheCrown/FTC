@@ -3,6 +3,9 @@ package net.forthecrown.discord;
 import static net.forthecrown.discord.DiscordAppender.APPENDER_NAME;
 
 import lombok.Getter;
+import net.forthecrown.discord.commands.AppenderCommand;
+import net.forthecrown.discord.listener.ServerLoadListener;
+import net.forthecrown.events.Events;
 import net.forthecrown.utils.TomlConfigs;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.LoggerContext;
@@ -12,17 +15,19 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class DiscordPlugin extends JavaPlugin {
 
   @Getter
-  private Config config = new Config();
+  private Config pluginConfig = new Config();
 
   @Override
   public void onEnable() {
     reloadConfig();
+
     new AppenderCommand();
+    Events.register(new ServerLoadListener());
   }
 
   @Override
   public void reloadConfig() {
-    config = TomlConfigs.loadPluginConfig(this, Config.class);
+    pluginConfig = TomlConfigs.loadPluginConfig(this, Config.class);
     updateLoggers();
   }
 
@@ -46,7 +51,7 @@ public class DiscordPlugin extends JavaPlugin {
   }
 
   Level getAppenderLevel() {
-    String name = config.getForwarderLevel();
+    String name = pluginConfig.getForwarderLevel();
     return Level.toLevel(name, Level.ERROR);
   }
 }

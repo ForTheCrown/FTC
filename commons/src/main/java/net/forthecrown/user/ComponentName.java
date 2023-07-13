@@ -11,5 +11,5 @@ public @interface ComponentName {
 
   String value() default "";
 
-  boolean redirectAlts() default false;
+  boolean redirectAlts() default true;
 }

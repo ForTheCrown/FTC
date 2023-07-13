@@ -9,7 +9,7 @@ import net.forthecrown.grenadier.annotations.CommandData;
 import net.forthecrown.text.Text;
 import org.bukkit.Location;
 
-@CommandData("file = commands/punching_bag.gcn")
+@CommandData("file = 'commands/punching_bag.gcn'")
 public class CommandPunchingBag {
 
   void createDummy(

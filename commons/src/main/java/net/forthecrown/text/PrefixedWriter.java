@@ -1,9 +1,12 @@
 package net.forthecrown.text;
 
 import lombok.Getter;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.format.Style;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @Getter
 public class PrefixedWriter implements TextWriter {
@@ -83,5 +86,20 @@ public class PrefixedWriter implements TextWriter {
   @Override
   public PrefixedWriter withPrefix(ComponentLike prefix) {
     return new PrefixedWriter(base, Component.textOfChildren(this.prefix, prefix));
+  }
+
+  @Override
+  public @Nullable Audience viewer() {
+    return base.viewer();
+  }
+
+  @Override
+  public void viewer(@Nullable Audience audience) {
+    base.viewer(audience);
+  }
+
+  @Override
+  public @NotNull Component asComponent() {
+    return base.asComponent();
   }
 }

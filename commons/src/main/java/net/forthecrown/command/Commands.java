@@ -12,10 +12,14 @@ import net.forthecrown.grenadier.annotations.AnnotatedCommandContext.DefaultExec
 import net.forthecrown.grenadier.annotations.CommandDataLoader;
 import net.forthecrown.grenadier.annotations.TypeRegistry;
 import net.forthecrown.text.page.PageEntryIterator;
+import net.forthecrown.utils.PluginUtil;
+import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.inventory.ItemStacks;
+import net.minecraft.server.commands.FunctionCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 
 public final class Commands {
   private Commands() {}
@@ -55,6 +59,10 @@ public final class Commands {
     registry.register("f_entities",   () -> new ExpandedEntityArgument(true, false));
 
     return registry;
+  }
+
+  public static String getDefaultPermission(String commandName) {
+    return DEFAULT_PERMISSION_FORMAT.replace("{command}", commandName);
   }
 
   public static void ensureIndexValid(int index, int size) throws CommandSyntaxException {
@@ -132,6 +140,15 @@ public final class Commands {
    * @param args Arguments to format
    */
   public static void executeConsole(String format, Object... args) {
-    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), String.format(format, args));
+    String formattedCmd = String.format(format, args);
+
+    if (Bukkit.isPrimaryThread()) {
+      Bukkit.dispatchCommand(Bukkit.getConsoleSender(), formattedCmd);
+    } else {
+      Plugin plugin = PluginUtil.getCallingPlugin();
+      Bukkit.getScheduler().runTask(plugin, () -> {
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), formattedCmd);
+      });
+    }
   }
 }

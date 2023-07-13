@@ -26,6 +26,7 @@ public class UserDataStorage {
   private static final Logger LOGGER = Loggers.getLogger();
 
   public static final String KEY_LAST_NAME = "lastOnlineName";
+  public static final String KEY_NAME = "name";
   public static final String KEY_PREVIOUS_NAMES = "previousNames";
   public static final String KEY_IP = "ip";
   public static final String KEY_LAST_LOC = "lastLocation";
@@ -34,6 +35,8 @@ public class UserDataStorage {
 
   private final Path directory;
   private final Path userDirectory;
+
+  private final Path alts;
 
   private final Path balances;
   private final Path gems;
@@ -44,12 +47,14 @@ public class UserDataStorage {
 
   public UserDataStorage(Path dir) {
     this.directory = dir;
-    this.userDirectory = directory.resolve("data");
+    this.userDirectory = directory.resolve("userdata");
+
+    this.alts     = directory.resolve("alts.json");
 
     this.balances = directory.resolve("balances.json");
-    this.gems = directory.resolve("gems.json");
+    this.gems     = directory.resolve("gems.json");
     this.playtime = directory.resolve("playtime.json");
-    this.votes = directory.resolve("votes.json");
+    this.votes    = directory.resolve("votes.json");
 
     this.userLookup = directory.resolve("profiles.json");
   }
@@ -148,6 +153,14 @@ public class UserDataStorage {
     return entry;
   }
 
+  public void loadAlts(AltUsers users) {
+    SerializationHelper.readJsonFile(alts, users::load);
+  }
+
+  public void saveAlts(AltUsers users) {
+    SerializationHelper.writeJsonFile(alts, users::save);
+  }
+
   public void saveUser(UserImpl user) {
     user.setTimeToNow(TimeField.LAST_LOADED);
 
@@ -196,7 +209,7 @@ public class UserDataStorage {
   }
 
   private void saveUserInternal(UserImpl user, JsonWrapper json) {
-    json.add("name", user.getName());
+    json.add(KEY_NAME, user.getName());
     json.add(KEY_LAST_NAME, user.getLastOnlineName());
 
     if (!user.getPreviousNames().isEmpty()) {
@@ -240,7 +253,9 @@ public class UserDataStorage {
       timeStamps.addTimeStamp(field.getKey(), timestamp);
     }
 
-    json.add(KEY_TIMESTAMPS, timeStamps);
+    if (!timeStamps.isEmpty()) {
+      json.add(KEY_TIMESTAMPS, timeStamps);
+    }
   }
 
   private void loadTimeFields(JsonWrapper json, UserImpl user) {
@@ -278,6 +293,10 @@ public class UserDataStorage {
   private void saveComponent(JsonWrapper json, UserComponent component) {
     var element = component.serialize();
 
+    if (component instanceof UnknownComponent unknown) {
+      json.add(unknown.getKey(), element);
+    }
+
     if (element == null
         || (element instanceof JsonArray arr && arr.isEmpty())
         || (element instanceof JsonObject obj && obj.size() <= 0)
@@ -300,6 +319,7 @@ public class UserDataStorage {
     json.remove(KEY_LOCATION);
     json.remove(KEY_LAST_LOC);
     json.remove(KEY_TIMESTAMPS);
+    json.remove(KEY_NAME);
 
     JsonWrapper componentsJson = json;
 
@@ -320,6 +340,10 @@ public class UserDataStorage {
 
       UserComponent component = user.getComponent(factory, false);
       component.deserialize(element);
+
+      if (component instanceof UnknownComponent unknown) {
+        unknown.setKey(id);
+      }
     }
   }
 

@@ -10,7 +10,6 @@ import net.forthecrown.Loggers;
 import net.forthecrown.inventory.ExtendedItems;
 import net.forthecrown.inventory.ItemsPlugin;
 import net.forthecrown.inventory.weapon.RoyalSword;
-import net.forthecrown.inventory.weapon.SwordConfig;
 import net.forthecrown.inventory.weapon.ability.SwordAbilityManager;
 import net.forthecrown.inventory.weapon.ability.WeaponAbility;
 import net.forthecrown.text.Text;
@@ -52,9 +51,8 @@ public class WeaponListener implements Listener {
       return;
     }
 
-    if (SwordConfig.allowNonOwnerSwords
-        || sword.getOwner().equals(damager.getUniqueId())
-    ) {
+    var config = ItemsPlugin.config();
+    if (config.allowNonOwnerSwords || sword.getOwner().equals(damager.getUniqueId())) {
       sword.damage(damager, event, item);
     }
 

@@ -257,4 +257,8 @@ public final class Users {
 
     return Optional.empty();
   }
+
+  public static Collection<User> getOnline() {
+    return service.getOnlineUsers();
+  }
 }

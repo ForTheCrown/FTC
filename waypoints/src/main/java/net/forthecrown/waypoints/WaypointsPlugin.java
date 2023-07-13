@@ -75,7 +75,7 @@ public class WaypointsPlugin extends JavaPlugin {
 
     SettingsBook<User> settingsBook = FtcServer.server().getGlobalSettingsBook();
     var list = settingsBook.getSettings();
-    list.add(regionInvites.toSetting());
-    list.add(hulkSmashing.toSetting());
+    list.add(regionInvites.toBookSettng());
+    list.add(hulkSmashing.toBookSettng());
   }
 }

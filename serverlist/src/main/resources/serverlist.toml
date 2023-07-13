@@ -1,0 +1,113 @@
+# Specifies data about how the server is displayed in players' server lists,
+# including the server's icon and MOTD
+# ------------------------------------------------------------------------------
+# Format:
+# ------------------------------------------------------------------------------
+# 'condition':
+#  If a string, assumes input is raw JavaScript, else you can specify if it's a
+#  script path, or a JavaScript code. This value is optional, if not set,
+#  condition will always be true.
+#  At present, 2 objects are placed into the script's bindings, a LocalDate
+#  object named 'date' and a regular java Random.
+#
+# examples:
+# - condition = "random.nextBoolean()"
+# - condition = { path = "path/to/script.js" }
+# - condition = { js = "false == false" }
+# ------------------------------------------------------------------------------
+# 'icons':
+#  Specifies either a single icon's path, or a list of icon paths, one of which
+#  will be chosen at random. The file paths given to this argument are relative
+#  to the 'icons' directory inside the FTC plugin folder
+#
+# examples:
+# - icons = "path/to/icon.png"
+# - icons = [ "icon/path.png", "foo/bar.png" ]
+# ------------------------------------------------------------------------------
+# 'period':
+#  Specifies the date month period the icon will be active in, if not set, entry
+#  is always active.
+#
+# examples:
+# - period = "01.01"
+#  Only active on the first day of January
+#
+# - period = [ "01.01", "30.01" ]
+#  Active from the 1st till the 30th of January
+#
+# - period = [ "01.12", "31.01" ]
+#  Active from the 1st of December till the 31st of January
+# ------------------------------------------------------------------------------
+# 'motd':
+#  Specifies a string displayed after the 'For The Crown - ' in the server's
+#  MOTD.
+#  By default, this text will be gray
+#
+# examples:
+# - motd = "Now with guilds"
+# - motd = "Now with emotes :heart:"
+# - motd = "Now with <gradient=red,blue:gradientsss!>"
+# ------------------------------------------------------------------------------
+# 'priority':
+#  Specifies how much the entry should be prioritized over others, larger number
+#  means it will be tested before others. By default, the value will be 0
+#
+# examples:
+# - priority =   0
+# - priority =  10
+# - priority = -10
+# ------------------------------------------------------------------------------
+
+[default]
+icons = "default.png"
+# priority = -10
+# ^ Not required. Default is a fallback used if no other entries are available
+motd = "&eNow with guilds!"
+
+[debug_mode]
+condition = "FTC.inDebugMode()"
+icons = "debug_mode.png"
+priority = 2
+motd = "Test server"
+
+[maintenance]
+condition = "Bukkit.hasWhitelist()"
+icons = "maintenance.png"
+priority = 1
+motd = "Maintenance, be back soon!"
+
+[pride_month]
+period = [ "01.06", "30.06" ]
+motd = "Happy pride month!"
+icons = [
+  "pride/asexual.png",
+  "pride/bisexual.png",
+  "pride/homosexual.png",
+  "pride/lesbian.png",
+  "pride/lgbt.png",
+  "pride/non_binary.png",
+  "pride/pansexual.png",
+  "pride/trans.png"
+]
+
+["seasonal/winter"]
+period = [ "01.12", "31.01" ]
+icons = "seasonal/winter.png"
+
+[april_fools]
+period = "01.04"
+
+# This is just the poggers emote lol
+icons = "seasonal/april_fools.png"
+
+[a_joke_of_an_icon]
+condition = "random.nextInt(100) == 0"
+priority = 1
+icons = "a_joke_of_an_icon.png"
+motd = "&cYou're amazing :heart:"
+
+["seasonal/valentines"]
+period = [ "10.02", "17.02" ]
+
+# This icon makes me cringe, ngl lmao
+icons = "seasonal/valentines.png"

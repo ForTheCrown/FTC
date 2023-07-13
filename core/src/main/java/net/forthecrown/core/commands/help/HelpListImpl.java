@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import net.forthecrown.Loggers;
 import net.forthecrown.command.Commands;
 import net.forthecrown.command.FtcCommand;
 import net.forthecrown.command.help.CommandHelpEntry;
@@ -38,8 +39,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
+import org.slf4j.Logger;
 
 public class HelpListImpl implements FtcHelpList {
+
+  public static final Logger LOGGER = Loggers.getLogger();
 
   /** Map of all keywords, mapped to their bound values */
   private final Map<String, Collection<HelpEntry>> keywordLookup
@@ -363,8 +367,7 @@ public class HelpListImpl implements FtcHelpList {
       }
 
       command.populateUsages(factory);
-
-      entries.add(new CommandHelpEntry(command));
+      entries.add(entry);
     });
 
     entries.forEach(this::placeInLookup);

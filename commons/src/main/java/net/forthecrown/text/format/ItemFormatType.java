@@ -1,6 +1,7 @@
 package net.forthecrown.text.format;
 
 import net.forthecrown.text.Text;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -8,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 public class ItemFormatType implements TextFormatType {
 
   @Override
-  public @NotNull Component resolveArgument(@NotNull Object value, @NotNull String style) {
+  public @NotNull Component resolve(Object value, String style, Audience audience) {
     // Make sure we're given an item stack
     // If not, just return a default value
     if (!(value instanceof ItemStack item)) {

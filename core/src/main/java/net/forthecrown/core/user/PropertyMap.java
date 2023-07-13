@@ -35,6 +35,8 @@ public class PropertyMap implements UserComponent {
    */
   private Object[] values = ArrayUtils.EMPTY_OBJECT_ARRAY;
 
+  private JsonObject unknownProperties;
+
   private final User user;
 
   /**
@@ -188,18 +190,31 @@ public class PropertyMap implements UserComponent {
     var obj = element.getAsJsonObject();
     var registry = Users.getService().getUserProperties();
 
+    JsonObject unknown = new JsonObject();
+
     for (var e : obj.entrySet()) {
       // Get property by entry name
       UserProperty<Object> property = (UserProperty<Object>) registry.orNull(e.getKey());
 
       // Test the property isn't null
       if (property == null) {
-        Loggers.getLogger().warn("Found unknown user property: '{}', skipping", e.getKey());
+        Loggers.getLogger().warn(
+            "Found unknown user property: '{}', adding to unknown property list",
+            e.getKey()
+        );
+
+        unknown.add(e.getKey(), e.getValue());
         continue;
       }
 
       // Deserialize the value and set it
       _set(property, property.deserialize(e.getValue()), false);
+    }
+
+    if (unknown.size() < 1) {
+      unknownProperties = null;
+    } else {
+      unknownProperties = unknown;
     }
   }
 
@@ -235,6 +250,10 @@ public class PropertyMap implements UserComponent {
       // Serialize and add to JSON
       var val = values[i];
       json.add(holder.getKey(), holder.getValue().serialize(val));
+    }
+
+    if (unknownProperties != null && unknownProperties.size() > 0) {
+      unknownProperties.entrySet().forEach(entry -> json.add(entry.getKey(), entry.getValue()));
     }
 
     return json.size() <= 0 ? null : json;

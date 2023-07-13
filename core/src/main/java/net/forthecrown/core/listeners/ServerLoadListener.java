@@ -1,5 +1,6 @@
 package net.forthecrown.core.listeners;
 
+import net.forthecrown.command.help.FtcHelpList;
 import net.forthecrown.core.CorePlugin;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -12,5 +13,8 @@ class ServerLoadListener implements Listener {
   public void onServerLoad(ServerLoadEvent event) {
     CorePlugin plugin = JavaPlugin.getPlugin(CorePlugin.class);
     plugin.getUserService().freezeRegistries();
+
+    FtcHelpList helpList = FtcHelpList.helpList();
+    helpList.update();
   }
 }

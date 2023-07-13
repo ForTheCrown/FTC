@@ -1,16 +1,14 @@
-package net.forthecrown.user;
+package net.forthecrown.user.name;
 
-import java.util.Optional;
 import java.util.Set;
 import net.forthecrown.text.TextWriter;
-import net.forthecrown.utils.Audiences;
+import net.forthecrown.user.NameRenderFlags;
+import net.forthecrown.user.User;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
 public interface UserNameFactory {
-
-  /* ----------------------------- METHODS ------------------------------ */
 
   /**
    * Fully formats a user's display name
@@ -21,7 +19,27 @@ public interface UserNameFactory {
    *
    * @return Fully formatted display name
    */
-  Component formatDisplayName(User user, @Nullable Audience viewer, Set<NameRenderFlags> flags);
+  default Component formatDisplayName(
+      User user,
+      @Nullable Audience viewer,
+      Set<NameRenderFlags> flags
+  ) {
+    return formatDisplayName(user, createContext(user, viewer, flags));
+  }
+
+  /**
+   * Fully formats a user's display name
+   * @param user The user whose name to format
+   * @param context Formatting context
+   * @return Fully formatted display name
+   */
+  Component formatDisplayName(User user, DisplayContext context);
+
+  @Nullable
+  Component formatPrefix(User user, DisplayContext context);
+
+  @Nullable
+  Component formatSuffix(User user, DisplayContext context);
 
   /**
    * Formats the profile display.
@@ -100,79 +118,4 @@ public interface UserNameFactory {
    * @param id Element ID
    */
   void removeAdminField(String id);
-
-  /* ----------------------------- SUB CLASSES ------------------------------ */
-
-  /**
-   * Element within a name
-   */
-  interface NameElement {
-
-    /**
-     * Writes this element's data to the specified writer
-     * @param user User whose name is being formatted
-     * @param context Display context
-     */
-    @Nullable
-    Component createDisplay(User user, DisplayContext context);
-  }
-
-  /**
-   * Element within a user's hover text or fully formatted profile display
-   */
-  interface ProfileDisplayElement {
-
-    /**
-     * Writes this element's data to the specified writer
-     * @param writer Output writer
-     * @param user User whose name is being formatted
-     * @param context Display context
-     */
-    void write(TextWriter writer, User user, DisplayContext context);
-
-    /**
-     * This field's placement. Determines where the field is displayed, either in both the hover
-     * text and regular profile view, or in 1 of those exclusively
-     *
-     * @return Field placement
-     */
-    default FieldPlacement placement() {
-      return FieldPlacement.IN_PROFILE;
-    }
-  }
-
-
-  enum FieldPlacement {
-    ALL,
-    IN_HOVER,
-    IN_PROFILE
-  }
-
-  record DisplayContext(
-      Audience viewer,
-      boolean useNickName,
-      boolean forHover,
-      boolean userOnline,
-      boolean self
-  ) {
-
-    public Optional<User> viewerUser() {
-      return userFromAudience(viewer);
-    }
-
-    public boolean viewerHasPermission(String permission) {
-      return viewerUser()
-          .map(user -> user.hasPermission(permission))
-          .orElse(false);
-    }
-
-    public static Optional<User> userFromAudience(Audience viewer) {
-      if (viewer instanceof User user) {
-        return Optional.of(user);
-      }
-
-      return Optional.ofNullable(Audiences.getPlayer(viewer))
-          .map(Users::get);
-    }
-  }
 }

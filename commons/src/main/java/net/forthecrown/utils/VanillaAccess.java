@@ -1,5 +1,8 @@
 package net.forthecrown.utils;
 
+import io.papermc.paper.plugin.provider.source.DirectoryProviderSource;
+import io.papermc.paper.plugin.provider.type.paper.PaperPluginParent.PaperServerPluginProvider;
+import io.papermc.paper.util.StacktraceDeobfuscator;
 import java.lang.reflect.Field;
 import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.nbt.paper.TagTranslators;
@@ -153,6 +156,10 @@ public final class VanillaAccess {
     }
 
     return result.createCraftBlockData();
+  }
+
+  public static void deobfuscate(Throwable throwable) {
+    StacktraceDeobfuscator.INSTANCE.deobfuscateThrowable(throwable);
   }
 
   /**

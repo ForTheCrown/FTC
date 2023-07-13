@@ -1,6 +1,12 @@
 package net.forthecrown.utils.io;
 
+import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
+import io.papermc.paper.plugin.configuration.PluginMeta;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.FileSystem;
@@ -16,6 +22,7 @@ import java.util.Map;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.Loggers;
+import net.forthecrown.registry.Ref;
 import net.forthecrown.utils.PluginUtil;
 import org.apache.commons.io.file.PathUtils;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -39,31 +46,38 @@ public class PluginJar {
    */
   public static final int ALLOW_OVERWRITE = 0x1;
 
+  private static final Field javaPlugin_file;
+
+  private static final Map<String, FileSystem> pluginJars = new Object2ObjectOpenHashMap<>();
+
+  static {
+    try {
+      Class<JavaPlugin> pluginClass = JavaPlugin.class;
+      Field f = pluginClass.getDeclaredField("file");
+      f.setAccessible(true);
+      javaPlugin_file = f;
+    } catch (ReflectiveOperationException exc) {
+      throw new RuntimeException(exc);
+    }
+  }
+
   /* ---------------------- JAR FILE SYSTEM ACCESS ------------------------ */
 
-  private static FileSystem getResourceFileSystem(Class<?> clazz) {
+  private static FileSystem getResourceFileSystem(JavaPlugin plugin) {
+    String name = plugin.getName();
+    FileSystem foundSystem = pluginJars.get(name);
+
+    if (foundSystem != null) {
+      return foundSystem;
+    }
+
+    Path jarPath = reflectivelyGetPluginJar(plugin).toPath();
+
     try {
-      URI jarUri = clazz
-          .getProtectionDomain()
-          .getCodeSource()
-          .getLocation()
-          .toURI();
-
-      URI uri = new URI("jar", jarUri.toString(), null);
-
-      Map<String, String> env = new HashMap<>();
-      env.put("create", "true");
-
-      try {
-        return FileSystems.newFileSystem(
-            uri,
-            env,
-            PathUtil.class.getClassLoader()
-        );
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-    } catch (URISyntaxException exc) {
+      FileSystem system = FileSystems.newFileSystem(jarPath);
+      pluginJars.put(name, system);
+      return system;
+    } catch (IOException exc) {
       throw new RuntimeException(exc);
     }
   }
@@ -77,7 +91,7 @@ public class PluginJar {
   }
 
   private static Path resourcePath(JavaPlugin plugin, String s, String... others) {
-    return getResourceFileSystem(plugin.getClass()).getPath(s, others);
+    return getResourceFileSystem(plugin).getPath(s, others);
   }
 
   /**
@@ -142,11 +156,17 @@ public class PluginJar {
       return;
     }
 
-    DirectoryCopyWalker walker = new DirectoryCopyWalker(
-        jarDir, dest, flags
-    );
-
+    DirectoryCopyWalker walker = new DirectoryCopyWalker(jarDir, dest);
     Files.walkFileTree(jarDir, walker);
+  }
+
+  private static File reflectivelyGetPluginJar(JavaPlugin plugin) {
+    try {
+      File f = (File) javaPlugin_file.get(plugin);
+      return f;
+    } catch (ReflectiveOperationException exc) {
+      throw new RuntimeException(exc);
+    }
   }
 
   @Getter
@@ -155,7 +175,6 @@ public class PluginJar {
 
     private final Path source;
     private final Path dest;
-    private final int flags;
 
     private Path resolveRelativeAsString(final Path directory) {
       return dest.resolve(source.relativize(directory).toString());
@@ -196,10 +215,9 @@ public class PluginJar {
       return FileVisitResult.CONTINUE;
     }
 
-    private boolean maySaveResource(BasicFileAttributes sourceAttr,
-                                    Path dest
-    ) throws IOException {
-      if (!Files.exists(dest)) {
+    private boolean maySaveResource(BasicFileAttributes sourceAttr, Path dest) throws IOException {
+      return !Files.exists(dest);
+      /*if (!Files.exists(dest)) {
         return true;
       }
 
@@ -216,7 +234,7 @@ public class PluginJar {
       var sLastModified = sourceAttr.lastModifiedTime().toInstant();
       var dLastModified = destAttr.lastModifiedTime().toInstant();
 
-      return sLastModified.isAfter(dLastModified);
+      return sLastModified.isAfter(dLastModified);*/
     }
   }
 }

@@ -9,5 +9,6 @@ public final class CoreListeners {
     register(new ServerLoadListener());
     register(new PlayerLoggingListener());
     register(new PlayerTeleportListener());
+    register(new ServerPingListener());
   }
 }

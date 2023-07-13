@@ -48,6 +48,7 @@ import org.bukkit.inventory.ItemStack;
 @Getter
 @RequiredArgsConstructor
 public class WeaponAbilityType {
+
   private final ImmutableList<ItemStack> recipe;
   private final ItemStack item;
 
@@ -312,7 +313,7 @@ public class WeaponAbilityType {
 
     public void enter(User user, WeaponAbilityType type) {
       user.createTeleport(() -> location, Type.TELEPORT)
-          .setDelayed(false)
+          .setDelay(null)
           .setSilent(true)
           .setAsync(false)
           .start();

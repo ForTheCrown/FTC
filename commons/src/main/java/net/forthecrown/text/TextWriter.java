@@ -1,11 +1,19 @@
 package net.forthecrown.text;
 
+import net.forthecrown.text.format.FormatBuilder;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
+import org.jetbrains.annotations.Nullable;
 
-public interface TextWriter {
+public interface TextWriter extends ComponentLike {
+
+  @Nullable
+  Audience viewer();
+
+  void viewer(@Nullable Audience audience);
 
   void write(ComponentLike text);
 
@@ -67,35 +75,89 @@ public interface TextWriter {
   }
 
   default void formatted(ComponentLike format, Object... args) {
-    write(Text.format(format.asComponent(), args));
+    write(
+        FormatBuilder.builder()
+            .setViewer(viewer())
+            .setFormat(format)
+            .setArguments(args)
+            .format()
+    );
   }
 
   default void formatted(String format, Object... args) {
-    write(Text.format(format, args));
+    write(
+        FormatBuilder.builder()
+            .setViewer(viewer())
+            .setFormat(format)
+            .setArguments(args)
+            .format()
+    );
   }
 
   default void formatted(String format, TextColor color, Object... args) {
-    write(Text.format(format, color, args));
+    write(
+        FormatBuilder.builder()
+            .setViewer(viewer())
+            .setFormat(format, color)
+            .setArguments(args)
+            .format()
+    );
   }
 
   default void formatted(String format, Style style, Object... args) {
-    write(Text.format(format, style, args));
+    write(
+        FormatBuilder.builder()
+            .setViewer(viewer())
+            .setFormat(format, style)
+            .setArguments(args)
+            .format()
+    );
   }
 
   default void formattedLine(String format, Object... args) {
-    line(Text.format(format, args));
+    line(
+        FormatBuilder.builder()
+            .setViewer(viewer())
+            .setFormat(format)
+            .setArguments(args)
+            .format()
+    );
   }
 
   default void formattedLine(String format, TextColor color, Object... args) {
-    line(Text.format(format, color, args));
+    line(
+        FormatBuilder.builder()
+            .setViewer(viewer())
+            .setFormat(format, color)
+            .setArguments(args)
+            .format()
+    );
   }
 
   default void formattedLine(String format, Style style, Object... args) {
-    line(Text.format(format, style, args));
+    line(
+        FormatBuilder.builder()
+            .setViewer(viewer())
+            .setFormat(format, style)
+            .setArguments(args)
+            .format()
+    );
   }
 
   default void formattedLine(ComponentLike like, Object... args) {
-    line(Text.format(like.asComponent(), args));
+    line(FormatBuilder.builder().setViewer(viewer()).setFormat(like).setArguments(args).format());
+  }
+
+  default void formattedField(Object field, String valueFormat, Object... args) {
+    field(
+        Text.valueOf(field),
+
+        FormatBuilder.builder()
+            .setArguments(args)
+            .setFormat(valueFormat)
+            .setViewer(viewer())
+            .format()
+    );
   }
 
   String getString();

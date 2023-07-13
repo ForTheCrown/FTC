@@ -25,15 +25,11 @@ public class DungeonBossGoal implements WeaponKillGoal {
   @Override
   public boolean test(User user, Entity entity) {
     // onDeath in DungeonBoss gets called before the weapon listener, getBossEntity() returns null
-    if (!entity.getPersistentDataContainer()
-        .has(Bosses.BOSS_TAG, PersistentDataType.STRING)
-    ) {
+    if (!entity.getPersistentDataContainer().has(Bosses.BOSS_TAG, PersistentDataType.STRING)) {
       return false;
     }
 
-    var bossKey = entity.getPersistentDataContainer()
-        .get(Bosses.BOSS_TAG, PersistentDataType.STRING);
-
+    var bossKey = entity.getPersistentDataContainer().get(Bosses.BOSS_TAG, PersistentDataType.STRING);
     return boss.getKey().equals(bossKey);
   }
 

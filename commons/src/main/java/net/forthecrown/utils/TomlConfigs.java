@@ -11,6 +11,8 @@ import java.util.concurrent.TimeUnit;
 import me.lucko.configurate.toml.TOMLConfigurationLoader;
 import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.grenadier.types.TimeArgument;
+import net.forthecrown.utils.io.PathUtil;
+import net.forthecrown.utils.io.PluginJar;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.configurate.ConfigurateException;
@@ -45,7 +47,7 @@ public final class TomlConfigs {
 
   public static <T> T loadConfig(String configName, JavaPlugin plugin, Class<T> type) {
     plugin.saveResource(configName, false);
-    Path path = plugin.getDataFolder().toPath().resolve(configName);
+    Path path = PathUtil.pluginPath(plugin, configName);
 
     try {
       ConfigurationNode node = load(path);

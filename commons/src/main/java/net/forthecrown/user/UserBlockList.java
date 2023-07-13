@@ -61,8 +61,18 @@ public interface UserBlockList extends UserComponent {
    */
   void removeSeparated(@NotNull User other);
 
+  /**
+   * Gets an immutable collection of blocked user IDs
+   * @return Blocked user ID set
+   */
+  @NotNull
   Collection<UUID> getBlocked();
 
+  /**
+   * Gets an immutable collection of user IDs that this user has been separated from
+   * @return Separated user ID set
+   */
+  @NotNull
   Collection<UUID> getSeparated();
 
   /**

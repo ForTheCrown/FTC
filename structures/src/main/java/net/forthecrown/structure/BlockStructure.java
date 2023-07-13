@@ -16,13 +16,11 @@ import org.spongepowered.math.vector.Vector3i;
 public class BlockStructure {
   /* ----------------------------- TAG KEYS ------------------------------- */
 
-  public static final String
-      TAG_DATA_VERSION = "data_version",
-      TAG_HEADER = "header",
-      TAG_PALETTES = "palettes",
-      TAG_FUNCTIONS = "functions",
-
-  DEFAULT_PALETTE_NAME = "default";
+  public static final String TAG_DATA_VERSION = "data_version";
+  public static final String TAG_HEADER = "header";
+  public static final String TAG_PALETTES = "palettes";
+  public static final String TAG_FUNCTIONS = "functions";
+  public static final String DEFAULT_PALETTE_NAME = "default";
 
   /* -------------------------- INSTANCE FIELDS --------------------------- */
 

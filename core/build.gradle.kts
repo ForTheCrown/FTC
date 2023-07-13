@@ -12,6 +12,8 @@ dependencies {
   implementation(project(":commons", "reobf"))
   implementation(project(":class-loader-tools"))
   compileOnly("net.luckperms:api:5.4")
+
+  compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit:2.6.4")
 }
 
 pluginYml {
@@ -21,5 +23,12 @@ pluginYml {
 
   depends {
     required("LuckPerms")
+    required("FastAsyncWorldEdit")
+  }
+}
+
+tasks {
+  buildAndCopyToRoot {
+    dependsOn(shadowJar)
   }
 }

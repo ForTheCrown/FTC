@@ -20,6 +20,8 @@ public final class CoreCommands {
   public static void createCommands() {
     new CommandHelp();
 
+    new CommandProfile();
+
     // Tpa
     new CommandTpaAccept();
     new CommandTpaCancel();

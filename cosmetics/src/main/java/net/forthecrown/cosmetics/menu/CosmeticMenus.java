@@ -1,6 +1,7 @@
 package net.forthecrown.cosmetics.menu;
 
 import net.forthecrown.cosmetics.CosmeticType;
+import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.menu.Menu;
 import net.forthecrown.menu.MenuBuilder;
 import net.forthecrown.menu.MenuNode;
@@ -19,6 +20,11 @@ public final class CosmeticMenus {
 
   public static void createMenus() {
     MenuBuilder builder = Menus.builder(Menus.MAX_INV_SIZE).setTitle("Cosmetics");
+
+    for (var t: Cosmetics.TYPES.values()) {
+      MenuNode node = toNode(t);
+      builder.add(t.getMenuSlot(), node);
+    }
 
     main = builder.build();
   }

@@ -8,26 +8,36 @@ import it.unimi.dsi.fastutil.objects.ObjectArrays;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 import lombok.Getter;
 import lombok.Setter;
 import net.forthecrown.Loggers;
+import net.forthecrown.Permissions;
+import net.forthecrown.command.Commands;
 import net.forthecrown.core.CoreConfig;
+import net.forthecrown.core.TabList;
 import net.forthecrown.core.commands.tpa.TpMessages;
 import net.forthecrown.core.commands.tpa.TpPermissions;
 import net.forthecrown.core.user.UserLookupImpl.UserLookupEntry;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Grenadier;
+import net.forthecrown.text.Text;
 import net.forthecrown.user.NameRenderFlags;
+import net.forthecrown.user.Properties;
 import net.forthecrown.user.TimeField;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserComponent;
+import net.forthecrown.user.name.UserNameFactory;
+import net.forthecrown.user.name.DisplayContext;
+import net.forthecrown.user.name.DisplayIntent;
 import net.forthecrown.user.UserOfflineException;
 import net.forthecrown.user.UserProperty;
 import net.forthecrown.user.UserTeleport;
@@ -42,6 +52,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.node.Node;
+import net.luckperms.api.node.types.PermissionNode;
 import net.luckperms.api.query.Flag;
 import net.luckperms.api.query.QueryMode;
 import net.luckperms.api.query.QueryOptions;
@@ -51,9 +63,9 @@ import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.permissions.Permission;
 import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -102,6 +114,8 @@ public final class UserImpl implements User {
 
   @Getter
   public UserTeleportImpl currentTeleport;
+
+  UserVanishTicker vanishTicker;
 
   public UserImpl(UserServiceImpl service, UUID uniqueId) {
     Objects.requireNonNull(uniqueId);
@@ -232,10 +246,38 @@ public final class UserImpl implements User {
   }
 
   @Override
-  public void playSound(Sound uiButtonClick, float volume, float pitch) {
+  public void hidePlayer(User other) throws UserOfflineException {
+    ensureValid();
+    this.ensureOnline();
+    other.ensureOnline();
+
+    getPlayer().hidePlayer(service.getPlugin(), other.getPlayer());
+  }
+
+  @Override
+  public void showPlayer(User other) throws UserOfflineException {
+    ensureValid();
+    this.ensureOnline();
+    other.ensureOnline();
+
+    getPlayer().showPlayer(service.getPlugin(), other.getPlayer());
+  }
+
+  @Override
+  public int getPlayTime() {
+    return service.getPlaytime().get(uniqueId);
+  }
+
+  @Override
+  public int getTotalVotes() {
+    return service.getVotes().get(uniqueId);
+  }
+
+  @Override
+  public void playSound(Sound sound, float volume, float pitch) {
     playSound(
         net.kyori.adventure.sound.Sound.sound()
-            .type(uiButtonClick)
+            .type(sound)
             .volume(volume)
             .pitch(pitch)
             .build()
@@ -513,40 +555,36 @@ public final class UserImpl implements User {
     getComponent(PropertyMap.class).set(property, value);
   }
 
+  private CompletableFuture<net.luckperms.api.model.user.User> getLuckPermsUser() {
+    var lpManager = LuckPermsProvider.get().getUserManager();
+
+    if (lpManager.isLoaded(uniqueId)) {
+      var user = lpManager.getUser(uniqueId);
+      return CompletableFuture.completedFuture(user);
+    }
+
+    return lpManager.loadUser(uniqueId);
+  }
+
   @Override
   public boolean hasPermission(String permission) {
     if (isOnline()) {
       return getPlayer().hasPermission(permission);
     }
 
-    // OPs have all permissions
-    if (getOfflinePlayer().isOp()) {
-      return true;
-    }
-
-    var lpManager = LuckPermsProvider.get().getUserManager();
-
     var options = QueryOptions.builder(QueryMode.NON_CONTEXTUAL)
         .flag(Flag.RESOLVE_INHERITANCE, true)
         .build();
 
-    if (lpManager.isLoaded(getUniqueId())) {
-      var cachedData = lpManager.getUser(getUniqueId());
-      assert cachedData != null : "User has no LP cache data";
-
-      return cachedData.getCachedData()
-          .getPermissionData(options)
-          .checkPermission(permission)
-          .asBoolean();
-    }
-
     try {
-      return lpManager.loadUser(getUniqueId())
-          .get()
-          .getCachedData()
-          .getPermissionData(options)
-          .checkPermission(permission)
-          .asBoolean();
+      return getLuckPermsUser()
+          .thenApply(user -> {
+            return user.getCachedData()
+                .getPermissionData(options)
+                .checkPermission(permission)
+                .asBoolean();
+          })
+          .get();
     } catch (ExecutionException | InterruptedException e) {
       LOGGER.error("Couldn't fetch permission data from LuckPerms", e);
     }
@@ -555,29 +593,148 @@ public final class UserImpl implements User {
   }
 
   @Override
-  public boolean hasPermission(Permission permission) {
-    return hasPermission(permission.getName());
+  public void setPermission(String permission) {
+    getLuckPermsUser().thenAccept(user -> {
+      Node node = PermissionNode.builder(permission)
+          .value(true)
+          .build();
+
+      user.data().add(node);
+    });
+  }
+
+  @Override
+  public void unsetPermission(String permission) {
+    getLuckPermsUser().thenAccept(user -> {
+      Node node = PermissionNode.builder(permission)
+          .value(true)
+          .build();
+
+      user.data().remove(node);
+    });
   }
 
   @Override
   public void updateVanished() {
     ensureValid();
+    ensureOnline();
+    boolean vanished = get(Properties.VANISHED);
+
+    // Make sure vanish ticker is active
+    if (vanished) {
+      if (vanishTicker == null) {
+        vanishTicker = new UserVanishTicker(this);
+      }
+    } else if (vanishTicker != null) {
+      vanishTicker.stop();
+      vanishTicker = null;
+    }
+
+    boolean canSeeVanished = hasPermission(Permissions.VANISH_SEE);
+
+    // Go through all online users to hide this
+    // user from that online user
+    for (var u : Users.getOnline()) {
+      // If the user is this, ignore
+      if (u.equals(this)) {
+        continue;
+      }
+
+      boolean otherVanished = u.get(Properties.VANISHED);
+
+      // Update our perspective of the other user
+      if (!canSeeVanished) {
+        if (otherVanished) {
+          hidePlayer(u);
+        } else {
+          showPlayer(u);
+        }
+      } else {
+        showPlayer(u);
+      }
+
+      // Update other user's perspective of us
+      if (!u.hasPermission(Permissions.VANISH_SEE)) {
+        if (vanished) {
+          u.hidePlayer(this);
+        } else {
+          u.showPlayer(this);
+        }
+      } else {
+        u.showPlayer(this);
+      }
+    }
   }
 
   @Override
   public void updateGodMode() {
     ensureValid();
+    ensureOnline();
+
+    boolean godMode = get(Properties.GODMODE);
+    var player = getPlayer();
+
+    if (godMode) {
+      var attr = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+      assert attr != null : "Player has no Max Health attribute";
+
+      player.setHealth(attr.getValue());
+      player.setFoodLevel(20);
+    }
+
+    player.setInvulnerable(godMode);
   }
 
   @Override
   public void updateFlying() {
     ensureValid();
+    ensureOnline();
+
+    boolean fly = canFly(getGameMode()) || get(Properties.FLYING);
+    player.setAllowFlight(fly);
+  }
+
+  private static boolean canFly(GameMode mode) {
+    return switch (mode) {
+      case CREATIVE, SPECTATOR -> true;
+      default -> false;
+    };
   }
 
   @Override
   public void updateTabName() {
     ensureValid();
+    ensureOnline();
 
+    Set<NameRenderFlags> flags = EnumSet.allOf(NameRenderFlags.class);
+    UserNameFactory factory = service.getNameFactory();
+
+    DisplayContext ctx = factory.createContext(this, null, flags)
+        .withIntent(DisplayIntent.TABLIST);
+
+    Component displayName = factory.formatDisplayName(this, ctx);
+    player.playerListName(displayName);
+
+    Component prefix = factory.formatPrefix(this, ctx);
+    Component suffix = factory.formatSuffix(this, ctx);
+
+    Commands.executeConsole("nte player %s clear", getName());
+
+    if (prefix != null) {
+      Commands.executeConsole("nte player %s prefix '%s &r'",
+          getName(),
+          Text.LEGACY.serialize(prefix)
+      );
+    }
+
+    if (suffix != null) {
+      Commands.executeConsole("nte player %s suffix ' %s'",
+          getName(),
+          Text.LEGACY.serialize(suffix)
+      );
+    }
+
+    TabList.update();
   }
 
   @Override

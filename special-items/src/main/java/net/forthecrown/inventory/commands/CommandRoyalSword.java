@@ -257,7 +257,8 @@ public class CommandRoyalSword extends FtcCommand {
   }
 
   private int abilityUses(CommandContext<CommandSource> c, boolean infinite)
-      throws CommandSyntaxException {
+      throws CommandSyntaxException
+  {
     var user = getUserSender(c);
     var pair = getSword(user);
     var item = pair.first();
@@ -291,7 +292,8 @@ public class CommandRoyalSword extends FtcCommand {
   }
 
   private int abilityCooldown(CommandContext<CommandSource> c, boolean remove)
-      throws CommandSyntaxException {
+      throws CommandSyntaxException
+  {
     var user = getUserSender(c);
     var pair = getSword(user);
     var item = pair.first();
@@ -358,7 +360,9 @@ public class CommandRoyalSword extends FtcCommand {
     return 0;
   }
 
-  private static Pair<ItemStack, RoyalSword> getSword(User user) throws CommandSyntaxException {
+  private static Pair<ItemStack, RoyalSword> getSword(User user)
+      throws CommandSyntaxException
+  {
     ItemStack held = Commands.getHeldItem(user.getPlayer());
     RoyalSword sword = ExtendedItems.ROYAL_SWORD.get(held);
 

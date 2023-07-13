@@ -5,6 +5,7 @@ import java.util.function.IntSupplier;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import net.forthecrown.menu.Slot;
 import net.forthecrown.registry.Holder;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;
@@ -27,17 +28,22 @@ public class CosmeticType<T> {
   private final MenuNodeFactory<T> menuNodeFactory;
 
   int id = -1;
+  String name;
+
+  private final Slot menuSlot;
 
   public CosmeticType(Builder<T> builder) {
     this.displayName = builder.displayName;
     this.predicate = builder.predicate;
     this.menuNodeFactory = builder.factory;
     this.displayMaterial = builder.displayMaterial;
+    this.menuSlot = builder.menuSlot;
 
     Objects.requireNonNull(displayName, "Null display name");
     Objects.requireNonNull(predicate, "Null predicate");
     Objects.requireNonNull(menuNodeFactory, "Null menu node factory");
     Objects.requireNonNull(displayMaterial, "Null display material");
+    Objects.requireNonNull(menuSlot, "Null menu slot");
 
     this.cosmetics = Registries.newFreezable();
     cosmetics.setListener(new RegistryListener<>() {
@@ -68,6 +74,8 @@ public class CosmeticType<T> {
     private MenuNodeFactory<T> factory;
 
     private Material displayMaterial;
+
+    private Slot menuSlot;
 
     public Builder<T> defaultNodeFactory(String id) {
       return defaultNodeFactory(() -> {

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.command.FtcCommand;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.text.Text;
 
 @Getter
 @RequiredArgsConstructor
@@ -14,10 +15,7 @@ public class CommandHelpEntry extends AbstractHelpEntry {
 
   @Override
   public CommandDisplayInfo createDisplay() {
-    var category = command.getClass()
-        .getPackageName()
-        .replace("net.forthecrown.commands.", "")
-        .replace("net.forthecrown.commands", "");
+    var category = packageNameToCategory(command.getClass().getPackageName());
 
     if (command.getBuiltNode() != null) {
       return CommandDisplayInfo.create(

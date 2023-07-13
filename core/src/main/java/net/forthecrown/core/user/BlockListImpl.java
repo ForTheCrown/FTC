@@ -2,6 +2,7 @@ package net.forthecrown.core.user;
 
 import com.google.gson.JsonElement;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -60,6 +61,16 @@ public class BlockListImpl implements UserBlockList {
   public void removeSeparated(@NotNull User other) {
     Objects.requireNonNull(other);
     separated.remove(other.getUniqueId());
+  }
+
+  @Override
+  public Set<UUID> getBlocked() {
+    return Collections.unmodifiableSet(blocked);
+  }
+
+  @Override
+  public Set<UUID> getSeparated() {
+    return Collections.unmodifiableSet(separated);
   }
 
   @Override

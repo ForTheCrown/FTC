@@ -23,3 +23,9 @@ pluginYml {
     optional("project:user-titles")
   }
 }
+
+tasks {
+  assemble {
+    dependsOn(reobfJar)
+  }
+}

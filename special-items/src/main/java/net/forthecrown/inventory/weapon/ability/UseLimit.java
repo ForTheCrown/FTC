@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import java.util.Optional;
 import net.forthecrown.scripts.Script;
 import net.forthecrown.scripts.Scripts;
+import net.forthecrown.titles.UserTitles;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.io.source.Source;
 import org.spongepowered.math.GenericMath;
@@ -22,10 +23,8 @@ public interface UseLimit {
 
     return user -> {
       script.put("user", user);
-      int tier = GenericMath.clamp(
-          user.getTitles().getTier().ordinal() - 1,
-          0, 3
-      );
+      UserTitles titles = user.getComponent(UserTitles.class);
+      int tier = GenericMath.clamp(titles.getTier().ordinal() - 1, 0, 3);
 
       script.put("tier", tier);
       var res = script.evaluate();

@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.Set;
 import lombok.Getter;
+import net.forthecrown.utils.VanillaAccess;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
 import org.jetbrains.annotations.NotNull;
@@ -74,8 +75,6 @@ class DiscordAppender extends AbstractAppender {
     if (builder.length() >= MAX_CONTENT_LENGTH) {
       builder.delete(MAX_CONTENT_LENGTH - 1, builder.length());
     } else if (thrown != null) {
-      //StacktraceDeobfuscator.INSTANCE.deobfuscateThrowable(thrown);
-
       int newMinLength = BLOCK_PREFIX.length()
           + BLOCK_SUFFIX.length()
           + MessageWriter.ERROR_OVER_MAX.length()
@@ -101,6 +100,7 @@ class DiscordAppender extends AbstractAppender {
   }
 
   private static void printStackTrace(Throwable t, PrintWriter out) {
+    VanillaAccess.deobfuscate(t);
     out.println(t);
 
     StackTraceElement[] stackTrace = t.getStackTrace();

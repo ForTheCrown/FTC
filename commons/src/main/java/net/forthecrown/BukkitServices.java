@@ -1,5 +1,7 @@
 package net.forthecrown;
 
+import static org.bukkit.Bukkit.getServicesManager;
+
 import java.util.Optional;
 import net.forthecrown.utils.PluginUtil;
 import org.bukkit.Bukkit;
@@ -10,19 +12,13 @@ import org.bukkit.plugin.ServicesManager;
 public final class BukkitServices {
   private BukkitServices() {}
 
-  public static ServicesManager getManager() {
-    return Bukkit.getServicesManager();
-  }
-
   public static <T> Optional<T> load(Class<T> type) {
-    return Optional.ofNullable(getManager().load(type));
+    return Optional.ofNullable(getServicesManager().load(type));
   }
 
   public static <T> T loadOrThrow(Class<T> type) {
     return load(type).orElseThrow(() -> {
-      throw new IllegalStateException(
-          "Missing implementation for service: " + type
-      );
+      throw new IllegalStateException("Missing implementation for service: " + type);
     });
   }
 
@@ -32,6 +28,6 @@ public final class BukkitServices {
   }
 
   public static <T> void register(Class<T> type, T value, Plugin plugin) {
-    getManager().register(type, value, plugin, ServicePriority.Normal);
+    getServicesManager().register(type, value, plugin, ServicePriority.Normal);
   }
 }

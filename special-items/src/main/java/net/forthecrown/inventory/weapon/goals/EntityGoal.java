@@ -23,7 +23,8 @@ public class EntityGoal implements WeaponKillGoal {
 
   @Override
   public Component loreDisplay() {
-    return type == null ? Component.text("Any entity")
+    return type == null
+        ? Component.text("Any entity")
         : Component.translatable(Bukkit.getUnsafe().getTranslationKey(type));
   }
 

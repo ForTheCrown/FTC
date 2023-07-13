@@ -121,7 +121,7 @@ public interface Exceptions {
    */
   CommandSyntaxException NOTHING_TO_LIST = create("Nothing to list!");
 
-  CommandSyntaxException NO_REGION_SELECTION = create("No region selection!");
+  CommandSyntaxException NO_REGION_SELECTION = create("No region selection (//wand selection)");
 
   CommandSyntaxException NO_PERMISSION = create("You do not have permission to do this");
 

@@ -1,7 +1,8 @@
 package net.forthecrown.user;
 
 import net.forthecrown.text.Text;
-import net.forthecrown.user.UserNameFactory.NameElement;
+import net.forthecrown.user.name.UserNameFactory;
+import net.forthecrown.user.name.NameElement;
 import net.kyori.adventure.text.Component;
 
 public final class NameElements {

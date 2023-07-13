@@ -1,9 +1,11 @@
 package net.forthecrown.inventory.weapon.goals;
 
 import lombok.Getter;
-import net.forthecrown.core.Messages;
+import net.forthecrown.text.Messages;
+import net.forthecrown.titles.RankTier;
+import net.forthecrown.titles.UserTitles;
+import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
-import net.forthecrown.user.data.RankTier;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -23,9 +25,10 @@ public class DonatorWeaponGoal implements WeaponGoal {
       return false;
     }
 
-    return Users.get(player)
-        .getTitles()
-        .hasTier(RankTier.TIER_1);
+    User user = Users.get(player);
+    UserTitles titles = user.getComponent(UserTitles.class);
+
+    return titles.hasTier(RankTier.TIER_1);
   }
 
   @Override

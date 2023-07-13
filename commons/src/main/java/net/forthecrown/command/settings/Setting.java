@@ -1,5 +1,7 @@
 package net.forthecrown.command.settings;
 
+import static net.kyori.adventure.text.Component.text;
+
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Objects;
 import lombok.AccessLevel;
@@ -113,13 +115,13 @@ public class Setting {
     return this;
   }
 
-  public BookSetting<User> toSetting() {
+  public BookSetting<User> toBookSettng() {
     Objects.requireNonNull(command, "Command not created yet");
 
     return new BookSetting<>() {
       @Override
       public Component displayName() {
-        return Component.text(getDisplayName());
+        return text(getDisplayName()).hoverEvent(text(getDescription()));
       }
 
       @Override
@@ -128,18 +130,14 @@ public class Setting {
         boolean state = access.getState(context);
 
         Component enable = BookSetting.createButton(
-            true, state, command, createSource(enableDescription)
+            true, state, command, text(enableDescription)
         );
 
         Component disable = BookSetting.createButton(
-            false, state, command, createSource(disableDescription)
+            false, state, command, text(disableDescription)
         );
 
         return Component.textOfChildren(enable, Component.space(), disable);
-      }
-
-      private HoverEventSource createSource(String desc) {
-        return Component.text(desc);
       }
 
       @Override

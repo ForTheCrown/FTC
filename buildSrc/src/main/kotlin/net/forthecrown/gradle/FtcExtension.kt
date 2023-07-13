@@ -1,8 +1,11 @@
 package net.forthecrown.gradle
 
-class FtcExtension {
+import org.gradle.api.Project
 
-  var useVanilla: Boolean = false
+class FtcExtension(private val project: Project) {
 
   val apiVersion: String get() = API_VERSION
+
+  fun useVanilla() {
+  }
 }

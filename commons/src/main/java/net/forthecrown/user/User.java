@@ -1,6 +1,7 @@
 package net.forthecrown.user;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
+import java.time.Duration;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -175,7 +176,35 @@ public interface User extends ForwardingAudience.Single {
    */
   void setReturnLocation(@Nullable Location location);
 
-  void playSound(Sound uiButtonClick, float volume, float pitch);
+  void playSound(Sound sound, float volume, float pitch);
+
+  /**
+   * Shows the specified {@code other} user to this user. Only has an effect if the {@code other}
+   * has been hidden prior to this method call.
+   *
+   * @param other user to show (un-hide) to this user
+   * @throws UserOfflineException If either this user or {@code other} is offline
+   */
+  void hidePlayer(User other) throws UserOfflineException;
+
+  /**
+   * Hides the specified {@code other} user from this user.
+   * @param other user to hide from this user
+   * @throws UserOfflineException If either this user or {@code other} is offline
+   */
+  void showPlayer(User other) throws UserOfflineException;
+
+  /**
+   * Gets the user's total playtime in seconds
+   * @return Playtime in seconds
+   */
+  int getPlayTime();
+
+  /**
+   * Gets the total amount of times this user has voted for the server
+   * @return User's total votes
+   */
+  int getTotalVotes();
 
   /* ----------------------------- COMPONENTS ------------------------------ */
 
@@ -347,7 +376,21 @@ public interface User extends ForwardingAudience.Single {
 
   boolean hasPermission(String permission);
 
-  boolean hasPermission(Permission permission);
+  default boolean hasPermission(Permission permission) {
+    return hasPermission(permission.getName());
+  }
+
+  void setPermission(String permission);
+
+  default void setPermission(Permission permission) {
+    setPermission(permission.getName());
+  }
+
+  void unsetPermission(String permission);
+
+  default void unsetPermission(Permission permission) {
+    unsetPermission(permission.getName());
+  }
 
   /* ----------------------------- UPDATE METHODS ------------------------------ */
 

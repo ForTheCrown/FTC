@@ -32,7 +32,7 @@ public class PlayerJoinLeaveListener implements Listener {
   public void onUserLeave(UserLeaveEvent event) {
 
     event.setRenderer((user, viewer) -> {
-      return Messages.leaveMessage(formattedName(user, viewer, false));
+      return Messages.leaveMessage(formattedName(user, viewer, false), event.getReason());
     });
   }
 

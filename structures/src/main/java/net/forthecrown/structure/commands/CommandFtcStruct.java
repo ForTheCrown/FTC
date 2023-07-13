@@ -47,6 +47,7 @@ import net.forthecrown.utils.math.Rotation;
 import net.forthecrown.utils.math.Transform;
 import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.utils.math.WorldBounds3i;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -246,6 +247,20 @@ public class CommandFtcStruct extends FtcCommand {
   @Override
   public void createCommand(GrenadierCommand command) {
     command
+        .then(literal("reload").executes(c -> {
+          Structures.get().load();
+
+          c.getSource().sendSuccess(Component.text("Reloaded structures plugin"));
+          return 0;
+        }))
+
+        .then(literal("save").executes(c -> {
+          Structures.get().save();
+
+          c.getSource().sendSuccess(Component.text("Saved structures plugin"));
+          return 0;
+        }))
+
         .then(literal("create")
             .then(argument("name", Arguments.FTC_KEY)
                 .executes(c -> create(c, EMPTY))
@@ -426,6 +441,10 @@ public class CommandFtcStruct extends FtcCommand {
   ) throws CommandSyntaxException {
     Player player = c.getSource().asPlayer();
     WorldBounds3i bounds3i = WorldBounds3i.ofPlayerSelection(player);
+
+    if (bounds3i == null) {
+      throw Exceptions.NO_REGION_SELECTION;
+    }
 
     // Ensure palette is not a different size from default palette
     if (palette != null

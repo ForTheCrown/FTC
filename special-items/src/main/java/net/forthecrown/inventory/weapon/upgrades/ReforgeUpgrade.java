@@ -1,7 +1,7 @@
 package net.forthecrown.inventory.weapon.upgrades;
 
 import net.forthecrown.inventory.weapon.RoyalSword;
-import net.forthecrown.utils.text.Text;
+import net.forthecrown.text.Text;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Material;

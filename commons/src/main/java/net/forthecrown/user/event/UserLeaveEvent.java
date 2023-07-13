@@ -16,7 +16,7 @@ public class UserLeaveEvent extends UserLogEvent {
   private final QuitReason reason;
 
   public UserLeaveEvent(User user, QuitReason reason) {
-    super(user, UserLogRenderer.DEFAULT_LEAVE);
+    super(user, UserLogRenderer.defaultLeave(reason));
     this.reason = reason;
   }
 

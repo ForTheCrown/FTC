@@ -135,6 +135,7 @@ public class UserServiceImpl implements UserService {
     storage.saveMap(votes,    storage.getVotes());
 
     storage.saveProfiles(lookup);
+    storage.saveAlts(altUsers);
 
     var userIt = userMaps.iterator();
     while (userIt.hasNext()) {
@@ -149,6 +150,7 @@ public class UserServiceImpl implements UserService {
 
   public void load() {
     storage.loadProfiles(lookup);
+    storage.loadAlts(altUsers);
 
     storage.loadMap(balances, storage.getBalances());
     storage.loadMap(gems,     storage.getGems());
@@ -177,6 +179,11 @@ public class UserServiceImpl implements UserService {
 
     user.setEntityLocation(player.getLocation());
     user.setLastOnlineName(player.getName());
+
+    if (user.vanishTicker != null) {
+      user.vanishTicker.stop();
+      user.vanishTicker = null;
+    }
 
     // Log play time
     logTime(user).apply(LOGGER::error, seconds -> {
@@ -290,6 +297,12 @@ public class UserServiceImpl implements UserService {
   public <E extends Enum<E>> Builder<E> createEnumProperty(Class<E> type) {
     ensureNotFrozen();
     return new BuilderImpl<>(FtcCodecs.enumCodec(type));
+  }
+
+  @Override
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  public Collection<User> getOnlineUsers() {
+    return (Collection) userMaps.getOnline();
   }
 
   @Override

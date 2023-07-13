@@ -90,7 +90,7 @@ public class ComponentFactory<T extends UserComponent> {
     if (regular != null) {
       return new RegularConstructorWrapper<>(regular);
     } else {
-      return new EmptyConstructorWrapper<>(regular);
+      return new EmptyConstructorWrapper<>(empty);
     }
   }
 

@@ -17,6 +17,7 @@ import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
+import org.bukkit.event.player.PlayerQuitEvent.QuitReason;
 
 public interface Messages {
 
@@ -180,6 +181,8 @@ public interface Messages {
   String BASE_JOIN_MESSAGE_NEW_NAME = "{0, user} (formerly known as {1}) joined the game";
 
   String BASE_LEAVE_MESSAGE = "{0, user} left the game";
+  String BASE_LEAVE_MESSAGE_TIMEOUT = "{0, user} left the game (Timed out)";
+  String BASE_LEAVE_MESSAGE_KICKED = "{0, user} left the game (Kicked)";
 
   static Component createButton(Component text, String cmd, Object... args) {
     return text.clickEvent(runCommand(String.format(cmd, args)));
@@ -413,7 +416,13 @@ public interface Messages {
     );
   }
 
-  static Component leaveMessage(Component displayName) {
-    return Text.format(BASE_LEAVE_MESSAGE, NamedTextColor.YELLOW, displayName);
+  static Component leaveMessage(Component displayName, QuitReason reason) {
+    String format = switch (reason) {
+      case KICKED -> BASE_LEAVE_MESSAGE_KICKED;
+      case TIMED_OUT -> BASE_LEAVE_MESSAGE_TIMEOUT;
+      default -> BASE_LEAVE_MESSAGE;
+    };
+    
+    return Text.format(format, NamedTextColor.YELLOW, displayName);
   }
 }

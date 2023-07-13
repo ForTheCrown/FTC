@@ -5,10 +5,11 @@ import net.forthecrown.BukkitServices;
 import net.forthecrown.Cooldowns;
 import net.forthecrown.FtcServer;
 import net.forthecrown.InventoryStorage;
+import net.forthecrown.WorldEditHook;
 import net.forthecrown.command.help.FtcHelpList;
 import net.forthecrown.core.commands.CoreCommands;
-import net.forthecrown.core.grave.GraveImpl;
 import net.forthecrown.core.commands.help.HelpListImpl;
+import net.forthecrown.core.grave.GraveImpl;
 import net.forthecrown.core.listeners.CoreListeners;
 import net.forthecrown.core.user.UserServiceImpl;
 import net.forthecrown.grenadier.Grenadier;
@@ -35,6 +36,8 @@ public class CorePlugin extends JavaPlugin {
 
   @Override
   public void onEnable() {
+    CoreDataFix.execute();
+
     Grenadier.plugin(this);
     GraveImpl.init();
 
@@ -47,6 +50,7 @@ public class CorePlugin extends JavaPlugin {
     BukkitServices.register(InventoryStorage.class, InventoryStorageImpl.getStorage());
     BukkitServices.register(Cooldowns.class, CooldownsImpl.getCooldowns());
     BukkitServices.register(UserService.class, userService);
+    BukkitServices.register(WorldEditHook.class, new WorldEditHookImpl());
 
     Users.setService(userService);
     userService.initialize();
@@ -54,6 +58,7 @@ public class CorePlugin extends JavaPlugin {
 
     CoreListeners.registerAll();
     CoreCommands.createCommands();
+    PrefsBook.init(ftcServer.getGlobalSettingsBook());
 
     saver = PeriodicalSaver.create(this::save, () -> ftcConfig.autosaveInterval);
     reloadConfig();

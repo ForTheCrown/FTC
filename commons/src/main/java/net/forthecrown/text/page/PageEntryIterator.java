@@ -1,5 +1,6 @@
 package net.forthecrown.text.page;
 
+import com.google.common.base.Preconditions;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -107,8 +108,9 @@ public abstract class PageEntryIterator<T> implements Iterator<T> {
     this.maxPage = getMaxPage(pageSize, size);
     this.index = start;
 
-    Validate.isTrue(page >= 0 && page <= maxPage, "Invalid page: %s, out of bounds [0..%s]", page,
-        maxPage);
+    Preconditions.checkArgument(page >= 0 && page <= maxPage,
+        "Invalid page: %s, out of bounds [0..%s]", page, maxPage
+    );
   }
 
   /**

@@ -13,6 +13,7 @@ dependencies {
   compileOnly(project(":dungeons"))
   compileOnly(project(":scripting"))
   compileOnly(project(":menus"))
+  compileOnly(project(":user-titles"))
 
   compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.1.0-SNAPSHOT")
 

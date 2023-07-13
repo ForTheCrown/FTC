@@ -6,6 +6,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.user.UserLookup.LookupEntry;
+import net.forthecrown.user.name.UserNameFactory;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -93,6 +94,12 @@ public interface UserService {
    * @return Created builder
    */
   <E extends Enum<E>> UserProperty.Builder<E> createEnumProperty(Class<E> type);
+
+  /**
+   * Gets an immutable collection of all currently online users
+   * @return Online users
+   */
+  Collection<User> getOnlineUsers();
 
   /**
    * Registers a user component type.

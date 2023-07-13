@@ -18,6 +18,7 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.nbt.paper.PaperNbt;
 import net.forthecrown.text.format.ComponentFormat;
+import net.forthecrown.text.format.FormatBuilder;
 import net.forthecrown.text.parse.ChatParser;
 import net.forthecrown.text.parse.TextContext;
 import net.forthecrown.user.Users;
@@ -423,8 +424,9 @@ public final class Text {
    * @return The formatted and clickable message
    * @see #prettyLocation(Location, boolean)
    */
-  public static TextComponent clickableLocation(Location l,
-                                                boolean includeWorld
+  public static TextComponent clickableLocation(
+      Location l,
+      boolean includeWorld
   ) {
     return prettyLocation(l, includeWorld)
         .hoverEvent(text("Click to teleport!"))
@@ -605,7 +607,7 @@ public final class Text {
    * @see #format(String, Style, Object...)
    */
   public static Component format(String format, Object... args) {
-    return format(format, Style.empty(), args);
+    return FormatBuilder.builder().setFormat(format).setArguments(args).format();
   }
 
   /**
@@ -624,7 +626,7 @@ public final class Text {
    * @see #format(String, Style, Object...)
    */
   public static Component format(String format, TextColor color, Object... args) {
-    return format(format, Style.style(color), args);
+    return FormatBuilder.builder().setFormat(format, color).setArguments(args).format();
   }
 
   /**
@@ -643,7 +645,7 @@ public final class Text {
    * @see #format(Component, Object...)
    */
   public static Component format(String format, Style style, Object... args) {
-    return format(renderString(format).style(style), args);
+    return FormatBuilder.builder().setFormat(format, style).setArguments(args).format();
   }
 
   /**
@@ -661,12 +663,7 @@ public final class Text {
    * @see ComponentFormat
    */
   public static Component format(Component format, Object... args) {
-    // Arguments are null or empty, we've got nothing to format
-    if (args == null || args.length == 0) {
-      return format;
-    }
-
-    return new ComponentFormat(format, args).asComponent();
+    return FormatBuilder.builder().setFormat(format).setArguments(args).format();
   }
 
   /* ----------------------------------------------------------- */
