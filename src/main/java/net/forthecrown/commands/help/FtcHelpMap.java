@@ -313,7 +313,7 @@ public class FtcHelpMap {
 
       command.populateUsages(factory);
 
-      entries.add(new CommandHelpEntry(command));
+      entries.add(entry);
     });
 
     entries.forEach(this::placeInLookup);
