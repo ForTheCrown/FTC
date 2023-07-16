@@ -63,6 +63,19 @@ public class Setting {
     return createInverted(SettingAccess.property(property));
   }
 
+  public Setting setToggleDescription(String base) {
+    return setEnableDescription(formatToggle(base, "start", "enable"))
+        .setDisableDescription(formatToggle(base, "stop", "disable"));
+  }
+
+  private static String formatToggle(String base, String startStop, String enableDisable) {
+    return base
+        .replace("{start}", startStop)
+        .replace("{Start}", Text.capitalizeFully(startStop))
+        .replace("{enable}", enableDisable)
+        .replace("{Enable}", Text.capitalizeFully(enableDisable));
+  }
+
   public void toggleState(User user) throws CommandSyntaxException {
     boolean newState = !access.getState(user);
 
@@ -77,6 +90,11 @@ public class Setting {
   }
 
   public void toggleOther(CommandSource source, User target) throws CommandSyntaxException {
+    if (source.isPlayer() && target.getName().equals(source.textName())) {
+      toggleState(target);
+      return;
+    }
+
     boolean newState = !access.getState(target);
 
     if (validator != null) {

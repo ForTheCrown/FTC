@@ -24,7 +24,7 @@ public interface Messages {
   Style CHAT_URL = Style.style(TextDecoration.UNDERLINED)
       .hoverEvent(text("Click to open link!"));
 
-  TextComponent FTC_PREFIX = text("[FTC] ", NamedTextColor.GOLD);
+  TextComponent FTC_PREFIX = Text.gradient("[FTC] ", NamedTextColor.BLACK, NamedTextColor.GOLD);
 
   /**
    * Common text which simply states "Click to allow"
@@ -182,6 +182,7 @@ public interface Messages {
 
   String BASE_LEAVE_MESSAGE = "{0, user} left the game";
   String BASE_LEAVE_MESSAGE_TIMEOUT = "{0, user} left the game (Timed out)";
+  String BASE_LEAVE_MESSAGE_ERROR = "{0, user} left the game (Error)";
   String BASE_LEAVE_MESSAGE_KICKED = "{0, user} left the game (Kicked)";
 
   static Component createButton(Component text, String cmd, Object... args) {
@@ -420,9 +421,37 @@ public interface Messages {
     String format = switch (reason) {
       case KICKED -> BASE_LEAVE_MESSAGE_KICKED;
       case TIMED_OUT -> BASE_LEAVE_MESSAGE_TIMEOUT;
+      case ERRONEOUS_STATE -> BASE_LEAVE_MESSAGE_ERROR;
       default -> BASE_LEAVE_MESSAGE;
     };
     
     return Text.format(format, NamedTextColor.YELLOW, displayName);
+  }
+
+
+  /**
+   * Creates a message stating the user has the given text
+   *
+   * @param unitDisplay The unit display of the user
+   * @return The formatted message
+   */
+  static Component unitQuerySelf(Component unitDisplay) {
+    return format("You have &e{0}&r.",
+        NamedTextColor.GRAY, unitDisplay
+    );
+  }
+
+  /**
+   * Creates a message stating the given user has the given text.
+   *
+   * @param unitDisplay The unit display of the user
+   * @param target      The user
+   * @return The formatted message
+   */
+  static Component unitQueryOther(Component unitDisplay, User target) {
+    return format("&e{0, user} &rhas &6{1}&r.",
+        NamedTextColor.GRAY,
+        target, unitDisplay
+    );
   }
 }

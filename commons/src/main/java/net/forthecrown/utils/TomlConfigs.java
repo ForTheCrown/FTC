@@ -2,6 +2,7 @@ package net.forthecrown.utils;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Type;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -18,9 +19,14 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.loader.HeaderMode;
+import org.spongepowered.configurate.objectmapping.FieldDiscoverer;
+import org.spongepowered.configurate.objectmapping.ObjectMapper;
+import org.spongepowered.configurate.objectmapping.ObjectMapper.Factory;
 import org.spongepowered.configurate.serialize.SerializationException;
 import org.spongepowered.configurate.serialize.TypeSerializer;
 import org.spongepowered.configurate.serialize.TypeSerializerCollection;
+import org.spongepowered.configurate.util.MapFactories;
+import org.spongepowered.configurate.util.MapFactory;
 import org.spongepowered.math.vector.Vector2d;
 import org.spongepowered.math.vector.Vector2f;
 import org.spongepowered.math.vector.Vector2i;
@@ -75,25 +81,32 @@ public final class TomlConfigs {
   }
 
   private static void registerTypeSerializers(TypeSerializerCollection.Builder builder) {
-    builder.registerExact(Duration.class, createDurationSerializer());
+    builder
+        .registerAnnotatedObjects(
+            ObjectMapper.factoryBuilder()
+                .addNodeResolver((name, element) -> parent -> parent.node(name))
+                .build()
+        )
 
-    // Auto generated via a TypeScript script
-    builder.registerExact(Vector2f.class, new Vector2fSerializer());
-    builder.registerExact(Vector2d.class, new Vector2dSerializer());
-    builder.registerExact(Vector2i.class, new Vector2iSerializer());
-    builder.registerExact(Vector2l.class, new Vector2lSerializer());
-    builder.registerExact(Vector3f.class, new Vector3fSerializer());
-    builder.registerExact(Vector3d.class, new Vector3dSerializer());
-    builder.registerExact(Vector3i.class, new Vector3iSerializer());
-    builder.registerExact(Vector3l.class, new Vector3lSerializer());
-    builder.registerExact(Vector4f.class, new Vector4fSerializer());
-    builder.registerExact(Vector4d.class, new Vector4dSerializer());
-    builder.registerExact(Vector4i.class, new Vector4iSerializer());
-    builder.registerExact(Vector4l.class, new Vector4lSerializer());
-    builder.registerExact(VectorNf.class, new VectorNfSerializer());
-    builder.registerExact(VectorNd.class, new VectorNdSerializer());
-    builder.registerExact(VectorNi.class, new VectorNiSerializer());
-    builder.registerExact(VectorNl.class, new VectorNlSerializer());
+        .registerExact(Duration.class, createDurationSerializer())
+
+        // Auto generated via a TypeScript script
+        .registerExact(Vector2f.class, new Vector2fSerializer())
+        .registerExact(Vector2d.class, new Vector2dSerializer())
+        .registerExact(Vector2i.class, new Vector2iSerializer())
+        .registerExact(Vector2l.class, new Vector2lSerializer())
+        .registerExact(Vector3f.class, new Vector3fSerializer())
+        .registerExact(Vector3d.class, new Vector3dSerializer())
+        .registerExact(Vector3i.class, new Vector3iSerializer())
+        .registerExact(Vector3l.class, new Vector3lSerializer())
+        .registerExact(Vector4f.class, new Vector4fSerializer())
+        .registerExact(Vector4d.class, new Vector4dSerializer())
+        .registerExact(Vector4i.class, new Vector4iSerializer())
+        .registerExact(Vector4l.class, new Vector4lSerializer())
+        .registerExact(VectorNf.class, new VectorNfSerializer())
+        .registerExact(VectorNd.class, new VectorNdSerializer())
+        .registerExact(VectorNi.class, new VectorNiSerializer())
+        .registerExact(VectorNl.class, new VectorNlSerializer());
   }
 
   public static TypeSerializer<Duration> createDurationSerializer() {
@@ -142,41 +155,7 @@ public final class TomlConfigs {
         }
 
         long millis = obj.toMillis();
-
-        long days = TimeUnit.MILLISECONDS.toDays(millis);
-        millis -= TimeUnit.DAYS.toMillis(millis);
-
-        long hours = TimeUnit.MILLISECONDS.toHours(millis);
-        millis -= TimeUnit.HOURS.toMillis(hours);
-
-        long minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
-        millis -= TimeUnit.MINUTES.toMillis(hours);
-
-        long seconds = TimeUnit.SECONDS.toHours(millis);
-        millis -= TimeUnit.HOURS.toMillis(hours);
-
-        StringBuilder builder = new StringBuilder();
-
-        boolean valueWritten = writeOpt(builder, days, "d")
-            | writeOpt(builder, hours, "h")
-            | writeOpt(builder, minutes, "m")
-            | writeOpt(builder, seconds, "s")
-            | writeOpt(builder, millis, "");
-
-        if (!valueWritten) {
-          builder.append("0ms");
-        }
-
-        node.set(builder.toString());
-      }
-
-      boolean writeOpt(StringBuilder builder, long val, String suffix) {
-        if (val < 1) {
-          return false;
-        }
-
-        builder.append(val).append(suffix);
-        return true;
+        node.set(millis);
       }
     };
   }

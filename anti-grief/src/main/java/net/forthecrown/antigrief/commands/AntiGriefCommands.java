@@ -15,5 +15,9 @@ public final class AntiGriefCommands {
   public static void createCommands() {
     PunishmentCommand.createCommands();
     new CommandSeparate();
+    new CommandNotes();
+    new CommandPunish();
+    new CommandSmite();
+    new CommandStaffChat();
   }
 }

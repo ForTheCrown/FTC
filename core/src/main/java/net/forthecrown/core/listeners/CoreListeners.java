@@ -10,5 +10,6 @@ public final class CoreListeners {
     register(new PlayerLoggingListener());
     register(new PlayerTeleportListener());
     register(new ServerPingListener());
+    register(new AdminBroadcastListener());
   }
 }

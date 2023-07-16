@@ -14,7 +14,7 @@ import net.forthecrown.text.Text;
 import net.forthecrown.text.parse.ChatParseFlag;
 import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.io.PathUtil;
-import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -48,7 +48,7 @@ public final class BannedWords {
     return contains(Text.renderString(unfiltered));
   }
 
-  public static boolean contains(Component component) {
+  public static boolean contains(ComponentLike component) {
     return containsBannedWords(Text.plain(component));
   }
 
@@ -66,7 +66,7 @@ public final class BannedWords {
     return false;
   }
 
-  public static boolean checkAndWarn(CommandSender sender, Component component) {
+  public static boolean checkAndWarn(CommandSender sender, ComponentLike component) {
     return _checkAndWarn(sender, Text.plain(component));
   }
 

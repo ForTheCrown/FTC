@@ -1,8 +1,11 @@
 package net.forthecrown.antigrief;
 
 import lombok.Getter;
+import net.forthecrown.FtcServer;
 import net.forthecrown.antigrief.commands.AntiGriefCommands;
 import net.forthecrown.antigrief.listeners.AntiGriefListeners;
+import net.forthecrown.command.settings.SettingsBook;
+import net.forthecrown.user.User;
 import net.forthecrown.utils.PeriodicalSaver;
 import net.forthecrown.utils.TomlConfigs;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -10,23 +13,30 @@ import org.bukkit.plugin.java.JavaPlugin;
 @Getter
 public class AntiGriefPlugin extends JavaPlugin {
 
-  private AntiGriefConfig config = new AntiGriefConfig();
+  private AntiGriefConfig pluginConfig = new AntiGriefConfig();
   private PeriodicalSaver saver;
 
   @Override
   public void onEnable() {
-    saver = PeriodicalSaver.create(this::save, config::getAutosaveInterval);
+    reloadConfig();
+
+    saver = PeriodicalSaver.create(this::save, () -> pluginConfig.getAutosaveInterval());
     saver.start();
 
     Punishments.get().load();
 
     AntiGriefCommands.createCommands();
     AntiGriefListeners.registerAll();
+
+    FtcServer server = FtcServer.server();
+    SettingsBook<User> settingsBook = server.getGlobalSettingsBook();
+    EavesDropper.createSettings(settingsBook);
+    StaffChat.createSettings(settingsBook);
   }
 
   @Override
   public void reloadConfig() {
-    config = TomlConfigs.loadPluginConfig(this, AntiGriefConfig.class);
+    pluginConfig = TomlConfigs.loadPluginConfig(this, AntiGriefConfig.class);
   }
 
   @Override

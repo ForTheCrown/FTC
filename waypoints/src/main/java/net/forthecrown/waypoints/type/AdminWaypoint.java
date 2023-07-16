@@ -2,7 +2,7 @@ package net.forthecrown.waypoints.type;
 
 import net.forthecrown.utils.math.Bounds3i;
 import net.forthecrown.waypoints.Waypoint;
-import net.forthecrown.waypoints.WaypointConfig;
+import net.forthecrown.waypoints.WaypointManager;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.math.vector.Vector3d;
 
@@ -21,6 +21,7 @@ public class AdminWaypoint extends WaypointType {
 
   @Override
   public @NotNull Bounds3i createBounds() {
-    return boundsFromSize(WaypointConfig.adminWaypointSize);
+    var size = WaypointManager.getInstance().config().adminWaypointSize;
+    return boundsFromSize(size);
   }
 }

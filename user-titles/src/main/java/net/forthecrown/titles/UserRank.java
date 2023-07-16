@@ -86,8 +86,8 @@ public class UserRank implements ComponentLike {
     }
 
     if (menuSlot != null) {
-      int r = menuSlot.getRow();
-      int c = menuSlot.getColumn();
+      int r = menuSlot.getY();
+      int c = menuSlot.getX();
 
       // Ensure given slot is in the upper 2x7 area and
       // not in the extra rank array below

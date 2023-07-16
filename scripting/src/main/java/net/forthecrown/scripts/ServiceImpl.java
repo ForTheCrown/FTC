@@ -9,6 +9,7 @@ import net.forthecrown.Worlds;
 import net.forthecrown.text.Text;
 import net.forthecrown.utils.io.source.Source;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.Plugin;
@@ -40,6 +41,7 @@ class ServiceImpl implements ScriptService {
     autoImportedClasses.add(Material.class);
     autoImportedClasses.add(EntityType.class);
     autoImportedClasses.add(Worlds.class);
+    autoImportedClasses.add(Bukkit.class);
   }
 
   @Override

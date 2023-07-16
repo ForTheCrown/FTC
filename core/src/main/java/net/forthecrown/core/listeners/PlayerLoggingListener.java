@@ -93,7 +93,7 @@ class PlayerLoggingListener implements Listener {
     user.updateGodMode();
     user.updateVanished();
 
-    UserJoinEvent userEvent = new UserJoinEvent(user, lastOnlineName, firstJoin);
+    UserJoinEvent userEvent = new UserJoinEvent(user, lastOnlineName, firstJoin, false);
     userEvent.callEvent();
     UserLogEvent.maybeAnnounce(userEvent);
   }

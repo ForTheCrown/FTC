@@ -96,7 +96,8 @@ public class PunishmentCommand extends FtcCommand {
   }
 
   int punish(User user, CommandSource source, @Nullable String reason, long length)
-      throws CommandSyntaxException {
+      throws CommandSyntaxException
+  {
     if (!Punishments.canPunish(source, user)) {
       throw GExceptions.cannotPunish(user);
     }
@@ -137,7 +138,8 @@ public class PunishmentCommand extends FtcCommand {
 
     @Override
     int punish(User user, CommandSource source, @Nullable String reason, long length)
-        throws CommandSyntaxException {
+        throws CommandSyntaxException
+    {
       if (!user.isOnline()) {
         throw GExceptions.CANNOT_KICK_OFFLINE;
       }

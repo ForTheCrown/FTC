@@ -12,7 +12,7 @@ class ServerLoadListener implements Listener {
   @EventHandler(ignoreCancelled = true)
   public void onServerLoad(ServerLoadEvent event) {
     CorePlugin plugin = JavaPlugin.getPlugin(CorePlugin.class);
-    plugin.getUserService().freezeRegistries();
+    plugin.getUserService().onServerLoaded();
 
     FtcHelpList helpList = FtcHelpList.helpList();
     helpList.update();

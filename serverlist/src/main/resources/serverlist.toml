@@ -65,7 +65,7 @@ icons = "default.png"
 motd = "&eNow with guilds!"
 
 [debug_mode]
-condition = "FTC.inDebugMode()"
+condition = "logger.isDebugEnabled()"
 icons = "debug_mode.png"
 priority = 2
 motd = "Test server"

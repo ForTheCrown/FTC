@@ -1,4 +1,4 @@
-package net.forthecrown.core.commands;
+package net.forthecrown.core.commands.admin;
 
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.context.CommandContext;

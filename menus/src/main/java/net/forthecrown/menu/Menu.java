@@ -3,7 +3,6 @@ package net.forthecrown.menu;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import java.util.EnumSet;
-import java.util.Objects;
 import lombok.Getter;
 import net.forthecrown.Cooldowns;
 import net.forthecrown.Loggers;
@@ -11,7 +10,6 @@ import net.forthecrown.command.Exceptions;
 import net.forthecrown.text.Text;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
-import net.forthecrown.utils.PluginUtil;
 import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.kyori.adventure.text.Component;
@@ -69,7 +67,7 @@ public class Menu implements MenuCloseConsumer {
   /* ----------------------------- CONSTRUCTOR ------------------------------ */
 
   Menu(MenuBuilder builder) {
-    this.title = Objects.requireNonNull(builder.title);
+    this.title = builder.title;
     this.size = builder.size;
     this.externalClickCallback = builder.externalClickCallback;
 
@@ -77,14 +75,21 @@ public class Menu implements MenuCloseConsumer {
 
     var nodeMap = Int2ObjectMaps.unmodifiable(builder.nodes);
     this.nodes = new MenuNode[size];
-    nodeMap.forEach((integer, menuNode) -> nodes[integer] = menuNode);
+
+    nodeMap.forEach((slot, menuNode) -> {
+      if (slot < 0 || slot >= size) {
+        throw new IndexOutOfBoundsException(
+            "Slot %s out of bounds for inventory size %s. Title = %s"
+                .formatted(slot, size, title == null ? null : Text.plain(title))
+        );
+      }
+
+      nodes[slot] = menuNode;
+    });
 
     this.openCallback = builder.openCallback;
     this.closeCallback = builder.closeCallback;
     this.border = builder.border;
-
-    String title = Text.plain(this.title);
-    var p = PluginUtil.currentContextPlugin();
   }
 
   /* ----------------------------- FUNCTIONS ------------------------------ */
@@ -127,6 +132,10 @@ public class Menu implements MenuCloseConsumer {
       Slot slot = Slot.of(i);
       MenuNode node = nodes[i];
 
+      if (node == null) {
+        continue;
+      }
+
       if (slot.getIndex() >= inv.getSize()) {
         throw new IllegalStateException(
             "Slot " + slot + " is too big for inventory size: " +
@@ -139,6 +148,8 @@ public class Menu implements MenuCloseConsumer {
       if (ItemStacks.isEmpty(item)) {
         continue;
       }
+
+      assert item != null;
 
       if (hasFlag(MenuFlag.PREVENT_ITEM_STACKING)) {
         Menus.makeUnstackable(item);

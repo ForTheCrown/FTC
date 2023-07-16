@@ -41,14 +41,14 @@ public abstract class ListPage<T> extends MenuPage {
     Slot endSlot = Slot.of(builder.getSize() - 1);
 
     // Difference between start and end slots
-    Slot size = endSlot.add(-startSlot.getColumn(), -startSlot.getRow());
+    Slot size = endSlot.add(-startSlot.getX(), -startSlot.getY());
 
     // entries per page
-    int pageSize = size.getColumn() * size.getRow();
+    int pageSize = size.getX() * size.getY();
 
     // Page move buttons
     builder.add(
-        builder.getSize() - Slot.COLUMN_SIZE,
+        builder.getSize() - Slot.X_SIZE,
         movePageButton(-1, pageSize)
     );
 
@@ -62,8 +62,8 @@ public abstract class ListPage<T> extends MenuPage {
     // when there's no entry at the given index, it
     // shows no item and does nothing when clicked
     for (int i = 0; i < pageSize; i++) {
-      int column = i % size.getColumn();
-      int row = i / size.getColumn();
+      int column = i % size.getX();
+      int row = i / size.getX();
 
       Slot slot = startSlot.add(column, row);
 

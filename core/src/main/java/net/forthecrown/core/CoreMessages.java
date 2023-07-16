@@ -2,14 +2,18 @@ package net.forthecrown.core;
 
 import static net.forthecrown.text.Text.format;
 import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.Component.translatable;
 
 import java.util.Collection;
 import java.util.UUID;
+import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.text.Text;
 import net.forthecrown.text.TextJoiner;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.GameMode;
 
 public interface CoreMessages {
 
@@ -18,6 +22,8 @@ public interface CoreMessages {
    * The title header of the ignored players list
    */
   Component IGNORE_LIST_HEADER = text("Ignored players: ", NamedTextColor.GOLD);
+
+  Component GAME_MODE_SELF = text("own", NamedTextColor.GOLD);
 
   /**
    * Lists all blocked users
@@ -59,5 +65,43 @@ public interface CoreMessages {
    */
   static Component unignorePlayer(User target) {
     return format("Unignored &e{0, user}", NamedTextColor.GRAY, target);
+  }
+
+  static Component gameModeChangedSelf(GameMode mode) {
+    return format("Set {0} gamemode to &e{1}&r.",
+        NamedTextColor.GRAY,
+        GAME_MODE_SELF,
+        translatable(mode)
+    );
+  }
+
+  static Component gameModeChangedOther(User target, GameMode mode) {
+    return format("Set {0, user}'s gamemode to &e{1}&r.",
+        NamedTextColor.GRAY,
+        target,
+        translatable(mode)
+    );
+  }
+
+  static Component gameModeChangedTarget(CommandSource changer, GameMode mode) {
+    return format("&6{0}&r changed your gamemode to &e{1}&r.",
+        NamedTextColor.GRAY,
+        Text.sourceDisplayName(changer),
+        translatable(mode)
+    );
+  }
+
+  static Component sudoCommand(User target, String cmd) {
+    return format("Forcing &e{0, user}&r to run '&f{1}&r'",
+        NamedTextColor.GRAY,
+        target, cmd
+    );
+  }
+
+  static Component sudoChat(User target, String chat) {
+    return format("Forcing &e{0, user}&r to say '&f{1}&r'",
+        NamedTextColor.GRAY,
+        target, chat
+    );
   }
 }

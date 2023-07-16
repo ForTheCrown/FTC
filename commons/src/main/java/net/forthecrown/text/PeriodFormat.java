@@ -1,6 +1,7 @@
 package net.forthecrown.text;
 
 import it.unimi.dsi.fastutil.objects.ObjectList;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
@@ -76,6 +77,10 @@ public class PeriodFormat implements ComponentLike {
 
     var currentTime = System.currentTimeMillis();
     return between(currentTime, currentTime + time);
+  }
+
+  public static PeriodFormat of(Duration time) {
+    return of(time.toMillis());
   }
 
   /**

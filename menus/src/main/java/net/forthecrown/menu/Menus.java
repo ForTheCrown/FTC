@@ -1,7 +1,7 @@
 package net.forthecrown.menu;
 
-import static net.forthecrown.menu.Slot.COLUMN_SIZE;
-import static net.forthecrown.menu.Slot.ROW_SIZE;
+import static net.forthecrown.menu.Slot.X_SIZE;
+import static net.forthecrown.menu.Slot.Y_SIZE;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
@@ -43,7 +43,7 @@ public final class Menus {
   /**
    * Maximum size of an inventory
    */
-  public static final int MAX_INV_SIZE = COLUMN_SIZE * ROW_SIZE;
+  public static final int MAX_INV_SIZE = X_SIZE * Y_SIZE;
 
   /**
    * Default border item, gray stained-glass pane
@@ -116,7 +116,7 @@ public final class Menus {
    * @return The size
    */
   public static int sizeFromRows(int rows) {
-    return rows * COLUMN_SIZE;
+    return rows * X_SIZE;
   }
 
   /**
@@ -130,7 +130,7 @@ public final class Menus {
    * @return True, if the size is a multiple of 9, bigger than 8 and less than 55
    */
   public static boolean isValidSize(int size) {
-    return size >= MIN_INV_SIZE && size <= MAX_INV_SIZE && size % COLUMN_SIZE == 0;
+    return size >= MIN_INV_SIZE && size <= MAX_INV_SIZE && size % X_SIZE == 0;
   }
 
   /**
@@ -162,19 +162,19 @@ public final class Menus {
    * @param item Item to place in the border
    */
   public static void placeBorder(Inventory in, ItemStack item) {
-    var finalRow = in.getSize() - COLUMN_SIZE - 1;
+    var finalRow = in.getSize() - X_SIZE - 1;
 
     for (int i = 0; i < in.getSize(); i++) {
       // If we're on the first or last row
       // then just place item
-      if (i < COLUMN_SIZE || i > finalRow) {
+      if (i < X_SIZE || i > finalRow) {
         setIfEmpty(in, i, item);
-      } else if (i % COLUMN_SIZE == 0) {
+      } else if (i % X_SIZE == 0) {
         // We're on the left side of the inventory
         // Place item and move to the right, place
         // and then continue loop
         setIfEmpty(in, i, item);
-        setIfEmpty(in, i += (COLUMN_SIZE - 1), item);
+        setIfEmpty(in, i += (X_SIZE - 1), item);
       }
     }
   }
@@ -190,10 +190,10 @@ public final class Menus {
   }
 
   public static boolean isBorderSlot(Slot slot, int size) {
-    return slot.getRow() == 0
-        || slot.getRow() == (size / COLUMN_SIZE)
-        || slot.getColumn() == 0
-        || slot.getColumn() == (COLUMN_SIZE - 1);
+    return slot.getY() == 0
+        || slot.getY() == (size / X_SIZE)
+        || slot.getX() == 0
+        || slot.getX() == (X_SIZE - 1);
   }
 
   /**

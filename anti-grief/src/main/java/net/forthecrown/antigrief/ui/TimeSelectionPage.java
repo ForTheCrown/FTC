@@ -11,6 +11,7 @@ import static net.forthecrown.text.Text.format;
 import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.forthecrown.Loggers;
 import net.forthecrown.menu.MenuBuilder;
 import net.forthecrown.menu.MenuNode;
 import net.forthecrown.menu.Menus;
@@ -21,8 +22,11 @@ import net.forthecrown.text.UnitFormat;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
+import org.slf4j.Logger;
 
 class TimeSelectionPage extends MenuPage {
+
+  public static final Logger LOGGER = Loggers.getLogger();
 
   private static final int[] MULTIPLIERS = {1, 2, 5, 10, 20};
 
@@ -70,6 +74,9 @@ class TimeSelectionPage extends MenuPage {
 
     for (int i = 0; i < MULTIPLIERS.length; i++) {
       var multiplier = MULTIPLIERS[i];
+
+      Slot s = start.add(i, 0);
+      LOGGER.debug("Adding multiplier slot {}", s);
 
       builder.add(start.add(i, 0),
           MenuNode.builder()

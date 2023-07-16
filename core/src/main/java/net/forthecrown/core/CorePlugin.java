@@ -30,6 +30,8 @@ public class CorePlugin extends JavaPlugin {
 
   private PeriodicalSaver saver;
 
+  private DayChange dayChange;
+
   public static CorePlugin plugin() {
     return getPlugin(CorePlugin.class);
   }
@@ -44,6 +46,7 @@ public class CorePlugin extends JavaPlugin {
     helpList = new HelpListImpl();
     userService = new UserServiceImpl(this);
     ftcServer = new FtcServerImpl();
+    dayChange = new DayChange();
 
     BukkitServices.register(FtcServer.class, ftcServer);
     BukkitServices.register(FtcHelpList.class, helpList);
@@ -55,6 +58,8 @@ public class CorePlugin extends JavaPlugin {
     Users.setService(userService);
     userService.initialize();
     userService.load();
+
+    dayChange.schedule();
 
     CoreListeners.registerAll();
     CoreCommands.createCommands();

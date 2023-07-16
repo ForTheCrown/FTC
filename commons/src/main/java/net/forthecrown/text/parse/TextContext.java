@@ -30,6 +30,10 @@ public class TextContext {
 
   public static TextContext create(Permissible textSource, Audience viewer) {
     Set<ChatParseFlag> flags = ChatParseFlag.allApplicable(textSource);
+    return of(flags, viewer);
+  }
+
+  public static TextContext of(Set<ChatParseFlag> flags, Audience viewer) {
     return new TextContext(viewer, flags);
   }
 

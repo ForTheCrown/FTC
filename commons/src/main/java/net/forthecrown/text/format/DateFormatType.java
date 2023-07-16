@@ -1,5 +1,6 @@
 package net.forthecrown.text.format;
 
+import static net.forthecrown.text.format.TextFormatTypes.DEFAULT;
 import static net.kyori.adventure.text.Component.text;
 
 import com.google.common.base.Strings;
@@ -28,7 +29,7 @@ class DateFormatType implements TextFormatType {
       return format(dateTime.toInstant().toEpochMilli(), style);
     }
 
-    return Text.valueOf(value);
+    return DEFAULT.resolve(value, style, audience);
   }
 
   private Component format(long l, String style) {

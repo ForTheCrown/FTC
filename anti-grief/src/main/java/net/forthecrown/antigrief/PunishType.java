@@ -182,7 +182,7 @@ public enum PunishType {
    */
   public String defaultReason() {
     AntiGriefPlugin plugin = JavaPlugin.getPlugin(AntiGriefPlugin.class);
-    return plugin.getConfig().getDefaultReason(this);
+    return plugin.getPluginConfig().getDefaultReason(this);
   }
 
 

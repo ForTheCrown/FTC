@@ -125,9 +125,8 @@ public class NameFactoryImpl implements UserNameFactory {
   }
 
   @Override
-  public void writeProfileDisplay(TextWriter writer, User user, Audience viewer) {
-    DisplayContext context = createContext(user, viewer, user.defaultRenderFlags());
-    createProfileText(writer, user, context, false);
+  public void writeProfileDisplay(TextWriter writer, User user, DisplayContext context) {
+    createProfileText(writer, user, context, context.intentMatches(DisplayIntent.HOVER_TEXT));
   }
 
   private Component createHoverText(User user, DisplayContext context) {
@@ -138,12 +137,15 @@ public class NameFactoryImpl implements UserNameFactory {
 
   TextWriter createProfileWriter() {
     TextWriter writer = TextWriters.newWriter();
+    applyProfileStyle(writer);
+    return writer;
+  }
 
+  @Override
+  public void applyProfileStyle(TextWriter writer) {
     writer.setFieldStyle(Style.style(NamedTextColor.YELLOW));
     writer.setFieldValueStyle(Style.style(NamedTextColor.WHITE));
     writer.setFieldSeparator(Component.text(": ", NamedTextColor.YELLOW));
-
-    return writer;
   }
 
   private void createProfileText(

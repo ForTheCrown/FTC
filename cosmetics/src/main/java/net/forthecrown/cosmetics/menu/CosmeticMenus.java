@@ -57,7 +57,7 @@ public final class CosmeticMenus {
     for (var cosmetic: type.getCosmetics()) {
       builder.add(cosmetic.getMenuSlot(), cosmetic.toMenuNode());
 
-      int row = cosmetic.getMenuSlot().getRow();
+      int row = cosmetic.getMenuSlot().getY();
       if (row > lowestRow) {
         lowestRow = row;
       }

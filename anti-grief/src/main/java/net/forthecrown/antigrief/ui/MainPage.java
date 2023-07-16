@@ -7,6 +7,13 @@ import net.forthecrown.menu.MenuNode;
 import net.forthecrown.menu.Menus;
 import net.forthecrown.menu.Slot;
 import net.forthecrown.menu.page.MenuPage;
+import net.forthecrown.user.User;
+import net.forthecrown.utils.context.Context;
+import net.forthecrown.utils.inventory.ItemStacks;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 class MainPage extends MenuPage {
 
@@ -39,5 +46,12 @@ class MainPage extends MenuPage {
 
     builder.add(PAST_PUNISHMENTS_SLOT, pastView);
     builder.add(CURRENT_PUNISHMENTS_SLOT, currentView);
+  }
+
+  @Override
+  public @Nullable ItemStack createItem(@NotNull User user, @NotNull Context context) {
+    return ItemStacks.builder(Material.PAPER)
+        .setName("&e< Main Page")
+        .build();
   }
 }

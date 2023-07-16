@@ -6,5 +6,5 @@ import org.bukkit.permissions.Permission;
 public interface CosmeticPermissions {
 
   Permission DEFAULT = Permissions.register("ftc.cosmetics");
-  Permission ADMIN = Permissions.registerPrefixed(DEFAULT, "admin");
+  Permission ADMIN = Permissions.register(DEFAULT, "admin");
 }

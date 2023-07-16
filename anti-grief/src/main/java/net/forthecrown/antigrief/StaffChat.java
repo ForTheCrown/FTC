@@ -12,20 +12,25 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import net.forthecrown.command.settings.Setting;
+import net.forthecrown.command.settings.SettingAccess;
+import net.forthecrown.command.settings.SettingsBook;
 import net.forthecrown.discord.FtcDiscord;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.text.ChannelledMessage;
 import net.forthecrown.text.Text;
 import net.forthecrown.text.TextWriter;
 import net.forthecrown.text.TextWriters;
+import net.forthecrown.text.ViewerAwareMessage;
 import net.forthecrown.user.Properties;
 import net.forthecrown.user.User;
+import net.forthecrown.user.UserProperty;
 import net.forthecrown.user.Users;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Class representing the staff chat
@@ -38,6 +43,9 @@ public final class StaffChat {
 
   public static final Set<UUID> toggledPlayers = new HashSet<>();
 
+  public static final UserProperty<Boolean> FORWARDING_DISABLED
+      = Properties.booleanProperty("staffChat_forwardingDisabled", false);
+
   public static final Component PREFIX
       = Component.text("[Staff] ", NamedTextColor.DARK_GRAY);
 
@@ -47,19 +55,48 @@ public final class StaffChat {
   public static final Component DISCORD_PREFIX
       = Component.text("[Discord] ", NamedTextColor.GRAY);
 
-  /**
-   * Sends a staff chat message
-   *
-   * @param sender  The message's sender
-   * @param message The message
-   * @param cmd     Whether the message was sent via command (If true, message won't get logged)
-   */
-  public static void send(@NotNull CommandSource sender, @NotNull Component message, boolean cmd) {
-    newMessage()
-        .setSource(sender)
-        .setMessage(message)
-        .setLogged(!cmd)
-        .send();
+  static void createSettings(SettingsBook<User> settingsBook) {
+    SettingAccess access = new SettingAccess() {
+      @Override
+      public boolean getState(User user) {
+        return toggledPlayers.contains(user.getUniqueId());
+      }
+
+      @Override
+      public void setState(User user, boolean state) {
+        if (state) {
+          toggledPlayers.add(user.getUniqueId());
+        } else {
+          toggledPlayers.remove(user.getUniqueId());
+        }
+      }
+    };
+
+    Setting setting = Setting.create(access)
+        .setDescription("Toggles all chat message being sent to staff chat")
+        .setDisplayName("StaffChat Toggle")
+        .setToggleDescription("{Enable} all chat messages being sent to staff chat")
+
+        .createCommand(
+            "staffchattoggle",
+            GriefPermissions.STAFF_CHAT,
+            GriefPermissions.STAFF_CHAT,
+            "sct", "sctoggle"
+        );
+
+    Setting forwarding = Setting.create(FORWARDING_DISABLED)
+        .setDisplayName("SC Forwarding")
+        .setDescription("Toggles staff chat messages being forwarded to Discord")
+        .setToggleDescription("{Enable} staff chat messages being forwarded to Discord")
+        .createCommand(
+            "staffchatdiscord",
+            GriefPermissions.STAFF_CHAT,
+            GriefPermissions.STAFF_CHAT,
+            "scdiscord", "sctogglediscord", "staffchat_togglediscord"
+        );
+
+    settingsBook.getSettings().add(setting.toBookSettng());
+    settingsBook.getSettings().add(forwarding.toBookSettng());
   }
 
   public static boolean isVanished(CommandSource source) {
@@ -78,7 +115,7 @@ public final class StaffChat {
   public static class StaffChatMessage {
     private MessageSource source;
 
-    private Component message;
+    private ViewerAwareMessage message;
     private Component prefix;
 
     private boolean logged;
@@ -105,21 +142,27 @@ public final class StaffChat {
     public void send() {
       Objects.requireNonNull(message, "Message not specified");
 
-      var writer = TextWriters.newWriter();
-      write(writer);
+      ChannelledMessage msg = ChannelledMessage.create(viewer -> {
+        var writer = TextWriters.newWriter();
+        writer.viewer(viewer);
 
-      var msg = writer.asComponent();
-      for (Player p : Bukkit.getOnlinePlayers()) {
-        if (!p.hasPermission(GriefPermissions.STAFF_CHAT)) {
-          continue;
+        write(writer);
+        return writer.asComponent();
+      });
+
+      Bukkit.getOnlinePlayers().forEach(player -> {
+        if (!player.hasPermission(GriefPermissions.STAFF_CHAT)) {
+          return;
         }
 
-        p.sendMessage(msg);
-      }
+        msg.addViewer(player);
+      });
 
       if (isLogged()) {
-        Bukkit.getConsoleSender().sendMessage(msg);
+        msg.addViewer(Bukkit.getConsoleSender());
       }
+
+      msg.send();
 
       if (discordForwarded && !fromDiscord) {
         sendDiscord();
@@ -128,12 +171,12 @@ public final class StaffChat {
 
     private void sendDiscord() {
       findChannel(COOL_CLUB).ifPresent(channel -> {
-        String strMessage = Text.toDiscord(message);
+        String strMessage = Text.toDiscord(message.asComponent());
 
         channel.sendMessageFormat("**%s >** %s",
             source == null
                 ? "UNKNOWN"
-                : Text.toDiscord(source.displayName()),
+                : Text.toDiscord(source.displayName(null)),
             strMessage
         ).submit();
       });
@@ -155,19 +198,19 @@ public final class StaffChat {
           writer.write(VANISH_PREFIX);
         }
 
-        writer.write(source.displayName());
+        writer.write(source.displayName(writer.viewer()));
       }
 
       writer.write(
           Component.text(" > ", NamedTextColor.DARK_GRAY, TextDecoration.BOLD)
       );
 
-      writer.write(message);
+      writer.write(message.create(writer.viewer()));
     }
   }
 
   public interface MessageSource {
-    Component displayName();
+    Component displayName(Audience viewer);
 
     boolean isVanished();
 
@@ -176,7 +219,7 @@ public final class StaffChat {
     static MessageSource simple(String name) {
       return new MessageSource() {
         @Override
-        public Component displayName() {
+        public Component displayName(Audience viewer) {
           return Component.text(name);
         }
 
@@ -195,9 +238,9 @@ public final class StaffChat {
     static MessageSource of(CommandSource source) {
       return new MessageSource() {
         @Override
-        public Component displayName() {
+        public Component displayName(Audience viewer) {
           if (source.isPlayer()) {
-            return Users.get(source.asPlayerOrNull()).displayName();
+            return Users.get(source.asPlayerOrNull()).displayName(viewer);
           }
 
           return source.displayName();
@@ -236,9 +279,9 @@ public final class StaffChat {
         }
 
         @Override
-        public Component displayName() {
+        public Component displayName(Audience viewer) {
           return asUser().map(
-              User::displayName,
+              user -> user.displayName(viewer),
               member1 -> Component.text(member1.getEffectiveName())
           );
         }

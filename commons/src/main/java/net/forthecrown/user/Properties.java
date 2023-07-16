@@ -52,6 +52,10 @@ public final class Properties {
       .defaultValue(Component.empty())
       .build();
 
+  public static UserProperty<Boolean> booleanProperty(String name, boolean defaultValue) {
+    return booleanProperty().key(name).defaultValue(defaultValue).build();
+  }
+
   public static UserProperty.Builder<Boolean> booleanProperty() {
     return Users.getService().createBooleanProperty();
   }

@@ -15,6 +15,7 @@ import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.text.PeriodFormat;
 import net.forthecrown.text.Text;
+import net.forthecrown.text.ViewerAwareMessage;
 import net.forthecrown.user.NameRenderFlags;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
@@ -25,7 +26,8 @@ import org.bukkit.inventory.ItemStack;
 
 public class TextFormatTypes {
 
-  public static final TextFormatType DEFAULT = (value, style, viewer) -> Text.valueOf(value);
+  public static final TextFormatType DEFAULT
+      = (value, style, viewer) -> Text.valueOf(value, viewer);
 
   /**
    * Formats the given <code>arg</code> input into a rhines message.
@@ -80,7 +82,7 @@ public class TextFormatTypes {
    */
   public static final TextFormatType CLASS = (value, style, audience) -> {
     if (value == null) {
-      return Text.valueOf(null);
+      return DEFAULT.resolve(value, style, audience);
     }
 
     Class c = value instanceof Class<?> ? (Class) value : value.getClass();
@@ -129,7 +131,7 @@ public class TextFormatTypes {
     } else if (value instanceof Number number) {
       time = number.longValue();
     } else {
-      return Text.valueOf(value);
+      return DEFAULT.resolve(value, style, audience);
     }
 
     if (style.contains("-ticks")) {
@@ -191,7 +193,7 @@ public class TextFormatTypes {
 
       user = Users.get(source.asPlayerOrNull());
     } else {
-      return Text.valueOf(value);
+      return DEFAULT.resolve(value, style, audience);
     }
 
     Set<NameRenderFlags> flags = EnumSet.noneOf(NameRenderFlags.class);
@@ -224,7 +226,7 @@ public class TextFormatTypes {
     // Make sure we're given an item stack
     // If not, just return a default value
     if (!(value instanceof ItemStack item)) {
-      return Text.valueOf(value);
+      return DEFAULT.resolve(value, style, audience);
     }
 
     // Format name with or without the item quantity

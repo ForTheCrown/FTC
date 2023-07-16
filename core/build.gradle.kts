@@ -25,6 +25,11 @@ pluginYml {
     required("LuckPerms")
     required("FastAsyncWorldEdit")
   }
+
+  loadBefore {
+    regular("GriefPrevention")
+    regular("OpenInv")
+  }
 }
 
 tasks {

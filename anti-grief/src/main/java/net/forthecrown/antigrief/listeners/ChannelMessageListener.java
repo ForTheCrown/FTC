@@ -4,6 +4,8 @@ import net.forthecrown.antigrief.BannedWords;
 import net.forthecrown.antigrief.Mute;
 import net.forthecrown.antigrief.Punishments;
 import net.forthecrown.events.ChannelMessageEvent;
+import net.forthecrown.utils.Audiences;
+import net.kyori.adventure.audience.Audience;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -12,7 +14,7 @@ class ChannelMessageListener implements Listener {
 
   @EventHandler(ignoreCancelled = true)
   public void onChannelMessage(ChannelMessageEvent event) {
-    var source = event.getUserSource();
+    Audience source = event.getSource();
 
     if (source == null) {
       return;
@@ -26,7 +28,7 @@ class ChannelMessageListener implements Listener {
     }
 
     if (mute == Mute.SOFT) {
-      event.getViewers().removeIf(audience -> audience.equals(event.getSource()));
+      event.getViewers().removeIf(viewer -> !Audiences.equals(viewer, source));
     }
 
     if (source instanceof CommandSender cmdSource

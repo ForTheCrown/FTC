@@ -13,6 +13,7 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.user.User;
+import net.forthecrown.user.UserService;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.ArrayIterator;
 import net.forthecrown.utils.io.JsonWrapper;
@@ -157,7 +158,14 @@ public class PunishEntry {
       }
     }
 
-    type.onPunishmentEnd(getUser(), this, punishment);
+    UserService service = Users.getService();
+
+    if (service.userLoadingAllowed()) {
+      type.onPunishmentEnd(getUser(), this, punishment);
+    } else {
+      PunishmentManager manager = Punishments.get();
+      manager.getPostStartup().add(() -> type.onPunishmentEnd(getUser(), this, punishment));
+    }
   }
 
   void clearCurrent() {

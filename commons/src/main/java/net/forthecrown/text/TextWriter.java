@@ -19,21 +19,15 @@ public interface TextWriter extends ComponentLike {
 
   void clear();
 
-  default void field(ComponentLike field, ComponentLike value) {
-    line(field.asComponent().applyFallbackStyle(getFieldStyle()));
+  default void field(Object field, Object value) {
+    line(Text.valueOf(field, viewer()).applyFallbackStyle(getFieldStyle()));
     write(getFieldSeparator());
 
-    if (!Text.isEmpty(value)) {
-      write(value.asComponent().applyFallbackStyle(getFieldValueStyle()));
+    Component valueText = Text.valueOf(value, viewer());
+
+    if (!Text.isEmpty(valueText)) {
+      write(valueText.applyFallbackStyle(getFieldValueStyle()));
     }
-  }
-
-  default void field(String field, ComponentLike value) {
-    field(Text.renderString(field), value);
-  }
-
-  default void field(String field, Object value) {
-    field(Text.renderString(field), Text.valueOf(value));
   }
 
   default void line(String s) {
@@ -80,7 +74,7 @@ public interface TextWriter extends ComponentLike {
             .setViewer(viewer())
             .setFormat(format)
             .setArguments(args)
-            .format()
+            .asComponent()
     );
   }
 
@@ -90,7 +84,7 @@ public interface TextWriter extends ComponentLike {
             .setViewer(viewer())
             .setFormat(format)
             .setArguments(args)
-            .format()
+            .asComponent()
     );
   }
 
@@ -100,7 +94,7 @@ public interface TextWriter extends ComponentLike {
             .setViewer(viewer())
             .setFormat(format, color)
             .setArguments(args)
-            .format()
+            .asComponent()
     );
   }
 
@@ -110,7 +104,7 @@ public interface TextWriter extends ComponentLike {
             .setViewer(viewer())
             .setFormat(format, style)
             .setArguments(args)
-            .format()
+            .asComponent()
     );
   }
 
@@ -120,7 +114,7 @@ public interface TextWriter extends ComponentLike {
             .setViewer(viewer())
             .setFormat(format)
             .setArguments(args)
-            .format()
+            .asComponent()
     );
   }
 
@@ -130,7 +124,7 @@ public interface TextWriter extends ComponentLike {
             .setViewer(viewer())
             .setFormat(format, color)
             .setArguments(args)
-            .format()
+            .asComponent()
     );
   }
 
@@ -140,12 +134,12 @@ public interface TextWriter extends ComponentLike {
             .setViewer(viewer())
             .setFormat(format, style)
             .setArguments(args)
-            .format()
+            .asComponent()
     );
   }
 
   default void formattedLine(ComponentLike like, Object... args) {
-    line(FormatBuilder.builder().setViewer(viewer()).setFormat(like).setArguments(args).format());
+    line(FormatBuilder.builder().setViewer(viewer()).setFormat(like).setArguments(args).asComponent());
   }
 
   default void formattedField(Object field, String valueFormat, Object... args) {
@@ -156,7 +150,7 @@ public interface TextWriter extends ComponentLike {
             .setArguments(args)
             .setFormat(valueFormat)
             .setViewer(viewer())
-            .format()
+            .asComponent()
     );
   }
 

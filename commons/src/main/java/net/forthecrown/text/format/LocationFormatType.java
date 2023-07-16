@@ -1,5 +1,7 @@
 package net.forthecrown.text.format;
 
+import static net.forthecrown.text.format.TextFormatTypes.DEFAULT;
+
 import net.forthecrown.text.Text;
 import net.forthecrown.utils.math.WorldVec3i;
 import net.kyori.adventure.audience.Audience;
@@ -22,7 +24,7 @@ public class LocationFormatType implements TextFormatType {
       return location(includeWorld, clickable, vec3i.toLocation());
     }
 
-    return Text.valueOf(value);
+    return DEFAULT.resolve(value, style, viewer);
   }
 
   private Component location(boolean world, boolean clickable, Location l) {

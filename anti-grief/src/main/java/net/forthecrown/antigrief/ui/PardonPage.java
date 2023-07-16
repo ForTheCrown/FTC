@@ -11,10 +11,14 @@ import net.forthecrown.menu.Menus;
 import net.forthecrown.menu.Slot;
 import net.forthecrown.menu.page.MenuPage;
 import net.forthecrown.text.Text;
+import net.forthecrown.user.User;
+import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 class PardonPage extends MenuPage {
 
@@ -85,5 +89,12 @@ class PardonPage extends MenuPage {
   @Override
   protected MenuNode createHeader() {
     return HEADER;
+  }
+
+  @Override
+  public @Nullable ItemStack createItem(@NotNull User user, @NotNull Context context) {
+    return ItemStacks.builder(Material.PAPER)
+        .setName("&e< Go back")
+        .build();
   }
 }

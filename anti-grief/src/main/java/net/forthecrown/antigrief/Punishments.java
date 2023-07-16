@@ -1,23 +1,24 @@
 package net.forthecrown.antigrief;
 
 import static net.forthecrown.antigrief.Punishment.INDEFINITE_EXPIRY;
+import static net.kyori.adventure.text.Component.text;
 
 import com.google.common.base.Strings;
+import java.util.Objects;
 import javax.annotation.Nullable;
 import net.forthecrown.Loggers;
 import net.forthecrown.Permissions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.text.PeriodFormat;
-import net.forthecrown.text.Text;
-import net.forthecrown.user.User;
-import net.forthecrown.utils.Audiences;
 import net.forthecrown.text.ChannelledMessage;
 import net.forthecrown.text.ChannelledMessage.MessageRenderer;
+import net.forthecrown.text.PeriodFormat;
+import net.forthecrown.text.ViewerAwareMessage;
+import net.forthecrown.text.format.FormatBuilder;
+import net.forthecrown.user.User;
+import net.forthecrown.utils.Audiences;
 import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.slf4j.Logger;
 
@@ -46,7 +47,7 @@ public final class Punishments {
     Mute status = muteStatus(sender);
 
     if (status == Mute.HARD) {
-      sender.sendMessage(Component.text("You are muted!", NamedTextColor.RED));
+      sender.sendMessage(text("You are muted!", NamedTextColor.RED));
     }
 
     return status;
@@ -81,12 +82,8 @@ public final class Punishments {
    * @return The sender's entry, null, if the sender is not a player or a user
    */
   public static PunishEntry entry(Audience sender) {
-    Player player = Audiences.getPlayer(sender);
-
-    if (player == null) {
-      return null;
-    }
-
+    User player = Audiences.getUser(sender);
+    Objects.requireNonNull(player);
     return inst.getEntry(player.getUniqueId());
   }
 
@@ -153,22 +150,24 @@ public final class Punishments {
       long length,
       String reason
   ) {
-    TextComponent.Builder builder = Component.text()
-        .append(Component.text(type.nameEndingED() + " "))
-        .color(NamedTextColor.YELLOW)
-        .append(target.displayName().color(NamedTextColor.GOLD));
+    _announce(source, viewer -> {
+      TextComponent.Builder builder = text()
+          .append(text(type.nameEndingED() + " "))
+          .color(NamedTextColor.YELLOW)
+          .append(target.displayName(viewer).color(NamedTextColor.GOLD));
 
-    if (length != INDEFINITE_EXPIRY) {
-      builder.append(Component.text(" for "))
-          .append(PeriodFormat.of(length).asComponent().color(NamedTextColor.GOLD));
-    }
+      if (length != INDEFINITE_EXPIRY) {
+        builder.append(text(" for "))
+            .append(PeriodFormat.of(length).asComponent().color(NamedTextColor.GOLD));
+      }
 
-    if (!Strings.isNullOrEmpty(reason)) {
-      builder.append(Component.text(", reason: "))
-          .append(Component.text(reason).color(NamedTextColor.GOLD));
-    }
+      if (!Strings.isNullOrEmpty(reason)) {
+        builder.append(text(", reason: "))
+            .append(text(reason).color(NamedTextColor.GOLD));
+      }
 
-    _announce(source, builder.build());
+      return builder.build();
+    });
   }
 
   /**
@@ -181,9 +180,13 @@ public final class Punishments {
   public static void announcePardon(CommandSource source, User target, PunishType type) {
     _announce(
         source,
-        Component.text("Un" + type.nameEndingED() + " ")
-            .color(NamedTextColor.YELLOW)
-            .append(target.displayName().color(NamedTextColor.YELLOW))
+        viewer -> {
+          return FormatBuilder.builder()
+              .setViewer(viewer)
+              .setFormat("Un{0} {1, user}", NamedTextColor.YELLOW)
+              .setArguments(type.nameEndingED(), target)
+              .asComponent();
+        }
     );
 
     LOGGER.info("{} Un{} {}",
@@ -193,25 +196,26 @@ public final class Punishments {
     );
   }
 
-  private static void _announce(CommandSource source, Component text) {
+  private static void _announce(CommandSource source, ViewerAwareMessage text) {
     // If punishments should be announced to all, then announce them
     // to all, otherwise send them to staff chat only
     if (!StaffChat.isVanished(source) && config().isAnnouncePunishments()) {
       source.sendMessage(text);
 
-      ChannelledMessage.create(Text.format("{0}: {1}", Text.sourceDisplayName(source), text))
-          .renderer(MessageRenderer.FTC_PREFIX)
-          .setBroadcast()
-          .send();
+      ChannelledMessage message = ChannelledMessage.create(viewer -> {
+        return FormatBuilder.builder()
+            .setFormat("{0, user}: {1}")
+            .setArguments(source, text)
+            .setViewer(viewer)
+            .asComponent();
+      });
 
+      message.renderer(MessageRenderer.FTC_PREFIX).setBroadcast().send();
       return;
     }
 
     // Tell staff chat
-    StaffChat.newMessage()
-        .setSource(source)
-        .setMessage(text)
-        .send();
+    StaffChat.newMessage().setSource(source).setMessage(text).send();
   }
 
   /**
@@ -242,6 +246,6 @@ public final class Punishments {
   }
 
   private static AntiGriefConfig config() {
-    return JavaPlugin.getPlugin(AntiGriefPlugin.class).getConfig();
+    return JavaPlugin.getPlugin(AntiGriefPlugin.class).getPluginConfig();
   }
 }

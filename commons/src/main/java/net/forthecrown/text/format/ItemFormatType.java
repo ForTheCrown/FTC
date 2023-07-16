@@ -1,5 +1,7 @@
 package net.forthecrown.text.format;
 
+import static net.forthecrown.text.format.TextFormatTypes.DEFAULT;
+
 import net.forthecrown.text.Text;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -13,7 +15,7 @@ public class ItemFormatType implements TextFormatType {
     // Make sure we're given an item stack
     // If not, just return a default value
     if (!(value instanceof ItemStack item)) {
-      return Text.valueOf(value);
+      return DEFAULT.resolve(value, style, audience);
     }
 
     // Format name with or without the item quantity

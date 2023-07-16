@@ -28,12 +28,12 @@ public class Slot {
    * The size of possible column positions (x coordinates) in an inventory, basically max column pos
    * + 1
    */
-  public static final int COLUMN_SIZE = 9;
+  public static final int X_SIZE = 9;
 
   /**
    * The size of possible row positions (y coordinate) in an inventory, basically max row pos + 1
    */
-  public static final int ROW_SIZE = 6;
+  public static final int Y_SIZE = 6;
 
   public static final Slot ZERO;
 
@@ -41,18 +41,18 @@ public class Slot {
   private static final Slot[][] XY_CACHE;
 
   static {
-    int slotsSize = COLUMN_SIZE * ROW_SIZE;
+    int slotsSize = X_SIZE * Y_SIZE;
     INDEX_CACHE = new Slot[slotsSize];
-    XY_CACHE = new Slot[COLUMN_SIZE][ROW_SIZE];
+    XY_CACHE = new Slot[X_SIZE][Y_SIZE];
 
     // Cache all slots
     int i = 0;
-    for (int col = 0; col < COLUMN_SIZE; col++) {
-      for (int row = 0; row < ROW_SIZE; row++) {
-        Slot slot = new Slot(col, row, i);
+    for (int y = 0; y < Y_SIZE; y++) {
+      for (int x = 0; x < X_SIZE; x++) {
+        Slot slot = new Slot(x, y, i);
 
         INDEX_CACHE[i] = slot;
-        XY_CACHE[col][row] = slot;
+        XY_CACHE[x][y] = slot;
 
         i++;
       }
@@ -66,12 +66,12 @@ public class Slot {
   /**
    * The slot's column (x) position
    */
-  private final byte column;
+  private final byte x;
 
   /**
    * slot's row (y) position
    */
-  private final byte row;
+  private final byte y;
 
   /**
    * The slot's inventory index
@@ -80,9 +80,9 @@ public class Slot {
 
   /* ---------------------------- CONSTRUCTOR ----------------------------- */
 
-  private Slot(int column, int row, int index) {
-    this.row = (byte) row;
-    this.column = (byte) column;
+  private Slot(int x, int y, int index) {
+    this.y = (byte) y;
+    this.x = (byte) x;
     this.index = index;
   }
 
@@ -91,13 +91,13 @@ public class Slot {
   /**
    * Gets the slot value of the given column (x) and row (y)
    *
-   * @param column The column (X) position of the slot
-   * @param row    The row (Y) position of the slot
+   * @param x The column (X) position of the slot
+   * @param y    The row (Y) position of the slot
    * @return The slot at the given coordinates
    */
-  public static Slot of(int column, int row) {
-    validateSlot(column, row);
-    return XY_CACHE[column][row];
+  public static Slot of(int x, int y) {
+    validateSlot(x, y);
+    return XY_CACHE[x][y];
   }
 
   /**
@@ -118,24 +118,24 @@ public class Slot {
    * @return The inventory index
    */
   public static int toIndex(int column, int row) {
-    return (row * COLUMN_SIZE) + column;
+    return (row * X_SIZE) + column;
   }
 
   public static void validateSlot(int index) {
     Objects.checkIndex(index, INDEX_CACHE.length);
   }
 
-  public static void validateSlot(int col, int row) {
+  public static void validateSlot(int x, int y) {
     // Ensure both column and row are in
     // inventory bounds
-    Validate.isTrue(col >= 0 && col < COLUMN_SIZE,
+    Validate.isTrue(x >= 0 && x < X_SIZE,
         "Invalid column, must be in range [0..%s], found: %s",
-        COLUMN_SIZE - 1, col
+        X_SIZE - 1, x
     );
 
-    Validate.isTrue(row >= 0 && row < ROW_SIZE,
+    Validate.isTrue(y >= 0 && y < Y_SIZE,
         "Invalid row, must be in range [0..%s], found: %s",
-        ROW_SIZE - 1, row
+        Y_SIZE - 1, y
     );
   }
 
@@ -144,12 +144,12 @@ public class Slot {
   /**
    * Adds the given amount to this slot's column (X) and row (Y) positions
    *
-   * @param column X-axis addition amount
-   * @param row    Y-axis addition amount
+   * @param x X-axis addition amount
+   * @param y    Y-axis addition amount
    * @return The slot at that position
    */
-  public Slot add(int column, int row) {
-    return of(this.column + column, this.row + row);
+  public Slot add(int x, int y) {
+    return of(this.x + x, this.y + y);
   }
 
   /* ----------------------------- LOADER ------------------------------ */
@@ -175,13 +175,22 @@ public class Slot {
 
     JsonWrapper json = JsonWrapper.wrap(element.getAsJsonObject());
 
-    Preconditions.checkState(json.has("row"), "No 'row' element in JSON");
-    Preconditions.checkState(json.has("column"), "No 'column' element in JSON");
+    int x = getInt(json, "column", "x");
+    int y = getInt(json, "row", "y");
 
-    int col = json.getInt("column");
-    int row = json.getInt("row");
+    return of(x, y);
+  }
 
-    return of(col, row);
+  private static int getInt(JsonWrapper json, String key, String fallbackKey) {
+    if (json.has(key)) {
+      return json.getInt(key);
+    }
+
+    if (json.has(fallbackKey)) {
+      return json.getInt(fallbackKey);
+    }
+
+    throw new IllegalStateException("No '" + key + "' or '" + fallbackKey + "' element in JSON");
   }
 
   // --- OBJECT OVERRIDES ---
@@ -205,6 +214,6 @@ public class Slot {
 
   @Override
   public String toString() {
-    return "(x=" + column + ", y=" + row + ")";
+    return "(x=" + x + ", y=" + y + ", index=" + index + ")";
   }
 }

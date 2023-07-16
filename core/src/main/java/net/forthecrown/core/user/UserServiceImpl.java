@@ -1,17 +1,9 @@
 package net.forthecrown.core.user;
 
+import com.google.common.base.Preconditions;
 import com.google.common.reflect.Reflection;
 import com.mojang.serialization.Codec;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import java.lang.management.ManagementFactory;
-import java.nio.file.Path;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 import lombok.Getter;
 import net.forthecrown.Loggers;
 import net.forthecrown.core.CoreConfig;
@@ -21,14 +13,8 @@ import net.forthecrown.registry.Holder;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.registry.RegistryListener;
-import net.forthecrown.user.Properties;
-import net.forthecrown.user.TimeField;
-import net.forthecrown.user.User;
-import net.forthecrown.user.UserComponent;
-import net.forthecrown.user.UserLookup;
-import net.forthecrown.user.UserProperty;
+import net.forthecrown.user.*;
 import net.forthecrown.user.UserProperty.Builder;
-import net.forthecrown.user.UserService;
 import net.forthecrown.user.event.UserLeaveEvent;
 import net.forthecrown.user.event.UserLogEvent;
 import net.forthecrown.utils.Result;
@@ -45,6 +31,16 @@ import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
+
+import java.lang.management.ManagementFactory;
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 @Internal
 @Getter
@@ -67,6 +63,8 @@ public class UserServiceImpl implements UserService {
   private final ScoreIntMap<UUID> votes;
 
   private final Registry<UserProperty<?>> propertyRegistry;
+
+  private boolean componentRegistryFrozen = false;
 
   public UserServiceImpl(CorePlugin plugin) {
     this.plugin = plugin;
@@ -112,6 +110,11 @@ public class UserServiceImpl implements UserService {
     return plugin.getFtcConfig();
   }
 
+  @Override
+  public boolean userLoadingAllowed() {
+    return userMaps.isLoadingEnabled();
+  }
+
   public void initialize() {
     // *Spongebob stinky sound effect*
     Reflection.initialize(Properties.class);
@@ -126,6 +129,7 @@ public class UserServiceImpl implements UserService {
     userMaps.getOnline().forEach(user -> {
       onUserLeave(user, QuitReason.DISCONNECTED, false);
     });
+    userMaps.setLoadingEnabled(false);
   }
 
   public void save() {
@@ -170,7 +174,7 @@ public class UserServiceImpl implements UserService {
     Player player = Bukkit.getPlayer(user.getUniqueId());
     Objects.requireNonNull(player, "Player not online: " + user.getName());
 
-    UserLeaveEvent userEvent = new UserLeaveEvent(user, reason);
+    UserLeaveEvent userEvent = new UserLeaveEvent(user, reason, false);
     userEvent.callEvent();
 
     if (announce) {
@@ -226,8 +230,10 @@ public class UserServiceImpl implements UserService {
     return Result.success(timeSeconds);
   }
 
-  public void freezeRegistries() {
+  public void onServerLoaded() {
     propertyRegistry.freeze();
+    componentRegistryFrozen = true;
+    userMaps.setLoadingEnabled(true);
   }
 
   @Override
@@ -307,6 +313,11 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public void registerComponent(Class<? extends UserComponent> componentType) {
+    Preconditions.checkState(
+        !componentRegistryFrozen,
+        "Component registry is frozen and cannot be modified"
+    );
+
     Components.createFactory(componentType);
   }
 

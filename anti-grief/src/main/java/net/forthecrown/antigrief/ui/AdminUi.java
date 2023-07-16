@@ -6,6 +6,7 @@ import net.forthecrown.menu.MenuNode;
 import net.forthecrown.text.TextWriters;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
+import net.forthecrown.user.name.UserNameFactory;
 import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.context.ContextOption;
 import net.forthecrown.utils.context.ContextSet;
@@ -30,9 +31,12 @@ public final class AdminUi {
             .setName(target.displayName(user));
 
         var writer = TextWriters.buffered();
-        Users.getService().getNameFactory().writeProfileDisplay(writer, target, user);
-        builder.addLore(writer.getBuffer());
 
+        UserNameFactory factory = Users.getService().getNameFactory();
+        factory.applyProfileStyle(writer);
+        factory.writeProfileDisplay(writer, target, user);
+
+        builder.addLore(writer.getBuffer());
         return builder.build();
       })
 

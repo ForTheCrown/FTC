@@ -5,13 +5,18 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.lang.StackWalker.Option;
 import net.forthecrown.command.arguments.Arguments;
 import net.forthecrown.command.arguments.ExpandedEntityArgument;
+import net.forthecrown.command.arguments.UserParseResult;
 import net.forthecrown.command.help.FtcSyntaxConsumer;
+import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Readers;
 import net.forthecrown.grenadier.annotations.AnnotatedCommandContext;
 import net.forthecrown.grenadier.annotations.AnnotatedCommandContext.DefaultExecutionRule;
+import net.forthecrown.grenadier.annotations.ArgumentModifier;
 import net.forthecrown.grenadier.annotations.CommandDataLoader;
 import net.forthecrown.grenadier.annotations.TypeRegistry;
 import net.forthecrown.text.page.PageEntryIterator;
+import net.forthecrown.user.User;
+import net.forthecrown.user.Users;
 import net.forthecrown.utils.PluginUtil;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.inventory.ItemStacks;
@@ -38,6 +43,11 @@ public final class Commands {
     Class<?> caller = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE).getCallerClass();
     CommandDataLoader loader = CommandDataLoader.resources(caller.getClassLoader());
     ctx.addLoader(loader);
+
+    ArgumentModifier<UserParseResult, User> resultToUser = (context, input) -> {
+      return input.get(context.getSource(), true);
+    };
+    ctx.getVariables().put("result_to_user", resultToUser);
 
     return ctx;
   }
@@ -132,6 +142,16 @@ public final class Commands {
           .dispatcherUnknownArgument()
           .createWithContext(reader);
     }
+  }
+
+  /**
+   * Gets the specified {@code source} as a {@link User}
+   * @param source Command source
+   * @return Source's user object
+   * @throws CommandSyntaxException If the {@code source} is not a player
+   */
+  public static User getUserSender(CommandSource source) throws CommandSyntaxException {
+    return Users.get(source.asPlayer());
   }
 
   /**

@@ -7,8 +7,9 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
+import org.jetbrains.annotations.NotNull;
 
-public class FormatBuilder {
+public class FormatBuilder implements ComponentLike {
 
   private Component format;
   private Object[] arguments;
@@ -45,7 +46,9 @@ public class FormatBuilder {
     return this;
   }
 
-  public Component format() {
+  @Override
+  @NotNull
+  public Component asComponent() {
     Objects.requireNonNull(format, "Format base not set");
 
     if (arguments == null || arguments.length < 1) {

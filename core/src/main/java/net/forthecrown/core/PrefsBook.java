@@ -6,6 +6,5 @@ import net.forthecrown.user.User;
 public class PrefsBook {
 
   static void init(SettingsBook<User> settings) {
-
   }
 }

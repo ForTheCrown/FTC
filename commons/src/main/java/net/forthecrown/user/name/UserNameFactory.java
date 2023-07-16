@@ -62,7 +62,24 @@ public interface UserNameFactory {
    * @param user User whose profile to format
    * @param viewer The audience viewing the profile
    */
-  void writeProfileDisplay(TextWriter writer, User user, Audience viewer);
+  default void writeProfileDisplay(TextWriter writer, User user, Audience viewer) {
+    DisplayContext ctx = createContext(user, viewer, user.defaultRenderFlags());
+    writeProfileDisplay(writer, user, ctx);
+  }
+
+  /**
+   * Writes the user's profile display
+   * @param writer Display output
+   * @param user User whose profile to format
+   * @param context Display context
+   */
+  void writeProfileDisplay(TextWriter writer, User user, DisplayContext context);
+
+  /**
+   * Applies the normal profile display style to the specified {@code writer}
+   * @param writer Writer to apply the style to
+   */
+  void applyProfileStyle(TextWriter writer);
 
   /**
    * Creates a display context

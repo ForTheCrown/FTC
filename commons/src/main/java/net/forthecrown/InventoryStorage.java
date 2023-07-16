@@ -36,7 +36,9 @@ public interface InventoryStorage {
   void swap(@NotNull Player player, @NotNull String category);
 
   /**
-   * Stores a player's current inventory
+   * Stores a player's current inventory.
+   * <p>
+   * Note: This does NOT clear the player's inventory afterward
    *
    * @param player     The player whose inventory to save
    * @param category   The category to save the player's current inventory into

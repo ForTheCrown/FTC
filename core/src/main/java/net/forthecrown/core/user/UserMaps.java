@@ -1,13 +1,13 @@
 package net.forthecrown.core.user;
 
+import com.google.common.base.Preconditions;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import lombok.Getter;
+import lombok.Setter;
 import net.forthecrown.user.TimeField;
 import net.forthecrown.user.UserLookup.LookupEntry;
+
+import java.util.*;
 
 public class UserMaps implements Iterable<UserImpl> {
 
@@ -15,6 +15,9 @@ public class UserMaps implements Iterable<UserImpl> {
   private final Map<UUID, UserImpl> online = new Object2ObjectOpenHashMap<>();
 
   private final UserServiceImpl service;
+
+  @Getter @Setter
+  private boolean loadingEnabled = false;
 
   public UserMaps(UserServiceImpl service) {
     this.service = service;
@@ -30,6 +33,12 @@ public class UserMaps implements Iterable<UserImpl> {
 
   public UserImpl getUser(LookupEntry entry) {
     Objects.requireNonNull(entry);
+
+    Preconditions.checkState(
+        loadingEnabled,
+        "User loading not yet enabled (User load attempted at startup before "
+            + "user service was fully initialized)"
+    );
 
     UUID uuid = entry.getUniqueId();
 
@@ -48,6 +57,7 @@ public class UserMaps implements Iterable<UserImpl> {
 
   public boolean remove(UserImpl user) {
     var removed = loaded.remove(user.getUniqueId());
+    online.remove(user.getUniqueId());
 
     if (removed == null) {
       return false;
@@ -55,8 +65,6 @@ public class UserMaps implements Iterable<UserImpl> {
 
     user.setTimeToNow(TimeField.LAST_LOADED);
     service.getStorage().saveUser(user);
-
-    online.remove(user.getUniqueId());
     user.service = null;
 
     return true;

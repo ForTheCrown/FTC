@@ -93,7 +93,6 @@ public class InventoryStorageImpl implements InventoryStorage {
     }
 
     map.put(category, items);
-    player.getInventory().clear();
   }
 
   @Override

@@ -15,12 +15,18 @@ public final class Permissions {
   public static final Permission ADMIN          = register("ftc.admin");
 
   public static final Permission DEFAULT        = register("ftc.default");
+
   public static final Permission VANISH         = register("ftc.vanish");
-  public static final Permission VANISH_SEE     = register(VANISH.getName() + ".see");
+  public static final Permission VANISH_SEE     = register(VANISH, "see");
+  public static final Permission VANISH_OTHERS  = register(VANISH, "others");
+
   public static final Permission HELP           = registerCmd("help");
   public static final Permission WORLD_BYPASS   = register("ftc.worldbypass");
+
   public static final Permission PROFILE        = registerCmd("profile");
-  public static final Permission PROFILE_BYPASS = registerPrefixed(PROFILE, "bypass");
+  public static final Permission PROFILE_BYPASS = register(PROFILE, "bypass");
+
+  public static final Permission IGNORE_AC      = registerCmd("ignoreac");
 
   public static Permission register(String key) {
     var manager = Bukkit.getPluginManager();
@@ -39,7 +45,7 @@ public final class Permissions {
     return register(Commands.getDefaultPermission(name));
   }
 
-  public static Permission registerPrefixed(Permission parent, String suffix) {
-    return register(parent.getName() + "." + suffix);
+  public static Permission register(Permission prefix, String suffix) {
+    return register(prefix.getName() + "." + suffix);
   }
 }

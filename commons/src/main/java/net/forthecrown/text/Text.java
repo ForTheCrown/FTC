@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Pattern;
 import net.forthecrown.Worlds;
 import net.forthecrown.grenadier.CommandSource;
@@ -19,9 +20,11 @@ import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.nbt.paper.PaperNbt;
 import net.forthecrown.text.format.ComponentFormat;
 import net.forthecrown.text.format.FormatBuilder;
+import net.forthecrown.text.parse.ChatParseFlag;
 import net.forthecrown.text.parse.ChatParser;
 import net.forthecrown.text.parse.TextContext;
 import net.forthecrown.user.Users;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.KeybindComponent;
@@ -45,6 +48,7 @@ import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.Permissible;
 import org.intellij.lang.annotations.RegExp;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -126,8 +130,12 @@ public final class Text {
    * @param text The text to render
    * @return The plain string version of the given text
    */
-  public static String plain(Component text) {
-    return PLAIN.serialize(text);
+  @Contract("null -> null")
+  public static String plain(@Nullable ComponentLike text) {
+    if (text == null) {
+      return null;
+    }
+    return PLAIN.serialize(text.asComponent());
   }
 
   /**
@@ -198,6 +206,15 @@ public final class Text {
    */
   public static Component renderString(Permissible permissible, String s) {
     return ChatParser.parsers().parse(s, TextContext.create(permissible, null));
+  }
+
+  public static ViewerAwareMessage parseToViewerAware(Permissible permissible, String s) {
+    Set<ChatParseFlag> flags = ChatParseFlag.allApplicable(permissible);
+
+    return viewer -> {
+      TextContext context = TextContext.of(flags, viewer);
+      return ChatParser.parsers().parse(s, context);
+    };
   }
 
   /**
@@ -544,7 +561,7 @@ public final class Text {
   }
 
   public static String capitalizeFully(String str) {
-    String[] words = str.split("\\s");
+    String[] words = str.toLowerCase().split("\\s");
     StringBuilder builder = new StringBuilder();
 
     for (int i = 0; i < words.length; i++) {
@@ -584,8 +601,11 @@ public final class Text {
   }
 
   public static Component sourceDisplayName(CommandSource source) {
+    return sourceDisplayName(source, null);
+  }
+  public static Component sourceDisplayName(CommandSource source, Audience viewer) {
     if (source.isPlayer()) {
-      return Users.get(source.asPlayerOrNull()).displayName();
+      return Users.get(source.asPlayerOrNull()).displayName(viewer);
     }
     return source.displayName();
   }
@@ -607,7 +627,7 @@ public final class Text {
    * @see #format(String, Style, Object...)
    */
   public static Component format(String format, Object... args) {
-    return FormatBuilder.builder().setFormat(format).setArguments(args).format();
+    return FormatBuilder.builder().setFormat(format).setArguments(args).asComponent();
   }
 
   /**
@@ -626,7 +646,7 @@ public final class Text {
    * @see #format(String, Style, Object...)
    */
   public static Component format(String format, TextColor color, Object... args) {
-    return FormatBuilder.builder().setFormat(format, color).setArguments(args).format();
+    return FormatBuilder.builder().setFormat(format, color).setArguments(args).asComponent();
   }
 
   /**
@@ -645,7 +665,7 @@ public final class Text {
    * @see #format(Component, Object...)
    */
   public static Component format(String format, Style style, Object... args) {
-    return FormatBuilder.builder().setFormat(format, style).setArguments(args).format();
+    return FormatBuilder.builder().setFormat(format, style).setArguments(args).asComponent();
   }
 
   /**
@@ -663,7 +683,7 @@ public final class Text {
    * @see ComponentFormat
    */
   public static Component format(Component format, Object... args) {
-    return FormatBuilder.builder().setFormat(format).setArguments(args).format();
+    return FormatBuilder.builder().setFormat(format).setArguments(args).asComponent();
   }
 
   /* ----------------------------------------------------------- */
@@ -689,8 +709,38 @@ public final class Text {
    * @return The component value of the given argument
    */
   public static @NotNull Component valueOf(@Nullable Object arg) {
+    return valueOf(arg, null);
+  }
+
+  /**
+   * Gets the component value of the arg object
+   * <p>
+   * If the given value is a {@link ComponentLike} or {@link Component} then the
+   * argument itself is returned.
+   * <p>
+   * Then this method tests if the given argument is either a
+   * {@link Translatable} object or a
+   * {@link KeybindComponent.KeybindLike} object, if it
+   * is, it returns a component respective to its type.
+   * <p>
+   * If the argument is null, then a "null" text component is returned.
+   * <p>
+   * Otherwise {@link Text#renderString(String)} is used to render the object's
+   * {@link String#valueOf(Object)} result to a component, meaning this method,
+   * if given a string with color codes or emotes, will translate them
+   *
+   * @param arg The arg object
+   * @param viewer Viewer of the message
+   *
+   * @return The component value of the given argument
+   */
+  public static @NotNull Component valueOf(@Nullable Object arg, Audience viewer) {
     if (arg == null) {
       return NULL;
+    }
+
+    if (arg instanceof ViewerAwareMessage awareMessage) {
+      return awareMessage.create(viewer);
     }
 
     if (arg instanceof ComponentLike like) {

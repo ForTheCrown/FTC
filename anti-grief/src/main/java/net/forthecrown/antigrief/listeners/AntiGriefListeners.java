@@ -9,5 +9,6 @@ public final class AntiGriefListeners {
     register(new ChannelMessageListener());
     register(new ChatListener());
     register(new PlayerLogListener());
+    register(new ServerLoadListener());
   }
 }

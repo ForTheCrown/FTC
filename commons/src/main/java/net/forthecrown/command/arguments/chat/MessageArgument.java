@@ -12,6 +12,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.grenadier.internal.VanillaMappedArgument;
 import net.forthecrown.text.Text;
+import net.forthecrown.text.parse.ChatParser;
+import net.forthecrown.text.parse.TextContext;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.minecraft.commands.CommandBuildContext;
 import org.bukkit.command.CommandSender;
@@ -51,8 +54,16 @@ public class MessageArgument
       return Text.renderString(text);
     }
 
-    public Component format(CommandSender source) {
-      return Text.renderString(source, text);
+    public Component formatAdmin(Audience viewer) {
+      ChatParser parser = ChatParser.parsers();
+      TextContext context = TextContext.totalRender(viewer);
+      return parser.parse(text, context);
+    }
+
+    public Component format(CommandSender source, Audience viewer) {
+      ChatParser parser = ChatParser.parsers();
+      TextContext context = TextContext.create(source, viewer);
+      return parser.parse(text, context);
     }
   }
 }

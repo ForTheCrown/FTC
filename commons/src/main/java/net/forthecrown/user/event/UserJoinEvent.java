@@ -3,6 +3,7 @@ package net.forthecrown.user.event;
 import lombok.Getter;
 import lombok.Setter;
 import net.forthecrown.user.User;
+import net.minecraft.commands.CommandSourceStack;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,8 +17,8 @@ public class UserJoinEvent extends UserLogEvent {
 
   private final boolean firstJoin;
 
-  public UserJoinEvent(User user, String lastOnlineName, boolean firstJoin) {
-    super(user, UserLogRenderer.DEFAULT_JOIN);
+  public UserJoinEvent(User user, String lastOnlineName, boolean firstJoin, boolean messageOnly) {
+    super(user, UserLogRenderer.DEFAULT_JOIN, messageOnly);
     this.lastOnlineName = lastOnlineName;
     this.firstJoin = firstJoin;
   }
@@ -30,5 +31,4 @@ public class UserJoinEvent extends UserLogEvent {
   public @NotNull HandlerList getHandlers() {
     return handlerList;
   }
-
 }

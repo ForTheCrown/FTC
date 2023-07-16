@@ -113,7 +113,7 @@ public abstract class AbstractTextWriter implements ComponentLike, TextWriter {
   @Override
   public void write(ComponentLike text) {
     Objects.requireNonNull(text, "Text was null");
-    var component = text.asComponent();
+    var component = Text.valueOf(text, viewer);
 
     if (component.equals(Component.newline())) {
       newLine();

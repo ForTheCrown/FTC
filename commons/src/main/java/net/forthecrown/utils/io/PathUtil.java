@@ -288,7 +288,6 @@ public final class PathUtil {
     ensureParentExists(destination);
 
     if (Files.isDirectory(source)) {
-      ensureDirectoryExists(destination);
       PathUtils.copyDirectory(source, destination);
     } else {
       Files.copy(source, destination);

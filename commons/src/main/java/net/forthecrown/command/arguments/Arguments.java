@@ -5,13 +5,17 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.forthecrown.McConstants;
 import net.forthecrown.command.arguments.chat.ChatArgument;
 import net.forthecrown.command.arguments.chat.MessageArgument;
+import net.forthecrown.command.arguments.chat.MessageArgument.Result;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.grenadier.types.SuffixedNumberArgument;
+import net.forthecrown.text.ViewerAwareMessage;
 import net.forthecrown.user.User;
 import net.kyori.adventure.text.Component;
+import org.bukkit.command.CommandSender;
 
 public interface Arguments {
 
@@ -28,6 +32,8 @@ public interface Arguments {
 
   SuffixedNumberArgument<Integer> RHINES = createRhineArgument();
 
+  SuffixedNumberArgument<Integer> GAMETIME = createGametimeArgument();
+
   static List<User> getUsers(CommandContext<CommandSource> c, String argument)
       throws CommandSyntaxException
   {
@@ -42,9 +48,21 @@ public interface Arguments {
     return result.get(c.getSource(), true);
   }
 
-  static Component getMessage(CommandContext<CommandSource> c, String arg) {
-    var source = c.getSource();
-    return c.getArgument(arg, MessageArgument.Result.class).format(source.asBukkit());
+  static ViewerAwareMessage getMessage(CommandContext<CommandSource> c, String arg) {
+    CommandSender source = c.getSource().asBukkit();
+
+    try {
+      Result result = c.getArgument(arg, Result.class);
+      return viewer -> result.format(source, viewer);
+    } catch (IllegalArgumentException exc) {
+      if (exc.getMessage().startsWith("No such argument '")
+          || exc.getMessage().startsWith("Argument '")
+      ) {
+        return c.getArgument(arg, ViewerAwareMessage.class);
+      }
+
+      throw exc;
+    }
   }
 
   private static SuffixedNumberArgument<Integer> createRhineArgument() {
@@ -55,6 +73,14 @@ public interface Arguments {
     units.put("b",    1_000_000_000);
     units.put("bil",  1_000_000_000);
 
+    return ArgumentTypes.suffixedInt(units);
+  }
+
+  private static SuffixedNumberArgument<Integer> createGametimeArgument() {
+    Map<String, Integer> units = new HashMap<>();
+    units.put("t", 1);
+    units.put("s", 20);
+    units.put("d", McConstants.TICKS_PER_DAY);
     return ArgumentTypes.suffixedInt(units);
   }
 }

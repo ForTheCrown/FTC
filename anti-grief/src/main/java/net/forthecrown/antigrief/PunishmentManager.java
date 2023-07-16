@@ -2,7 +2,10 @@ package net.forthecrown.antigrief;
 
 import com.google.gson.JsonElement;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nonnull;
@@ -25,9 +28,17 @@ public class PunishmentManager {
 
   private final Path path;
 
+  @Getter
+  private final List<Runnable> postStartup = new ArrayList<>();
+
   public PunishmentManager() {
     this.path = PathUtil.pluginPath("punishments.json");
-    PathUtil.ensureDirectoryExists(path);
+
+    try {
+      PathUtil.ensureParentExists(path);
+    } catch (IOException exc) {
+      throw new RuntimeException(exc);
+    }
   }
 
   /**

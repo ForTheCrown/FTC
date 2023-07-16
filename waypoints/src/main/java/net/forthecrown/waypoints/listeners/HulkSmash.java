@@ -61,7 +61,12 @@ public class HulkSmash implements Listener {
   public static void interrupt(User user) {
     Objects.requireNonNull(user);
     var smash = listeners.get(user.getUniqueId());
-    smash.unregister(false);
+
+    if (smash != null) {
+      smash.unregister(false);
+    } else {
+      user.set(Waypoints.HULK_SMASHING, false);
+    }
   }
 
   public void beginListening() {

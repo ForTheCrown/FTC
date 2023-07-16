@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
 import lombok.Getter;
 import net.forthecrown.events.ChannelMessageEvent;
 import net.forthecrown.utils.Audiences;
@@ -15,7 +16,7 @@ import org.bukkit.Bukkit;
 @Getter
 public final class ChannelledMessage {
 
-  private final Component message;
+  private final ViewerAwareMessage message;
 
   private MessageRenderer renderer = MessageRenderer.DEFAULT;
   private Audience source;
@@ -24,11 +25,15 @@ public final class ChannelledMessage {
 
   private String channelName = "UNSET";
 
-  private ChannelledMessage(Component message) {
+  private ChannelledMessage(ViewerAwareMessage message) {
     this.message = Objects.requireNonNull(message);
   }
 
   public static ChannelledMessage create(Component message) {
+    return new ChannelledMessage(ViewerAwareMessage.wrap(message));
+  }
+
+  public static ChannelledMessage create(ViewerAwareMessage message) {
     return new ChannelledMessage(message);
   }
 
@@ -69,6 +74,11 @@ public final class ChannelledMessage {
   public ChannelledMessage setBroadcast() {
     viewers.add(Bukkit.getConsoleSender());
     viewers.addAll(Bukkit.getOnlinePlayers());
+    return this;
+  }
+
+  public ChannelledMessage filterViewers(Predicate<Audience> predicate) {
+    viewers.removeIf(predicate.negate());
     return this;
   }
 
@@ -119,9 +129,10 @@ public final class ChannelledMessage {
     }
 
     Set<Audience> viewers = event.getViewers();
-    final Component baseMessage = event.getMessage();
+    final ViewerAwareMessage viewerAwareBase = event.getMessage();
 
     viewers.forEach(viewer -> {
+      Component baseMessage = viewerAwareBase.create(viewer);
       Component msg = renderer.render(viewer, baseMessage);
       viewer.sendMessage(msg);
     });
@@ -134,12 +145,9 @@ public final class ChannelledMessage {
     MessageRenderer DEFAULT = (viewer, baseMessage) -> baseMessage;
 
     MessageRenderer FTC_PREFIX = new MessageRenderer() {
-
-      final Component prefix = Text.gradient("[FTC] ", NamedTextColor.BLACK, NamedTextColor.GOLD);
-
       @Override
       public Component render(Audience viewer, Component baseMessage) {
-        return Component.textOfChildren(prefix, baseMessage);
+        return Component.textOfChildren(Messages.FTC_PREFIX, baseMessage);
       }
     };
 

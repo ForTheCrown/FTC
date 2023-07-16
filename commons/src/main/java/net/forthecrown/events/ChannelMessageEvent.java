@@ -5,6 +5,7 @@ import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 import net.forthecrown.text.ChannelledMessage;
+import net.forthecrown.text.ViewerAwareMessage;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.Audiences;
@@ -30,12 +31,12 @@ public class ChannelMessageEvent extends Event implements Cancellable {
   /**
    * The current message
    */
-  private Component message;
+  private ViewerAwareMessage message;
 
   /**
    * The original, unedited message
    */
-  private final Component initialMessage;
+  private final ViewerAwareMessage initialMessage;
 
   /**
    * Source of the broadcast, may be null.
@@ -59,7 +60,7 @@ public class ChannelMessageEvent extends Event implements Cancellable {
   private final String channelName;
 
   public ChannelMessageEvent(
-      Component initialMessage,
+      ViewerAwareMessage initialMessage,
       Audience source,
       Set<Audience> viewers,
       String channelName
@@ -75,7 +76,7 @@ public class ChannelMessageEvent extends Event implements Cancellable {
    * Sets the message to be broadcast
    * @param message Message
    */
-  public void setMessage(@NotNull Component message) {
+  public void setMessage(@NotNull ViewerAwareMessage message) {
     Objects.requireNonNull(message);
     this.message = message;
   }

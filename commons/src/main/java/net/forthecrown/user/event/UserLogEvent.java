@@ -19,11 +19,18 @@ public abstract class UserLogEvent extends UserEvent {
 
   private UserLogRenderer renderer;
 
-  public UserLogEvent(User user, UserLogRenderer renderer) {
+  /**
+   * Refers to the event being called only for the message render, the user has not actually left
+   * or joined the server
+   */
+  private final boolean messageOnly;
+
+  public UserLogEvent(User user, UserLogRenderer renderer, boolean messageOnly) {
     super(user);
 
-    this.showMessage = !user.get(Properties.VANISHED);
+    this.showMessage = true;
     this.renderer = renderer;
+    this.messageOnly = messageOnly;
   }
 
   public void setRenderer(UserLogRenderer renderer) {

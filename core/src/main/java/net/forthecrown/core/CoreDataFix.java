@@ -51,6 +51,12 @@ class UserUpdate extends DataUpdater {
       }
     }
 
+    JsonWrapper homes = json.getWrapped("homes");
+    if (homes != null && homes.has("user:home:region")) {
+      properties.add("homeWaypoint", json.get("user:home:region"));
+      homes.remove("user:home:region");
+    }
+
     json.remove("interactions");
 
     if (!properties.isEmpty()) {

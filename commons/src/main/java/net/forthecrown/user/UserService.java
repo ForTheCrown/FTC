@@ -102,6 +102,17 @@ public interface UserService {
   Collection<User> getOnlineUsers();
 
   /**
+   * Tests if user instances can be loaded. This will be set to true after the server has fully
+   * loaded after startup or after reloading.
+   * <p>
+   * During the time this is false, components and user properties can be registered, if this value
+   * is set to true, components and properties are locked
+   *
+   * @return {@code true}, if usere objects can be created and loaded, {@code false} otherwise
+   */
+  boolean userLoadingAllowed();
+
+  /**
    * Registers a user component type.
    * <p>
    * The name the component will be registered under and will be used when the user is serialized
