@@ -1,10 +1,6 @@
 package net.forthecrown.dungeons;
 
-import static net.forthecrown.utils.io.PluginJar.ALLOW_OVERWRITE;
-import static net.forthecrown.utils.io.PluginJar.OVERWRITE_IF_NEWER;
-
 import com.mojang.serialization.DataResult;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -69,15 +65,7 @@ public class LevelDataStorage {
   }
 
   void saveDefaults() {
-    try {
-      PluginJar.saveResources(
-          "dungeons",
-          directory,
-          ALLOW_OVERWRITE | OVERWRITE_IF_NEWER
-      );
-    } catch (IOException exc) {
-      LOGGER.error("Couldn't save default dungeon files", exc);
-    }
+    PluginJar.saveResources("dungeons", directory);
   }
 
   public Path getPath(long creationTime, int i) {

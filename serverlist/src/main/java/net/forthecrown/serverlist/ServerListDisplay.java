@@ -5,7 +5,6 @@ import static net.forthecrown.utils.MonthDayPeriod.ALL;
 import com.google.gson.JsonElement;
 import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -75,14 +74,9 @@ public class ServerListDisplay {
   }
 
   void saveDefaults() {
-    try {
-      PluginJar.saveResources("icons", directory);
-      PluginJar.saveResources("serverlist.toml", loaderFile);
-
-      LOGGER.debug("Saved default server icon directory");
-    } catch (IOException exc) {
-      LOGGER.error("Couldn't save default icons!", exc);
-    }
+    PluginJar.saveResources("icons", directory);
+    PluginJar.saveResources("serverlist.toml", loaderFile);
+    LOGGER.debug("Saved default server icon directory");
   }
 
   /** Caches all registered entries that are applicable to the current date */

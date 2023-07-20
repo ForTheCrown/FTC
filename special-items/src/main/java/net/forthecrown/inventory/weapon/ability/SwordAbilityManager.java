@@ -1,8 +1,6 @@
 package net.forthecrown.inventory.weapon.ability;
 
 import static net.forthecrown.inventory.weapon.ability.WeaponAbility.START_LEVEL;
-import static net.forthecrown.utils.io.PluginJar.ALLOW_OVERWRITE;
-import static net.forthecrown.utils.io.PluginJar.OVERWRITE_IF_NEWER;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -95,15 +93,8 @@ public class SwordAbilityManager {
     });
   }
 
-  void init() throws IOException {
-    PluginJar.saveResources(
-        "weapon_abilities",
-        getDirectory(),
-        ALLOW_OVERWRITE | OVERWRITE_IF_NEWER
-    );
-  }
-
   public void loadAbilities() {
+    PluginJar.saveResources("weapon_abilities", getDirectory());
     registry.clear();
 
     Map<String, List<ItemStack>> itemLists;

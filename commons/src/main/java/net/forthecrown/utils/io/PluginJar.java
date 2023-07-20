@@ -213,6 +213,10 @@ public class PluginJar {
 
     private boolean maySaveResource(BasicFileAttributes sourceAttr, Path dest) throws IOException {
       return !Files.exists(dest);
+
+      // This shit does not work with so many things modifying the file attributes
+      // Git ignores file attributes alltogether, so that just breaks the intended
+      // functionality of all of this
       /*if (!Files.exists(dest)) {
         return true;
       }
