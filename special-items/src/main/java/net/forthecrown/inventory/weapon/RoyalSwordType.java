@@ -3,6 +3,7 @@ package net.forthecrown.inventory.weapon;
 import static net.forthecrown.text.Text.nonItalic;
 
 import java.util.UUID;
+import net.forthecrown.dungeons.enchantments.DungeonEnchantments;
 import net.forthecrown.inventory.ExtendedItemType;
 import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.utils.inventory.ItemBuilder;
@@ -67,6 +68,6 @@ public class RoyalSwordType implements ExtendedItemType<RoyalSword> {
         .setNameRaw(RANK_1_NAME)
         .setUnbreakable(true)
         .setFlags(ItemFlag.HIDE_ATTRIBUTES)
-        .addEnchant(FtcEnchants.SOUL_BOND, 1);
+        .addEnchant(DungeonEnchantments.SOUL_BOUND, 1);
   }
 }

@@ -7,6 +7,7 @@ import static net.forthecrown.inventory.ExtendedItems.TAG_TYPE;
 import com.google.common.base.Preconditions;
 import java.util.UUID;
 import lombok.Getter;
+import net.forthecrown.enchantment.FtcEnchant;
 import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.text.TextWriter;
