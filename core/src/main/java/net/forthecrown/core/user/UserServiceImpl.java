@@ -4,17 +4,34 @@ import com.google.common.base.Preconditions;
 import com.google.common.reflect.Reflection;
 import com.mojang.serialization.Codec;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import java.lang.management.ManagementFactory;
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import lombok.Getter;
 import net.forthecrown.Loggers;
 import net.forthecrown.core.CoreConfig;
 import net.forthecrown.core.CorePlugin;
 import net.forthecrown.core.user.PropertyImpl.BuilderImpl;
+import net.forthecrown.packet.PacketListeners;
 import net.forthecrown.registry.Holder;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.registry.RegistryListener;
-import net.forthecrown.user.*;
+import net.forthecrown.user.Properties;
+import net.forthecrown.user.TimeField;
+import net.forthecrown.user.User;
+import net.forthecrown.user.UserComponent;
+import net.forthecrown.user.UserLookup;
+import net.forthecrown.user.UserProperty;
 import net.forthecrown.user.UserProperty.Builder;
+import net.forthecrown.user.UserService;
 import net.forthecrown.user.event.UserLeaveEvent;
 import net.forthecrown.user.event.UserLogEvent;
 import net.forthecrown.utils.Result;
@@ -24,23 +41,12 @@ import net.forthecrown.utils.Time;
 import net.forthecrown.utils.io.FtcCodecs;
 import net.forthecrown.utils.io.PathUtil;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerQuitEvent.QuitReason;
 import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
-
-import java.lang.management.ManagementFactory;
-import java.nio.file.Path;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 @Internal
 @Getter
@@ -121,6 +127,7 @@ public class UserServiceImpl implements UserService {
 
     registerComponent(PropertyMap.class);
     registerComponent(BlockListImpl.class);
+    registerComponent(UserTimestamps.class);
   }
 
   public void shutdown() {
@@ -171,8 +178,7 @@ public class UserServiceImpl implements UserService {
   }
 
   public void onUserLeave(UserImpl user, QuitReason reason, boolean announce) {
-    Player player = Bukkit.getPlayer(user.getUniqueId());
-    Objects.requireNonNull(player, "Player not online: " + user.getName());
+    Player player = user.getPlayer();
 
     UserLeaveEvent userEvent = new UserLeaveEvent(user, reason, false);
     userEvent.callEvent();
@@ -181,8 +187,11 @@ public class UserServiceImpl implements UserService {
       UserLogEvent.maybeAnnounce(userEvent);
     }
 
-    user.setEntityLocation(player.getLocation());
-    user.setLastOnlineName(player.getName());
+    if (player != null) {
+      PacketListeners.listeners().uninject(player);
+      user.setEntityLocation(player.getLocation());
+      user.setLastOnlineName(player.getName());
+    }
 
     if (user.vanishTicker != null) {
       user.vanishTicker.stop();
@@ -234,6 +243,7 @@ public class UserServiceImpl implements UserService {
     propertyRegistry.freeze();
     componentRegistryFrozen = true;
     userMaps.setLoadingEnabled(true);
+    TimeField.freeze();
   }
 
   @Override
@@ -306,9 +316,8 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  @SuppressWarnings({"unchecked", "rawtypes"})
   public Collection<User> getOnlineUsers() {
-    return (Collection) userMaps.getOnline();
+    return Collections.unmodifiableCollection(userMaps.getOnline());
   }
 
   @Override

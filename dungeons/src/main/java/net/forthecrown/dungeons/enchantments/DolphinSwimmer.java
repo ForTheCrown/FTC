@@ -1,8 +1,7 @@
 package net.forthecrown.dungeons.enchantments;
 
-import java.util.Set;
 import net.forthecrown.dungeons.DungeonUtils;
-import net.minecraft.world.item.enchantment.EnchantmentCategory;
+import net.forthecrown.enchantment.FtcEnchant;
 import org.bukkit.Material;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.inventory.EquipmentSlot;
@@ -15,25 +14,15 @@ public class DolphinSwimmer extends FtcEnchant {
     super(
         DungeonUtils.royalsKey("dolphinswimmer"),
         "Dolphin Swimmer",
-        EnchantmentCategory.TRIDENT,
+        EnchantmentTarget.TRIDENT,
 
-        net.minecraft.world.entity.EquipmentSlot.OFFHAND,
-        net.minecraft.world.entity.EquipmentSlot.MAINHAND
+        EquipmentSlot.OFF_HAND,
+        EquipmentSlot.HAND
     );
-  }
-
-  @Override
-  public @NotNull EnchantmentTarget getItemTarget() {
-    return EnchantmentTarget.TRIDENT;
   }
 
   @Override
   public boolean canEnchantItem(@NotNull ItemStack stack) {
     return stack.getType() == Material.TRIDENT;
-  }
-
-  @Override
-  public @NotNull Set<EquipmentSlot> getActiveSlots() {
-    return Set.of(EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
   }
 }

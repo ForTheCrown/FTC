@@ -3,7 +3,6 @@ package net.forthecrown.inventory.weapon;
 import static net.forthecrown.text.Text.nonItalic;
 
 import java.util.UUID;
-import net.forthecrown.dungeons.enchantments.FtcEnchants;
 import net.forthecrown.inventory.ExtendedItemType;
 import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.utils.inventory.ItemBuilder;

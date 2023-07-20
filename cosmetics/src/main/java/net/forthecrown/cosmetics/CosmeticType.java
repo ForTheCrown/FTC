@@ -5,13 +5,11 @@ import java.util.function.IntSupplier;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.forthecrown.menu.Slot;
 import net.forthecrown.registry.Holder;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.registry.RegistryListener;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -19,31 +17,21 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class CosmeticType<T> {
 
   private final Registry<Cosmetic<T>> cosmetics;
-
-  private final Component displayName;
-  private final Material displayMaterial;
-
   private final CosmeticPredicate<T> predicate;
-
   private final MenuNodeFactory<T> menuNodeFactory;
+  private final Component displayName;
 
   int id = -1;
   String name;
-
-  private final Slot menuSlot;
 
   public CosmeticType(Builder<T> builder) {
     this.displayName = builder.displayName;
     this.predicate = builder.predicate;
     this.menuNodeFactory = builder.factory;
-    this.displayMaterial = builder.displayMaterial;
-    this.menuSlot = builder.menuSlot;
 
     Objects.requireNonNull(displayName, "Null display name");
     Objects.requireNonNull(predicate, "Null predicate");
     Objects.requireNonNull(menuNodeFactory, "Null menu node factory");
-    Objects.requireNonNull(displayMaterial, "Null display material");
-    Objects.requireNonNull(menuSlot, "Null menu slot");
 
     this.cosmetics = Registries.newFreezable();
     cosmetics.setListener(new RegistryListener<>() {
@@ -72,10 +60,6 @@ public class CosmeticType<T> {
     private CosmeticPredicate<T> predicate = CosmeticPredicate.defaultPredicate();
 
     private MenuNodeFactory<T> factory;
-
-    private Material displayMaterial;
-
-    private Slot menuSlot;
 
     public Builder<T> defaultNodeFactory(String id) {
       return defaultNodeFactory(() -> {

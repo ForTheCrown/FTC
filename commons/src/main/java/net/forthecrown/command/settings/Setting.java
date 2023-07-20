@@ -3,6 +3,7 @@ package net.forthecrown.command.settings;
 import static net.kyori.adventure.text.Component.text;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.time.Duration;
 import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -11,35 +12,55 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.forthecrown.command.Exceptions;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.SyntaxExceptions;
 import net.forthecrown.text.Messages;
 import net.forthecrown.text.Text;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserProperty;
+import net.forthecrown.utils.Audiences;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.HoverEventSource;
+import net.kyori.adventure.text.event.ClickCallback;
+import net.kyori.adventure.text.event.ClickCallback.Options;
+import net.kyori.adventure.text.event.ClickEvent;
 import org.bukkit.permissions.Permission;
+import org.jetbrains.annotations.NotNull;
 
-@Getter
-@Setter
 @Accessors(chain = true)
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Setting {
 
+  @Getter
   private final SettingAccess access;
 
+  @Getter
+  @Setter
   private SettingValidator validator = SettingValidator.NOP;
 
+  @Getter
+  @Setter
   private String displayName;
 
+  @Getter
+  @Setter
   private String description = "";
 
+  @Getter
+  @Setter
   private String enableDescription = "Enables this setting";
+
+  @Getter
+  @Setter
   private String disableDescription = "Disables this setting";
 
-  private String toggleMessage = "{0} this setting";
+  @Getter
+  @Setter
+  private String toggle = "{0} this setting";
 
-  @Setter(AccessLevel.PRIVATE)
+  @Getter
   private SettingCommand command;
+
+  private BookSetting<User> setting;
 
   public static Setting create(SettingAccess access) {
     return new Setting(access);
@@ -78,14 +99,17 @@ public class Setting {
 
   public void toggleState(User user) throws CommandSyntaxException {
     boolean newState = !access.getState(user);
+    setState(user, newState);
+  }
 
+  public void setState(User user, boolean newState) throws CommandSyntaxException {
     if (validator != null) {
       validator.test(user, newState);
     }
 
     access.setState(user, newState);
 
-    Component message = Messages.toggleMessage(toggleMessage, newState);
+    Component message = Messages.toggleMessage(toggle, newState);
     user.sendMessage(message);
   }
 
@@ -133,10 +157,39 @@ public class Setting {
     return this;
   }
 
+  private ClickCallback<Audience> createCallback(boolean state, SettingsBook<User> book) {
+    return new ClickCallback<Audience>() {
+      @Override
+      public void accept(@NotNull Audience audience) {
+        User user = Audiences.getUser(audience);
+
+        if (user == null) {
+          return;
+        }
+
+        try {
+          setState(user, state);
+          book.open(user, user);
+        } catch (CommandSyntaxException exc) {
+          SyntaxExceptions.handle(exc, user.getCommandSource());
+        }
+      }
+    };
+  }
+
   public BookSetting<User> toBookSettng() {
     Objects.requireNonNull(command, "Command not created yet");
+    Objects.requireNonNull(displayName, "displayName not set");
 
-    return new BookSetting<>() {
+    if (setting != null) {
+      return setting;
+    }
+
+    return setting = new BookSetting<>() {
+
+      ClickCallback<Audience> enableCallback;
+      ClickCallback<Audience> disableCallback;
+
       @Override
       public Component displayName() {
         return text(getDisplayName()).hoverEvent(text(getDescription()));
@@ -144,15 +197,33 @@ public class Setting {
 
       @Override
       public Component createButtons(User context) {
-        String command = "/" + getCommand().getName();
         boolean state = access.getState(context);
 
+        if (enableCallback == null) {
+          enableCallback = createCallback(true, getBook());
+        }
+
+        if (disableCallback == null) {
+          disableCallback = createCallback(false, getBook());
+        }
+
+        final Options options = Options.builder()
+            .uses(-1)
+            .lifetime(Duration.ofDays(365))
+            .build();
+
         Component enable = BookSetting.createButton(
-            true, state, command, text(enableDescription)
+            true,
+            state,
+            ClickEvent.callback(enableCallback, options),
+            text(enableDescription)
         );
 
         Component disable = BookSetting.createButton(
-            false, state, command, text(disableDescription)
+            false,
+            state,
+            ClickEvent.callback(disableCallback, options),
+            text(disableDescription)
         );
 
         return Component.textOfChildren(enable, Component.space(), disable);

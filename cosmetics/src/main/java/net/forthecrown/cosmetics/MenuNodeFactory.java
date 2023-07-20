@@ -28,7 +28,7 @@ public interface MenuNodeFactory<T> {
             Material material = Cosmetics.getCosmeticMaterial(owned);
 
             ItemBuilder builder = ItemStacks.builder(material)
-                .setNameRaw(cosmetic.getDisplayName());
+                .setName(cosmetic.getDisplayName());
 
             List<Component> desc = cosmetic.getDescription();
             for (Component c : desc) {
@@ -57,6 +57,7 @@ public interface MenuNodeFactory<T> {
 
             if (active) {
               builder
+                  .addLore(Component.text("Currently active", NamedTextColor.GREEN))
                   .addEnchant(Enchantment.CHANNELING, 1)
                   .setFlags(ItemFlag.HIDE_ENCHANTS);
             }

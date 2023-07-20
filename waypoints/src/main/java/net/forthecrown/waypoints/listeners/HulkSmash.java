@@ -12,7 +12,7 @@ import net.forthecrown.cosmetics.travel.TravelEffect;
 import net.forthecrown.events.Events;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.Tasks;
-import net.forthecrown.waypoints.Waypoints;
+import net.forthecrown.waypoints.WaypointPrefs;
 import net.kyori.adventure.util.Ticks;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -65,12 +65,12 @@ public class HulkSmash implements Listener {
     if (smash != null) {
       smash.unregister(false);
     } else {
-      user.set(Waypoints.HULK_SMASHING, false);
+      user.set(WaypointPrefs.HULK_SMASHING, false);
     }
   }
 
   public void beginListening() {
-    user.set(Waypoints.HULK_SMASHING, true);
+    user.set(WaypointPrefs.HULK_SMASHING, true);
     active = true;
 
     Events.register(this);
@@ -123,7 +123,7 @@ public class HulkSmash implements Listener {
     HandlerList.unregisterAll(this);
 
     if (unsetProperty) {
-      user.set(Waypoints.HULK_SMASHING, false);
+      user.set(WaypointPrefs.HULK_SMASHING, false);
     }
 
     listeners.remove(user.getUniqueId());

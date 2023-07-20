@@ -4,7 +4,7 @@ import static net.forthecrown.text.Text.nonItalic;
 import static net.kyori.adventure.text.Component.text;
 
 import java.util.UUID;
-import net.forthecrown.dungeons.enchantments.FtcEnchants;
+import net.forthecrown.dungeons.enchantments.DungeonEnchantments;
 import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.utils.inventory.ItemBuilder;
@@ -53,6 +53,6 @@ public class CrownType implements ExtendedItemType<RoyalCrown> {
         .setNameRaw(CROWN_TITLE)
         .setModelData(MODEL_DATA)
         .setUnbreakable(true)
-        .addEnchant(FtcEnchants.SOUL_BOND, 1);
+        .addEnchant(DungeonEnchantments.SOUL_BOUND, 1);
   }
 }

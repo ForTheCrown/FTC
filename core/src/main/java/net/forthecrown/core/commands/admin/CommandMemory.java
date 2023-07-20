@@ -26,7 +26,7 @@ public class CommandMemory extends FtcCommand {
   public void createCommand(GrenadierCommand command) {
     command
         .executes(c -> {
-          var worlds = TextJoiner.onNewLine()
+          Component worlds = TextJoiner.onNewLine()
               .add(Bukkit.getWorlds().stream()
                   .map(world -> {
                     return Text.format(
@@ -49,14 +49,14 @@ public class CommandMemory extends FtcCommand {
           c.getSource().sendMessage(
               Text.format(
                   """
-                      &eUptime:&7 {0, time, -timestamp}
+                      &eUptime:&7 {0, time}
                       &eTPS:&7 {1}
                       &eMax memory:&7 {2} Mb
                       &eFree memory:&7 {3} Mb
                       &eWorlds: &7{4}
                       """,
 
-                  ManagementFactory.getRuntimeMXBean().getStartTime(),
+                  ManagementFactory.getRuntimeMXBean().getUptime(),
                   getTPS(),
                   Runtime.getRuntime().maxMemory() / 1_000_000,
                   Runtime.getRuntime().freeMemory() / 1_000_000,
@@ -70,7 +70,8 @@ public class CommandMemory extends FtcCommand {
   private Component getTPS() {
     var tps = Bukkit.getTPS();
 
-    return Text.format("{0, number}: 1m, {1, number}: 5m, {2, number}: 15m",
+    return Text.format(
+        "{0, number, -floor}: 1m, {1, number, -floor}: 5m, {2, number, -floor}: 15m",
         tps[0], tps[1], tps[2]
     );
   }

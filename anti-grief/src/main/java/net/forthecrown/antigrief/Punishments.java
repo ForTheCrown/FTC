@@ -210,7 +210,7 @@ public final class Punishments {
             .asComponent();
       });
 
-      message.renderer(MessageRenderer.FTC_PREFIX).setBroadcast().send();
+      message.setRenderer(MessageRenderer.FTC_PREFIX).setBroadcast().send();
       return;
     }
 

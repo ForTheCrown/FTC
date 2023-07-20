@@ -66,6 +66,8 @@ public class UserMaps implements Iterable<UserImpl> {
     user.setTimeToNow(TimeField.LAST_LOADED);
     service.getStorage().saveUser(user);
     user.service = null;
+    user.online = false;
+    user.player = null;
 
     return true;
   }

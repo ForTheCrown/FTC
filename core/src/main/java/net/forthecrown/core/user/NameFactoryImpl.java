@@ -1,6 +1,5 @@
 package net.forthecrown.core.user;
 
-import static net.kyori.adventure.text.Component.space;
 import static net.kyori.adventure.text.Component.text;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
@@ -11,7 +10,6 @@ import java.util.Set;
 import net.forthecrown.Permissions;
 import net.forthecrown.text.BufferedTextWriter;
 import net.forthecrown.text.Text;
-import net.forthecrown.text.TextInfo;
 import net.forthecrown.text.TextWriter;
 import net.forthecrown.text.TextWriters;
 import net.forthecrown.user.NameElements;
@@ -28,6 +26,7 @@ import net.forthecrown.utils.Audiences;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -35,11 +34,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 public class NameFactoryImpl implements UserNameFactory {
-
-  private static final char BORDER_CHAR = ' ';
-  private static final int MAX_CHAT_WIDTH = 320; // Font pixels aren't real pixels
-  private static final int BORDER_CHAR_LENGTH = 4; // ' ' is 3 px, but +1 for space between chars
-  private static final int FOOTER_SIZE = MAX_CHAT_WIDTH / BORDER_CHAR_LENGTH;
 
   private static final Style BORDER_STYLE
       = Style.style(NamedTextColor.GOLD, TextDecoration.STRIKETHROUGH);
@@ -67,7 +61,7 @@ public class NameFactoryImpl implements UserNameFactory {
       if (ctx.useNickName()) {
         name = user.nickOrName();
       } else {
-        name = text(user.getName());
+        name = user.name();
       }
     }
 
@@ -90,7 +84,18 @@ public class NameFactoryImpl implements UserNameFactory {
       builder.hoverEvent(hover);
     }
 
-    return builder.build();
+    return builder
+        .clickEvent(userClickEvent(ctx.userOnline(), user))
+        .insertion(user.getUniqueId().toString())
+        .build();
+  }
+
+  private ClickEvent userClickEvent(boolean online, User user) {
+    if (online) {
+      return ClickEvent.suggestCommand("/tell " + user.getNickOrName());
+    } else {
+      return ClickEvent.suggestCommand("/profile " + user.getNickOrName());
+    }
   }
 
   @Override
@@ -190,24 +195,21 @@ public class NameFactoryImpl implements UserNameFactory {
     }
 
     headerName = text()
-        .append(space(), headerName, space())
+        .append(headerName)
         .color(NamedTextColor.YELLOW)
         .build();
 
-    int headerLength = TextInfo.length(headerName);
-    int bordersSize = (MAX_CHAT_WIDTH - headerLength) / 2;
-    int borderChars = bordersSize / BORDER_CHAR_LENGTH;
-
-    String headerBorder = String.valueOf(BORDER_CHAR).repeat(borderChars);
-    String footer = String.valueOf(BORDER_CHAR).repeat(FOOTER_SIZE);
-    Component borderText = text(headerBorder, BORDER_STYLE);
+    Component footer = Text.chatWidthBorder(null).style(BORDER_STYLE);
+    Component borderText = Text.chatWidthBorder(headerName).style(BORDER_STYLE);
 
     writer.line(borderText);
+    writer.space();
     writer.write(headerName);
+    writer.space();
     writer.write(borderText);
 
     lines.forEach(writer::line);
-    writer.line(text(footer, BORDER_STYLE));
+    writer.line(footer);
   }
 
   private void writeFields(
@@ -246,8 +248,8 @@ public class NameFactoryImpl implements UserNameFactory {
         return false;
       }
 
-      if (placement == FieldPlacement.IN_HOVER && !formattingHover) {
-        return true;
+      if (placement == FieldPlacement.IN_HOVER) {
+        return !formattingHover;
       }
 
       // At this point, placement = IN_PROFILE, which requires that this

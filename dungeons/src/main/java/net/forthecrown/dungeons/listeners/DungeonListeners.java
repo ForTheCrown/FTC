@@ -4,7 +4,8 @@ import com.google.common.base.Strings;
 import java.util.Random;
 import net.forthecrown.dungeons.DungeonAreas;
 import net.forthecrown.dungeons.boss.SkalatanBoss;
-import net.forthecrown.dungeons.enchantments.FtcEnchants;
+import net.forthecrown.dungeons.enchantments.DungeonEnchantments;
+import net.forthecrown.enchantment.FtcEnchants;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.kyori.adventure.text.Component;
@@ -58,7 +59,7 @@ public class DungeonListeners implements Listener {
         .setNameRaw(Component.text("Fork").decorate(TextDecoration.BOLD))
         .build();
 
-    FtcEnchants.addEnchant(item, FtcEnchants.DOLPHIN_SWIMMER, 1);
+    FtcEnchants.addEnchant(item, DungeonEnchantments.DOLPHIN_SWIMMER, 1);
 
     return item;
   }

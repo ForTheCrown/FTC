@@ -2,6 +2,7 @@ package net.forthecrown.user.event;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.forthecrown.text.Messages;
 import net.forthecrown.user.User;
 import net.minecraft.commands.CommandSourceStack;
 import org.bukkit.event.HandlerList;
@@ -21,6 +22,10 @@ public class UserJoinEvent extends UserLogEvent {
     super(user, UserLogRenderer.DEFAULT_JOIN, messageOnly);
     this.lastOnlineName = lastOnlineName;
     this.firstJoin = firstJoin;
+
+    if (hasNameChanged()) {
+      setRenderer(UserLogRenderer.newNameJoin(getLastOnlineName()));
+    }
   }
 
   public boolean hasNameChanged() {

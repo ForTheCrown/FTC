@@ -23,9 +23,7 @@ import net.minecraft.commands.arguments.selector.EntitySelectorParser;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 
-public class ExpandedEntityArgument
-    implements ArgumentType<EntitySelector>, VanillaMappedArgument
-{
+public class ExpandedEntityArgument implements ArgumentType<EntitySelector> {
 
   private final EntityArgument argument;
 
@@ -104,10 +102,5 @@ public class ExpandedEntityArgument
       Completions.suggest(builder, entities);
       FtcSuggestions.suggestPlayerNames(s, builder1, false);
     });
-  }
-
-  @Override
-  public ArgumentType<?> getVanillaType(CommandBuildContext context) {
-    return ((VanillaMappedArgument) argument).getVanillaType(context);
   }
 }

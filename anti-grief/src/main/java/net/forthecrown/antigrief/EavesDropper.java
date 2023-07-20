@@ -62,7 +62,8 @@ public final class EavesDropper {
   static void createSettings(SettingsBook<User> settingsBook) {
     Setting muted = Setting.create(EAVES_DROP_MUTED)
         .setDisplayName("Spy on muted")
-        .setToggleMessage("{Start} spying on muted players' messages")
+        .setToggle("N{1} spying on muted users")
+        .setToggleDescription("{Start} spying on muted players' messages")
         .setDescription("Toggles spying on people's muted messages");
 
     muted.createCommand(
@@ -74,7 +75,8 @@ public final class EavesDropper {
 
     Setting dms = Setting.create(EAVES_DROP_DM)
         .setDisplayName("Spy on DMs")
-        .setToggleMessage("{Start} spying on players' DMs")
+        .setToggle("N{1} spying on people's DMs")
+        .setToggleDescription("{Start} spying on players' DMs")
         .setDescription("Toggles spying on people's direct messages");
 
     dms.createCommand(
@@ -85,7 +87,9 @@ public final class EavesDropper {
     );
 
     Setting signs = Setting.create(EAVES_DROP_SIGN)
-        .setDisableDescription("Spy on signs")
+        .setDisplayName("Spy on signs")
+        .setToggle("N{1} spying on people's signs writings")
+        .setToggleDescription("{Start} spying on what people write on signs")
         .setDescription("Toggles spying on what people write on signs");
 
     signs.createCommand(
@@ -98,6 +102,7 @@ public final class EavesDropper {
     Setting mchat = Setting.create(EAVES_DROP_MCHAT)
         .setDisplayName("Spy on mchat")
         .setDescription("Toggles spying on people's marriage DMs")
+        .setToggle("N{1} spying on marriage chat DMs")
         .setToggleDescription("{Start} spying on people's marriage DMs");
 
     mchat.createCommand(
@@ -110,6 +115,7 @@ public final class EavesDropper {
     Setting gchat = Setting.create(EAVES_DROP_GUILD_CHAT)
         .setDisplayName("Spy on guilds")
         .setDescription("Toggles spying on guild chats")
+        .setToggle("N{1} spying on guild chats")
         .setToggleDescription("{Start} spying on guild chats");
 
     gchat.createCommand(
@@ -121,6 +127,7 @@ public final class EavesDropper {
 
     Setting veins = Setting.create(EAVES_DROP_MINING)
         .setDisplayName("Spy on miners")
+        .setToggle("{0} mining notifications")
         .setEnableDescription("Get notified when people mine ores")
         .setDisableDescription("Don't get notified when people mine ores")
         .setDescription("Toggles being notified when players mine ores");

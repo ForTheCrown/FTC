@@ -30,6 +30,12 @@ public interface UserLogRenderer {
     };
   }
 
+  static UserLogRenderer newNameJoin(String newName) {
+    return (user, viewer) -> {
+      return Messages.newNameJoinMessage(user.displayName(viewer), newName);
+    };
+  }
+
   /**
    * Renders the login/logout message
    * @param user User that joined/left

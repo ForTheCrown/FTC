@@ -3,8 +3,12 @@ aliases = "user_titles"
         | "titles"
         | "userranks"
         | "user_ranks"
+        | "ranks"
+        | "rank"
 
 description = "Manages user titles and rank tiers"
+
+executes = openMenu()
 
 literal("reload") {
   description = "Reloads the plugin"

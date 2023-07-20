@@ -12,6 +12,7 @@ import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Mob;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
@@ -62,16 +63,14 @@ public abstract class SimpleBoss extends KeyedBossImpl implements SingleEntityBo
 
     createBossBar(currentContext);
 
-    // Get everything that's needed started
+    // Get everything that's needed to be started
     registerEvents();
     startTickTask();
 
     logSpawn(currentContext);
 
     // Give boss the boss tag and an empty loottable
-    entity.getPersistentDataContainer()
-        .set(Bosses.BOSS_TAG, PersistentDataType.STRING, getKey());
-
+    entity.getPersistentDataContainer().set(Bosses.BOSS_TAG, PersistentDataType.STRING, getKey());
     entity.setLootTable(LootTables.EMPTY.getLootTable());
 
     runComponents(component -> component.onSpawn(this, currentContext));
@@ -115,7 +114,7 @@ public abstract class SimpleBoss extends KeyedBossImpl implements SingleEntityBo
     return entity;
   }
 
-  @EventHandler(ignoreCancelled = true)
+  @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
   public void onEntityDamage(EntityDamageEvent event) {
     if (!event.getEntity().equals(entity)) {
       return;
@@ -126,8 +125,7 @@ public abstract class SimpleBoss extends KeyedBossImpl implements SingleEntityBo
     // Update boss bar
     bossBar.setProgress(
         GenericMath.clamp(
-            newHealth / entity.getAttribute(Attribute.GENERIC_MAX_HEALTH)
-                .getValue(),
+            newHealth / entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue(),
             0, 1
         )
     );

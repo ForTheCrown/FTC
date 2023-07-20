@@ -33,7 +33,10 @@ record DirectSource(CharSequence src, String name) implements Source {
 
     String stringUrl = src.toString();
     tag.putString("raw", stringUrl);
-    tag.putString("name", name);
+
+    if (!name.equals("<eval>")) {
+      tag.putString("name", name);
+    }
 
     return tag;
   }

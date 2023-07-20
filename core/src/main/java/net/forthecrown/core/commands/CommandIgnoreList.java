@@ -72,7 +72,7 @@ public class CommandIgnoreList extends FtcCommand {
       throw Exceptions.NOTHING_TO_LIST;
     }
 
-    source.sendMessage(CoreMessages.listBlocked(list.getBlocked()));
+    source.sendMessage(CoreMessages.listBlocked(list.getBlocked(), source));
     return 0;
   }
 }

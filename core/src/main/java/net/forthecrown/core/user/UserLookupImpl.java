@@ -14,7 +14,9 @@ import lombok.Setter;
 import net.forthecrown.command.FtcSuggestions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Completions;
+import net.forthecrown.user.User;
 import net.forthecrown.user.UserLookup;
+import net.forthecrown.user.Users;
 import org.jetbrains.annotations.ApiStatus.Internal;
 
 @Internal
@@ -198,6 +200,14 @@ public class UserLookupImpl implements UserLookup {
       boolean allowOffline
   ) {
     var token = builder.getRemainingLowerCase();
+
+    if (token.length() < 3 || !allowOffline) {
+      return Completions.suggest(builder,
+          source.getVisiblePlayers()
+              .map(Users::get)
+              .map(User::getNickOrName)
+      );
+    }
 
     for (var e : identified.values()) {
       var hover = FtcSuggestions.uuidTooltip(e.getUniqueId());

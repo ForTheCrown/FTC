@@ -3,7 +3,6 @@ package net.forthecrown.core.user;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import it.unimi.dsi.fastutil.longs.LongArrays;
 import it.unimi.dsi.fastutil.objects.ObjectArrays;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -16,6 +15,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,27 +29,29 @@ import net.forthecrown.core.commands.tpa.TpPermissions;
 import net.forthecrown.core.user.UserLookupImpl.UserLookupEntry;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Grenadier;
+import net.forthecrown.text.ChannelledMessage;
+import net.forthecrown.text.ChannelledMessage.MessageHandler;
 import net.forthecrown.text.Text;
+import net.forthecrown.text.ViewerAwareMessage;
 import net.forthecrown.user.NameRenderFlags;
 import net.forthecrown.user.Properties;
 import net.forthecrown.user.TimeField;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserComponent;
-import net.forthecrown.user.name.UserNameFactory;
-import net.forthecrown.user.name.DisplayContext;
-import net.forthecrown.user.name.DisplayIntent;
 import net.forthecrown.user.UserOfflineException;
 import net.forthecrown.user.UserProperty;
 import net.forthecrown.user.UserTeleport;
 import net.forthecrown.user.UserTeleport.Type;
 import net.forthecrown.user.Users;
-import net.forthecrown.user.event.UserAfkEvent;
+import net.forthecrown.user.name.DisplayContext;
+import net.forthecrown.user.name.DisplayIntent;
+import net.forthecrown.user.name.UserNameFactory;
 import net.forthecrown.utils.ArrayIterator;
+import net.forthecrown.utils.Audiences;
 import net.forthecrown.utils.Locations;
 import net.forthecrown.utils.Time;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.node.Node;
@@ -95,27 +97,27 @@ public final class UserImpl implements User {
   private Location entityLocation;
   private Location returnLocation;
 
-  // Lazily initialized in setTime(TimeField, long)
-  @Getter @Setter
-  private long[] timeFields;
-
   @Getter
   private boolean afk;
 
   @Getter
-  private Component afkReason;
+  private ViewerAwareMessage afkReason;
 
   @Getter @Setter
-  private boolean online;
+  boolean online;
+
+  @Getter @Setter
+  Player player;
 
   private UserComponent[] components;
-
-  private Player player;
 
   @Getter
   public UserTeleportImpl currentTeleport;
 
   UserVanishTicker vanishTicker;
+
+  @Getter @Setter
+  private CommandSource lastMessage;
 
   public UserImpl(UserServiceImpl service, UUID uniqueId) {
     Objects.requireNonNull(uniqueId);
@@ -136,19 +138,6 @@ public final class UserImpl implements User {
 
   public void ensureValid() {
     Objects.requireNonNull(service, "User object has been invalidated :(");
-  }
-
-  @Override
-  public Player getPlayer() {
-    if (!isOnline()) {
-      return null;
-    }
-
-    if (player == null) {
-      player = Bukkit.getPlayer(getUniqueId());
-    }
-
-    return player;
   }
 
   @Override
@@ -265,7 +254,15 @@ public final class UserImpl implements User {
 
   @Override
   public int getPlayTime() {
-    return service.getPlaytime().get(uniqueId);
+    int seconds = 0;
+
+    if (isOnline()) {
+      long loginTime = getTime(TimeField.LAST_LOGIN);
+      long msSince = Time.timeSince(loginTime);
+      seconds = (int) TimeUnit.MILLISECONDS.toSeconds(msSince);
+    }
+
+    return seconds + service.getPlaytime().get(uniqueId);
   }
 
   @Override
@@ -333,43 +330,30 @@ public final class UserImpl implements User {
 
   @Override
   public long getTime(TimeField field) {
-    if (timeFields == null) {
-      return -1L;
-    }
-
-    if (timeFields.length <= field.getId()) {
-      return -1L;
-    }
-
-    return timeFields[field.getId()];
+    return getComponent(UserTimestamps.class).getTime(field);
   }
 
   @Override
   public void setTime(TimeField field, long value) {
     ensureValid();
-
-    int id = field.getId();
-
-    if (timeFields == null) {
-      timeFields = new long[id + 1];
-      Arrays.fill(timeFields, -1);
-    } else if (timeFields.length <= id) {
-      int oldLength = timeFields.length;
-      int newLength = id + 1;
-
-      timeFields = LongArrays.ensureCapacity(timeFields, id + 1);
-
-      Arrays.fill(timeFields, oldLength, newLength, -1);
-    }
-
-    timeFields[id] = value;
+    getComponent(UserTimestamps.class).setTime(field, value);
   }
 
   @Override
-  public Component displayName(@Nullable Audience viewer, Set<NameRenderFlags> flags) {
+  public Component displayName(
+      @Nullable Audience viewer,
+      Set<NameRenderFlags> flags,
+      DisplayIntent intent
+  ) {
+    Objects.requireNonNull(flags, "Null flags");
+    Objects.requireNonNull(intent, "Null intent");
+
     ensureValid();
+
     NameFactoryImpl factory = service.getNameFactory();
-    return factory.formatDisplayName(this, viewer, flags);
+    DisplayContext ctx = factory.createContext(this, viewer, flags).withIntent(intent);
+
+    return factory.formatDisplayName(this, ctx);
   }
 
   @Override
@@ -426,7 +410,7 @@ public final class UserImpl implements User {
   }
 
   @Override
-  public void setAfk(boolean afk, @Nullable Component reason) throws UserOfflineException {
+  public void setAfk(boolean afk, @Nullable ViewerAwareMessage reason) throws UserOfflineException {
     ensureOnline();
     ensureValid();
 
@@ -450,40 +434,47 @@ public final class UserImpl implements User {
   }
 
   @Override
-  public void afk(@Nullable Component reason) throws IllegalStateException, UserOfflineException {
+  public void afk(@Nullable ViewerAwareMessage reason)
+      throws IllegalStateException, UserOfflineException
+  {
     ensureOnline();
     Preconditions.checkState(!isAfk(), "User is already AFK");
     ensureValid();
 
-    UserAfkEvent event = new UserAfkEvent(this, reason);
-    event.callEvent();
+    ViewerAwareMessage nonNullReason = reason == null
+        ? ViewerAwareMessage.wrap(Component.empty())
+        : reason;
 
-    Component finalReason = event.getMessage();
-    setAfk(true, finalReason);
+    ChannelledMessage channelled = ChannelledMessage.create(nonNullReason)
+        .setSource(this)
+        .setBroadcast()
+        .setChannelName("afk");
 
-    Users.forEachUser(user -> {
-      if (user.equals(this)) {
-        return;
+    channelled.setRenderer((viewer, baseMessage) -> {
+      Component displayName;
+
+      if (Audiences.equals(viewer, this)) {
+        displayName = Component.text("You are");
+      } else {
+        displayName = Component.text()
+            .append(displayName(viewer))
+            .append(Component.text(" is"))
+            .build();
       }
 
-      Component viewerReason = finalReason;
-      if (!event.getMessageViewFilter().test(user)) {
-        viewerReason = null;
+      Component suffix;
+
+      if (Text.isEmpty(baseMessage)) {
+        suffix = Component.text(".");
+      } else {
+        suffix = Component.text(": ").append(baseMessage);
       }
 
-      TextComponent.Builder builder = Component.text()
-          .color(NamedTextColor.GRAY)
-          .append(displayName(user));
-
-      builder.append(Component.text(" is now AFK"));
-
-      if (viewerReason != null) {
-        builder.append(Component.text(": "))
-            .append(viewerReason);
-      }
-
-      user.sendMessage(builder.build());
+      return Text.format("{0} now AFK{1}", NamedTextColor.GRAY, displayName, suffix);
     });
+
+    channelled.setHandler(MessageHandler.EMPTY_IF_NOT_VIEWING);
+    channelled.send();
   }
 
   @Override
@@ -493,6 +484,25 @@ public final class UserImpl implements User {
     ensureValid();
 
     setAfk(false, null);
+
+    ChannelledMessage.announce(viewer -> {
+      Component displayName;
+
+      if (Audiences.equals(this, viewer)) {
+        displayName = Component.text("You are");
+      } else {
+        displayName = Component.text()
+            .append(displayName(viewer))
+            .append(Component.text(" is"))
+            .build();
+      }
+
+      return Component.text()
+          .color(NamedTextColor.GRAY)
+          .append(displayName)
+          .append(Component.text(" no longer AFK."))
+          .build();
+    });
   }
 
   @Override

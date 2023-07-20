@@ -144,7 +144,7 @@ public interface TextWriter extends ComponentLike {
 
   default void formattedField(Object field, String valueFormat, Object... args) {
     field(
-        Text.valueOf(field),
+        Text.valueOf(field, viewer()),
 
         FormatBuilder.builder()
             .setArguments(args)

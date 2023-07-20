@@ -1,5 +1,5 @@
 
-# If true, punishments will be announcce in general chat, if false they will only be announced in
+# If true, punishments will be announced in general chat, if false they will only be announced in
 # staff chat
 announcePunishments = false
 

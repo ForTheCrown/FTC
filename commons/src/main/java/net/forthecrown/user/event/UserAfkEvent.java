@@ -4,6 +4,7 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import lombok.Getter;
 import lombok.Setter;
+import net.forthecrown.text.ViewerAwareMessage;
 import net.forthecrown.user.User;
 import net.kyori.adventure.text.Component;
 import org.bukkit.event.HandlerList;
@@ -16,11 +17,11 @@ public class UserAfkEvent extends UserEvent {
   private static final HandlerList handlerList = new HandlerList();
 
   @Setter
-  private Component message;
+  private ViewerAwareMessage message;
 
   private Predicate<User> messageViewFilter = user -> true;
 
-  public UserAfkEvent(User user, Component message) {
+  public UserAfkEvent(User user, ViewerAwareMessage message) {
     super(user);
     this.message = message;
   }

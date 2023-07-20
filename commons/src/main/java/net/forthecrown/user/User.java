@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.text.ViewerAwareMessage;
+import net.forthecrown.user.name.DisplayIntent;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.ForwardingAudience;
 import net.kyori.adventure.text.Component;
@@ -206,6 +208,19 @@ public interface User extends ForwardingAudience.Single {
    */
   int getTotalVotes();
 
+  /**
+   * Sets the last person to have messaged/message this user
+   * @param sender Message sender
+   */
+  void setLastMessage(CommandSource sender);
+
+  /**
+   * Gets the last command source that sent this user a message/was sent a message by this user
+   * @return Message sender
+   */
+  @Nullable
+  CommandSource getLastMessage();
+
   /* ----------------------------- COMPONENTS ------------------------------ */
 
   /**
@@ -276,7 +291,19 @@ public interface User extends ForwardingAudience.Single {
     return flags;
   }
 
-  Component displayName(@Nullable Audience viewer, Set<NameRenderFlags> flags);
+  default Component displayName(@Nullable Audience viewer, Set<NameRenderFlags> flags) {
+    return displayName(viewer, flags, DisplayIntent.UNSET);
+  }
+
+  default Component displayName(@Nullable Audience viewer, DisplayIntent intent) {
+    return displayName(viewer, defaultRenderFlags(), intent);
+  }
+
+  Component displayName(
+      @Nullable Audience viewer,
+      Set<NameRenderFlags> flags,
+      DisplayIntent intent
+  );
 
   Component nickOrName();
 
@@ -300,7 +327,7 @@ public interface User extends ForwardingAudience.Single {
    *
    * @throws UserOfflineException If the user is not online
    */
-  void setAfk(boolean afk, @Nullable Component reason) throws UserOfflineException;
+  void setAfk(boolean afk, @Nullable ViewerAwareMessage reason) throws UserOfflineException;
 
   /**
    * Gets the amount of time this user has been in an AFK state since logging in
@@ -315,7 +342,7 @@ public interface User extends ForwardingAudience.Single {
    * @throws IllegalStateException If the user is already AFK
    * @throws UserOfflineException  If the user is not AFK
    */
-  void afk(@Nullable Component reason) throws IllegalStateException, UserOfflineException;
+  void afk(@Nullable ViewerAwareMessage reason) throws IllegalStateException, UserOfflineException;
 
   /**
    * Makes this user leave their AFK state
@@ -337,7 +364,7 @@ public interface User extends ForwardingAudience.Single {
    *         is not AFK
    */
   @Nullable
-  Component getAfkReason();
+  ViewerAwareMessage getAfkReason();
 
   /* ----------------------------- CURRENCIES ------------------------------ */
 

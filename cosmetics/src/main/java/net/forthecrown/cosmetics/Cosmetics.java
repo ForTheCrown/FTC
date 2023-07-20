@@ -20,19 +20,19 @@ public final class Cosmetics {
   public static final CosmeticType<Particle> ARROW_EFFECTS
       = CosmeticType.<Particle>builder()
       .defaultNodeFactory("arrow_effects")
-      .displayName(Component.text("Arrow Effects"))
+      .displayName(Component.text("Arrow Trail Particles"))
       .build();
 
   public static final CosmeticType<DeathEffect> DEATH_EFFECTS
       = CosmeticType.<DeathEffect>builder()
       .defaultNodeFactory("death_effects")
-      .displayName(Component.text("Death Effects"))
+      .displayName(Component.text("Death Particles"))
       .build();
 
   public static final CosmeticType<TravelEffect> TRAVEL_EFFECTS
       = CosmeticType.<TravelEffect>builder()
       .defaultNodeFactory("travel_effects")
-      .displayName(Component.text("Travel Effects"))
+      .displayName(Component.text("Waypoint Effects"))
       .build();
 
   static {

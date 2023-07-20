@@ -8,7 +8,6 @@ public final class AntiGriefListeners {
   public static void registerAll() {
     register(new ChannelMessageListener());
     register(new ChatListener());
-    register(new PlayerLogListener());
     register(new ServerLoadListener());
   }
 }

@@ -211,6 +211,7 @@ class RhinoScript implements Script {
     Context ctx = Context.enter();
     ctx.setLanguageVersion(VERSION_ES6);
     ctx.setOptimizationLevel(useClassGen ? 9 : -1);
+    ctx.setApplicationClassLoader(getClass().getClassLoader());
     return ctx;
   }
 
@@ -383,6 +384,12 @@ class RhinoScript implements Script {
 
     extensions.put(name, extension);
     extension.setScript(this);
+
+    if (isCompiled()) {
+      extension.onScriptCompile();
+      put(name, extension);
+    }
+
     return true;
   }
 

@@ -1,15 +1,21 @@
 package net.forthecrown.core.user;
 
+import static net.kyori.adventure.text.Component.text;
+
 import com.google.common.base.Strings;
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.function.ToIntFunction;
 import net.forthecrown.Permissions;
+import net.forthecrown.core.CoreMessages;
 import net.forthecrown.text.PeriodFormat;
 import net.forthecrown.text.TextWriter;
 import net.forthecrown.text.UnitFormat;
 import net.forthecrown.user.Properties;
 import net.forthecrown.user.TimeField;
 import net.forthecrown.user.User;
+import net.forthecrown.user.UserBlockList;
 import net.forthecrown.user.name.DisplayContext;
 import net.forthecrown.user.name.FieldPlacement;
 import net.forthecrown.user.name.ProfileDisplayElement;
@@ -125,6 +131,10 @@ interface ProfileFields {
     writer.formattedField("Location", "{0, location}", location);
   };
 
+  ProfileDisplayElement SEPARATED_USERS = blockedUsers(UserBlockList::getSeparated, "Separated");
+
+  ProfileDisplayElement IGNORED_USERS = blockedUsers(UserBlockList::getBlocked, "Blocked");
+
   static void registerAll(UserNameFactory factory) {
     factory.addProfileField("name", REAL_NAME);
     factory.addProfileField("privacy_state", PROFILE_PRIVATE_STATE);
@@ -141,6 +151,34 @@ interface ProfileFields {
     factory.addAdminProfileField("ip", IP);
     factory.addAdminProfileField("return_location", RETURN_LOCATION);
     factory.addAdminProfileField("location", LOCATION);
+    factory.addAdminProfileField("separated", SEPARATED_USERS);
+    factory.addAdminProfileField("blocked", IGNORED_USERS);
+  }
+
+  static ProfileDisplayElement blockedUsers(
+      Function<UserBlockList, Collection<java.util.UUID>> getter,
+      String name
+  ) {
+    return new ProfileDisplayElement() {
+      @Override
+      public void write(TextWriter writer, User user, DisplayContext context) {
+        UserBlockList blockList = user.getComponent(UserBlockList.class);
+        var separated = getter.apply(blockList);
+
+        if (separated.isEmpty()) {
+          return;
+        }
+
+        var blocked = CoreMessages.joinIds(separated, text(name + ": "), context.viewer());
+
+        writer.field(name, text("[Hover to see]").hoverEvent(blocked));
+      }
+
+      @Override
+      public FieldPlacement placement() {
+        return FieldPlacement.IN_PROFILE;
+      }
+    };
   }
 
   static ProfileDisplayElement timestamp(String name, TimeField field) {

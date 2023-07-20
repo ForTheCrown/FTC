@@ -62,9 +62,12 @@ public class ServerListDisplay {
   @Setter
   private boolean allowMaxPlayerRandomization;
 
+  @Setter
+  private Component baseMotd;
+
   ServerListDisplay() {
     this.directory = PathUtil.pluginPath("icons");
-    this.loaderFile = PathUtil.pluginPath("config.toml");
+    this.loaderFile = PathUtil.pluginPath("serverlist.toml");
 
     this.random = new Random();
 

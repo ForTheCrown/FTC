@@ -168,6 +168,11 @@ public interface Messages {
   TextColor CHAT_NAME_COLOR = TextColor.fromHexString("#e6e6e6");
 
   /**
+   * AFK tab suffix
+   */
+  TextComponent AFK_SUFFIX = text(" [AFK]", NamedTextColor.GRAY);
+
+  /**
    * Format used by {@link Users#testBlocked(User, User, String, String)} for separated players.
    */
   String SEPARATED_FORMAT = "You are forcefully separated from {0, user}!";

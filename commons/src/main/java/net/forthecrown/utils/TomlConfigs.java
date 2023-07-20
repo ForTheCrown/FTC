@@ -9,11 +9,11 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import me.lucko.configurate.toml.TOMLConfigurationLoader;
 import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.grenadier.types.TimeArgument;
 import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.utils.io.PluginJar;
+import net.forthecrown.utils.io.configurate.TomlConfigurationLoader;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.configurate.ConfigurateException;
@@ -68,14 +68,12 @@ public final class TomlConfigs {
     return loader.load();
   }
 
-  public static TOMLConfigurationLoader createLoader(Path path) {
-    return TOMLConfigurationLoader.builder()
+  public static TomlConfigurationLoader createLoader(Path path) {
+    return TomlConfigurationLoader.builder()
         .path(path)
         .defaultOptions(configurationOptions -> {
           return configurationOptions.serializers(TomlConfigs::registerTypeSerializers);
         })
-        .setTableIndent(2)
-        .setKeyIndent(2)
         .headerMode(HeaderMode.PRESERVE)
         .build();
   }

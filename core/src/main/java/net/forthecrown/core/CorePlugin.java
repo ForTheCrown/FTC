@@ -59,8 +59,6 @@ public class CorePlugin extends JavaPlugin {
     userService.initialize();
     userService.load();
 
-    dayChange.schedule();
-
     CoreListeners.registerAll();
     CoreCommands.createCommands();
     PrefsBook.init(ftcServer.getGlobalSettingsBook());
@@ -70,14 +68,10 @@ public class CorePlugin extends JavaPlugin {
   }
 
   @Override
-  public void onDisable() {
-    userService.shutdown();
-  }
-
-  @Override
   public void reloadConfig() {
     ftcConfig = TomlConfigs.loadPluginConfig(this, CoreConfig.class);
     saver.start();
+    dayChange.schedule();
   }
 
   @Override
@@ -95,5 +89,12 @@ public class CorePlugin extends JavaPlugin {
 
     InventoryStorageImpl.getStorage().save();
     CooldownsImpl.getCooldowns().save();
+  }
+
+  public void reload() {
+    reloadConfig();
+    userService.load();
+    InventoryStorageImpl.getStorage().load();
+    CooldownsImpl.getCooldowns().load();
   }
 }

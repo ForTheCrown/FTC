@@ -161,7 +161,13 @@ public abstract class AbstractBoss implements DungeonBoss {
       return;
     }
 
-    components.forEach(consumer);
+    components.forEach(bossComponent -> {
+      try {
+        consumer.accept(bossComponent);
+      } catch (Throwable t) {
+        LOGGER.error("Error iterating over component {}", bossComponent, t);
+      }
+    });
   }
 
   // Getters :D

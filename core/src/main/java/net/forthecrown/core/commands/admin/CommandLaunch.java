@@ -7,12 +7,15 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Collection;
 import net.forthecrown.command.Exceptions;
 import net.forthecrown.command.FtcCommand;
+import net.forthecrown.command.arguments.ExpandedEntityArgument;
 import net.forthecrown.command.help.UsageFactory;
 import net.forthecrown.core.CorePermissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.grenadier.types.ParsedPosition;
+import net.forthecrown.grenadier.types.ParsedPosition.Type;
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -61,53 +64,55 @@ public class CommandLaunch extends FtcCommand {
 
   @Override
   public void createCommand(GrenadierCommand command) {
-    command.then(argument("entity", ArgumentTypes.entities())
-        .executes(c -> {
-          Player player = c.getSource().asPlayer();
-          Vector dir = player.getLocation().getDirection();
+    command
+        .withPlainTranslation(true)
 
-          return launch(c, dir, false);
-        })
+        .then(argument("entity", new ExpandedEntityArgument(true, false))
+            .executes(c -> {
+              Player player = c.getSource().asPlayer();
+              Vector dir = player.getLocation().getDirection();
 
-        .then(argument("vec", ArgumentTypes.position())
-            .executes(c -> launchVelocityGiven(c, false))
-        )
+              return launch(c, dir, false);
+            })
 
-        .then(literal("add")
             .then(argument("vec", ArgumentTypes.position())
                 .executes(c -> launchVelocityGiven(c, false))
             )
-        )
-    );
+
+            .then(literal("add")
+                .then(argument("vec", ArgumentTypes.position())
+                    .executes(c -> launchVelocityGiven(c, false))
+                )
+            )
+        );
   }
 
-  int launchVelocityGiven(CommandContext<CommandSource> c,
-                          boolean add
-  ) throws CommandSyntaxException {
+  int launchVelocityGiven(CommandContext<CommandSource> c, boolean add)
+      throws CommandSyntaxException
+  {
     ParsedPosition pos = c.getArgument("vec", ParsedPosition.class);
 
-    if (pos.getXCoordinate().relative()
-        || pos.getYCoordinate().relative()
-        || pos.getZCoordinate().relative()
-    ) {
-      throw Exceptions.create("Cannot use relative ('~' or '^') coordiantes here");
+    if (pos.getType() != Type.LOCAL) {
+      if (pos.getXCoordinate().relative()
+          || pos.getYCoordinate().relative()
+          || pos.getZCoordinate().relative()
+      ) {
+        throw Exceptions.create("Cannot use relative ('^') coordinates here");
+      }
     }
 
-    return launch(
-        c,
-        new Vector(
-            pos.getXCoordinate().value(),
-            pos.getYCoordinate().value(),
-            pos.getZCoordinate().value()
-        ),
-        add
-    );
+    Location sourceLocation = c.getSource().getLocation();
+    sourceLocation.setX(0);
+    sourceLocation.setY(0);
+    sourceLocation.setZ(0);
+    pos.apply(sourceLocation);
+
+    return launch(c, sourceLocation.toVector(), add);
   }
 
-  int launch(CommandContext<CommandSource> c,
-             Vector velocity,
-             boolean add
-  ) throws CommandSyntaxException {
+  int launch(CommandContext<CommandSource> c, Vector velocity, boolean add)
+      throws CommandSyntaxException
+  {
     Collection<Entity> entities = ArgumentTypes.getEntities(c, "entity");
 
     for (Entity e : entities) {

@@ -208,4 +208,12 @@ public @UtilityClass class FtcCodecs {
       );
     }, e -> e.name().toLowerCase());
   }
+
+  public static UUID uuidFromIntArray(int[] arr) {
+    return UUIDUtil.uuidFromIntArray(arr);
+  }
+
+  public static int[] uuidToIntArray(UUID uuid) {
+    return UUIDUtil.uuidToIntArray(uuid);
+  }
 }

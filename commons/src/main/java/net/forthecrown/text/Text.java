@@ -194,7 +194,7 @@ public final class Text {
    * @return The rendered message
    */
   public static Component renderString(String s) {
-    return ChatParser.parsers().parse(s, TextContext.totalRender());
+    return ChatParser.parser().parse(s, TextContext.totalRender());
   }
 
   /**
@@ -205,7 +205,7 @@ public final class Text {
    * @return The formatted message
    */
   public static Component renderString(Permissible permissible, String s) {
-    return ChatParser.parsers().parse(s, TextContext.create(permissible, null));
+    return ChatParser.parser().parse(s, TextContext.create(permissible, null));
   }
 
   public static ViewerAwareMessage parseToViewerAware(Permissible permissible, String s) {
@@ -213,7 +213,7 @@ public final class Text {
 
     return viewer -> {
       TextContext context = TextContext.of(flags, viewer);
-      return ChatParser.parsers().parse(s, context);
+      return ChatParser.parser().parse(s, context);
     };
   }
 
@@ -603,11 +603,43 @@ public final class Text {
   public static Component sourceDisplayName(CommandSource source) {
     return sourceDisplayName(source, null);
   }
+
   public static Component sourceDisplayName(CommandSource source, Audience viewer) {
     if (source.isPlayer()) {
       return Users.get(source.asPlayerOrNull()).displayName(viewer);
     }
     return source.displayName();
+  }
+
+  public static TextComponent chatWidthBorder(Component title) {
+    // Font pixels aren't real pixels, (in actuality, max chat width is 640px)
+    final int maxChatWidth = 320;
+
+    if (isEmpty(title)) {
+      return border(maxChatWidth, 0);
+    }
+
+    Component withSpaces = text().append(space(), title, space()).build();
+    int titleLength = TextInfo.length(withSpaces);
+
+    return border(maxChatWidth, titleLength);
+  }
+
+  public static TextComponent border(int maxWidthPx, int titleLengthPx) {
+    final char borderChar = ' ';
+    final int borderWidth = 4; // ' ' is 3 px, but +1 for space between chars
+
+    if (titleLengthPx <= 0) {
+      final int size = maxWidthPx / borderWidth;
+      return text(String.valueOf(borderChar).repeat(size))
+          .decorate(TextDecoration.STRIKETHROUGH);
+    }
+
+    int borderSize = (maxWidthPx - titleLengthPx) / 2;
+    int borderChars = borderSize / borderWidth;
+
+    return text(String.valueOf(borderChar).repeat(borderChars))
+        .decorate(TextDecoration.STRIKETHROUGH);
   }
 
   /* ----------------------------- FORMATTERS ------------------------------ */

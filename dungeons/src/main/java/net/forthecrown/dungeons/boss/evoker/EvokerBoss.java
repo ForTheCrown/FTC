@@ -30,11 +30,12 @@ import net.forthecrown.dungeons.boss.evoker.phases.AttackPhases;
 import net.forthecrown.dungeons.boss.evoker.phases.GhastPhase;
 import net.forthecrown.dungeons.boss.evoker.phases.SummonPhase;
 import net.forthecrown.dungeons.boss.evoker.phases.SwarmPhase;
-import net.forthecrown.dungeons.enchantments.FtcEnchants;
+import net.forthecrown.dungeons.enchantments.DungeonEnchantments;
+import net.forthecrown.enchantment.FtcEnchants;
+import net.forthecrown.text.Text;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.math.Vectors;
-import net.forthecrown.text.Text;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -384,7 +385,7 @@ public class EvokerBoss extends KeyedBossImpl implements SingleEntityBoss {
     }
 
     ItemStack enchantedBook = new ItemStack(Material.ENCHANTED_BOOK);
-    FtcEnchants.addEnchant(enchantedBook, FtcEnchants.SOUL_BOND, 1);
+    FtcEnchants.addEnchant(enchantedBook, DungeonEnchantments.SOUL_BOUND, 1);
 
     DungeonUtils.giveOrDropItem(
         player.getInventory(),

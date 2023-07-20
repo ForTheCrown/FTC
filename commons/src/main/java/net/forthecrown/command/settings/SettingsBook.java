@@ -20,7 +20,11 @@ public class SettingsBook<C> {
   @Getter @Setter
   private Component title = Component.text("Settings");
 
-  public void create(C c, User user) {
+  public void open(C c, User user) {
+    for (var s: settings) {
+      s.setBook(this);
+    }
+
     var book = createBook(c, title, settings);
     user.openBook(book);
   }

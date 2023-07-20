@@ -9,6 +9,7 @@ import net.forthecrown.user.User;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 
 @Getter
@@ -39,6 +40,10 @@ public abstract class UserLogEvent extends UserEvent {
   }
 
   public static void maybeAnnounce(UserLogEvent event) {
+    maybeAnnounce(event, false);
+  }
+
+  public static void maybeAnnounce(UserLogEvent event, boolean ignoreVanishCheck) {
     if (!event.isShowMessage()) {
       return;
     }
@@ -46,14 +51,17 @@ public abstract class UserLogEvent extends UserEvent {
     UserLogRenderer renderer = event.getRenderer();
     User source = event.getUser();
 
-    Bukkit.getOnlinePlayers().forEach(player -> {
-      Component message = renderer.render(source, player);
+    Bukkit.getServer().forEachAudience(audience -> {
+      Component message = renderer.render(source, audience);
 
       if (message == null) {
         return;
       }
 
-      if (source.get(Properties.VANISHED)) {
+      if (source.get(Properties.VANISHED)
+          && audience instanceof Player player
+          && !ignoreVanishCheck
+      ) {
         if (!player.hasPermission(Permissions.VANISH_SEE)) {
           return;
         }
@@ -64,7 +72,7 @@ public abstract class UserLogEvent extends UserEvent {
         );
       }
 
-      player.sendMessage(message);
+      audience.sendMessage(message);
     });
   }
 }

@@ -207,7 +207,7 @@ public class CommandSign extends FtcCommand {
                           );
                         })
 
-                        .executes(c -> set(c, c.getArgument("line", Component.class)))
+                        .executes(c -> set(c, Arguments.getMessage(c, "line").asComponent()))
                     )
                 )
 

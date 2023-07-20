@@ -12,17 +12,20 @@ import org.jetbrains.annotations.NotNull;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
 
-public class RegionPoleType extends PlayerWaypointType {
+public final class RegionPoleType extends WaypointType {
+
+  public static final Material[] REGION_POLE_COLUMN = {
+      Material.GLOWSTONE,
+      Material.GLOWSTONE,
+      Material.SEA_LANTERN
+  };
 
   public RegionPoleType() {
-    super("Region Pole", Waypoints.REGION_POLE_COLUMN);
+    super("Region Pole", REGION_POLE_COLUMN);
   }
 
   @Override
-  public void onPreMove(Waypoint waypoint,
-                        Vector3i newPosition,
-                        World newWorld
-  ) {
+  public void onPreMove(Waypoint waypoint, Vector3i newPosition, World newWorld) {
     clearPole(waypoint);
   }
 
@@ -36,8 +39,7 @@ public class RegionPoleType extends PlayerWaypointType {
       return;
     }
 
-    var oldBounds = waypoint.getBounds()
-        .toWorldBounds(waypoint.getWorld());
+    var oldBounds = waypoint.getBounds().toWorldBounds(waypoint.getWorld());
 
     for (var b : oldBounds) {
       b.setType(Material.AIR, false);
@@ -60,23 +62,19 @@ public class RegionPoleType extends PlayerWaypointType {
 
   @Override
   public Optional<CommandSyntaxException> isValid(Waypoint waypoint) {
-    return Waypoints.isValidWaypointArea(
-        waypoint.getPosition().add(0, 1, 0),
-        this,
-        waypoint.getWorld(),
-        false
-    );
+    var pos = waypoint.getPosition().add(0, 1, 0);
+    return Waypoints.isValidWaypointArea(pos, this, waypoint.getWorld(), false);
   }
 
   @Override
   public Vector3d getVisitPosition(Waypoint waypoint) {
-    return super.getVisitPosition(waypoint)
-        .add(0, 1, 0);
+    return super.getVisitPosition(waypoint).add(0, 1, 0);
   }
 
   @Override
   public boolean isDestroyed(Waypoint waypoint) {
-    return isDestroyed(
+    return WaypointTypes.isDestroyed(
+        getColumn(),
         waypoint.getPosition().add(0, 1, 0),
         waypoint.getWorld()
     );

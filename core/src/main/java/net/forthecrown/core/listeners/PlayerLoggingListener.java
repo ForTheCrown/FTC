@@ -8,6 +8,7 @@ import net.forthecrown.core.CorePlugin;
 import net.forthecrown.core.user.UserImpl;
 import net.forthecrown.core.user.UserLookupImpl;
 import net.forthecrown.core.user.UserServiceImpl;
+import net.forthecrown.packet.PacketListeners;
 import net.forthecrown.user.TimeField;
 import net.forthecrown.user.UserLookup.LookupEntry;
 import net.forthecrown.user.event.UserJoinEvent;
@@ -67,6 +68,7 @@ class PlayerLoggingListener implements Listener {
 
     UserImpl user = service.getUser(entry);
     user.setOnline(true);
+    user.setPlayer(player);
     user.setIp(player.getAddress().getHostName());
 
     String lastOnlineName = user.getLastOnlineName();
@@ -96,6 +98,8 @@ class PlayerLoggingListener implements Listener {
     UserJoinEvent userEvent = new UserJoinEvent(user, lastOnlineName, firstJoin, false);
     userEvent.callEvent();
     UserLogEvent.maybeAnnounce(userEvent);
+
+    PacketListeners.listeners().inject(player);
   }
 
   @EventHandler(ignoreCancelled = true)

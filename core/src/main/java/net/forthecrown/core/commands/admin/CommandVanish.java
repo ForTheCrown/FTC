@@ -89,6 +89,10 @@ public class CommandVanish {
   }
 
   void joinLeaveMessage(User user, boolean vanished) {
+    if (user.isOnline()) {
+      return;
+    }
+
     if (vanished) {
       leaveMessage(user);
     } else {
@@ -99,12 +103,12 @@ public class CommandVanish {
   void leaveMessage(User user) {
     UserLeaveEvent event = new UserLeaveEvent(user, QuitReason.DISCONNECTED, true);
     event.callEvent();
-    UserLogEvent.maybeAnnounce(event);
+    UserLogEvent.maybeAnnounce(event, true);
   }
 
   void joinMessage(User user) {
     UserJoinEvent event = new UserJoinEvent(user, user.getName(), false, true);
     event.callEvent();
-    UserLogEvent.maybeAnnounce(event);
+    UserLogEvent.maybeAnnounce(event, true);
   }
 }

@@ -1,5 +1,8 @@
 package net.forthecrown.cosmetics.emotes;
 
+import net.forthecrown.FtcServer;
+import net.forthecrown.command.settings.Setting;
+import net.forthecrown.command.settings.SettingsBook;
 import net.forthecrown.cosmetics.Cosmetic;
 import net.forthecrown.cosmetics.CosmeticType;
 import net.forthecrown.cosmetics.Cosmetics;
@@ -7,6 +10,7 @@ import net.forthecrown.cosmetics.MenuNodeFactory;
 import net.forthecrown.menu.MenuNode;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.user.Properties;
+import net.forthecrown.user.User;
 import net.forthecrown.user.UserProperty;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.kyori.adventure.text.Component;
@@ -26,23 +30,23 @@ public final class Emotes {
       .factory(createFactory())
       .build();
 
-  public static final Cosmetic<Emote>
-      BONK = create(12, new EmoteBonk(), "bonk", "Bonk.");
+  public static final Cosmetic<Emote> BONK
+      = create(12, new EmoteBonk(), "bonk", "Bonk.");
 
-  public static final Cosmetic<Emote>
-      SMOOCH = create(13, new EmoteSmooch(), "smooch", "Shower your friends with love.");
+  public static final Cosmetic<Emote> SMOOCH
+      = create(13, new EmoteSmooch(), "smooch", "Shower your friends with love.");
 
-  public static final Cosmetic<Emote>
-      POKE = create(14, new EmotePoke(), "poke", "Poke someone and make 'em jump back a bit.");
+  public static final Cosmetic<Emote> POKE
+      = create(14, new EmotePoke(), "poke", "Poke someone and make 'em jump back a bit.");
 
-  public static final Cosmetic<Emote>
-      SCARE = create(21, new EmoteScare(), "scare", "Can be earned around Halloween.", "Scares someone");
+  public static final Cosmetic<Emote> SCARE
+      = create(21, new EmoteScare(), "scare", "Can be earned around Halloween.", "Scares someone");
 
-  public static final Cosmetic<Emote>
-      JINGLE = create(22, new EmoteJingle(), "jingle", "Can be earned around Christmas.", "Plays a christmas tune");
+  public static final Cosmetic<Emote> JINGLE
+      = create(22, new EmoteJingle(), "jingle", "Can be earned around Christmas.", "Plays a christmas tune");
 
-  public static final Cosmetic<Emote>
-      HUG = create(23, new EmoteHug(), "hug", "Can be earned around Valentine's Day.", "Hugs someone :D");
+  public static final Cosmetic<Emote> HUG
+      = create(23, new EmoteHug(), "hug", "Can be earned around Valentine's Day.", "Hugs someone :D");
 
   private static Cosmetic<Emote> create(int slot, Emote emote, String name, String... desc) {
     return Cosmetic.create(emote, slot, name, desc);
@@ -72,5 +76,21 @@ public final class Emotes {
     r.register("scare", SCARE);
     r.register("jingle", JINGLE);
     r.register("hug", HUG);
+
+    SettingsBook<User> settingsBook = FtcServer.server().getGlobalSettingsBook();
+
+    Setting setting = Setting.create(EMOTES_ENABLED)
+        .setDisplayName("Emotes")
+        .setToggleDescription("{Enable} emote commands")
+        .setToggle("{0} emote commands")
+        .setDescription("Toggles whether you can send and receive emotes")
+
+        .createCommand(
+            "toggleemotes",
+            EmotePermissions.EMOTES,
+            EmotePermissions.EMOTES_ADMIN
+        );
+
+    settingsBook.getSettings().add(setting.toBookSettng());
   }
 }

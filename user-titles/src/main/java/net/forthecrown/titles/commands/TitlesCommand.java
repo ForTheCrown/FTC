@@ -4,6 +4,7 @@ import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Map;
 import java.util.Set;
+import net.forthecrown.command.Commands;
 import net.forthecrown.command.Exceptions;
 import net.forthecrown.command.arguments.RegistryArguments;
 import net.forthecrown.command.arguments.UserParseResult;
@@ -16,6 +17,7 @@ import net.forthecrown.registry.Holder;
 import net.forthecrown.text.Text;
 import net.forthecrown.text.TextJoiner;
 import net.forthecrown.text.TextWriters;
+import net.forthecrown.titles.RankMenu;
 import net.forthecrown.titles.RankTier;
 import net.forthecrown.titles.TitlesPlugin;
 import net.forthecrown.titles.UserRank;
@@ -46,6 +48,11 @@ public class TitlesCommand {
 
   User resultToUser(CommandSource source, UserParseResult result) throws CommandSyntaxException {
     return result.get(source, false);
+  }
+
+  void openMenu(CommandSource source) throws CommandSyntaxException {
+    User user = Commands.getUserSender(source);
+    RankMenu.getInstance().open(user);
   }
 
   void reloadPlugin(CommandSource source) {

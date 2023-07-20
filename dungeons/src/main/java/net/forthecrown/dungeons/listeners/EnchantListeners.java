@@ -7,11 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import net.forthecrown.dungeons.enchantments.FtcEnchant;
-import net.forthecrown.dungeons.enchantments.FtcEnchants;
+import net.forthecrown.dungeons.enchantments.DungeonEnchantments;
+import net.forthecrown.enchantment.FtcEnchant;
+import net.forthecrown.enchantment.FtcEnchants;
+import net.forthecrown.text.Text;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.inventory.ItemStacks;
-import net.forthecrown.text.Text;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableBoolean;
@@ -196,7 +197,7 @@ public class EnchantListeners implements Listener {
       return;
     }
 
-    if (!hasEnchant(player.getInventory().getItemInMainHand(), FtcEnchants.POISON_CRIT)) {
+    if (!hasEnchant(player.getInventory().getItemInMainHand(), DungeonEnchantments.POISON_CRIT)) {
       return;
     }
 
@@ -249,8 +250,8 @@ public class EnchantListeners implements Listener {
     }
 
     var inv = player.getInventory();
-    if (!(hasEnchant(inv.getItemInOffHand(), FtcEnchants.HEALING_BLOCK)
-        || hasEnchant(inv.getItemInMainHand(), FtcEnchants.HEALING_BLOCK))
+    if (!(hasEnchant(inv.getItemInOffHand(), DungeonEnchantments.HEALING_BLOCK)
+        || hasEnchant(inv.getItemInMainHand(), DungeonEnchantments.HEALING_BLOCK))
     ) {
       return;
     }
@@ -300,7 +301,7 @@ public class EnchantListeners implements Listener {
 
     var map = item.getEnchantments();
 
-    if (!map.containsKey(FtcEnchants.DOLPHIN_SWIMMER)) {
+    if (!map.containsKey(DungeonEnchantments.DOLPHIN_SWIMMER)) {
       return;
     }
 
@@ -325,7 +326,7 @@ public class EnchantListeners implements Listener {
 
   @EventHandler(ignoreCancelled = true)
   public void onEntityShootBow(EntityShootBowEvent event) {
-    if (!hasEnchant(event.getBow(), FtcEnchants.STRONG_AIM)) {
+    if (!hasEnchant(event.getBow(), DungeonEnchantments.STRONG_AIM)) {
       return;
     }
 

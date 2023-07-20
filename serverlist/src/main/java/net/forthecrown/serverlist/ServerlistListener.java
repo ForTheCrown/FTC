@@ -1,15 +1,9 @@
 package net.forthecrown.serverlist;
 
-import static net.kyori.adventure.text.Component.empty;
-import static net.kyori.adventure.text.Component.newline;
-import static net.kyori.adventure.text.Component.text;
-
 import com.destroystokyo.paper.event.server.PaperServerListPingEvent;
 import java.util.Random;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.Style;
-import net.kyori.adventure.text.format.TextDecoration;
+import net.forthecrown.events.DayChangeEvent;
+import net.forthecrown.text.placeholder.PlaceholderList;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -29,28 +23,28 @@ public class ServerlistListener implements Listener {
     }
 
     var pair = display.getCurrent();
-    event.motd(motd(pair.right()));
+    var base = display.getBaseMotd();
+
+    if (base == null) {
+      base = Bukkit.motd();
+    }
+
+    PlaceholderList placeholders = PlaceholderList.newList()
+        .useDefaults()
+        .add("version", Bukkit::getMinecraftVersion);
+
+    placeholders.add("message", placeholders.render(pair.right()));
+
+    event.motd(placeholders.render(base));
 
     if (pair.first() != null) {
       event.setServerIcon(pair.first());
     }
   }
 
-  Component motd(Component afterDash) {
-    return text()
-        .color(NamedTextColor.GRAY)
-
-        .append(
-            text("For The Crown", Style.style(NamedTextColor.GOLD, TextDecoration.BOLD)),
-
-            afterDash == null
-                ? empty()
-                : text(" - ").append(afterDash)
-        )
-
-        .append(newline())
-        .append(text("Currently on " + Bukkit.getMinecraftVersion()))
-
-        .build();
+  @EventHandler(ignoreCancelled = true)
+  public void onDayChange(DayChangeEvent event) {
+    ServerListDisplay display = JavaPlugin.getPlugin(ServerlistPlugin.class).getDisplay();
+    display.cacheDateEntries();
   }
 }

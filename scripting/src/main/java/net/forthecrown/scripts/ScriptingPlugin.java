@@ -3,10 +3,10 @@ package net.forthecrown.scripts;
 import com.google.gson.JsonElement;
 import java.nio.file.Path;
 import java.util.Map;
+import net.forthecrown.BukkitServices;
 import net.forthecrown.command.Commands;
 import net.forthecrown.grenadier.annotations.AnnotatedCommandContext;
 import net.forthecrown.scripts.commands.ScriptingCommand;
-import net.forthecrown.BukkitServices;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.utils.io.SerializationHelper;
@@ -21,6 +21,8 @@ public class ScriptingPlugin extends JavaPlugin {
     Scripts.setService(service);
     BukkitServices.register(ScriptService.class, service);
 
+    ScriptPlaceholders.registerAll();
+
     AnnotatedCommandContext ctx = Commands.createAnnotationContext();
     ctx.registerCommand(new ScriptingCommand());
   }
@@ -29,6 +31,8 @@ public class ScriptingPlugin extends JavaPlugin {
   public void onDisable() {
     ServiceImpl service = (ServiceImpl) Scripts.getService();
     service.close();
+
+    ScriptPlaceholders.removeAll();
   }
 
   @Override

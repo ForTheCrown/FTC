@@ -106,7 +106,8 @@ public final class PluginUtil {
         return clazz.getClassLoader() instanceof ConfiguredPluginClassLoader;
       })
           .map(stackFrame -> JavaPlugin.getProvidingPlugin(stackFrame.getDeclaringClass()))
-          .findFirst().orElse(null);
+          .findFirst()
+          .orElse(null);
     });
   }
 }

@@ -72,10 +72,12 @@ public class CommandCosmetics extends FtcCommand {
     prefixed.usage("unset")
         .addInfo("Clears the user's active %s cosmetic", name);
 
-    prefixed.usage("clear", "Clears the user's available")
+    prefixed.usage("clear")
+        .addInfo("Clears the user's available")
         .addInfo("%s cosmetics", name);
 
-    prefixed.usage("add <cosmetic>", "Adds the <cosmetic> to the user's")
+    prefixed.usage("add <cosmetic>")
+        .addInfo("Adds the <cosmetic> to the user's")
         .addInfo("cosmetic effect list");
 
     prefixed.usage("remove <cosmetic>")
@@ -97,6 +99,7 @@ public class CommandCosmetics extends FtcCommand {
 
             .executes(c -> {
               JavaPlugin.getPlugin(CosmeticsPlugin.class).reloadConfig();
+              CosmeticMenus.createMenus();
 
               c.getSource().sendSuccess(text("Reloaded cosmetics config"));
               return 0;

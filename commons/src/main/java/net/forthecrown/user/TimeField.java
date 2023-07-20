@@ -8,7 +8,7 @@ import net.forthecrown.registry.Registry;
 @Getter
 public final class TimeField {
 
-  public static final Registry<TimeField> REGISTRY = Registries.newRegistry();
+  public static final Registry<TimeField> REGISTRY = Registries.newFreezable();
 
   /**
    * Time stamp of when the user is next allowed to use a command like /home or /tpa

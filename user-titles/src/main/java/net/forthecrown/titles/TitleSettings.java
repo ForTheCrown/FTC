@@ -18,7 +18,8 @@ public class TitleSettings {
     var setting = Setting.create(SEE_RANKS)
         .setDescription("Toggles seeing ranks in chat")
         .setDisplayName("Ranks in chat")
-        .setToggleMessage("N{1} showing ranks in chat")
+        .setToggle("N{1} showing ranks in chat")
+        .setToggleDescription("{Enable} seeing ranks in chat")
         .createCommand("rankchat", Permissions.DEFAULT, Permissions.ADMIN, "chatranks");
 
     settingsBook.getSettings().add(setting.toBookSettng());

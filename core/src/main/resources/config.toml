@@ -9,5 +9,12 @@ tpCooldown = "3s"
 # Time it takes for a TPA request to expire
 tpaExpireTime = "3m"
 
+# Maximum length a player's nickname can have
+maxNickLength = 16
+
 # Worlds people cannot set their homes to or
 illegalWorlds = [ "world_void", "world_test" ]
+
+# The time of day the day reset happens
+# In hh:mm:ss format
+dayUpdateTime = 00:00:01

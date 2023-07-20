@@ -14,6 +14,7 @@ import net.forthecrown.grenadier.annotations.AnnotatedCommandContext.DefaultExec
 import net.forthecrown.grenadier.annotations.ArgumentModifier;
 import net.forthecrown.grenadier.annotations.CommandDataLoader;
 import net.forthecrown.grenadier.annotations.TypeRegistry;
+import net.forthecrown.registry.Holder;
 import net.forthecrown.text.page.PageEntryIterator;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
@@ -48,6 +49,9 @@ public final class Commands {
       return input.get(context.getSource(), true);
     };
     ctx.getVariables().put("result_to_user", resultToUser);
+
+    ArgumentModifier<Holder, Object> holderToValue = (context, input) -> input.getValue();
+    ctx.getVariables().put("holder_to_value", holderToValue);
 
     return ctx;
   }

@@ -15,7 +15,7 @@ public final class Events {
    * @param listener The listener to register
    */
   public static void register(Listener listener) {
-    Plugin caller = PluginUtil.getCallingPlugin();
+    Plugin caller = PluginUtil.currentContextPlugin();
     Bukkit.getPluginManager().registerEvents(listener, caller);
   }
 

@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
+import net.forthecrown.Permissions;
 import net.forthecrown.command.Exceptions;
 import net.forthecrown.grenadier.Grenadier;
 import net.forthecrown.text.Messages;

@@ -1,9 +1,13 @@
 package net.forthecrown.events;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Supplier;
 import lombok.Getter;
 import lombok.Setter;
 import net.forthecrown.Permissions;
+import net.forthecrown.command.Exceptions;
 import net.kyori.adventure.text.Component;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -11,6 +15,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @Getter @Setter
 public class WorldAccessTestEvent extends Event implements Cancellable {
@@ -113,6 +118,20 @@ public class WorldAccessTestEvent extends Event implements Cancellable {
     }
 
     boolean accessible();
-    Component denyReason();
+
+    @Nullable Component denyReason();
+
+    default Component denyReasonOr(Supplier<Component> supplier) {
+      Objects.requireNonNull(supplier);
+      return Optional.ofNullable(denyReason()).orElseGet(supplier);
+    }
+
+    default void orThrow(Supplier<Component> supplier) throws CommandSyntaxException {
+      if (accessible()) {
+        return;
+      }
+
+      throw Exceptions.create(denyReasonOr(supplier));
+    }
   }
 }

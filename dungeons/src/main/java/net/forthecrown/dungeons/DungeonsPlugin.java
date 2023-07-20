@@ -1,5 +1,6 @@
 package net.forthecrown.dungeons;
 
+import net.forthecrown.dungeons.enchantments.DungeonEnchantments;
 import net.forthecrown.events.Events;
 import net.forthecrown.ItemGraveService;
 import net.forthecrown.command.Commands;
@@ -16,6 +17,7 @@ public class DungeonsPlugin extends JavaPlugin {
   @Override
   public void onEnable() {
     Bosses.init();
+    DungeonEnchantments.init();
 
     Events.register(new DungeonListeners());
     Events.register(new EnchantListeners());

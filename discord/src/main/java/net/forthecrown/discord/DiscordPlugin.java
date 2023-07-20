@@ -28,21 +28,24 @@ public class DiscordPlugin extends JavaPlugin {
   @Override
   public void reloadConfig() {
     pluginConfig = TomlConfigs.loadPluginConfig(this, Config.class);
-    updateLoggers();
+    updateLoggers(false);
   }
 
   @Override
   public void onDisable() {
-
+    updateLoggers(true);
   }
 
-  void updateLoggers() {
+  void updateLoggers(boolean remove) {
     var ctx = LoggerContext.getContext(false);
     var config = ctx.getConfiguration();
     var root = config.getRootLogger();
 
     root.removeAppender(APPENDER_NAME);
-    root.addAppender(new DiscordAppender(config.getName()), getAppenderLevel(), null);
+
+    if (!remove) {
+      root.addAppender(new DiscordAppender(config.getName()), getAppenderLevel(), null);
+    }
 
     LoggerConfig discordSRV = new LoggerConfig("DiscordSRV", Level.OFF, false);
     config.addLogger("DiscordSRV", discordSRV);

@@ -8,6 +8,7 @@ import net.forthecrown.antigrief.StaffChat;
 import net.forthecrown.text.ViewerAwareMessage;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
+import net.forthecrown.utils.Audiences;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -24,7 +25,7 @@ class ChatListener implements Listener {
     }
 
     if (mute == Mute.SOFT) {
-      event.viewers().removeIf(audience -> !audience.equals(event.getPlayer()));
+      event.viewers().removeIf(audience -> !Audiences.equals(audience, event.getPlayer()));
     }
 
     if (BannedWords.checkAndWarn(event.getPlayer(), event.message())) {
@@ -37,7 +38,6 @@ class ChatListener implements Listener {
 
       StaffChat.newMessage()
           .setLogged(true)
-          .setDiscordForwarded(!user.get(StaffChat.FORWARDING_DISABLED))
           .setMessage(ViewerAwareMessage.wrap(event.message()))
           .setSource(user.getCommandSource())
           .send();

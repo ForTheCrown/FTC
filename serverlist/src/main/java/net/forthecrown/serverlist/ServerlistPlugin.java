@@ -4,6 +4,7 @@ import lombok.Getter;
 import net.forthecrown.events.Events;
 import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.utils.io.SerializationHelper;
+import net.kyori.adventure.text.Component;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @Getter
@@ -33,6 +34,9 @@ public class ServerlistPlugin extends JavaPlugin {
         json -> {
           boolean allowRandom = json.getBool("allowMaxPlayerRandomization", true);
           display.setAllowMaxPlayerRandomization(allowRandom);
+
+          Component baseMotd = json.getComponent("baseMotd");
+          display.setBaseMotd(baseMotd);
         }
     );
   }

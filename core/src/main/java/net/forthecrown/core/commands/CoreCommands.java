@@ -5,6 +5,7 @@ import net.forthecrown.command.UserMapCommand;
 import net.forthecrown.command.UserMapTopCommand;
 import net.forthecrown.core.commands.admin.CommandBroadcast;
 import net.forthecrown.core.commands.admin.CommandCooldown;
+import net.forthecrown.core.commands.admin.CommandFtcCore;
 import net.forthecrown.core.commands.admin.CommandGameMode;
 import net.forthecrown.core.commands.admin.CommandGetOffset;
 import net.forthecrown.core.commands.admin.CommandGetPos;
@@ -25,6 +26,8 @@ import net.forthecrown.core.commands.admin.CommandTime;
 import net.forthecrown.core.commands.admin.CommandTop;
 import net.forthecrown.core.commands.admin.CommandVanish;
 import net.forthecrown.core.commands.admin.CommandWorld;
+import net.forthecrown.core.commands.docs.CommandDocGen;
+import net.forthecrown.core.commands.item.ItemModCommands;
 import net.forthecrown.core.commands.tpa.CommandTpDeny;
 import net.forthecrown.core.commands.tpa.CommandTpDenyAll;
 import net.forthecrown.core.commands.tpa.CommandTpaAccept;
@@ -74,15 +77,34 @@ public final class CoreCommands {
     new CommandGameMode();
     new CommandCooldown();
     new CommandBroadcast();
+    new CommandDocGen();
 
+    new CommandSay();
+    new CommandNickname();
+    new CommandNear();
+    new CommandMe();
+    new CommandList();
+    new CommandHat();
+    new CommandBack();
+    new CommandAfk();
+    new CommandSettings();
+    new CommandTell();
+    new CommandReply();
+    new CommandSuicide();
+
+    CommandSelfOrUser.createCommands();
+    CommandDumbThing.createCommands();
     CommandSpecificGameMode.createCommands();
     ToolBlockCommands.createCommands();
+    ItemModCommands.createCommands();
+
     createMapTopCommands();
     createCurrencyCommands();
 
     AnnotatedCommandContext ctx = Commands.createAnnotationContext();
     ctx.registerCommand(new CommandTeleport());
     ctx.registerCommand(new CommandVanish());
+    ctx.registerCommand(new CommandFtcCore());
   }
 
   static void createCurrencyCommands() {

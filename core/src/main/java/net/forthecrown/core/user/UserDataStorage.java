@@ -6,7 +6,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.UUID;
 import lombok.Getter;
 import net.forthecrown.Loggers;
@@ -31,7 +30,6 @@ public class UserDataStorage {
   public static final String KEY_IP = "ip";
   public static final String KEY_LAST_LOC = "lastLocation";
   public static final String KEY_LOCATION = "location";
-  public static final String KEY_TIMESTAMPS = "timeStamps";
 
   private final Path directory;
   private final Path userDirectory;
@@ -204,7 +202,6 @@ public class UserDataStorage {
       user.setEntityLocation(json.getLocation(KEY_LOCATION));
     }
 
-    loadTimeFields(json, user);
     loadComponents(json, user);
   }
 
@@ -228,57 +225,7 @@ public class UserDataStorage {
       json.addLocation(KEY_LOCATION, user.getLocation());
     }
 
-    if (user.getTimeFields() != null) {
-      saveTimeFields(json, user.getTimeFields());
-    }
-
     saveComponents(json, user);
-  }
-
-  private void saveTimeFields(JsonWrapper json, long[] fields) {
-    if (fields == null || fields.length < 1) {
-      return;
-    }
-
-    JsonWrapper timeStamps = JsonWrapper.create();
-
-    for (int i = 0; i < fields.length; i++) {
-      long timestamp = fields[i];
-      TimeField field = TimeField.REGISTRY.orThrow(i);
-
-      if (timestamp == -1 || !field.isSerialized()) {
-        continue;
-      }
-
-      timeStamps.addTimeStamp(field.getKey(), timestamp);
-    }
-
-    if (!timeStamps.isEmpty()) {
-      json.add(KEY_TIMESTAMPS, timeStamps);
-    }
-  }
-
-  private void loadTimeFields(JsonWrapper json, UserImpl user) {
-    if (json.missingOrNull(KEY_TIMESTAMPS)) {
-      return;
-    }
-
-    JsonWrapper timeStamps = json.getWrapped(KEY_TIMESTAMPS);
-    long[] fields = new long[TimeField.REGISTRY.size()];
-    Arrays.fill(fields, -1);
-
-    for (var e: timeStamps.entrySet()) {
-      String key = e.getKey();
-      long timestamp = JsonUtils.readTimestamp(e.getValue());
-
-      TimeField.REGISTRY.get(key).ifPresentOrElse(field -> {
-        fields[field.getId()] = timestamp;
-      }, () -> {
-        LOGGER.error("Unknown time stamp '{}'", key);
-      });
-    }
-
-    user.setTimeFields(fields);
   }
 
   private void saveComponents(JsonWrapper json, UserImpl user) {
@@ -318,7 +265,6 @@ public class UserDataStorage {
     json.remove(KEY_PREVIOUS_NAMES);
     json.remove(KEY_LOCATION);
     json.remove(KEY_LAST_LOC);
-    json.remove(KEY_TIMESTAMPS);
     json.remove(KEY_NAME);
 
     JsonWrapper componentsJson = json;
@@ -327,7 +273,7 @@ public class UserDataStorage {
       return;
     }
 
-    for (var e: json.entrySet()) {
+    for (var e: componentsJson.entrySet()) {
       String id = e.getKey();
       JsonElement element = e.getValue();
 

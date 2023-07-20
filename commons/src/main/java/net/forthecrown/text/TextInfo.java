@@ -42,7 +42,8 @@ public final class TextInfo {
     if (pixels < 2) {
       // I spent a good 30 minutes looking for a 1px wide character in
       // minecraft's texture sheets, god bless unicode
-      return "꣎";
+      // Name: 'saurashtra danda'
+      return "\uA8CE";
     }
 
     if (pixels == 2) {

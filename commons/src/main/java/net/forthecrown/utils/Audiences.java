@@ -83,6 +83,7 @@ public final class Audiences {
   }
 
   public static boolean equals(Audience first, Audience second) {
-    return Objects.equals(unwrap(first), unwrap(second));
+    return Objects.equals(first, second)
+        || Objects.equals(unwrap(first), unwrap(second));
   }
 }

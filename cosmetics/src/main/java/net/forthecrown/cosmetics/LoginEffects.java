@@ -1,6 +1,7 @@
 package net.forthecrown.cosmetics;
 
 import static net.forthecrown.cosmetics.Cosmetic.create;
+import static net.kyori.adventure.text.Component.space;
 import static net.kyori.adventure.text.Component.text;
 
 import net.forthecrown.command.Exceptions;
@@ -9,20 +10,20 @@ import net.forthecrown.menu.Slot;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.text.Messages;
 import net.forthecrown.titles.RankTier;
-import net.forthecrown.user.User;
+import net.forthecrown.user.name.DisplayIntent;
 import net.forthecrown.utils.inventory.ItemStacks;
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.event.player.PlayerQuitEvent.QuitReason;
 import org.bukkit.inventory.ItemFlag;
 
 public final class LoginEffects {
   private LoginEffects() {}
 
   public static final CosmeticType<LoginEffect> TYPE = CosmeticType.<LoginEffect>builder()
-      .displayName(text("Login Effects"))
+      .displayName(text("Login/Leave Decorations"))
       .factory(createFactory())
       .predicate((user, cosmetic) -> cosmetic.getValue().predicate().test(user))
       .build();
@@ -72,12 +73,12 @@ public final class LoginEffects {
     r.register("booster", BOOSTER);
   }
 
-  public static Component getDisplayName(LoginEffect effect, User user, Audience viewer) {
-    return Component.text()
-        .append(effect.prefix())
-        .append(user.displayName(viewer))
-        .append(effect.suffix())
-        .build();
+  public static Component format(LoginEffect effect, Component baseMessage) {
+    return Component.textOfChildren(
+        effect.prefix(), space(),
+        baseMessage,
+        space(), effect.suffix()
+    );
   }
 
   private static MenuNodeFactory<LoginEffect> createFactory() {
@@ -86,14 +87,29 @@ public final class LoginEffects {
           .setItem((user, context) -> {
             var builder = ItemStacks.builder(Cosmetics.getCosmeticMaterial(cosmetic.test(user)))
                 .setName(cosmetic.getDisplayName())
-                .addLore("&7Join/Leave decoration")
-                .addLore("&7Example:")
-                .addLore(Messages.joinMessage(getDisplayName(cosmetic.getValue(), user, user)));
+                .addLore("&7Join/Leave decoration");
+
+            // Use TABLIST as intent so it A) doesn't have hover text, and B), will always
+            // have player's rank prefix
+            Component displayName = user.displayName(user, DisplayIntent.TABLIST);
+            LoginEffect eff = cosmetic.getValue();
+
+            Component join
+                = format(eff, Messages.joinMessage(displayName));
+            Component leave
+                = format(eff, Messages.leaveMessage(displayName, QuitReason.DISCONNECTED));
+
+            builder.addLore("Examples:")
+                .addLore(join)
+                .addLore(leave);
 
             boolean active = cosmetic.equals(user.getComponent(CosmeticData.class).get(TYPE));
 
             if (active) {
-              builder.setFlags(ItemFlag.HIDE_ENCHANTS).addEnchant(Enchantment.BINDING_CURSE, 1);
+              builder
+                  .addLore(Component.text("Currently active", NamedTextColor.GREEN))
+                  .addEnchant(Enchantment.CHANNELING, 1)
+                  .setFlags(ItemFlag.HIDE_ENCHANTS);
             }
 
             if (!cosmetic.test(user)) {

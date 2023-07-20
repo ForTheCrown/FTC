@@ -11,7 +11,7 @@ literal('giveapple') {
 }
 
 argument('boss', @boss) {
-  map_result = result.getValue()
+  map_result = @holder_to_value
 
   literal('kill') {
     description = "Kills a <boss>"

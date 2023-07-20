@@ -7,10 +7,8 @@ import lombok.Setter;
 import net.forthecrown.text.ChannelledMessage;
 import net.forthecrown.text.ViewerAwareMessage;
 import net.forthecrown.user.User;
-import net.forthecrown.user.Users;
 import net.forthecrown.utils.Audiences;
 import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -47,10 +45,11 @@ public class ChannelMessageEvent extends Event implements Cancellable {
   private boolean cancelled;
 
   /**
-   * A set of all players, plus the server's console sender (if it wasn't removed) that will view
-   * the message
+   * A set of audiences that will view the message.
+   * <p>
+   * Note: This set does NOT include the source
    */
-  private final Set<Audience> viewers;
+  private final Set<Audience> targets;
 
   /**
    * The name of the channel the message is being sent in.
@@ -59,17 +58,22 @@ public class ChannelMessageEvent extends Event implements Cancellable {
    */
   private final String channelName;
 
-  public ChannelMessageEvent(
-      ViewerAwareMessage initialMessage,
-      Audience source,
-      Set<Audience> viewers,
-      String channelName
-  ) {
-    this.initialMessage = initialMessage;
-    this.message = initialMessage;
-    this.source = source;
-    this.viewers = viewers;
-    this.channelName = channelName;
+  /**
+   * Determines if the message is also shown to the 'source' of the message
+   * @see #getSource()
+   */
+  private boolean shownToSender;
+
+  private boolean announcement;
+
+  public ChannelMessageEvent(ChannelledMessage message) {
+    this.initialMessage = message.getMessage();
+    this.message        = message.getMessage();
+    this.source         = message.getSource();
+    this.targets        = message.getTargets();
+    this.channelName    = message.getChannelName();
+    this.shownToSender  = message.isShownToSender();
+    this.announcement   = message.isAnnouncement();
   }
 
   /**
@@ -87,16 +91,7 @@ public class ChannelMessageEvent extends Event implements Cancellable {
    *         user or player
    */
   public @Nullable User getUserSource() {
-    if (source == null) {
-      return null;
-    }
-
-    if (source instanceof User user) {
-      return user;
-    }
-
-    var player = getPlayerSource();
-    return player == null ? null : Users.get(player);
+    return Audiences.getUser(source);
   }
 
   /**

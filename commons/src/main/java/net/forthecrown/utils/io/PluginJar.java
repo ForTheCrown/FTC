@@ -104,23 +104,19 @@ public class PluginJar {
    * @throws IOException If an IO error occurred
    * @see #saveResources(String, Path, int)
    */
-  public static void saveResources(String sourceDir, int flags)
-      throws IOException
-  {
+  public static void saveResources(String sourceDir, int flags) {
     JavaPlugin caller = PluginUtil.getCallingPlugin();
     Path dest = caller.getDataFolder().toPath().resolve(sourceDir);
     _saveResources(caller, sourceDir, dest, flags);
   }
 
-  public static void saveResources(String sourceDir) throws IOException {
+  public static void saveResources(String sourceDir) {
     JavaPlugin caller = PluginUtil.getCallingPlugin();
     Path dest = caller.getDataFolder().toPath().resolve(sourceDir);
     _saveResources(caller, sourceDir, dest, 0);
   }
 
-  public static void saveResources(String sourceDir, Path dest)
-      throws IOException
-  {
+  public static void saveResources(String sourceDir, Path dest) {
     JavaPlugin caller = PluginUtil.getCallingPlugin();
     _saveResources(caller, sourceDir, dest, 0);
   }
@@ -138,17 +134,12 @@ public class PluginJar {
    * @see #ALLOW_OVERWRITE
    * @see #OVERWRITE_IF_NEWER
    */
-  public static void saveResources(String sourceDir,
-                                   Path dest,
-                                   int flags
-  ) throws IOException {
+  public static void saveResources(String sourceDir, Path dest, int flags) {
     JavaPlugin caller = PluginUtil.getCallingPlugin();
     _saveResources(caller, sourceDir, dest, flags);
   }
 
-  private static void _saveResources(JavaPlugin plugin, String sourceDir, Path dest, int flags)
-      throws IOException
-  {
+  private static void _saveResources(JavaPlugin plugin, String sourceDir, Path dest, int flags) {
     Path jarDir = resourcePath(plugin, sourceDir);
 
     if (!Files.exists(jarDir)) {
@@ -157,7 +148,12 @@ public class PluginJar {
     }
 
     DirectoryCopyWalker walker = new DirectoryCopyWalker(jarDir, dest);
-    Files.walkFileTree(jarDir, walker);
+
+    try {
+      Files.walkFileTree(jarDir, walker);
+    } catch (IOException exc) {
+      throw new RuntimeException(exc);
+    }
   }
 
   private static File reflectivelyGetPluginJar(JavaPlugin plugin) {

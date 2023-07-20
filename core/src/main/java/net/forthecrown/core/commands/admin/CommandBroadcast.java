@@ -49,8 +49,8 @@ public class CommandBroadcast extends FtcCommand {
 
               ChannelledMessage channelled = ChannelledMessage.create(message)
                   .setBroadcast()
-                  .renderer(MessageRenderer.FTC_PREFIX)
-                  .source(c.getSource());
+                  .setRenderer(MessageRenderer.FTC_PREFIX)
+                  .setSource(c.getSource());
 
               channelled.send();
               return 0;

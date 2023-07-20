@@ -22,9 +22,7 @@ import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.waypoints.WPermissions;
 import net.forthecrown.waypoints.Waypoint;
 import net.forthecrown.waypoints.WaypointManager;
-import net.forthecrown.waypoints.WaypointProperties;
 import net.forthecrown.waypoints.WaypointProperty;
-import net.forthecrown.waypoints.Waypoints;
 import net.forthecrown.waypoints.WaypointsPlugin;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -208,19 +206,20 @@ public class CommandWaypoints extends FtcCommand {
   }
 
   private int property(CommandContext<CommandSource> c, boolean unset)
-      throws CommandSyntaxException {
+      throws CommandSyntaxException
+  {
     Waypoint waypoint = get(c);
     Holder<WaypointProperty> holder = (Holder) c.getArgument("property", Holder.class);
     var property = holder.getValue();
-
     var type = property.getParser();
 
     if (unset) {
       waypoint.set(property, null);
 
       c.getSource().sendSuccess(
-          Text.format("Unset property {0}",
-              holder.getKey()
+          Text.format("Unset property {0} for waypoint",
+              holder.getKey(),
+              waypoint.getEffectiveName()
           )
       );
       return 0;
@@ -230,17 +229,9 @@ public class CommandWaypoints extends FtcCommand {
     StringReader input = new StringReader(strInput);
 
     Object value = type.parse(input);
-
     Commands.ensureCannotRead(input);
 
-    if (property == WaypointProperties.NAME) {
-      String strValue = value.toString();
-
-      if (!Waypoints.isValidName(strValue)) {
-        throw Exceptions.format("'{0}' is an invalid name", strValue);
-      }
-    }
-
+    property.validateValue(waypoint, value);
     waypoint.set(property, value);
 
     c.getSource().sendSuccess(

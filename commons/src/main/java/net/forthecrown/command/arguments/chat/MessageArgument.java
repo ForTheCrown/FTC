@@ -55,13 +55,13 @@ public class MessageArgument
     }
 
     public Component formatAdmin(Audience viewer) {
-      ChatParser parser = ChatParser.parsers();
+      ChatParser parser = ChatParser.parser();
       TextContext context = TextContext.totalRender(viewer);
       return parser.parse(text, context);
     }
 
     public Component format(CommandSender source, Audience viewer) {
-      ChatParser parser = ChatParser.parsers();
+      ChatParser parser = ChatParser.parser();
       TextContext context = TextContext.create(source, viewer);
       return parser.parse(text, context);
     }

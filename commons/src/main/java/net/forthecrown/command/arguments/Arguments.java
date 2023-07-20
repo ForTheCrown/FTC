@@ -48,6 +48,10 @@ public interface Arguments {
     return result.get(c.getSource(), true);
   }
 
+  static Result getUserMessage(CommandContext<CommandSource> c, String arg) {
+    return c.getArgument(arg, Result.class);
+  }
+
   static ViewerAwareMessage getMessage(CommandContext<CommandSource> c, String arg) {
     CommandSender source = c.getSource().asBukkit();
 
@@ -55,9 +59,7 @@ public interface Arguments {
       Result result = c.getArgument(arg, Result.class);
       return viewer -> result.format(source, viewer);
     } catch (IllegalArgumentException exc) {
-      if (exc.getMessage().startsWith("No such argument '")
-          || exc.getMessage().startsWith("Argument '")
-      ) {
+      if (exc.getMessage().startsWith("Argument '")) {
         return c.getArgument(arg, ViewerAwareMessage.class);
       }
 

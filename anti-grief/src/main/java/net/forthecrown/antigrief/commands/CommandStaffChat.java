@@ -48,16 +48,8 @@ public class CommandStaffChat extends FtcCommand {
     command.then(argument("message", Arguments.CHAT)
         .executes(c -> {
           ViewerAwareMessage message = Arguments.getMessage(c, "message");
-          boolean forward;
-
-          if (c.getSource().isPlayer()) {
-            forward = !getUserSender(c).get(StaffChat.FORWARDING_DISABLED);
-          } else {
-            forward = true;
-          }
 
           StaffChat.newMessage()
-              .setDiscordForwarded(forward)
               .setSource(c.getSource())
               .setMessage(message)
               .setLogged(!c.getSource().is(ConsoleCommandSender.class))

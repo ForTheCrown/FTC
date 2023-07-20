@@ -43,11 +43,15 @@ public class ChatParser {
     functions.add(new LinkFunction());
   }
 
-  public static ChatParser parsers() {
+  public static ChatParser parser() {
     return parsers == null ? (parsers = new ChatParser()) : parsers;
   }
 
   public Component parse(String string, TextContext context) {
+    return runFunctions(parseBasic(string, context), context);
+  }
+
+  public Component parseBasic(String string, TextContext context) {
     if (!context.has(ChatParseFlag.IGNORE_CASE)) {
       string = checkCase(string);
     }
@@ -64,14 +68,14 @@ public class ChatParser {
       text = ChatEmotes.format(text);
     }
 
+    return text;
+  }
+
+  public Component runFunctions(Component text, TextContext context) {
     if (functions.isEmpty()) {
       return text;
     }
 
-    return runFunctions(text, context);
-  }
-
-  private Component runFunctions(Component text, TextContext context) {
     Component result = text;
 
     for (var func: functions) {

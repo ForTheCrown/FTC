@@ -5,24 +5,47 @@ import static net.forthecrown.text.Messages.BUTTON_DENY_CROSS;
 
 import com.google.common.base.Strings;
 import java.util.Objects;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEventSource;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
 
-public interface BookSetting<C> {
+@Getter
+@Setter(AccessLevel.PACKAGE)
+public abstract class BookSetting<C> {
 
-  Component displayName();
+  private SettingsBook<C> book;
 
-  Component createButtons(C context);
+  public abstract Component displayName();
 
-  boolean shouldInclude(C context);
+  public abstract Component createButtons(C context);
 
-  static Component createButton(
+  public abstract boolean shouldInclude(C context);
+
+  public static Component createButton(
       boolean toggle,
       boolean current,
       String cmd,
+      @NotNull HoverEventSource hover
+  ) {
+    return createButton(
+        toggle,
+        current,
+        Strings.isNullOrEmpty(cmd)
+            ? null
+            : ClickEvent.runCommand(cmd),
+        hover
+    );
+  }
+
+  public static Component createButton(
+      boolean toggle,
+      boolean current,
+      ClickEvent event,
       @NotNull HoverEventSource hover
   ) {
     Objects.requireNonNull(hover);
@@ -35,8 +58,6 @@ public interface BookSetting<C> {
       builder.color(NamedTextColor.GRAY).hoverEvent(hover);
     }
 
-    return builder
-        .clickEvent(Strings.isNullOrEmpty(cmd) ? null : ClickEvent.runCommand(cmd))
-        .build();
+    return builder.clickEvent(event).build();
   }
 }

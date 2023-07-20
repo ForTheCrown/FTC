@@ -24,7 +24,6 @@ import net.forthecrown.text.TextWriters;
 import net.forthecrown.text.ViewerAwareMessage;
 import net.forthecrown.user.Properties;
 import net.forthecrown.user.User;
-import net.forthecrown.user.UserProperty;
 import net.forthecrown.user.Users;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -42,9 +41,6 @@ public final class StaffChat {
   private static final String COOL_CLUB = "cool-club";
 
   public static final Set<UUID> toggledPlayers = new HashSet<>();
-
-  public static final UserProperty<Boolean> FORWARDING_DISABLED
-      = Properties.booleanProperty("staffChat_forwardingDisabled", false);
 
   public static final Component PREFIX
       = Component.text("[Staff] ", NamedTextColor.DARK_GRAY);
@@ -74,8 +70,9 @@ public final class StaffChat {
 
     Setting setting = Setting.create(access)
         .setDescription("Toggles all chat message being sent to staff chat")
-        .setDisplayName("StaffChat Toggle")
+        .setDisplayName("SC Toggle")
         .setToggleDescription("{Enable} all chat messages being sent to staff chat")
+        .setToggle("N{1} sending all chat messages to Staff Chat")
 
         .createCommand(
             "staffchattoggle",
@@ -84,19 +81,7 @@ public final class StaffChat {
             "sct", "sctoggle"
         );
 
-    Setting forwarding = Setting.create(FORWARDING_DISABLED)
-        .setDisplayName("SC Forwarding")
-        .setDescription("Toggles staff chat messages being forwarded to Discord")
-        .setToggleDescription("{Enable} staff chat messages being forwarded to Discord")
-        .createCommand(
-            "staffchatdiscord",
-            GriefPermissions.STAFF_CHAT,
-            GriefPermissions.STAFF_CHAT,
-            "scdiscord", "sctogglediscord", "staffchat_togglediscord"
-        );
-
     settingsBook.getSettings().add(setting.toBookSettng());
-    settingsBook.getSettings().add(forwarding.toBookSettng());
   }
 
   public static boolean isVanished(CommandSource source) {
@@ -155,11 +140,11 @@ public final class StaffChat {
           return;
         }
 
-        msg.addViewer(player);
+        msg.addTarget(player);
       });
 
       if (isLogged()) {
-        msg.addViewer(Bukkit.getConsoleSender());
+        msg.addTarget(Bukkit.getConsoleSender());
       }
 
       msg.send();
