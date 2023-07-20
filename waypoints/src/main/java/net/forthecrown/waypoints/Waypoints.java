@@ -2,6 +2,7 @@ package net.forthecrown.waypoints;
 
 import static net.kyori.adventure.text.Component.text;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -10,6 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import net.forthecrown.Loggers;
+import net.forthecrown.antigrief.BannedWords;
 import net.forthecrown.command.Exceptions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.structure.BlockStructure;
@@ -18,22 +20,18 @@ import net.forthecrown.structure.StructurePlaceConfig;
 import net.forthecrown.structure.Structures;
 import net.forthecrown.structure.buffer.ImmediateBlockBuffer;
 import net.forthecrown.text.Text;
-import net.forthecrown.user.Properties;
 import net.forthecrown.user.TimeField;
 import net.forthecrown.user.User;
-import net.forthecrown.user.UserProperty;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.PluginUtil;
 import net.forthecrown.utils.Time;
 import net.forthecrown.utils.math.Bounds3i;
 import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.waypoints.WaypointScan.Result;
-import net.forthecrown.waypoints.event.WaypointNameValidateEvent;
 import net.forthecrown.waypoints.type.PlayerWaypointType;
 import net.forthecrown.waypoints.type.WaypointType;
 import net.forthecrown.waypoints.type.WaypointTypes;
 import net.kyori.adventure.text.Component;
-import org.bukkit.FluidCollisionMode;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -42,7 +40,6 @@ import org.bukkit.block.Sign;
 import org.bukkit.block.data.type.Snow;
 import org.bukkit.block.data.type.WallSign;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.math.vector.Vector3i;
 
 public final class Waypoints {
@@ -52,75 +49,8 @@ public final class Waypoints {
 
   public static final UUID NIL_UUID = new UUID(0, 0);
 
-  public static final UserProperty<UUID> HOME_PROPERTY = Properties.uuidProperty()
-      .key("homeWaypoint")
-      .defaultValue(NIL_UUID)
-      .callback((user, value, oldValue) -> {
-        var manager = WaypointManager.getInstance();
-
-        if (!Objects.equals(oldValue, NIL_UUID)) {
-          Waypoint old = manager.get(oldValue);
-          old.removeResident(user.getUniqueId());
-        }
-
-        if (!Objects.equals(value, NIL_UUID)) {
-          Waypoint newHome = manager.get(value);
-          newHome.addResident(user.getUniqueId());
-        }
-      })
-      .build();
-
-  public static final UserProperty<Boolean> INVITES_ALLOWED = Properties.booleanProperty()
-      .key("regionInvites")
-      .defaultValue(true)
-      .build();
-
-  public static final UserProperty<Boolean> HULK_SMASH_ENABLED = Properties.booleanProperty()
-      .key("hulkSmash")
-      .defaultValue(true)
-      .build();
-
-  public static final UserProperty<Boolean> HULK_SMASHING = Properties.booleanProperty()
-      .key("hulkSmash_active")
-      .defaultValue(false)
-      .build();
-
-  /**
-   * The required center column for guild waypoints
-   */
-  public static final Material[] GUILD_COLUMN = {
-      Material.STONE_BRICKS,
-      Material.STONE_BRICKS,
-      Material.LODESTONE,
-  };
-
-  /**
-   * The required center column for player waypoints
-   */
-  public static final Material[] PLAYER_COLUMN = {
-      Material.STONE_BRICKS,
-      Material.STONE_BRICKS,
-      Material.CHISELED_STONE_BRICKS,
-  };
-
-  /**
-   * The required center column for region poles
-   */
-  public static final Material[] REGION_POLE_COLUMN = {
-      Material.GLOWSTONE,
-      Material.GLOWSTONE,
-      Material.SEA_LANTERN
-  };
-
-  public static final int COLUMN_TOP = PLAYER_COLUMN.length - 1;
-
-  /**
-   * Name of the Region pole {@link net.forthecrown.structure.BlockStructure}
-   */
   public static final String POLE_STRUCTURE = "region_pole";
-
   public static final String FUNC_REGION_NAME = "region_name";
-
   public static final String FUNC_RESIDENTS = "region_residents";
 
   /**
@@ -129,9 +59,7 @@ public final class Waypoints {
   public static Vector3i DEFAULT_POLE_SIZE = Vector3i.from(5);
 
   public static BlockStructure getRegionPole() {
-    return Structures.get()
-        .getRegistry()
-        .orNull(POLE_STRUCTURE);
+    return Structures.get().getRegistry().orNull(POLE_STRUCTURE);
   }
 
   public static Vector3i poleSize() {
@@ -201,9 +129,7 @@ public final class Waypoints {
                                            FunctionInfo info,
                                            StructurePlaceConfig config
   ) {
-    if (region.get(WaypointProperties.HIDE_RESIDENTS)
-        || region.getResidents().isEmpty()
-    ) {
+    if (region.get(WaypointProperties.HIDE_RESIDENTS) || region.getResidents().isEmpty()) {
       return;
     }
 
@@ -244,7 +170,7 @@ public final class Waypoints {
    * Gets all invulnerable waypoints within the given bounds in the given world
    */
   public static Set<Waypoint> getInvulnerable(Bounds3i bounds3i, World world) {
-    return filterSet(
+    return removeVulnerable(
         WaypointManager.getInstance()
             .getChunkMap()
             .getOverlapping(world, bounds3i)
@@ -255,7 +181,7 @@ public final class Waypoints {
    * Gets all invulnerable waypoints at the given position in the given world
    */
   public static Set<Waypoint> getInvulnerable(Vector3i pos, World world) {
-    return filterSet(
+    return removeVulnerable(
         WaypointManager.getInstance()
             .getChunkMap()
             .get(world, pos)
@@ -265,7 +191,7 @@ public final class Waypoints {
   /**
    * Removes non-invulnerable waypoints from the given set
    */
-  private static Set<Waypoint> filterSet(Set<Waypoint> waypoints) {
+  private static Set<Waypoint> removeVulnerable(Set<Waypoint> waypoints) {
     waypoints.removeIf(waypoint -> !waypoint.get(WaypointProperties.INVULNERABLE));
     return waypoints;
   }
@@ -296,10 +222,7 @@ public final class Waypoints {
    * world with no waypoints
    */
   public static Waypoint getNearest(User user) {
-    return WaypointManager.getInstance()
-        .getChunkMap()
-        .findNearest(user.getLocation())
-        .left();
+    return WaypointManager.getInstance().getChunkMap().findNearest(user.getLocation()).left();
   }
 
   /**
@@ -318,10 +241,20 @@ public final class Waypoints {
       }
     }
 
-    var event = new WaypointNameValidateEvent(name);
-    event.callEvent();
+    WaypointManager manager = WaypointManager.getInstance();
+    Waypoint waypoint = manager.getExtensive(name);
 
-    return event.isAllowed();
+    if (waypoint != null || BannedWords.contains(name)) {
+      return false;
+    }
+
+    for (var e: manager.getExtensions()) {
+      if (!e.isValidName(name)) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   /**
@@ -354,10 +287,12 @@ public final class Waypoints {
    */
   public static Optional<CommandSyntaxException> isValidWaypointArea(
       Vector3i pos,
-      PlayerWaypointType type,
+      WaypointType type,
       World w,
       boolean testOverlap
   ) {
+    Preconditions.checkArgument(type.isBuildable(), "Type is not buildable");
+
     var bounds = type.createBounds()
         .move(pos)
         .expand(0, 1, 0, 0, 0, 0)
@@ -475,20 +410,6 @@ public final class Waypoints {
   }
 
   /**
-   * Tests if the given block is the top of a waypoint.
-   *
-   * @param block The block to test
-   * @return True, if the block's type is either the top of {@link #GUILD_COLUMN} or
-   * {@link #PLAYER_COLUMN}
-   */
-  public static boolean isTopOfWaypoint(Block block) {
-    var t = block.getType();
-
-    return t == GUILD_COLUMN[COLUMN_TOP]
-        || t == PLAYER_COLUMN[COLUMN_TOP];
-  }
-
-  /**
    * Attempts to create a waypoint.
    * <p>
    * The given source must be a player. The player must be looking at a valid waypoint top block. If
@@ -497,7 +418,7 @@ public final class Waypoints {
    * move the guild's waypoint, or are not in a chunk owned by their guild.
    * <p>
    * After that, this method will ensure the waypoint's area is valid, see
-   * {@link #isValidWaypointArea(Vector3i, PlayerWaypointType, World, boolean)}. If that fails, the
+   * {@link #isValidWaypointArea(Vector3i, WaypointType, World, boolean)}. If that fails, the
    * returned exception is thrown.
    * <p>
    * Then the waypoint is created, if the created waypoint is for a guild, then the guild's waypoint
@@ -512,7 +433,7 @@ public final class Waypoints {
   public static Waypoint tryCreate(CommandSource source) throws CommandSyntaxException {
     var player = source.asPlayer();
     User user = Users.get(player);
-    Block b = findTopBlock(player);
+    Block b = WaypointTypes.findTopBlock(player);
 
     if (b == null) {
       throw WExceptions.FACE_WAYPOINT_TOP;
@@ -546,11 +467,7 @@ public final class Waypoints {
       throw WExceptions.invalidWaypointTop(topMaterial);
     }
 
-    var factory = type.getFactory();
-
-    if (factory != null) {
-      factory.onCreate(user);
-    }
+    type.onCreate(user);
 
     var existing = WaypointManager.getInstance()
         .getChunkMap()
@@ -584,39 +501,8 @@ public final class Waypoints {
       }
     }
 
-    if (factory != null) {
-      factory.postCreate(waypoint, user);
-    }
-
+    type.onPostCreate(waypoint, user);
     return waypoint;
-  }
-
-  /**
-   * Finds a potential waypoint's top block
-   * <p>
-   * This gets the given player's targeted block, at a max distance of 5, and
-   * checks if that block, or any block above it, qualifies as a waypoint's top
-   * block, the first valid block being the one that's chosen.
-   *
-   * @param player The player who's looking at a waypoint's block
-   * @return A waypoint's potential top block, null, if none found.
-   */
-  public static @Nullable Block findTopBlock(Player player) {
-    var block = player.getTargetBlockExact(5, FluidCollisionMode.NEVER);
-
-    if (block == null) {
-      return null;
-    }
-
-    for (int i = 0; i < COLUMN_TOP + 2; i++) {
-      Block b = block.getRelative(0, i, 0);
-
-      if (isTopOfWaypoint(b)) {
-        return b;
-      }
-    }
-
-    return null;
   }
 
   /**
@@ -705,7 +591,7 @@ public final class Waypoints {
   }
 
   public static Waypoint getHomeWaypoint(User user) {
-    UUID homeId = user.get(HOME_PROPERTY);
+    UUID homeId = user.get(WaypointPrefs.HOME_PROPERTY);
     if (NIL_UUID.equals(homeId)) {
       return null;
     }

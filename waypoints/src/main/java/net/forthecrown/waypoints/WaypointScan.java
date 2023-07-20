@@ -44,9 +44,11 @@ public final class WaypointScan {
       return DESTROYED;
     }
 
+    String name = waypoint.get(WaypointProperties.NAME);
+
     if (waypoint.getResidents().isEmpty()
-        && waypoint.get(WaypointProperties.GUILD_OWNER) == null
-        && Strings.isNullOrEmpty(waypoint.get(WaypointProperties.NAME))
+        && Strings.isNullOrEmpty(name)
+        && waypoint.getType().canBeRemoved(waypoint)
     ) {
       LOGGER.debug("scan={} has no residents/name/guild", waypoint);
       return NO_RESIDENTS_NAME_GUILD;

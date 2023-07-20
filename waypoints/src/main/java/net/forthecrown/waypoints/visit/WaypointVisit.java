@@ -22,6 +22,7 @@ import net.forthecrown.user.User;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.waypoints.Waypoint;
 import net.forthecrown.waypoints.WaypointManager;
+import net.forthecrown.waypoints.WaypointPrefs;
 import net.forthecrown.waypoints.WaypointProperties;
 import net.forthecrown.waypoints.Waypoints;
 import net.forthecrown.waypoints.listeners.HulkSmash;
@@ -134,7 +135,7 @@ public class WaypointVisit implements Runnable {
     // 4) The area above the user must only be air
     // 5) The user shouldn't be in spectator mode
     hulkSmash = WaypointManager.getInstance().config().hulkSmashPoles
-        && user.get(Waypoints.HULK_SMASH_ENABLED)
+        && user.get(WaypointPrefs.HULK_SMASH_ENABLED)
         && isClearAbove(getTeleportLocation())
         && isClearAbove(user.getLocation().add(0, Math.ceil(user.getPlayer().getHeight()), 0))
         && user.getGameMode() != GameMode.SPECTATOR;

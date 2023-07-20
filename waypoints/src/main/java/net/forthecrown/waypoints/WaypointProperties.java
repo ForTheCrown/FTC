@@ -95,20 +95,4 @@ public class WaypointProperties {
    */
   public static final WaypointProperty<UUID> OWNER
       = new WaypointProperty<>("owner", ArgumentTypes.uuid(), FtcCodecs.INT_ARRAY_UUID, null);
-
-  /**
-   * The UUID of the guild that owns the waypoint
-   */
-  public static final WaypointProperty<UUID> GUILD_OWNER
-      = new WaypointProperty<>("guildOwner", ArgumentTypes.uuid(), FtcCodecs.INT_ARRAY_UUID, null)
-      .setCallback((waypoint, oldValue, value) -> {
-        Waypoints.setNameSign(
-            waypoint,
-            waypoint.getEffectiveName()
-        );
-      });
-
-  static {
-    REGISTRY.freeze();
-  }
 }

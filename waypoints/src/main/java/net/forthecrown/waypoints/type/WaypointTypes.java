@@ -1,59 +1,136 @@
 package net.forthecrown.waypoints.type;
 
-import static net.forthecrown.waypoints.Waypoints.validateMoveInCooldown;
-
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import lombok.experimental.UtilityClass;
+import java.util.HashSet;
+import java.util.Set;
+import net.forthecrown.registry.Holder;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;
-import net.forthecrown.user.TimeField;
-import net.forthecrown.user.User;
-import net.forthecrown.user.Users;
-import net.forthecrown.waypoints.Waypoint;
-import net.forthecrown.waypoints.WaypointProperties;
-import net.forthecrown.waypoints.Waypoints;
+import net.forthecrown.registry.RegistryListener;
+import net.forthecrown.utils.math.Vectors;
+import org.bukkit.FluidCollisionMode;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
+import org.spongepowered.math.vector.Vector3i;
 
-public @UtilityClass class WaypointTypes {
+public class WaypointTypes {
 
-  public final Registry<WaypointType> REGISTRY = Registries.newFreezable();
+  public static final Registry<WaypointType> REGISTRY = Registries.newFreezable();
 
-  public final AdminWaypoint ADMIN
-      = register("admin", new AdminWaypoint());
+  public static final WaypointType ADMIN = new AdminWaypoint();
+  public static final WaypointType PLAYER = new PlayerWaypointType();
+  public static final WaypointType REGION_POLE = new RegionPoleType();
 
-  public final PlayerWaypointType GUILD
-      = register("guild", new PlayerWaypointType("Guild", Waypoints.GUILD_COLUMN));
-
-  public final PlayerWaypointType PLAYER
-      = register("player", new PlayerWaypointType("Player-Made", Waypoints.PLAYER_COLUMN));
-
-  public final RegionPoleType REGION_POLE
-      = register("region_pole", new RegionPoleType());
+  private static int highestColumn;
+  private static final Set<WaypointType> buildableTypes = new HashSet<>();
 
   static {
-    REGISTRY.freeze();
-
-    PLAYER.setFactory(new WaypointFactory() {
+    REGISTRY.setListener(new RegistryListener<>() {
       @Override
-      public void onCreate(User user) throws CommandSyntaxException {
-        validateMoveInCooldown(user);
+      public void onRegister(Holder<WaypointType> value) {
+        WaypointType type = value.getValue();
+
+        if (!type.isBuildable()) {
+          return;
+        }
+
+        highestColumn = Math.max(highestColumn, type.getColumn().length);
+        buildableTypes.add(type);
       }
 
       @Override
-      public void postCreate(Waypoint waypoint, User user) {
-        if (waypoint.get(WaypointProperties.OWNER) == null) {
-          waypoint.set(
-              WaypointProperties.OWNER,
-              user.getUniqueId()
-          );
+      public void onUnregister(Holder<WaypointType> value) {
+        highestColumn = 0;
+
+        var type = value.getValue();
+        if (type.isBuildable()) {
+          buildableTypes.remove(type);
         }
 
-        user.setTimeToNow(TimeField.LAST_MOVEIN);
-        user.set(Waypoints.HOME_PROPERTY, waypoint.getId());
+        for (var t: REGISTRY) {
+          if (!t.isBuildable()) {
+            continue;
+          }
+
+          highestColumn = Math.max(highestColumn, t.getColumn().length);
+        }
       }
     });
   }
 
-  private static <T extends WaypointType> T register(String key, T type) {
+  public static void init() {
+    register("admin", ADMIN);
+    register("player", PLAYER);
+    register("region_pole", REGION_POLE);
+  }
+
+  public static boolean isDestroyed(Material[] column, Vector3i pos, World world) {
+    int destroyedCount = 0;
+
+    for (int i = 0; i < column.length; i++) {
+      var bPos = i == 0 ? pos : pos.add(0, i, 0);
+      var block = Vectors.getBlock(bPos, world);
+
+      if (block.getType() != column[i]) {
+        ++destroyedCount;
+      }
+    }
+
+    return destroyedCount >= column.length;
+  }
+
+  /**
+   * Tests if the given block is the top of a waypoint.
+   *
+   * @param block The block to test
+   * @return True, if the block's type is a waypoint's top block
+   */
+  public static boolean isTopOfWaypoint(Block block) {
+    var t = block.getType();
+
+    for (var wt: buildableTypes) {
+      Material[] col = wt.getColumn();
+      Material top = col[col.length - 1];
+
+      if (t == top) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Finds a potential waypoint's top block
+   * <p>
+   * This gets the given player's targeted block, at a max distance of 5, and
+   * checks if that block, or any block above it, qualifies as a waypoint's top
+   * block, the first valid block being the one that's chosen.
+   *
+   * @param player The player who's looking at a waypoint's block
+   * @return A waypoint's potential top block, null, if none found.
+   */
+  public static @Nullable Block findTopBlock(Player player) {
+    var block = player.getTargetBlockExact(5, FluidCollisionMode.NEVER);
+
+    if (block == null) {
+      return null;
+    }
+
+    for (int i = 0; i < highestColumn + 2; i++) {
+      Block b = block.getRelative(0, i, 0);
+
+      if (isTopOfWaypoint(b)) {
+        return b;
+      }
+    }
+
+    return null;
+  }
+
+  public static <T extends WaypointType> T register(String key, T type) {
     return (T) REGISTRY.register(key, type).getValue();
   }
 }

@@ -38,11 +38,11 @@ public class CommandCreateWaypoint extends FtcCommand {
     factory.usage("", "Attempts to create a waypoint from the block")
         .addInfo("you're looking at");
 
-    factory.usage("-admin")
+    factory.usage("admin")
         .addInfo("Creates an invisible admin waypoint")
         .addInfo("where you're standing");
 
-    factory.usage("-region_pole")
+    factory.usage("region_pole")
         .addInfo("Creates a region pole waypoint from the block")
         .addInfo("you're looking at");
   }
@@ -55,7 +55,7 @@ public class CommandCreateWaypoint extends FtcCommand {
           return 0;
         })
 
-        .then(literal("-admin")
+        .then(literal("admin")
             .executes(c -> {
               Waypoints.makeWaypoint(
                   WaypointTypes.ADMIN,
@@ -66,7 +66,7 @@ public class CommandCreateWaypoint extends FtcCommand {
             })
         )
 
-        .then(literal("-region_pole")
+        .then(literal("region_pole")
             .executes(c -> {
               Waypoints.makeWaypoint(
                   WaypointTypes.REGION_POLE,

@@ -1,20 +1,21 @@
 package net.forthecrown.waypoints.type;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.Objects;
 import java.util.Optional;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import net.forthecrown.user.User;
 import net.forthecrown.utils.math.Bounds3i;
 import net.forthecrown.waypoints.Waypoint;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
 
 @Getter
-@EqualsAndHashCode
-@RequiredArgsConstructor
 public abstract class WaypointType {
 
   /**
@@ -22,13 +23,23 @@ public abstract class WaypointType {
    */
   private final String displayName;
 
+  private final Material[] column;
+
+  public WaypointType(String displayName) {
+    this(displayName, null);
+  }
+
+  public WaypointType(String displayName, Material[] column) {
+    Objects.requireNonNull(displayName, "Null display name");
+
+    this.displayName = displayName;
+    this.column = column;
+  }
+
   /**
    * Pre waypoint move callback
    */
-  public void onPreMove(Waypoint waypoint,
-                        Vector3i newPosition,
-                        World newWorld
-  ) {
+  public void onPreMove(Waypoint waypoint, Vector3i newPosition, World newWorld) {
 
   }
 
@@ -53,6 +64,14 @@ public abstract class WaypointType {
 
   }
 
+  public void onCreate(User creator) throws CommandSyntaxException {
+
+  }
+
+  public void onPostCreate(Waypoint waypoint, User creator) {
+
+  }
+
   /**
    * Tests if the waypoint is valid.
    * <p>
@@ -61,32 +80,54 @@ public abstract class WaypointType {
    * just
    * returns an empty optional
    *
-   * @see net.forthecrown.waypoints.Waypoints#isValidWaypointArea(Vector3i, PlayerWaypointType,
-   * World, boolean)
+   * @see net.forthecrown.waypoints.Waypoints#isValidWaypointArea(Vector3i, WaypointType, World,
+   * boolean)
    */
   public Optional<CommandSyntaxException> isValid(Waypoint waypoint) {
     return Optional.empty();
+  }
+
+  public boolean canBeRemoved(Waypoint waypoint) {
+    return true;
   }
 
   /**
    * Gets the teleport position to the waypoint
    */
   public Vector3d getVisitPosition(Waypoint waypoint) {
-    return waypoint.getBounds()
-        .center()
-        .withY(waypoint.getBounds().maxY());
+    if (column != null) {
+      return waypoint.getPosition().toDouble().add(0.5, column.length, 0.5);
+    }
+
+    return waypoint.getBounds().center().withY(waypoint.getBounds().maxY());
   }
 
   public boolean isDestroyed(Waypoint waypoint) {
     return false;
   }
 
-  protected static Bounds3i boundsFromSize(Vector3i size) {
+  public static Bounds3i boundsFromSize(Vector3i size) {
     Vector3i halfSize = size.div(2, 1, 2);
 
     return Bounds3i.of(
         halfSize.negate().withY(0),
         halfSize.sub(0, 1, 0)
     );
+  }
+
+  public TextColor getNameColor() {
+    return NamedTextColor.GRAY;
+  }
+
+  public String getEffectiveName(Waypoint waypoint) {
+    return null;
+  }
+
+  public final boolean isBuildable() {
+    return internalIsBuildable() && column != null;
+  }
+
+  protected boolean internalIsBuildable() {
+    return false;
   }
 }

@@ -64,10 +64,7 @@ public final class WaypointProperty<T> {
     validator.validateValue(waypoint, value);
   }
 
-  public void onValueUpdate(Waypoint waypoint,
-                            @Nullable T oldValue,
-                            @Nullable T value
-  ) {
+  public void onValueUpdate(Waypoint waypoint, @Nullable T oldValue, @Nullable T value) {
     // This method is overriden by several instances of this class,
     // but this was the most used function call I made in it lol
     if (updatesMarker) {

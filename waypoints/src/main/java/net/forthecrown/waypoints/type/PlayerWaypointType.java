@@ -1,32 +1,55 @@
 package net.forthecrown.waypoints.type;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.Optional;
+import java.util.function.Function;
 import lombok.Getter;
 import lombok.Setter;
+import net.forthecrown.user.TimeField;
+import net.forthecrown.user.User;
 import net.forthecrown.utils.math.Bounds3i;
-import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.waypoints.Waypoint;
 import net.forthecrown.waypoints.WaypointManager;
+import net.forthecrown.waypoints.WaypointPrefs;
+import net.forthecrown.waypoints.WaypointProperties;
 import net.forthecrown.waypoints.Waypoints;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.math.vector.Vector3d;
-import org.spongepowered.math.vector.Vector3i;
-
-import java.util.Optional;
 
 @Getter
-public class PlayerWaypointType extends WaypointType {
+public final class PlayerWaypointType extends WaypointType {
 
-  private final Material[] column;
+  public static final Material[] PLAYER_COLUMN = {
+      Material.STONE_BRICKS,
+      Material.STONE_BRICKS,
+      Material.CHISELED_STONE_BRICKS,
+  };
 
   @Setter
-  private WaypointFactory factory;
+  private TextColor nameColor;
 
-  public PlayerWaypointType(String displayName, Material[] column) {
-    super(displayName);
-    this.column = column;
+  @Setter
+  private Function<Waypoint, String> nameProvider;
+
+  public PlayerWaypointType() {
+    super("Player-Made", PLAYER_COLUMN);
+  }
+
+  @Override
+  public void onCreate(User creator) throws CommandSyntaxException {
+    Waypoints.validateMoveInCooldown(creator);
+  }
+
+  @Override
+  public void onPostCreate(Waypoint waypoint, User creator) {
+    if (waypoint.get(WaypointProperties.OWNER) == null) {
+      waypoint.set(WaypointProperties.OWNER, creator.getUniqueId());
+    }
+
+    creator.setTimeToNow(TimeField.LAST_MOVEIN);
+    creator.set(WaypointPrefs.HOME_PROPERTY, waypoint.getId());
   }
 
   @Override
@@ -49,26 +72,11 @@ public class PlayerWaypointType extends WaypointType {
   public Vector3d getVisitPosition(Waypoint waypoint) {
     return waypoint.getPosition()
         .toDouble()
-        .add(0.5, column.length, 0.5);
+        .add(0.5, getColumn().length, 0.5);
   }
 
   @Override
   public boolean isDestroyed(Waypoint waypoint) {
-    return isDestroyed(waypoint.getPosition(), waypoint.getWorld());
-  }
-
-  protected boolean isDestroyed(Vector3i pos, World world) {
-    int destroyedCount = 0;
-
-    for (int i = 0; i < column.length; i++) {
-      var bPos = i == 0 ? pos : pos.add(0, i, 0);
-      var block = Vectors.getBlock(bPos, world);
-
-      if (block.getType() != column[i]) {
-        ++destroyedCount;
-      }
-    }
-
-    return destroyedCount >= column.length;
+    return WaypointTypes.isDestroyed(getColumn(), waypoint.getPosition(), waypoint.getWorld());
   }
 }

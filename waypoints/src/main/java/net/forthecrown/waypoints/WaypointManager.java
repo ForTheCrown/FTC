@@ -1,5 +1,6 @@
 package net.forthecrown.waypoints;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.nio.file.Path;
@@ -7,6 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Stream;
 import lombok.Getter;
@@ -14,12 +16,9 @@ import net.forthecrown.Loggers;
 import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.user.Users;
-import net.forthecrown.utils.Time;
 import net.forthecrown.utils.WorldChunkMap;
 import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.utils.io.SerializationHelper;
-import net.forthecrown.waypoints.WaypointScan.Result;
-import net.forthecrown.waypoints.event.WaypointQueryEvent;
 import net.forthecrown.waypoints.event.WaypointRemoveEvent;
 import org.slf4j.Logger;
 
@@ -27,31 +26,19 @@ public class WaypointManager {
 
   private static final Logger LOGGER = Loggers.getLogger();
 
-  /**
-   * The waypoint manager singleton instance
-   */
   @Getter
   static WaypointManager instance;
 
-  /**
-   * Name lookup map
-   */
-  private final Map<String, Waypoint> byName = new Object2ObjectOpenHashMap<>();
+  private final Path path;
+  private final WaypointsPlugin plugin;
 
-  /**
-   * ID lookup map
-   */
+  private final Map<String, Waypoint> byName = new Object2ObjectOpenHashMap<>();
   private final Map<UUID, Waypoint> byId = new Object2ObjectOpenHashMap<>();
 
-  /**
-   * Collision and spatial lookup map
-   */
   @Getter
   final WorldChunkMap<Waypoint> chunkMap = new WorldChunkMap<>();
 
-  private final Path path;
-
-  private final WaypointsPlugin plugin;
+  final Map<String, WaypointExtension> extensions = new HashMap<>();
 
   /* ---------------------------- CONSTRUCTOR ----------------------------- */
 
@@ -66,63 +53,33 @@ public class WaypointManager {
     return plugin.wConfig;
   }
 
+  public void addExtension(String name, WaypointExtension extension) {
+    Objects.requireNonNull(name, "Null name");
+    Objects.requireNonNull(extension, "Null extension");
+
+    Preconditions.checkState(
+        !extensions.containsKey(name),
+        "Extension with name '%s' already registered", name
+    );
+
+    extensions.put(name, extension);
+  }
+
+  public void removeExtension(String name) {
+    Objects.requireNonNull(name, "Null name");
+    extensions.remove(name);
+  }
+
+  public Collection<WaypointExtension> getExtensions() {
+    return extensions.values();
+  }
+
   public void save() {
     SerializationHelper.writeTagFile(path, this::save);
   }
 
   public void load() {
     SerializationHelper.readTagFile(path, this::load);
-  }
-
-  public void onDayChange() {
-    Map<Waypoint, Result> toRemove = new HashMap<>();
-
-    for (var w : byId.values()) {
-      Result result = WaypointScan.scan(w);
-
-      if (result == Result.SUCCESS
-          || result == Result.CANNOT_BE_DESTROYED
-      ) {
-        continue;
-      }
-
-      if (result == Result.DESTROYED) {
-        toRemove.put(w, result);
-        continue;
-      }
-
-      // Residents empty, no set name, no guild or pole was broken
-      if (shouldRemove(w)) {
-        toRemove.put(w, result);
-      }
-    }
-
-    // No waypoints to remove so stop here
-    if (toRemove.isEmpty()) {
-      return;
-    }
-
-    // Remove all invalid waypoints
-    toRemove.forEach((waypoint, result) -> {
-      LOGGER.info("Auto-removing waypoint {}, reason={}",
-          waypoint.identificationInfo(),
-          result.getReason()
-      );
-
-      removeWaypoint(waypoint);
-    });
-  }
-
-  private boolean shouldRemove(Waypoint waypoint) {
-    if (waypoint.getLastValidTime() == -1) {
-      waypoint.setLastValidTime(System.currentTimeMillis());
-      return false;
-    }
-
-    long deletionDelay = config().waypointDeletionDelay.toMillis();
-    long deletionTime = waypoint.getLastValidTime() + deletionDelay;
-
-    return Time.isPast(deletionTime);
   }
 
   /**
@@ -163,7 +120,7 @@ public class WaypointManager {
       Waypoints.updateDynmap(waypoint);
     }
 
-    chunkMap.add(waypoint.getWorld(), waypoint);
+    chunkMap.add(waypoint.getWorld(), waypoint.getBounds(), waypoint);
   }
 
   /**
@@ -198,7 +155,7 @@ public class WaypointManager {
           .keySet()
           .stream()
           .map(Users::get)
-          .forEach(user -> user.set(Waypoints.HOME_PROPERTY, null));
+          .forEach(user -> user.set(WaypointPrefs.HOME_PROPERTY, null));
     }
 
     WaypointRemoveEvent event = new WaypointRemoveEvent(waypoint);
@@ -235,11 +192,14 @@ public class WaypointManager {
       return waypoint;
     }
 
-    WaypointQueryEvent queryEvent = new WaypointQueryEvent(name);
-    queryEvent.callEvent();
+    for (var e: extensions.values()) {
+      Waypoint w = e.lookup(name, this);
 
-    if (queryEvent.getResult() != null) {
-      return queryEvent.getResult();
+      if (w == null) {
+        continue;
+      }
+
+      return w;
     }
 
     try {
@@ -270,9 +230,13 @@ public class WaypointManager {
 
     for (var e : tag.entrySet()) {
       Waypoint waypoint = new Waypoint(UUID.fromString(e.getKey()));
-      waypoint.load(e.getValue().asCompound());
 
-      addWaypoint(waypoint);
+      try {
+        waypoint.load(e.getValue().asCompound());
+        addWaypoint(waypoint);
+      } catch (Throwable t) {
+        LOGGER.debug("Couldn't load waypoint {}", e.getKey(), t);
+      }
     }
   }
 

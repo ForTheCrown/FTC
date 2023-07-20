@@ -6,7 +6,7 @@ import net.forthecrown.waypoints.WaypointManager;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.math.vector.Vector3d;
 
-public class AdminWaypoint extends WaypointType {
+public final class AdminWaypoint extends WaypointType {
 
   public AdminWaypoint() {
     super("Admin");

@@ -1,6 +1,6 @@
 package net.forthecrown.waypoints.command;
 
-import static net.forthecrown.waypoints.Waypoints.INVITES_ALLOWED;
+import static net.forthecrown.waypoints.WaypointPrefs.INVITES_ALLOWED;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Optional;

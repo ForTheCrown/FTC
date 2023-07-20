@@ -1,6 +1,8 @@
 package net.forthecrown.waypoints;
 
 import com.google.common.base.Strings;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Codec;
 import it.unimi.dsi.fastutil.longs.LongObjectPair;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
@@ -22,15 +24,12 @@ import net.forthecrown.nbt.LongTag;
 import net.forthecrown.text.Text;
 import net.forthecrown.text.TextWriter;
 import net.forthecrown.text.TextWriters;
-import net.forthecrown.user.Users;
 import net.forthecrown.utils.ArrayIterator;
-import net.forthecrown.utils.BoundsHolder;
 import net.forthecrown.utils.Time;
 import net.forthecrown.utils.io.TagOps;
 import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.math.Bounds3i;
 import net.forthecrown.utils.math.Vectors;
-import net.forthecrown.waypoints.type.PlayerWaypointType;
 import net.forthecrown.waypoints.type.WaypointType;
 import net.forthecrown.waypoints.type.WaypointTypes;
 import net.kyori.adventure.text.Component;
@@ -50,7 +49,7 @@ import org.spongepowered.math.vector.Vector3i;
  * A waypoint is a teleport-enabling area where users can teleport to other waypoints which are
  * placed arbitrarily throughout the server.
  */
-public class Waypoint implements BoundsHolder {
+public class Waypoint {
 
   private static final Logger LOGGER = Loggers.getLogger();
 
@@ -109,28 +108,25 @@ public class Waypoint implements BoundsHolder {
    */
   private Object[] properties = ArrayUtils.EMPTY_OBJECT_ARRAY;
 
-  // Right-margin at 80 really do be making me make questionable style
-  //   decisions
+  private CompoundTag unknownProperties;
 
   /**
    * Map of User UUID to Pair(Inviter UUID, Invite sent timestamp)
    */
   @Getter
-  private final Map<UUID, LongObjectPair<UUID>>
-      invites = new Object2ObjectOpenHashMap<>();
+  private final Map<UUID, LongObjectPair<UUID>> invites = new Object2ObjectOpenHashMap<>();
 
   /**
    * Map of Users' UUID to the date they set this waypoint as their home
    */
   @Getter
-  private final Object2LongMap<UUID>
-      residents = new Object2LongOpenHashMap<>();
+  private final Object2LongMap<UUID> residents = new Object2LongOpenHashMap<>();
 
   /**
    * Last time this waypoint was 'valid'
    * <p>
    * Valid means the waypoint's 'pole' exists and all other requirements specified in
-   * {@link Waypoints#isValidWaypointArea(Vector3i, PlayerWaypointType, World, boolean)} are filled.
+   * {@link Waypoints#isValidWaypointArea(Vector3i, WaypointType, World, boolean)} are filled.
    * This field is used by the day change listener in {@link WaypointManager} to track when this
    * pole was last valid and delete poles that are not valid for extended periods of time
    */
@@ -191,26 +187,15 @@ public class Waypoint implements BoundsHolder {
     Objects.requireNonNull(world, "World cannot be null");
 
     // If this is already our location, don't do anything
-    if (Objects.equals(position, getPosition())
-        && Objects.equals(world, getWorld())
-    ) {
+    if (Objects.equals(position, getPosition()) && Objects.equals(world, getWorld())) {
       return;
     }
 
     // If not added, most likely being deserialized, so we don't
     // need to update any actual values
     if (hasBeenAdded() && getWorld() != null) {
-      // If type is region_pole, it'll need
-      // to destroy the old pole
       type.onPreMove(this, position, world);
-
-      // Remove from the spatial lookup
-      manager.getChunkMap()
-          .remove(getWorld(), this);
-
-      // Dynmap may or may not be installed,
-      // Here mostly because I don't have dynmap
-      // on the test server
+      manager.getChunkMap().remove(getWorld(), this);
       Waypoints.updateDynmap(this);
     }
 
@@ -219,13 +204,8 @@ public class Waypoint implements BoundsHolder {
     this.bounds = type.createBounds().move(position);
 
     if (hasBeenAdded()) {
-      // If the type is region pole, it'll need to
-      // place a region pole
       type.onPostMove(this);
-
-      // Add back to spatial lookup, with new
-      // position
-      manager.getChunkMap().add(world, this);
+      manager.getChunkMap().add(world, bounds, this);
     }
   }
 
@@ -291,9 +271,7 @@ public class Waypoint implements BoundsHolder {
     T current = get(property);
 
     // If current value == given value, don't change anything
-    if ((current == null && value == null)
-        || Objects.equals(current, value)
-    ) {
+    if ((current == null && value == null) || Objects.equals(current, value)) {
       return false;
     }
 
@@ -419,15 +397,7 @@ public class Waypoint implements BoundsHolder {
   }
 
   private TextColor getTextColor() {
-    if (type == WaypointTypes.REGION_POLE) {
-      return NamedTextColor.YELLOW;
-    } else if (type == WaypointTypes.GUILD) {
-      return NamedTextColor.GOLD;
-    } else if (type == WaypointTypes.PLAYER) {
-      return NamedTextColor.WHITE;
-    } else  { // ADMIN waypoint type
-      return NamedTextColor.AQUA;
-    }
+    return type.getNameColor();
   }
 
   /**
@@ -440,8 +410,15 @@ public class Waypoint implements BoundsHolder {
    * @return The gotten name, may be null
    */
   public @Nullable String getEffectiveName() {
-    if (!Strings.isNullOrEmpty(get(WaypointProperties.NAME))) {
-      return get(WaypointProperties.NAME);
+    String fromProperty = get(WaypointProperties.NAME);
+
+    if (!Strings.isNullOrEmpty(fromProperty)) {
+      return fromProperty;
+    }
+
+    String fromType = type.getEffectiveName(this);
+    if (Strings.isNullOrEmpty(fromType)) {
+      return fromType;
     }
 
     return effectiveName;
@@ -476,20 +453,22 @@ public class Waypoint implements BoundsHolder {
 
         WaypointProperties.REGISTRY.get(id)
             .ifPresentOrElse(property -> {
-              if (next == null
-                  || Objects.equals(property.getDefaultValue(), next)
-              ) {
+              if (next == null || Objects.equals(property.getDefaultValue(), next)) {
                 return;
               }
 
               WaypointProperty<Object> prop = property;
-              BinaryTag pTag = prop.getCodec().encodeStart(TagOps.OPS, next)
-                  .getOrThrow(false, s -> {});
+              Codec<Object> codec = prop.getCodec();
+              BinaryTag pTag = codec.encodeStart(TagOps.OPS, next).getOrThrow(false, s -> {});
 
               propTag.put(property.getName(), pTag);
             }, () -> {
               LOGGER.warn("Unknown property at index {}", id);
             });
+      }
+
+      if (unknownProperties != null && !unknownProperties.isEmpty()) {
+        propTag.putAll(unknownProperties);
       }
 
       tag.put(TAG_PROPERTIES, propTag);
@@ -507,8 +486,21 @@ public class Waypoint implements BoundsHolder {
 
   @SuppressWarnings("unchecked")
   public void load(CompoundTag tag) {
-    this.type = WaypointTypes.REGISTRY
-        .readTagOrThrow(tag.get(TAG_TYPE));
+    var opt = WaypointTypes.REGISTRY.readTag(tag.get(TAG_TYPE));
+
+    if (opt.isEmpty()) {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.error("Waypoint {} has unknown type '{}', defaulting to player type",
+            id, tag.get(TAG_TYPE)
+        );
+        type = WaypointTypes.PLAYER;
+      } else {
+        // Will just throw an exception
+        WaypointTypes.REGISTRY.readTagOrThrow(tag.get(TAG_TYPE));
+      }
+    } else {
+      type = opt.get();
+    }
 
     this.position = Vectors.read3i(tag.get(TAG_POS));
 
@@ -519,8 +511,7 @@ public class Waypoint implements BoundsHolder {
       setWorld(world);
     }
 
-    this.bounds = type.createBounds()
-        .move(position);
+    this.bounds = type.createBounds().move(position);
 
     if (tag.containsKey(TAG_LAST_VALID)) {
       lastValidTime = tag.getLong(TAG_LAST_VALID);
@@ -532,19 +523,22 @@ public class Waypoint implements BoundsHolder {
       CompoundTag propertyTag = tag.getCompound(TAG_PROPERTIES);
 
       for (var e : propertyTag.entrySet()) {
-        WaypointProperties.REGISTRY
-            .get(e.getKey())
+        WaypointProperties.REGISTRY.get(e.getKey()).ifPresentOrElse(property -> {
+          WaypointProperty<Object> prop = property;
 
-            .ifPresentOrElse(property -> {
-              WaypointProperty<Object> prop = property;
+          prop.getCodec()
+              .decode(TagOps.OPS, e.getValue())
+              .map(Pair::getFirst)
+              .resultOrPartial(LOGGER::warn)
+              .ifPresent(o -> set(property, o));
+        }, () -> {
+          LOGGER.warn("Unknown property '{}', adding to unknowns list", e.getKey());
 
-              prop.getCodec()
-                  .decode(TagOps.OPS, e.getValue())
-                  .resultOrPartial(LOGGER::warn)
-                  .ifPresent(o -> set(property, o));
-            }, () -> {
-              LOGGER.warn("Unknown property '{}'", e.getKey());
-            });
+          if (unknownProperties == null) {
+            unknownProperties = BinaryTags.compoundTag();
+          }
+          unknownProperties.put(e.getKey(), e.getValue());
+        });
       }
     } else {
       properties = ArrayUtils.EMPTY_OBJECT_ARRAY;

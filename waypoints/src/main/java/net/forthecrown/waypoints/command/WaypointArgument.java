@@ -18,19 +18,15 @@ import net.forthecrown.waypoints.WExceptions;
 import net.forthecrown.waypoints.WPermissions;
 import net.forthecrown.waypoints.Waypoint;
 import net.forthecrown.waypoints.WaypointManager;
-import net.forthecrown.waypoints.event.WaypointParseEvent;
-import net.forthecrown.waypoints.event.WaypointSuggestionsEvent;
 
 public class WaypointArgument implements ArgumentType<ParseResult<Waypoint>> {
 
-  public static final String
-      FLAG_CURRENT = "-current",
-      FLAG_NEAREST = "-nearest";
+  public static final String FLAG_CURRENT = "-current";
+  public static final String FLAG_NEAREST = "-nearest";
 
   @Override
   public ParseResult<Waypoint> parse(StringReader reader) throws CommandSyntaxException {
     int start = reader.getCursor();
-
     var name = reader.readUnquotedString();
 
     // By flags
@@ -41,29 +37,32 @@ public class WaypointArgument implements ArgumentType<ParseResult<Waypoint>> {
     }
 
     // By waypoint name
-    Waypoint waypoint = WaypointManager.getInstance().get(name);
+    WaypointManager manager = WaypointManager.getInstance();
+    Waypoint waypoint = manager.get(name);
     if (waypoint != null) {
       return new WaypointResults.DirectResult(waypoint);
     }
 
     // By username
     LookupEntry lookup = Users.getService().getLookup().query(name);
-
     if (lookup != null) {
       return new WaypointResults.UserResult(lookup);
     }
 
     // By guild name
-    WaypointParseEvent event = new WaypointParseEvent(Readers.copy(reader, start));
-    event.callEvent();
+    var extensions = manager.getExtensions();
 
-    if (event.isCancelled()) {
-      throw event.getException();
-    }
+    for (var e: extensions) {
+      try {
+        var extReader = Readers.copy(reader, start);
+        ParseResult<Waypoint> result = e.parse(extReader);
 
-    if (event.getParseResult() != null) {
-      reader.setCursor(event.getReader().getCursor());
-      return event.getParseResult();
+        if (result != null) {
+          return result;
+        }
+      } catch (CommandSyntaxException exc) {
+        continue;
+      }
     }
 
     throw WExceptions.unknownRegion(reader, start);
@@ -83,14 +82,11 @@ public class WaypointArgument implements ArgumentType<ParseResult<Waypoint>> {
     // Suggest players
     FtcSuggestions.suggestPlayerNames(source, builder, false);
 
-    WaypointSuggestionsEvent event
-        = new WaypointSuggestionsEvent((CommandContext<CommandSource>) context, builder);
+    WaypointManager manager = WaypointManager.getInstance();
 
-    event.callEvent();
+    var extensions = manager.getExtensions();
+    extensions.forEach(extension -> extension.addSuggestions(builder, source));
 
-    return Completions.suggest(
-        event.getBuilder(),
-        WaypointManager.getInstance().getNames()
-    );
+    return Completions.suggest(builder, WaypointManager.getInstance().getNames());
   }
 }

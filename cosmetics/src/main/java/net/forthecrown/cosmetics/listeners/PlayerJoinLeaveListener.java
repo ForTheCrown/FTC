@@ -9,7 +9,7 @@ import net.forthecrown.user.NameRenderFlags;
 import net.forthecrown.user.User;
 import net.forthecrown.user.event.UserJoinEvent;
 import net.forthecrown.user.event.UserLeaveEvent;
-import net.kyori.adventure.audience.Audience;
+import net.forthecrown.user.name.DisplayIntent;
 import net.kyori.adventure.text.Component;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,11 +20,13 @@ public class PlayerJoinLeaveListener implements Listener {
   public void onUserJoin(UserJoinEvent event) {
 
     event.setRenderer((user, viewer) -> {
-      var displayName = formattedName(user, viewer, true);
+      var displayName = user.displayName(viewer, DisplayIntent.TABLIST);
 
-      return event.hasNameChanged()
+      Component base = event.hasNameChanged()
           ? Messages.newNameJoinMessage(displayName, event.getLastOnlineName())
           : Messages.joinMessage(displayName);
+
+      return formatMessage(user, base);
     });
   }
 
@@ -32,26 +34,24 @@ public class PlayerJoinLeaveListener implements Listener {
   public void onUserLeave(UserLeaveEvent event) {
 
     event.setRenderer((user, viewer) -> {
-      return Messages.leaveMessage(formattedName(user, viewer, false), event.getReason());
+      var displayName = user.displayName(
+          viewer,
+          Set.of(NameRenderFlags.ALLOW_NICKNAME),
+          DisplayIntent.TABLIST
+      );
+
+      Component base = Messages.leaveMessage(displayName, event.getReason());
+      return formatMessage(user, base);
     });
   }
 
-  private Component formattedName(User user, Audience viewer, boolean online) {
-    Set<NameRenderFlags> flags = online
-        ? Set.of(NameRenderFlags.ALLOW_NICKNAME, NameRenderFlags.USER_ONLINE)
-        : Set.of(NameRenderFlags.ALLOW_NICKNAME);
-
-    Component displayName = user.displayName(viewer, flags);
+  private Component formatMessage(User user, Component baseMessage) {
     LoginEffect effect = user.getComponent(CosmeticData.class).getValue(LoginEffects.TYPE);
 
     if (effect == null) {
-      return displayName;
+      return baseMessage;
     }
 
-    return Component.text()
-        .append(effect.prefix())
-        .append(displayName)
-        .append(effect.suffix())
-        .build();
+    return LoginEffects.format(effect, baseMessage);
   }
 }

@@ -7,7 +7,9 @@ import net.forthecrown.waypoints.WExceptions;
 import net.forthecrown.waypoints.WMessages;
 import net.forthecrown.waypoints.WPermissions;
 import net.forthecrown.waypoints.Waypoint;
+import net.forthecrown.waypoints.WaypointPrefs;
 import net.forthecrown.waypoints.Waypoints;
+import net.forthecrown.waypoints.type.WaypointTypes;
 import org.bukkit.Sound;
 
 public class CommandMoveIn extends FtcCommand {
@@ -46,9 +48,9 @@ public class CommandMoveIn extends FtcCommand {
           Waypoints.validateMoveInCooldown(user);
 
           if (waypoint == null || !waypoint.getBounds().contains(user.getPlayer())) {
-            var target = Waypoints.findTopBlock(user.getPlayer());
+            var target = WaypointTypes.findTopBlock(user.getPlayer());
 
-            if (target != null && Waypoints.isTopOfWaypoint(target)) {
+            if (target != null && WaypointTypes.isTopOfWaypoint(target)) {
               Waypoints.tryCreate(c.getSource());
 
               c.getSource().sendMessage(WMessages.HOME_WAYPOINT_SET);
@@ -62,7 +64,7 @@ public class CommandMoveIn extends FtcCommand {
             }
           }
 
-          user.set(Waypoints.HOME_PROPERTY, waypoint.getId());
+          user.set(WaypointPrefs.HOME_PROPERTY, waypoint.getId());
           user.sendMessage(WMessages.HOME_WAYPOINT_SET);
           user.playSound(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 2);
 
