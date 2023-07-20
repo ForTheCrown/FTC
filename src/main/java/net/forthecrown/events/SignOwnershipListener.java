@@ -1,5 +1,6 @@
 package net.forthecrown.events;
 
+import io.papermc.paper.event.player.PlayerOpenSignEvent;
 import java.util.Objects;
 import java.util.UUID;
 import net.forthecrown.core.FTC;
@@ -7,14 +8,12 @@ import net.forthecrown.core.Keys;
 import net.forthecrown.core.Permissions;
 import net.minecraft.core.UUIDUtil;
 import org.bukkit.NamespacedKey;
-import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -28,22 +27,13 @@ public class SignOwnershipListener implements Listener {
   public void onSignChange(SignChangeEvent event) {
     UUID playerId = event.getPlayer().getUniqueId();
     Sign sign = (Sign) event.getBlock().getState();
-    setOwner(sign, playerId);
+    setOwnerIfNoneExists(sign, playerId);
     sign.update();
   }
 
   @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
-  public void onPlayerInteract(PlayerInteractEvent event) {
-    if (!event.getAction().isRightClick()) {
-      return;
-    }
-
-    BlockState state = event.getClickedBlock().getState();
-
-    if (!(state instanceof Sign sign)) {
-      return;
-    }
-
+  public void onPlayerOpenSign(PlayerOpenSignEvent event) {
+    var sign = event.getSign();
     Player player = event.getPlayer();
     UUID playerId = player.getUniqueId();
     UUID owner = getOwner(sign);
@@ -68,11 +58,15 @@ public class SignOwnershipListener implements Listener {
     return UUIDUtil.uuidFromIntArray(intList);
   }
 
-  void setOwner(Sign sign, UUID owner) {
+  void setOwnerIfNoneExists(Sign sign, UUID owner) {
     PersistentDataContainer container = sign.getPersistentDataContainer();
 
     if (owner == null) {
       container.remove(SIGN_OWNER);
+      return;
+    }
+
+    if (container.has(SIGN_OWNER)) {
       return;
     }
 

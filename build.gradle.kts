@@ -76,7 +76,7 @@ dependencies {
   compileOnly("net.luckperms:api:5.4")
   compileOnly("org.mcteam.ancientgates:ancientgates:2.6")
   compileOnly("com.bencodez:votingplugin:6.11.3")
-  compileOnly("com.github.Gecolay.GSit:core:1.3.7")
+  compileOnly("com.github.Gecolay.GSit:core:1.4.10")
 
   // Minecraft, Bukkit and Paper
   paperweight.paperDevBundle("${minecraftVersion}-R0.1-SNAPSHOT")

@@ -113,11 +113,15 @@ public final class SignShops {
     }
 
     if (block.getState() instanceof Sign sign) {
-      PersistentDataContainer container = sign.getPersistentDataContainer();
-      return container.has(SHOP_KEY, PersistentDataType.TAG_CONTAINER);
+      return isShop(sign);
     } else {
       return false;
     }
+  }
+
+  public static boolean isShop(Sign sign) {
+    PersistentDataContainer container = sign.getPersistentDataContainer();
+    return container.has(SHOP_KEY, PersistentDataType.TAG_CONTAINER);
   }
 
   /**

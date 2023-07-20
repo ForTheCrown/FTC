@@ -6,6 +6,7 @@ import net.forthecrown.events.Events;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.Tasks;
 import net.kyori.adventure.util.Ticks;
+import org.bukkit.GameMode;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.event.EventHandler;
@@ -21,6 +22,8 @@ public class HulkSmashListener implements Listener {
    * Determines the amount of game ticks between cosmetic effect tick
    */
   public static final byte GAME_TICKS_PER_COSMETIC_TICK = 1; //Nice name, I know
+
+  public static final int MAX_GROUND_TICKS = 10;
 
   private final User user;
   private final TravelEffect effect;
@@ -40,6 +43,7 @@ public class HulkSmashListener implements Listener {
 
   private short ticks = 30 * (Ticks.TICKS_PER_SECOND / GAME_TICKS_PER_COSMETIC_TICK);
   private short groundTicks = 0;
+  private boolean onGround;
 
   private BukkitTask tickTask;
 
@@ -48,12 +52,20 @@ public class HulkSmashListener implements Listener {
     double velY = vel.getY();
 
     // Test if on ground, god-damn floating point errors
-    if (!user.getPlayer().isGliding() && velY >= -0.07841 && velY <= 0) {
-      ++groundTicks;
+    if (!user.getPlayer().isGliding()
+        && velY >= -0.07841
+        && velY <= 0
+        && user.getGameMode() == GameMode.CREATIVE
+    ) {
+      onGround = true;
     }
 
-    // If been on ground for 5 or more ticks, stop
-    if (groundTicks >= 5) {
+    if (onGround) {
+      groundTicks++;
+    }
+
+    // If been on ground for MAX_GROUND_TICKS or more ticks, stop
+    if (groundTicks >= MAX_GROUND_TICKS) {
       end();
       return;
     }
@@ -110,6 +122,6 @@ public class HulkSmashListener implements Listener {
     }
 
     event.setCancelled(true);
-    end();
+    onGround = true;
   }
 }
