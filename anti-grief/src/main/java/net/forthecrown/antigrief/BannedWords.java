@@ -53,9 +53,9 @@ public final class BannedWords {
   }
 
   private static boolean containsBannedWords(String input) {
-    String filteredInput = input.toLowerCase();
-    filteredInput = StringUtils.replaceChars(filteredInput, "АВЕЅZІКМНОРСТХШѴУ",
-        "ABESZIKMHOPCTXWVY");
+    String filteredInput = StringUtils.replaceChars(
+        input.toLowerCase(), "АВЕЅZІКМНОРСТХШѴУ", "ABESZIKMHOPCTXWVY"
+    );
 
     for (String s : BANNED_WORDS) {
       if (filteredInput.contains(s)) {

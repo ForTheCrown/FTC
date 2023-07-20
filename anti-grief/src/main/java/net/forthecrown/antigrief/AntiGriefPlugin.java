@@ -37,6 +37,7 @@ public class AntiGriefPlugin extends JavaPlugin {
   @Override
   public void reloadConfig() {
     pluginConfig = TomlConfigs.loadPluginConfig(this, AntiGriefConfig.class);
+    BannedWords.load();
   }
 
   @Override
