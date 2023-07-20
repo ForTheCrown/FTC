@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import net.forthecrown.utils.math.AbstractBounds3i;
+import net.forthecrown.utils.math.Bounds3i;
 import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.utils.math.WorldBounds3i;
 import net.forthecrown.utils.math.WorldVec3i;
@@ -24,11 +25,11 @@ import org.spongepowered.math.vector.Vector3i;
  * @param <T> The map's type
  * @see ChunkedMap
  */
-public class WorldChunkMap<T extends BoundsHolder> {
+public class WorldChunkMap<T> {
 
   private final Map<String, ChunkedMap<T>> worlds = new Object2ObjectOpenHashMap<>();
 
-  public boolean add(World world, T value) {
+  public boolean add(World world, Bounds3i bounds, T value) {
     Objects.requireNonNull(world, "World was null");
     Objects.requireNonNull(value, "Value was null");
 
@@ -37,7 +38,17 @@ public class WorldChunkMap<T extends BoundsHolder> {
         s -> new ChunkedMap<>()
     );
 
-    return worldMap.add(value);
+    return worldMap.add(value, bounds);
+  }
+
+  public boolean add(WorldBounds3i bounds, T value) {
+    Objects.requireNonNull(bounds, "World was null");
+    Objects.requireNonNull(value, "Value was null");
+
+    var world = bounds.getWorld();
+    Objects.requireNonNull(world, "World not loaded");
+
+    return add(bounds.getWorld(), Bounds3i.of(bounds), value);
   }
 
   public boolean remove(@NotNull World world, @NotNull T value) {

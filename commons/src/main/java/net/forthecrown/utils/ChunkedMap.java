@@ -36,7 +36,7 @@ import org.spongepowered.math.vector.Vector3i;
  * @param <T> The type this map holds
  */
 @RequiredArgsConstructor
-public class ChunkedMap<T extends BoundsHolder> {
+public class ChunkedMap<T> {
   /* ----------------------------- CONSTANTS ------------------------------ */
   /**
    * Constant returned by {@link #findNearest(Vector3d)} when no near object was found
@@ -94,9 +94,7 @@ public class ChunkedMap<T extends BoundsHolder> {
    * Iterates through the chunks of the given bounds
    */
   @SuppressWarnings("deprecation")
-  private static void forEachChunk(AbstractBounds3i<?> bounds3i,
-                                   LongConsumer consumer
-  ) {
+  private static void forEachChunk(AbstractBounds3i<?> bounds3i, LongConsumer consumer) {
     // Min chunk pos
     int minX = Vectors.toChunk(bounds3i.minX());
     int minY = Vectors.toChunk(bounds3i.minY());
@@ -216,7 +214,7 @@ public class ChunkedMap<T extends BoundsHolder> {
    * @param value The entry to add
    * @return True, if the map changed as a result of this method call, false otherwise
    */
-  public boolean add(@NotNull T value) {
+  public boolean add(@NotNull T value, Bounds3i bounds) {
     Objects.requireNonNull(value, "Value");
     Entry<T> existing = entries.get(value);
 
@@ -224,25 +222,25 @@ public class ChunkedMap<T extends BoundsHolder> {
     // Test if the bounds are different, if they are
     // update bounds, else return false
     if (existing != null) {
-      if (!existing.bounds3i().equals(value.getBounds())) {
+      if (!existing.bounds3i().equals(bounds)) {
         _remove(existing);
       } else {
         return false;
       }
     }
 
-    Entry<T> entry = new Entry<>(value, value.getBounds());
+    Entry<T> entry = new Entry<>(value, bounds);
     entries.put(value, entry);
 
     // Update total area
     if (totalArea == null) {
-      totalArea = Bounds3i.of(value.getBounds());
+      totalArea = Bounds3i.of(bounds);
     } else {
-      totalArea = totalArea.combine(value.getBounds());
+      totalArea = totalArea.combine(bounds);
     }
 
     // Add to each chunk's list
-    forEachChunk(value.getBounds(), cPos -> {
+    forEachChunk(bounds, cPos -> {
       var list = chunkMap.computeIfAbsent(cPos, pos -> new ChunkList<>());
       list.add(entry);
     });
@@ -333,8 +331,7 @@ public class ChunkedMap<T extends BoundsHolder> {
     if (entries.isEmpty()) {
       clear();
     } else {
-      chunkMap.values()
-          .removeIf(AbstractCollection::isEmpty);
+      chunkMap.values().removeIf(AbstractCollection::isEmpty);
     }
   }
 

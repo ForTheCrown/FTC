@@ -12,13 +12,12 @@ import net.forthecrown.dungeons.level.generator.NodeAlign;
 import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.structure.BlockStructure;
 import net.forthecrown.utils.math.Rotation;
-import net.forthecrown.utils.BoundsHolder;
 import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.math.Bounds3i;
 import net.forthecrown.utils.math.Transform;
 import org.spongepowered.math.vector.Vector3i;
 
-public abstract class DungeonPiece implements BoundsHolder {
+public abstract class DungeonPiece {
   /* ----------------------------- CONSTANTS ------------------------------ */
 
   public static final String
@@ -125,7 +124,7 @@ public abstract class DungeonPiece implements BoundsHolder {
     );
 
     if (level != null) {
-      level.getChunkMap().add(this);
+      level.getChunkMap().add(this, this.bounds);
     }
   }
 
