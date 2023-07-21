@@ -37,7 +37,8 @@ public class ShopInteractionListener implements Listener {
       Material.GREEN_DYE,
       Material.RED_DYE,
       Material.BLACK_DYE,
-      Material.GLOW_INK_SAC
+      Material.GLOW_INK_SAC,
+      Material.HONEYCOMB
   );
 
   @EventHandler
