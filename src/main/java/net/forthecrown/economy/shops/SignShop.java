@@ -461,8 +461,6 @@ public class SignShop implements InventoryHolder {
       );
     }
 
-    s.setWaxed(true);
-
     // Save the shop into the sign's persistent data
     // container
     save(s);
