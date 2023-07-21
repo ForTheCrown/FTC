@@ -3,7 +3,6 @@ package net.forthecrown.events;
 import io.papermc.paper.event.player.PlayerOpenSignEvent;
 import java.util.Objects;
 import java.util.UUID;
-import net.forthecrown.core.FTC;
 import net.forthecrown.core.Keys;
 import net.forthecrown.core.Permissions;
 import net.minecraft.core.UUIDUtil;
@@ -21,12 +20,16 @@ public class SignOwnershipListener implements Listener {
 
   public static final NamespacedKey SIGN_OWNER = Keys.forthecrown("sign_owner");
 
-  public static final boolean ADMIN_BYPASS = !FTC.inDebugMode();
-
   @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
   public void onSignChange(SignChangeEvent event) {
-    UUID playerId = event.getPlayer().getUniqueId();
     Sign sign = (Sign) event.getBlock().getState();
+    UUID playerId = event.getPlayer().getUniqueId();
+
+    if (!canEdit(sign, event.getPlayer())) {
+      event.setCancelled(true);
+      return;
+    }
+
     setOwnerIfNoneExists(sign, playerId);
     sign.update();
   }
@@ -35,16 +38,21 @@ public class SignOwnershipListener implements Listener {
   public void onPlayerOpenSign(PlayerOpenSignEvent event) {
     var sign = event.getSign();
     Player player = event.getPlayer();
-    UUID playerId = player.getUniqueId();
-    UUID owner = getOwner(sign);
 
-    if ((player.hasPermission(Permissions.ADMIN) && ADMIN_BYPASS)
-        || Objects.equals(playerId, owner)
-    ) {
+    if (canEdit(sign, player)) {
       return;
     }
 
     event.setCancelled(true);
+  }
+
+  boolean canEdit(Sign sign, Player player) {
+    if (player.hasPermission(Permissions.ADMIN)) {
+      return true;
+    }
+
+    UUID owner = getOwner(sign);
+    return Objects.equals(owner, player.getUniqueId());
   }
 
   UUID getOwner(Sign sign) {

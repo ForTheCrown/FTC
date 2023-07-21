@@ -2,6 +2,7 @@ package net.forthecrown.events.economy;
 
 import io.papermc.paper.event.player.PlayerOpenSignEvent;
 import java.util.Set;
+import net.forthecrown.core.Permissions;
 import net.forthecrown.economy.Economy;
 import net.forthecrown.economy.shops.ShopManager;
 import net.forthecrown.economy.shops.SignShop;
@@ -67,7 +68,9 @@ public class ShopInteractionListener implements Listener {
     SignShop shop = manager.getShop(event.getClickedBlock());
 
     // If holding a dye, and you own the shop, don't perform any logic
-    if (SignShops.mayEdit(shop, player.getUniqueId())) {
+    if (SignShops.mayEdit(shop, player.getUniqueId())
+        || player.hasPermission(Permissions.SHOP_ADMIN)
+    ) {
       ItemStack held = player.getInventory().getItemInMainHand();
 
       if (!ItemStacks.isEmpty(held) && DYES.contains(held.getType())) {
