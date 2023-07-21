@@ -1,42 +1,71 @@
 package net.forthecrown.events;
 
 import io.papermc.paper.event.player.PlayerOpenSignEvent;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import net.forthecrown.core.Keys;
 import net.forthecrown.core.Permissions;
+import net.forthecrown.core.logging.Loggers;
 import net.minecraft.core.UUIDUtil;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 public class SignOwnershipListener implements Listener {
 
+  public static final Logger LOGGER = Loggers.getLogger();
+
   public static final NamespacedKey SIGN_OWNER = Keys.forthecrown("sign_owner");
+
+  private final Set<UUID> justClicked = new HashSet<>();
 
   @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
   public void onSignChange(SignChangeEvent event) {
     Sign sign = (Sign) event.getBlock().getState();
-    UUID playerId = event.getPlayer().getUniqueId();
 
     if (!canEdit(sign, event.getPlayer())) {
       event.setCancelled(true);
+    }
+  }
+
+  @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+  public void onPlayerInteract(PlayerInteractEvent event) {
+    if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
       return;
     }
 
-    setOwnerIfNoneExists(sign, playerId);
-    sign.update();
+    var block = event.getClickedBlock();
+    if (!(block.getState() instanceof Sign)) {
+      return;
+    }
+
+    justClicked.add(event.getPlayer().getUniqueId());
   }
 
   @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
   public void onPlayerOpenSign(PlayerOpenSignEvent event) {
+    var id = event.getPlayer().getUniqueId();
     var sign = event.getSign();
+
+    // Doesn't contain means they just placed the sign
+    if (!justClicked.contains(id)) {
+      setOwnerIfNoneExists(sign, id);
+      sign.update();
+      return;
+    }
+
+    justClicked.remove(id);
     Player player = event.getPlayer();
 
     if (canEdit(sign, player)) {
