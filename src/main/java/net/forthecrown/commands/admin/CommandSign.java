@@ -83,6 +83,7 @@ public class CommandSign extends FtcCommand {
     prefixed.usage("<line: number(1..4)> -clear", "Clears <line>");
     prefixed.usage("type <type>", "Sets the sign's type");
     prefixed.usage("glow <true | false>", "Makes a sign glow/not glow");
+    prefixed.usage("waxed <true | false>", "Sets a sign to be waxed or not");
   }
 
   @Override
@@ -114,6 +115,23 @@ public class CommandSign extends FtcCommand {
 
                       c.getSource().sendSuccess(
                           Text.format("Set sign glowing: {0}", glowing)
+                      );
+                      return 0;
+                    })
+                )
+            )
+
+            .then(literal("waxed")
+                .then(argument("waxed_state", BoolArgumentType.bool())
+                    .executes(c -> {
+                      Sign sign = get(c);
+                      boolean waxed = c.getArgument("waxed_state", Boolean.class);
+
+                      sign.setWaxed(waxed);
+                      sign.update();
+
+                      c.getSource().sendSuccess(
+                          Text.format("Set sign waxed {0}", waxed)
                       );
                       return 0;
                     })
