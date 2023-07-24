@@ -53,6 +53,11 @@ public class SignOwnershipListener implements Listener {
     justClicked.add(event.getPlayer().getUniqueId());
   }
 
+  @EventHandler(priority = EventPriority.MONITOR)
+  public void onPlayerOpenSignMonitor(PlayerOpenSignEvent event) {
+    justClicked.remove(event.getPlayer().getUniqueId());
+  }
+
   @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
   public void onPlayerOpenSign(PlayerOpenSignEvent event) {
     var id = event.getPlayer().getUniqueId();
