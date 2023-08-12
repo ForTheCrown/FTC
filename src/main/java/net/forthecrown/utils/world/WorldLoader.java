@@ -8,6 +8,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import net.forthecrown.core.config.GeneralConfig;
 import net.forthecrown.core.logging.Loggers;
@@ -39,7 +40,7 @@ public @UtilityClass class WorldLoader {
   /**
    * The amount of chunks that have to be loaded before the logger logs a progress update message
    */
-  public int LOG_INTERVAL = 100;
+  public int LOG_INTERVAL = 1000;
 
   /**
    * The size of a {@link LoadSection} in chunks
@@ -195,11 +196,15 @@ public @UtilityClass class WorldLoader {
         float progressPercent = (float) loaded / (float) chunkCount * 100;
         System.gc();
 
-        LOGGER.info("[{}] Loading progress: {} / {}, or {}%",
+        long elapsedSeconds = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - started);
+        float cps = (float) loaded / elapsedSeconds;
+
+        LOGGER.info("[{}] Loading progress: {} / {}, or {}% cps={}",
             world.getName(),
             loaded,
             chunkCount,
-            String.format("%.2f", progressPercent)
+            String.format("%.2f", progressPercent),
+            String.format("%.2f", cps)
         );
       }
     }
@@ -442,7 +447,7 @@ public @UtilityClass class WorldLoader {
     private void complete() {
       completed = true;
       loader.completeSection();
-      LOGGER.info("Completed " + this);
+      LOGGER.debug("Completed " + this);
     }
 
     @Override
