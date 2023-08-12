@@ -47,6 +47,7 @@ import net.forthecrown.commands.admin.CommandHologram;
 import net.forthecrown.commands.admin.CommandIllegalWorlds;
 import net.forthecrown.commands.admin.CommandInvStore;
 import net.forthecrown.commands.admin.CommandJoinInfo;
+import net.forthecrown.commands.admin.CommandKingMaker;
 import net.forthecrown.commands.admin.CommandLaunch;
 import net.forthecrown.commands.admin.CommandMakeAward;
 import net.forthecrown.commands.admin.CommandMemory;
@@ -198,6 +199,7 @@ public final class Commands {
     new CommandCooldown();
     new CommandFtcVersion();
     new CommandDocGen();
+    new CommandKingMaker();
 
     InteractableCommands.createCommands();
     CommandSpecificGameMode.createCommands();

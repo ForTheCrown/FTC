@@ -1257,6 +1257,11 @@ public class User implements ForwardingAudience.Single,
       return getTitles().getTitle().getPrefix();
     }
 
+    var kingship = UserManager.get().getKingship();
+    if (kingship.isKing(uniqueId)) {
+      return kingship.getTitle();
+    }
+
     // Otherwise return an empty prefix
     return Component.empty();
   }

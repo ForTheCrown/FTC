@@ -10,6 +10,10 @@ import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -42,12 +46,12 @@ public class RoyalCrown extends ExtendedItem {
   }
 
   // Unused
-  /*public void upgrade(ItemStack item) {
+  public void upgrade(ItemStack item) {
     rank++;
     item.editMeta(this::applyRank);
 
     update(item);
-  }*/
+  }
 
   @Override
   protected void onUpdate(ItemStack item, ItemMeta meta) {
@@ -80,7 +84,7 @@ public class RoyalCrown extends ExtendedItem {
   }
 
   // Unused
-  /*public void applyRank(ItemMeta meta) {
+  public void applyRank(ItemMeta meta) {
     int rank = getRank();
     int enchantRank = rank;
     int extraHearts = rank * 2;
@@ -115,5 +119,5 @@ public class RoyalCrown extends ExtendedItem {
           )
       );
     }
-  }*/
+  }
 }

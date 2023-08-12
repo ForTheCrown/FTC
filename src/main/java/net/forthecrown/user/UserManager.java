@@ -90,6 +90,8 @@ public final class UserManager implements SerializableObject {
    */
   private final UUID2IntMap gems;
 
+  private final Kingship kingship;
+
   /**
    * The directory of that user files are in, not to be confused with the user
    * data file directory where individual user files are kept.
@@ -112,6 +114,8 @@ public final class UserManager implements SerializableObject {
     playTime  = createMap("playtime.json", null);
     votes     = createMap("votes.json", null);
     gems      = createMap("gems.json", null);
+
+    kingship = new Kingship(directory.resolve("king.json"));
   }
 
   private UUID2IntMap createMap(String file, @Nullable IntSupplier supplier) {
@@ -159,6 +163,7 @@ public final class UserManager implements SerializableObject {
     saveMaps();
     userLookup.save();
     alts.save();
+    kingship.save();
 
     saveUsers();
   }
@@ -171,6 +176,7 @@ public final class UserManager implements SerializableObject {
   public void reload() {
     userLookup.reload();
     alts.reload();
+    kingship.load();
     loadMaps();
 
     reloadUsers();
@@ -251,8 +257,12 @@ public final class UserManager implements SerializableObject {
    * @param uuid The ID to remove, aka, unload
    */
   public void remove(UUID uuid) {
-    loaded.remove(uuid);
-    online.remove(uuid);
+    try {
+      loaded.remove(uuid);
+      online.remove(uuid);
+    } catch (ArrayIndexOutOfBoundsException ignored) {
+      // I have absolutely no idea how this is being thrown, but it is
+    }
   }
 
   /**
