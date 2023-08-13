@@ -4,9 +4,13 @@ import static net.forthecrown.utils.text.Text.nonItalic;
 import static net.kyori.adventure.text.Component.text;
 
 import net.forthecrown.core.Worlds;
+import net.forthecrown.user.Kingship;
+import net.forthecrown.user.UserManager;
+import net.forthecrown.user.Users;
 import net.forthecrown.utils.RomanNumeral;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.inventory.ItemStacks;
+import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.format.UnitFormat;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
@@ -35,7 +39,7 @@ public final class FtcItems {
    * @return The created coin(s)
    */
   public static ItemStack makeCoins(int amount, int itemAmount) {
-    return ItemStacks.builder(COIN_MATERIAL, itemAmount)
+    var builder = ItemStacks.builder(COIN_MATERIAL, itemAmount)
         .setNameRaw(
             text(UnitFormat.UNIT_RHINE + "s", nonItalic(NamedTextColor.GOLD))
         )
@@ -48,9 +52,28 @@ public final class FtcItems {
         .addLoreRaw(
             text("Minted in the year " + getOverworldYear() + ".")
                 .style(NON_ITALIC_DARK_GRAY)
-        )
+        );
 
-        .build();
+    Kingship kingship = UserManager.get().getKingship();
+    if (kingship.hasKing()) {
+      var user = Users.get(kingship.getKingId());
+
+      String title = switch (kingship.getPreference()) {
+        case MONARCH -> "Monarch";
+        case QUEEN -> "Queen";
+        case KING -> "King";
+      };
+
+      builder.addLore(
+          Text.format("During the reign of {0} {1}",
+              NamedTextColor.DARK_GRAY,
+              title,
+              user.getName()
+          )
+      );
+    }
+
+    return builder.build();
   }
 
   private static String getOverworldYear() {

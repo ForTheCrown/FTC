@@ -196,10 +196,10 @@ public class CommandScripts extends FtcCommand {
     var scriptName = script.getSource().getName();
     ScriptResult result;
 
-    script.put("source", source);
-
     try {
-      result = script.compile(args).eval();
+      script.compile(args);
+      script.put("source", source);
+      result = script.eval();
     } catch (ScriptLoadException exc) {
       exc.printStackTrace();
 

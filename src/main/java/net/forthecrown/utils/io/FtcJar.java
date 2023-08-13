@@ -1,8 +1,9 @@
 package net.forthecrown.utils.io;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.lang.reflect.Field;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
@@ -11,12 +12,13 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.forthecrown.core.FTC;
 import net.forthecrown.core.logging.Loggers;
 import org.apache.logging.log4j.Logger;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class FtcJar {
 
@@ -36,46 +38,56 @@ public class FtcJar {
    */
   public static final int ALLOW_OVERWRITE = 0x1;
 
-  /**
-   * The ZIP file system of the plugin jar
-   */
-  public static final FileSystem JAR_FILE_SYSTEM;
+  private static final Field javaPlugin_file;
+
+  private static final Map<String, FileSystem> pluginJars = new Object2ObjectOpenHashMap<>();
 
   static {
     try {
-      URI jarUri = PathUtil.class
-          .getProtectionDomain()
-          .getCodeSource()
-          .getLocation()
-          .toURI();
-
-      URI uri = new URI("jar", jarUri.toString(), null);
-
-      Map<String, String> env = new HashMap<>();
-      env.put("create", "true");
-
-      try {
-        JAR_FILE_SYSTEM = FileSystems.newFileSystem(
-            uri,
-            env,
-            PathUtil.class.getClassLoader()
-        );
-
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-    } catch (URISyntaxException exc) {
+      Class<JavaPlugin> pluginClass = JavaPlugin.class;
+      Field f = pluginClass.getDeclaredField("file");
+      f.setAccessible(true);
+      javaPlugin_file = f;
+    } catch (ReflectiveOperationException exc) {
       throw new RuntimeException(exc);
     }
   }
 
   /* ---------------------- JAR FILE SYSTEM ACCESS ------------------------ */
 
+  private static FileSystem getResourceFileSystem(JavaPlugin plugin) {
+    String name = plugin.getName();
+    FileSystem foundSystem = pluginJars.get(name);
+
+    if (foundSystem != null) {
+      return foundSystem;
+    }
+
+    Path jarPath = reflectivelyGetPluginJar(plugin).toPath();
+
+    try {
+      FileSystem system = FileSystems.newFileSystem(jarPath);
+      pluginJars.put(name, system);
+      return system;
+    } catch (IOException exc) {
+      throw new RuntimeException(exc);
+    }
+  }
+
+  private static File reflectivelyGetPluginJar(JavaPlugin plugin) {
+    try {
+      File f = (File) javaPlugin_file.get(plugin);
+      return f;
+    } catch (ReflectiveOperationException exc) {
+      throw new RuntimeException(exc);
+    }
+  }
+
   /**
    * Gets a path to a file inside the plugin jar
    */
   public static Path resourcePath(String s, String... others) {
-    return JAR_FILE_SYSTEM.getPath(s, others);
+    return getResourceFileSystem(FTC.getPlugin()).getPath(s, others);
   }
 
   /**

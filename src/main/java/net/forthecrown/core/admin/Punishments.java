@@ -136,8 +136,7 @@ public final class Punishments {
         ? "Eternal"
         : PeriodFormat.of(length).toString();
 
-    LOGGER.info(Loggers.STAFF_LOG,
-        "{} punished {} with {}, reason: {}, length: {}",
+    LOGGER.info("{} punished {} with {}, reason: {}, length: {}",
         source.textName(), target.getName(),
         type.name().toLowerCase(),
         reason,

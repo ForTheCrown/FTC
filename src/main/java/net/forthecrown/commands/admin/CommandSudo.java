@@ -5,7 +5,6 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.help.UsageFactory;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.commands.manager.FtcSuggestions;
 import net.forthecrown.core.Messages;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Completions;
@@ -49,11 +48,6 @@ public class CommandSudo extends FtcCommand {
                       || CHAT_PREFIX.startsWith(token.toLowerCase())
                   ) {
                     Completions.suggest(b, CHAT_PREFIX);
-                  }
-
-                  if (!token.startsWith(CHAT_PREFIX)) {
-                    return FtcSuggestions.COMMAND_SUGGESTIONS
-                        .getSuggestions(c, b);
                   }
 
                   return Suggestions.empty();

@@ -6,6 +6,8 @@ authors: [ Julie, Wout ]
 prefix: 'FTC'
 loader: net.forthecrown.core.FtcPluginLoader
 
+has-open-classloader: true
+
 dependencies:
   - name: WorldGuard
     required: true

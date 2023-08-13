@@ -229,11 +229,11 @@ public class ResourceWorld {
 
       World original = Worlds.resource();
 
-      // Kick players out and close gates
-      WorldReCreator.kickPlayers(original);
-      setGatesOpen(false);
-
       Tasks.runSync(() -> {
+        // Kick players out and close gates
+        WorldReCreator.kickPlayers(original);
+        setGatesOpen(false);
+
         // Re-create world
         WorldReCreator creator = WorldReCreator.of(original)
             .seed(seed)

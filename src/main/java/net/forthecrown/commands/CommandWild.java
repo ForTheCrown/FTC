@@ -34,6 +34,8 @@ import org.bukkit.potion.PotionEffectType;
 
 public class CommandWild extends FtcCommand {
 
+  public static final int MAX_RANGE = 12_500;
+
   public CommandWild() {
     super("wild");
 
@@ -196,13 +198,13 @@ public class CommandWild extends FtcCommand {
     final int maxSize = (int) ((b.getSize() / 2) - 200);
 
     final int[] xBounds = {
-        b.getCenter().getBlockX() - maxSize,
-        b.getCenter().getBlockX() + maxSize
+        Math.max(center.getBlockX() - maxSize, -MAX_RANGE),
+        Math.min(center.getBlockX() + maxSize,  MAX_RANGE)
     };
 
     final int[] zBounds = {
-        b.getCenter().getBlockZ() - maxSize,
-        b.getCenter().getBlockZ() + maxSize
+        Math.max(center.getBlockZ() - maxSize, -MAX_RANGE),
+        Math.min(center.getBlockZ() + maxSize,  MAX_RANGE)
     };
 
     boolean changeY = world.getName().contains("nether");

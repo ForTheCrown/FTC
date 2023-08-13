@@ -20,11 +20,11 @@ public class TriggerListener implements Listener {
       return;
     }
 
-    manager.run(event.getPlayer(), event.getFrom(), event.getTo());
+    manager.run(event.getPlayer(), event.getFrom(), event.getTo(), false);
   }
 
   @EventHandler(ignoreCancelled = true)
   public void onPlayerTeleport(PlayerTeleportEvent event) {
-    manager.run(event.getPlayer(), event.getFrom(), event.getTo());
+    manager.run(event.getPlayer(), event.getFrom(), event.getTo(), true);
   }
 }

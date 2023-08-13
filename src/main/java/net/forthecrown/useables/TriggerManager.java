@@ -118,14 +118,14 @@ public class TriggerManager {
     return true;
   }
 
-  public void run(Player player, Location source, Location destination) {
+  public void run(Player player, Location source, Location destination, boolean teleporting) {
     Bounds3i sourceBounds = makePlayerBounds(source);
     Bounds3i destBounds = makePlayerBounds(destination);
 
     World sourceWorld = source.getWorld();
     World destWorld = destination.getWorld();
 
-    if (Objects.equals(sourceWorld, destWorld)) {
+    if (!teleporting && Objects.equals(sourceWorld, destWorld)) {
       Bounds3i totalArea = sourceBounds.combine(destBounds);
 
       var triggers = this.worldMap.getOverlapping(sourceWorld, totalArea);
