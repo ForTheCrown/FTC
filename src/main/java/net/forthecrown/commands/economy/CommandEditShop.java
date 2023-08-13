@@ -231,7 +231,7 @@ public class CommandEditShop extends FtcCommand {
                 })
             )
         )
-        .then(literal("transfer")
+        /*.then(literal("transfer")
             .then(argument("player_transfer", Arguments.USER)
 
                 .executes(c -> {
@@ -252,7 +252,7 @@ public class CommandEditShop extends FtcCommand {
                   return 0;
                 })
             )
-        )
+        )*/
         .then(literal("line")
             .then(argument("line_actual", IntegerArgumentType.integer(2, 3))
                 .suggests((context, builder) -> {
