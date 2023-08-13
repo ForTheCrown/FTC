@@ -11,6 +11,8 @@ import org.bukkit.Bukkit;
 
 public class CommandMemory extends FtcCommand {
 
+  static final int BYTES_PER_MB = (int) Math.pow(1024, 2);
+
   public CommandMemory() {
     super("memory");
 
@@ -30,7 +32,7 @@ public class CommandMemory extends FtcCommand {
               .add(Bukkit.getWorlds().stream()
                   .map(world -> {
                     return Text.format(
-                        "&e{0}: " +
+                        "&6{0}: " +
                             "&eEntities:&7 {1}, " +
                             "&eLoaded Chunks:&7 {2}, " +
                             "&eTile entities:&7 {3}, " +
@@ -46,20 +48,22 @@ public class CommandMemory extends FtcCommand {
               )
               .asComponent();
 
+          Runtime runtime = Runtime.getRuntime();
+
           c.getSource().sendMessage(
               Text.format(
                   """
                       &eUptime:&7 {0, time, -timestamp}
                       &eTPS:&7 {1}
-                      &eMax memory:&7 {2} Mb
-                      &eFree memory:&7 {3} Mb
-                      &eWorlds: &7{4}
+                      &eMax memory:&7 {2} Mib
+                      &eFree memory:&7 {3} Mib
+                      &eWorlds: \n&7{4}
                       """,
 
                   ManagementFactory.getRuntimeMXBean().getStartTime(),
                   getTPS(),
-                  Runtime.getRuntime().maxMemory() / 1_000_000,
-                  Runtime.getRuntime().freeMemory() / 1_000_000,
+                  runtime.maxMemory() / BYTES_PER_MB,
+                  runtime.totalMemory() / BYTES_PER_MB,
                   worlds
               )
           );
