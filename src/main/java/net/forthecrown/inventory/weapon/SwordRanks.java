@@ -8,8 +8,10 @@ import net.forthecrown.inventory.weapon.goals.DungeonBossGoal;
 import net.forthecrown.inventory.weapon.goals.EntityGoal;
 import net.forthecrown.inventory.weapon.upgrades.EnchantUpgrade;
 import net.forthecrown.inventory.weapon.upgrades.EndBossUpgrade;
+import net.forthecrown.inventory.weapon.upgrades.GemReward;
 import net.forthecrown.inventory.weapon.upgrades.ModifierUpgrade;
 import net.forthecrown.inventory.weapon.upgrades.ReforgeUpgrade;
+import net.forthecrown.inventory.weapon.upgrades.RhineReward;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -53,8 +55,10 @@ public class SwordRanks {
                 "it carries the hero onwards"
             )
         )
-        // Removed bal upgrade: 10_000 rhines
-        // Removed gem upgrade: 500 gems
+
+        .addUpgrade(new RhineReward(5000))
+        .addUpgrade(new GemReward(200))
+
         .addGoal(new EntityGoal(100, EntityType.ZOMBIE))
         .addGoal(new EntityGoal(50, EntityType.CREEPER))
         .addGoal(new EntityGoal(150, EntityType.SKELETON))
@@ -74,13 +78,12 @@ public class SwordRanks {
             )
         )
         .addUpgrade(new ModifierUpgrade(0.5, 1))
-        // Removed bal upgrade: 15_000 rhines
+        .addUpgrade(new RhineReward(8000))
 
-        .addGoal(new EntityGoal(200, EntityType.BLAZE))
-        .addGoal(new EntityGoal(200, EntityType.WITHER_SKELETON))
-        .addGoal(new EntityGoal(200, EntityType.MAGMA_CUBE))
-        .addGoal(new EntityGoal(200, EntityType.PIGLIN))
-        .addGoal(new EntityGoal(200, EntityType.ENDERMAN))
+        .addGoal(new EntityGoal(100, EntityType.BLAZE))
+        .addGoal(new EntityGoal(100, EntityType.WITHER_SKELETON))
+        .addGoal(new EntityGoal(100, EntityType.MAGMA_CUBE))
+        .addGoal(new EntityGoal(100, EntityType.PIGLIN))
 
         .register(ranks);
 
@@ -96,8 +99,8 @@ public class SwordRanks {
             )
         )
         .addUpgrade(new ModifierUpgrade(1, 2))
-        // Removed bal upgrade: 12_500 rhines
-        // Removed gem upgrade: 1000 gems
+        .addUpgrade(new RhineReward(10_000))
+        .addUpgrade(new GemReward(250))
 
         .addGoal(new DungeonBossGoal(Bosses.ZHAMBIE))
         .addGoal(new DungeonBossGoal(Bosses.SKALATAN))
@@ -119,8 +122,8 @@ public class SwordRanks {
         )
         .addUpgrade(new EnchantUpgrade(Enchantment.LOOT_BONUS_MOBS, 4))
         .addUpgrade(new ModifierUpgrade(1.5D, 5))
-        // Removed bal upgrade: 10_000 rhines
-        // Removed gem upgrade: 1000 gems
+        .addUpgrade(new RhineReward(10_000))
+        .addUpgrade(new GemReward(250))
 
         .addGoal(new EntityGoal(100, EntityType.SNOWMAN))
 
@@ -128,23 +131,30 @@ public class SwordRanks {
 
     // --- RANK  6 ---
     SwordRank.builder(DONATOR_RANK)
-        .addGoal(new EntityGoal(200, EntityType.GHAST))
+        .addGoal(new EntityGoal(120, EntityType.GHAST))
         .addGoal(new DonatorWeaponGoal())
         .register(ranks);
 
     // --- RANK  7 ---
     SwordRank.builder(7)
+        .addUpgrade(new RhineReward(12_000))
+        .addUpgrade(new GemReward(250))
         .addGoal(new ChargedCreeperGoal(25))
         .register(ranks);
 
     // --- RANK  8 ---
     SwordRank.builder(8)
+        .addUpgrade(new RhineReward(15_000))
+        .addUpgrade(new GemReward(250))
+
         .addGoal(new EntityGoal(10, EntityType.WITHER))
         .register(ranks);
 
     // --- RANK  9 ---
     SwordRank.builder(9)
-        .addGoal(new EntityGoal(10, EntityType.ENDER_DRAGON))
+        .addGoal(new EntityGoal(5, EntityType.ENDER_DRAGON))
+        .addGoal(new EntityGoal(300, EntityType.ENDERMAN))
+        .addGoal(new EntityGoal(50, EntityType.SHULKER))
         .register(ranks);
 
     ModifierFunction
@@ -167,6 +177,9 @@ public class SwordRanks {
         .addUpgrade(new EnchantUpgrade(Enchantment.LOOT_BONUS_MOBS, 5))
         .addUpgrade(new ModifierUpgrade(speed.apply(10), attack.apply(10)))
 
+        .addUpgrade(new RhineReward(15_000))
+        .addUpgrade(new GemReward(250))
+
         // Removed bal upgrade: 15_000 rhines
         // Removed gem upgrade: 1000 gems
 
@@ -178,14 +191,18 @@ public class SwordRanks {
         // Removed bal upgrade: 25_000 rhines
         // Removed gem upgrade: 1000 gems
 
+        .addUpgrade(new RhineReward(20_000))
+        .addUpgrade(new GemReward(500))
+
         .addGoal(new EntityGoal(25_000, null))
         .register(ranks);
 
     // --- RANK 12 ---
     SwordRank.builder(12)
         .addUpgrade(new ModifierUpgrade(speed.apply(12), attack.apply(12)))
-        // Removed bal upgrade: 35_000 rhines
-        // Removed gem upgrade: 2000 gems
+
+        .addUpgrade(new RhineReward(25_000))
+        .addUpgrade(new GemReward(450))
 
         .addGoal(new EntityGoal(20, EntityType.WANDERING_TRADER))
         .register(ranks);
@@ -193,8 +210,9 @@ public class SwordRanks {
     // --- RANK 13 ---
     SwordRank.builder(13)
         .addUpgrade(new ModifierUpgrade(speed.apply(13), attack.apply(13)))
-        // Removed bal upgrade: 100_000 rhines
-        // Removed gem upgrade: 2000 gems
+
+        .addUpgrade(new RhineReward(25_000))
+        .addUpgrade(new GemReward(500))
 
         .addGoal(new EntityGoal(50, EntityType.RAVAGER))
         .addGoal(new EntityGoal(50, EntityType.EVOKER))
@@ -212,8 +230,8 @@ public class SwordRanks {
       SwordRank.builder(i)
           .addUpgrade(new ModifierUpgrade(speed.apply(i), attack.apply(i)))
           .addUpgrade(EndBossUpgrade.endBoss(i))
-          // Removed bal upgrade: i * 5000 rhines
-          // Removed gem upgrade: i * 100 gems
+          .addUpgrade(new GemReward(i * 50))
+          .addUpgrade(new RhineReward(i * 2500))
 
           .addGoal(new EntityGoal(endGoal, EntityType.ENDER_DRAGON))
           .addGoal(new EntityGoal(endGoal, EntityType.WITHER))
