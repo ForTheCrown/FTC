@@ -5,9 +5,12 @@ import static net.kyori.adventure.text.Component.text;
 
 import com.google.common.base.Strings;
 import java.text.SimpleDateFormat;
-import java.time.chrono.ChronoZonedDateTime;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 import net.forthecrown.text.Text;
+import net.forthecrown.utils.Time;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
@@ -25,8 +28,25 @@ class DateFormatType implements TextFormatType {
       return format(date, style);
     }
 
-    if (value instanceof ChronoZonedDateTime dateTime) {
-      return format(dateTime.toInstant().toEpochMilli(), style);
+    if (value instanceof TemporalAccessor acc) {
+      TemporalAccessor formatObject;
+
+      if (acc instanceof Instant instant) {
+        formatObject = Time.dateTime(instant.toEpochMilli());
+      } else {
+        formatObject = acc;
+      }
+
+      DateTimeFormatter formatter;
+
+      if (Strings.isNullOrEmpty(style)) {
+        formatter = Text.DATE_TIME_FORMATTER;
+      } else {
+        formatter = DateTimeFormatter.ofPattern(style);
+      }
+
+      String str = formatter.format(formatObject);
+      return text(str);
     }
 
     return DEFAULT.resolve(value, style, audience);

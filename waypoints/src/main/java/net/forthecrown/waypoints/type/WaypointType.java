@@ -64,7 +64,7 @@ public abstract class WaypointType {
 
   }
 
-  public void onCreate(User creator) throws CommandSyntaxException {
+  public void onCreate(User creator, Vector3i topPos) throws CommandSyntaxException {
 
   }
 

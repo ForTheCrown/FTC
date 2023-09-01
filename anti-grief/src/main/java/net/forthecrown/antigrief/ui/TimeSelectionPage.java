@@ -8,6 +8,7 @@ import static net.forthecrown.antigrief.ui.AdminUi.TIME_MULTIPLIER;
 import static net.forthecrown.menu.Menus.DEFAULT_INV_SIZE;
 import static net.forthecrown.text.Text.format;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -55,7 +56,7 @@ class TimeSelectionPage extends MenuPage {
               })
 
               .setRunnable((user, context, click) -> {
-                long length = context.getOrThrow(TIME_MULTIPLIER) * o.inMillis;
+                Duration length = o.getDuration(context.getOrThrow(TIME_MULTIPLIER));
 
                 var entry = context.get(ENTRY);
 
@@ -126,6 +127,10 @@ class TimeSelectionPage extends MenuPage {
       }
 
       return UnitFormat.unit(multiplier, name);
+    }
+
+    public Duration getDuration(int multiplier) {
+      return Duration.ofMillis(multiplier * inMillis);
     }
   }
 }

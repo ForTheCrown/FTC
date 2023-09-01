@@ -45,6 +45,10 @@ public class BlockInfo {
 
   /* ----------------------------- METHODS ------------------------------ */
 
+  public boolean hasTag() {
+    return tag != null && !tag.isEmpty();
+  }
+
   /**
    * Gets the block state of this block info
    *
@@ -72,6 +76,10 @@ public class BlockInfo {
 
   static CompoundTag copyTag(CompoundTag tag) {
     return tag == null ? null : tag.copy();
+  }
+
+  public CompoundTag getTag() {
+    return copyTag(tag);
   }
 
   /* ----------------------------- CLONE METHODS ------------------------------ */

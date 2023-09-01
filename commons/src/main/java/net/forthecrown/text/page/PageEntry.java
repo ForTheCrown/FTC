@@ -25,7 +25,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
  *
  * @param <T> The type the entry formats
  * @see PageFormat
- * @see PageEntryIterator
+ * @see PagedIterator
  */
 @Getter
 @Setter
@@ -56,7 +56,7 @@ public class PageEntry<T> {
     return PageEntry.<T>create().setEntryDisplay(display);
   }
 
-  public void write(PageEntryIterator<T> it, T entry,
+  public void write(PagedIterator<T> it, T entry,
                     TextWriter writer,
                     Context context
   ) {
@@ -80,7 +80,7 @@ public class PageEntry<T> {
                T entry,
                int viewerIndex,
                Context context,
-               PageEntryIterator<T> it
+               PagedIterator<T> it
     );
   }
 
@@ -90,6 +90,6 @@ public class PageEntry<T> {
       return Component.text(viewerIndex + ")", NamedTextColor.YELLOW);
     };
 
-    Component createIndex(int viewerIndex, T entry, PageEntryIterator<T> it);
+    Component createIndex(int viewerIndex, T entry, PagedIterator<T> it);
   }
 }

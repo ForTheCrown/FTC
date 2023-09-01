@@ -1,4 +1,4 @@
-import net.forthecrown.gradle.API_VERSION
+import net.forthecrown.gradle.MC_VERSION
 
 plugins {
   java
@@ -10,7 +10,11 @@ repositories {
 }
 
 dependencies {
-  paperweight.paperDevBundle("${API_VERSION}-R0.1-SNAPSHOT")
+  paperweight.paperDevBundle("${MC_VERSION}-R0.1-SNAPSHOT")
+}
+
+ftc {
+  implementedBy("core")
 }
 
 tasks {

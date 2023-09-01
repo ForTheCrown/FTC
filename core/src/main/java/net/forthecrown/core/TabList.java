@@ -15,11 +15,11 @@ import net.forthecrown.text.TextInfo;
 import net.forthecrown.user.NameRenderFlags;
 import net.forthecrown.user.Properties;
 import net.forthecrown.user.Users;
+import net.forthecrown.user.name.DisplayIntent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.apache.commons.lang3.tuple.Triple;
 import org.bukkit.Bukkit;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -69,7 +69,7 @@ public final class TabList {
    *
    * @return The formatted tab list display
    */
-  public static Triple<Component, Component, Component> createHeaderFooter() {
+  public static TabInfo createHeaderFooter() {
     int largestPlayerName = 0;
     int playerCount = 0;
     int vanishedCount = 0;
@@ -93,7 +93,11 @@ public final class TabList {
         playerNameSize += TextInfo.getPxWidth(String.valueOf(score));
       }
 
-      Component displayName = u.displayName(null, EnumSet.allOf(NameRenderFlags.class));
+      Component displayName = u.displayName(
+          null,
+          EnumSet.allOf(NameRenderFlags.class),
+          DisplayIntent.TABLIST
+      );
 
       playerNameSize += TextInfo.getPxWidth(Text.plain(displayName));
       largestPlayerName = Math.max(largestPlayerName, playerNameSize);
@@ -148,10 +152,10 @@ public final class TabList {
       );
     }
 
-    var footer = createFooter(playerCount + vanishedCount);
-    var vanishedFooter = vanishedCount == 0 ? null : createFooter(playerCount);
+    var adminFooter = createFooter(playerCount + vanishedCount);
+    var normalFooter = vanishedCount == 0 ? null : createFooter(playerCount);
 
-    return Triple.of(header.build(), footer, vanishedFooter);
+    return new TabInfo(header.build(), adminFooter, normalFooter);
   }
 
   private static Component createFooter(int count) {
@@ -172,14 +176,18 @@ public final class TabList {
     // Middle - admin footer
     // Right - regular footer, null, if no vanished users
     // admin footer = Footer that includes vanished users
-    var triple = createHeaderFooter();
+    TabInfo info = createHeaderFooter();
 
     for (var u : Users.getOnline()) {
-      if (triple.getRight() == null || u.hasPermission(Permissions.VANISH_SEE)) {
-        u.sendPlayerListHeaderAndFooter(triple.getLeft(), triple.getMiddle());
+      if (info.normalFooter() == null || u.hasPermission(Permissions.VANISH_SEE)) {
+        u.sendPlayerListHeaderAndFooter(info.header(), info.adminFooter());
       } else {
-        u.sendPlayerListHeaderAndFooter(triple.getLeft(), triple.getRight());
+        u.sendPlayerListHeaderAndFooter(info.header(), info.normalFooter());
       }
     }
+  }
+
+  public record TabInfo(Component header, Component adminFooter, Component normalFooter) {
+
   }
 }

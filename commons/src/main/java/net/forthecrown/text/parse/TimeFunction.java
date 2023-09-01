@@ -19,7 +19,9 @@ public class TimeFunction extends TextFunction {
   public static final String PRESENT = "present";
 
   public TimeFunction() {
-    super(Pattern.compile("<t[:=](-?[0-9]+|present)(?::([tTdDfFR]))?>"));
+    super(
+        Pattern.compile("<t[:=](-?[0-9]+|(?:present(?:[-+][0-9]+[a-zA-Z]?)?))(?::([tTdDfFR]))?>")
+    );
   }
 
   @Override

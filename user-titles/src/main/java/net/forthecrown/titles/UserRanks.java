@@ -5,6 +5,7 @@ import static net.forthecrown.titles.RankTier.NONE;
 import static net.forthecrown.titles.RankTier.TIER_1;
 import static net.forthecrown.titles.RankTier.TIER_2;
 import static net.forthecrown.titles.RankTier.TIER_3;
+import static net.forthecrown.titles.TitleSettings.SEE_RANKS;
 import static net.kyori.adventure.text.Component.text;
 
 import com.google.gson.JsonElement;
@@ -16,6 +17,8 @@ import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.registry.RegistryListener;
 import net.forthecrown.text.Text;
+import net.forthecrown.user.name.DisplayContext;
+import net.forthecrown.user.name.DisplayIntent;
 import net.forthecrown.utils.Result;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
@@ -307,6 +310,13 @@ public final class UserRanks {
    */
   public static void clearNonConstants() {
     REGISTRY.removeIf(h -> h.getValue().isReloadable());
+  }
+
+  public static boolean showRank(DisplayContext context) {
+    // Don't display rank prefix if the user has disabled it,
+    // only in certain circumstances though
+    return !context.intentMatches(DisplayIntent.UNSET, DisplayIntent.HOVER_TEXT)
+         || context.viewerProperty(SEE_RANKS);
   }
 
   public static Result<UserRank> deserialize(JsonElement element) {

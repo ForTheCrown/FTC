@@ -89,7 +89,10 @@ public final class Components {
       return ObjectBooleanPair.of(nameValue, redirectAlts);
     }
 
-    String result = type.getSimpleName().replace("User", "");
+    String result = type.getSimpleName()
+        .replace("User", "")
+        .replace("Impl", "");
+
     char first = result.charAt(0);
 
     return ObjectBooleanPair.of(

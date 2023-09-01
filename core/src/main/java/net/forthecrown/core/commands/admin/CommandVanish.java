@@ -7,7 +7,7 @@ import java.util.Map;
 import net.forthecrown.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.annotations.Argument;
-import net.forthecrown.grenadier.annotations.CommandData;
+import net.forthecrown.grenadier.annotations.CommandFile;
 import net.forthecrown.grenadier.annotations.VariableInitializer;
 import net.forthecrown.text.Messages;
 import net.forthecrown.text.format.FormatBuilder;
@@ -18,7 +18,7 @@ import net.forthecrown.user.event.UserLeaveEvent;
 import net.forthecrown.user.event.UserLogEvent;
 import org.bukkit.event.player.PlayerQuitEvent.QuitReason;
 
-@CommandData("file = 'commands/vanish.gcn'")
+@CommandFile("commands/vanish.gcn")
 public class CommandVanish {
 
   @VariableInitializer

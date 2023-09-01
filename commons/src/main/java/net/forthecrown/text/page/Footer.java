@@ -18,14 +18,14 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * A formatter used to format {@link PageEntryIterator} page footers.
+ * A formatter used to format {@link PagedIterator} page footers.
  * <p>
  * This formatter specifically only deals with the part of a page that comes after the entries, for
  * example, this would format the border, page buttons and page numbers that are at the bottom of a
  * text displayed by a command like <code>/baltop</code>
  *
  * @see PageFormat
- * @see PageEntryIterator
+ * @see PagedIterator
  */
 @Getter
 @AllArgsConstructor(staticName = "of")
@@ -76,7 +76,7 @@ public class Footer implements PageElement {
   }
 
   @Override
-  public void write(PageEntryIterator it, TextWriter writer, Context context) {
+  public void write(PagedIterator it, TextWriter writer, Context context) {
     if (border != null) {
       writer.write(border);
     }

@@ -8,6 +8,7 @@ import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import net.forthecrown.user.User;
 import net.forthecrown.utils.PluginUtil;
 
 /**
@@ -61,6 +62,10 @@ public final class FtcDiscord {
 
   public static UUID getPlayerId(Member member) {
     return getPlayerId(member.getId());
+  }
+
+  public static Optional<Member> getUserMember(User user) {
+    return getUserMember(user.getUniqueId());
   }
 
   public static Optional<Member> getUserMember(UUID playerId) {

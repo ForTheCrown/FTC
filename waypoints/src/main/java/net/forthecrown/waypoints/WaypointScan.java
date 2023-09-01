@@ -34,6 +34,7 @@ public final class WaypointScan {
   public static Result scan(Waypoint waypoint) {
     if (waypoint.getType() == WaypointTypes.ADMIN
         || waypoint.get(WaypointProperties.INVULNERABLE)
+        || !waypoint.getType().isBuildable()
     ) {
       LOGGER.debug("scan={} is invulnerable", waypoint);
       return CANNOT_BE_DESTROYED;

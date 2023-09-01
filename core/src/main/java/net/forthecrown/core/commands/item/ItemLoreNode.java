@@ -16,6 +16,12 @@ import net.forthecrown.core.CoreExceptions;
 import net.forthecrown.core.CoreMessages;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Completions;
+import net.forthecrown.text.Text;
+import net.forthecrown.text.TextWriters;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.apache.commons.lang3.Range;
 
 public class ItemLoreNode extends ItemModifierNode {
@@ -37,6 +43,12 @@ public class ItemLoreNode extends ItemModifierNode {
             .addInfo("Adds <text> to your held item's lore")
     );
 
+    factory.usage("display")
+        .addInfo("Displays the lore of the item you're holding with index numbers");
+
+    factory.usage("set <index> <text>")
+        .addInfo("Sets the lore on the specified line of the item you're holding");
+
     factory.usage("remove <index>")
         .addInfo("Removes the lore on the given line");
 
@@ -50,6 +62,30 @@ public class ItemLoreNode extends ItemModifierNode {
   @Override
   public void create(LiteralArgumentBuilder<CommandSource> command) {
     command
+        .then(literal("display")
+            .executes(c -> {
+              var held = getHeld(c.getSource());
+              var lore = held.lore();
+
+              if (lore == null || lore.isEmpty()) {
+                throw Exceptions.NOTHING_TO_LIST;
+              }
+
+              var writer = TextWriters.newWriter();
+              writer.setStyle(Style.style(NamedTextColor.DARK_PURPLE, TextDecoration.ITALIC));
+
+              for (int i = 0; i < lore.size(); i++) {
+                var line = lore.get(i);
+                int viewerIndex = i + 1;
+
+                writer.formattedLine("&7{0, number})&r {1}", viewerIndex, line);
+              }
+
+              c.getSource().sendMessage(writer.asComponent());
+              return 0;
+            })
+        )
+
         .then(literal("clear")
             .executes(c -> {
               var held = getHeld(c.getSource());
@@ -78,6 +114,38 @@ public class ItemLoreNode extends ItemModifierNode {
                   c.getSource().sendSuccess(CoreMessages.addedLore(message));
                   return 0;
                 })
+            )
+        )
+
+        .then(literal("set")
+            .then(argument("index", IntegerArgumentType.integer(1))
+                .suggests(suggestLoreIndexes())
+
+                .then(argument("text", Arguments.CHAT)
+                    .executes(c -> {
+                      var held = getHeld(c.getSource());
+                      var lore = held.lore();
+
+                      if (lore == null || lore.isEmpty()) {
+                        throw Exceptions.create("No lore on the item");
+                      }
+
+                      int index = c.getArgument("index", Integer.class);
+                      Component text = Arguments.getMessage(c, "text").asComponent();
+
+                      Commands.ensureIndexValid(index, lore.size());
+
+                      lore.set(index-1, text);
+                      held.lore(lore);
+
+                      c.getSource().sendSuccess(
+                          Text.format("Set lore line &e{0, number}&r to '&f{1}&r'",
+                              NamedTextColor.GRAY, index, text
+                          )
+                      );
+                      return 0;
+                    })
+                )
             )
         )
 

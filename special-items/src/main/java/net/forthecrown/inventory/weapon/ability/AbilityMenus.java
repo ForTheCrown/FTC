@@ -13,16 +13,17 @@ import java.util.Set;
 import lombok.Getter;
 import net.forthecrown.command.Exceptions;
 import net.forthecrown.inventory.ExtendedItems;
+import net.forthecrown.inventory.ItemUserProperties;
 import net.forthecrown.inventory.weapon.RoyalSword;
 import net.forthecrown.menu.ClickContext;
 import net.forthecrown.menu.MenuBuilder;
 import net.forthecrown.menu.MenuFlag;
 import net.forthecrown.menu.MenuNode;
 import net.forthecrown.menu.Menus;
+import net.forthecrown.menu.Slot;
 import net.forthecrown.menu.page.MenuPage;
 import net.forthecrown.registry.Holder;
 import net.forthecrown.text.Text;
-import net.forthecrown.user.Properties;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.context.Context;
@@ -31,7 +32,6 @@ import net.forthecrown.utils.context.ContextSet;
 import net.forthecrown.utils.inventory.ItemArrayList;
 import net.forthecrown.utils.inventory.ItemList;
 import net.forthecrown.utils.inventory.ItemStacks;
-import net.forthecrown.menu.Slot;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
@@ -148,7 +148,7 @@ public class AbilityMenus extends MenuPage {
     builder.add(ANIM_TOGGLE_SLOT,
         MenuNode.builder()
             .setItem((user, context) -> {
-              boolean playAnim = !user.get(Properties.SKIP_ABILITY_ANIM);
+              boolean playAnim = !user.get(ItemUserProperties.SKIP_ABILITY_ANIM);
 
               var iBuilder = ItemStacks.builder(
                   playAnim
@@ -173,7 +173,7 @@ public class AbilityMenus extends MenuPage {
 
             .setRunnable((user, context, click) -> {
               click.cancelEvent(true);
-              user.flip(Properties.SKIP_ABILITY_ANIM);
+              user.flip(ItemUserProperties.SKIP_ABILITY_ANIM);
 
               // Don't reload inventory, might remove items they placed in it,
               // instead just modify this option's item 1 tick after the click
@@ -247,11 +247,11 @@ public class AbilityMenus extends MenuPage {
         })
 
         // Give all items back to user when inventory is closed
-        .setCloseCallback((inventory, user, reason) -> {
+        .setCloseCallback((inventory, ctx, user, reason) -> {
           opened = false;
 
           for (var s: RESERVED_SLOTS) {
-            ItemStack item = inventory.getItem(s);
+            ItemStack item = inventory.getItem(s.getIndex());
 
             if (ItemStacks.isEmpty(item)) {
               continue;
@@ -263,11 +263,7 @@ public class AbilityMenus extends MenuPage {
               continue;
             }
 
-            Util.giveOrDropItem(
-                user.getInventory(),
-                user.getLocation(),
-                item
-            );
+            ItemStacks.giveOrDrop(user.getInventory(), item);
           }
         })
         .build();
@@ -277,19 +273,16 @@ public class AbilityMenus extends MenuPage {
   protected void addBorder(MenuBuilder builder) {}
 
   @Override
-  public @Nullable ItemStack createItem(@NotNull User user,
-                                        @NotNull Context context
-  ) {
+  public @Nullable ItemStack createItem(@NotNull User user, @NotNull Context context) {
     return ItemStacks.builder(Material.BREWING_STAND)
         .setName("&eUpgrade crafting menu")
         .addLore("&7Back to main menu")
         .build();
   }
 
-  private static void onCraftClick(User user,
-                                   Context context,
-                                   ClickContext click
-  ) throws CommandSyntaxException {
+  private static void onCraftClick(User user, Context context, ClickContext click)
+      throws CommandSyntaxException
+  {
     click.cancelEvent(true);
     var matching = matchingAbility(click.getInventory(), user);
 
@@ -352,7 +345,7 @@ public class AbilityMenus extends MenuPage {
     ItemList menuItems = new ItemArrayList();
 
     for (var slot: SLOTS) {
-      var ingredient = click.getInventory().getItem(slot);
+      var ingredient = click.getInventory().getItem(slot.getIndex());
 
       if (ItemStacks.isEmpty(ingredient)) {
         continue;
@@ -363,7 +356,7 @@ public class AbilityMenus extends MenuPage {
 
     menuItems.removeAllMatching(items);
 
-    boolean playAnim = !user.get(Properties.SKIP_ABILITY_ANIM);
+    boolean playAnim = !user.get(ItemUserProperties.SKIP_ABILITY_ANIM);
 
     if (playAnim) {
       AbilityAnimation.getInstance().start(

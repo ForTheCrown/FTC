@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.DataResult;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -62,22 +61,13 @@ public class MinecraftAssetDownloader {
     JsonObject assetObjects;
 
     try {
-      assetObjects = downloadJson(assetIndex)
-          .getAsJsonObject()
-          .getAsJsonObject("objects");
+      assetObjects = downloadJson(assetIndex).getAsJsonObject().getAsJsonObject("objects");
     } catch (IOException exc) {
-      LOGGER.error("Error downloading asset index for version '{}'",
-          gameVersion,
-          exc
-      );
-
+      LOGGER.error("Error downloading asset index for version '{}'", gameVersion, exc);
       return;
     }
 
-    LOGGER.info("Beginning asset download of MC assets for version {}",
-        gameVersion
-    );
-
+    LOGGER.info("Beginning asset download of MC assets for version {}", gameVersion);
     downloadAssets(assetObjects);
 
     LOGGER.info(

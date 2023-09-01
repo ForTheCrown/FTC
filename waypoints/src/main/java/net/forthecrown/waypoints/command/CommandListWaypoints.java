@@ -12,7 +12,7 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.text.page.Footer;
 import net.forthecrown.text.page.PageEntry;
-import net.forthecrown.text.page.PageEntryIterator;
+import net.forthecrown.text.page.PagedIterator;
 import net.forthecrown.text.page.PageFormat;
 import net.forthecrown.waypoints.WPermissions;
 import net.forthecrown.waypoints.Waypoint;
@@ -108,7 +108,7 @@ public class CommandListWaypoints extends FtcCommand {
     });
 
     Commands.ensurePageValid(--page, pageSize, waypoints.size());
-    var it = PageEntryIterator.of(waypoints, page, pageSize);
+    var it = PagedIterator.of(waypoints, page, pageSize);
 
     var text = waypointPageFormat.format(it);
     source.sendMessage(text);

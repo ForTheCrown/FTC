@@ -1,6 +1,5 @@
 package net.forthecrown.text;
 
-import io.papermc.paper.chat.ChatRenderer.ViewerUnaware;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
@@ -18,7 +17,7 @@ public interface ViewerAwareMessage extends ComponentLike {
    * @return Wrapped text
    */
   static ViewerAwareMessage wrap(Component component) {
-    return viewer -> component;
+    return new WrappedComponent(component);
   }
 
   /**
@@ -32,5 +31,18 @@ public interface ViewerAwareMessage extends ComponentLike {
   @NotNull
   default Component asComponent() {
     return create(null);
+  }
+
+  record WrappedComponent(Component text) implements ViewerAwareMessage {
+
+    @Override
+    public Component create(@Nullable Audience viewer) {
+      return text;
+    }
+
+    @Override
+    public @NotNull Component asComponent() {
+      return text;
+    }
   }
 }

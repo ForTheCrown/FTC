@@ -2,17 +2,18 @@ package net.forthecrown.titles.commands;
 
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import net.forthecrown.command.Commands;
 import net.forthecrown.command.Exceptions;
 import net.forthecrown.command.arguments.RegistryArguments;
-import net.forthecrown.command.arguments.UserParseResult;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.annotations.Argument;
 import net.forthecrown.grenadier.annotations.CommandData;
 import net.forthecrown.grenadier.annotations.VariableInitializer;
 import net.forthecrown.grenadier.types.ArgumentTypes;
+import net.forthecrown.grenadier.types.ArrayArgument;
 import net.forthecrown.registry.Holder;
 import net.forthecrown.text.Text;
 import net.forthecrown.text.TextJoiner;
@@ -32,22 +33,24 @@ import org.bukkit.plugin.java.JavaPlugin;
 @CommandData("file = titles_command.gcn")
 public class TitlesCommand {
 
+  static final String ADMIN_PERMISSION = "ftc.commands.ranks.admin";
+
   static final String ARG = "user";
   static final String TITLE = "title";
+  static final String TITLES = "titles";
   static final String TIER = "tier";
 
   @VariableInitializer
   void createVars(Map<String, Object> map) {
     map.put("tier", ArgumentTypes.enumType(RankTier.class));
 
-    ArgumentType<Holder<UserRank>> rankType
-        = new RegistryArguments<>(UserRanks.REGISTRY, "UserRank");
+    ArgumentType<Holder<UserRank>> rankType = new RegistryArguments<>(UserRanks.REGISTRY, "Rank");
 
-    map.put("title", ArgumentTypes.map(rankType, Holder::getValue));
-  }
+    ArgumentType<UserRank> mapped = ArgumentTypes.map(rankType, Holder::getValue);
+    ArrayArgument<UserRank> array = ArgumentTypes.array(mapped);
 
-  User resultToUser(CommandSource source, UserParseResult result) throws CommandSyntaxException {
-    return result.get(source, false);
+    map.put("title", mapped);
+    map.put("titles", array);
   }
 
   void openMenu(CommandSource source) throws CommandSyntaxException {
@@ -103,42 +106,69 @@ public class TitlesCommand {
     );
   }
 
-  void addTitle(CommandSource source, @Argument(ARG) User user, @Argument(TITLE) UserRank rank)
-      throws CommandSyntaxException
-  {
-    ensureNotDefault(rank);
+  void addTitles(
+      CommandSource source,
+      @Argument(ARG) User user,
+      @Argument(TITLES) Collection<UserRank> ranks
+  ) throws CommandSyntaxException {
+
     UserTitles titles = user.getComponent(UserTitles.class);
 
-    if (titles.hasTitle(rank)) {
-      throw Exceptions.format("{0, user} already has the title {1}", user, rank);
+    for (UserRank rank : ranks) {
+      ensureNotDefault(rank);
+
+      if (titles.hasTitle(rank)) {
+        throw Exceptions.format("{0, user} already has the title {1}", user, rank);
+      }
     }
 
-    titles.addTitle(rank);
+    ranks.forEach(titles::addTitle);
 
-    source.sendSuccess(
-        Text.format("Gave &e{0, user}&r the &f{1}&r title.",
-            user, rank
-        )
-    );
+    if (ranks.size() == 1) {
+      source.sendSuccess(
+          Text.format("Gave &e{0, user}&r the &f{1}&r title.",
+              user, ranks.iterator().next()
+          )
+      );
+    } else {
+      source.sendSuccess(
+          Text.format("Gave &e{0, user}&r &f{1, number}&r titles.",
+              user, ranks.size()
+          )
+      );
+    }
   }
 
-  void removeTitle(CommandSource source, @Argument(ARG) User user, @Argument(TITLE) UserRank rank)
-      throws CommandSyntaxException
-  {
-    ensureNotDefault(rank);
+  void removeTitles(
+      CommandSource source,
+      @Argument(ARG) User user,
+      @Argument(TITLES) Collection<UserRank> ranks
+  ) throws CommandSyntaxException {
     UserTitles titles = user.getComponent(UserTitles.class);
 
-    if (!titles.hasTitle(rank)) {
-      throw Exceptions.format("{0, user} already doesn't have the title {1}", user, rank);
+    for (UserRank rank : ranks) {
+      ensureNotDefault(rank);
+
+      if (!titles.hasTitle(rank)) {
+        throw Exceptions.format("{0, user} already doesn't have the title {1}", user, rank);
+      }
     }
 
-    titles.removeTitle(rank);
+    ranks.forEach(titles::removeTitle);
 
-    source.sendSuccess(
-        Text.format("Removed the &f{1}&r title from &e{0, user}&r.",
-            user, rank
-        )
-    );
+    if (ranks.size() == 1) {
+      source.sendSuccess(
+          Text.format("Removed the &f{1}&r title from &e{0, user}&r.",
+              user, ranks.iterator().next()
+          )
+      );
+    } else {
+      source.sendSuccess(
+          Text.format("Removed &f{1}&r titles from &e{0, user}&r.",
+              user, ranks.size()
+          )
+      );
+    }
   }
 
   void setTier(CommandSource source, @Argument(ARG) User user, @Argument(TIER) RankTier tier)

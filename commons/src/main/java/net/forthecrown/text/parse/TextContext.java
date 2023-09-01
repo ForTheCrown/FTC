@@ -3,6 +3,7 @@ package net.forthecrown.text.parse;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
+import net.forthecrown.user.User;
 import net.kyori.adventure.audience.Audience;
 import org.bukkit.permissions.Permissible;
 
@@ -25,10 +26,18 @@ public class TextContext {
   }
 
   public static TextContext totalRender(Audience audience) {
+    if (audience == null) {
+      return TOTAL_RENDER;
+    }
     return new TextContext(audience, TOTAL_RENDER.flags);
   }
 
   public static TextContext create(Permissible textSource, Audience viewer) {
+    Set<ChatParseFlag> flags = ChatParseFlag.allApplicable(textSource);
+    return of(flags, viewer);
+  }
+
+  public static TextContext create(User textSource, Audience viewer) {
     Set<ChatParseFlag> flags = ChatParseFlag.allApplicable(textSource);
     return of(flags, viewer);
   }

@@ -41,33 +41,48 @@ class TextSplitter extends AbstractFlattenerListener {
       return;
     }
 
-    if (pattern.matcher(text).matches()) {
-      pushToResult();
-      return;
-    }
+    var matcher = pattern.matcher(text);
 
-    String[] split = pattern.split(text, -1);
+    var results = matcher.results().toList();
+    var it = results.listIterator();
 
-    if (split.length == 1) {
+    if (!it.hasNext()) {
       pushToCurrent(text);
       return;
     }
 
-    for (int i = 0; i < split.length; i++) {
-      String s = split[i];
+    while (it.hasNext()) {
+      var result = it.next();
 
-      if (s.isEmpty()) {
+      if (result.start() == 0) {
         pushToResult();
         continue;
       }
 
-      pushToCurrent(s);
+      int lastEnd;
+      it.previous();
 
-      // If not last
-      if (i != split.length - 1) {
-        pushToResult();
+      if (it.hasPrevious()) {
+        lastEnd = it.previous().end();
+        it.next();
+      } else {
+        lastEnd = 0;
       }
+
+      it.next();
+
+      String string = text.substring(lastEnd, result.start());
+      pushToCurrent(string);
+      pushToResult();
     }
+
+    var last = it.previous();
+    if (last.end() == text.length()) {
+      return;
+    }
+
+    var untilEnd = text.substring(last.end());
+    pushToCurrent(untilEnd);
   }
 
   private void pushToCurrent(String text) {

@@ -94,19 +94,15 @@ public final class SerializationHelper {
     });
   }
 
-  public static boolean readTomlAsJson(Path file, Consumer<JsonWrapper> callback) {
-    return readTomlFile(file, table -> {
-      JsonObject obj = TomlUtil.toJson(table);
-      JsonWrapper json = JsonWrapper.wrap(obj);
-      callback.accept(json);
-    });
-  }
-
   public static boolean readAsJson(Path file, Consumer<JsonWrapper> callback) {
     String fName = file.getFileName().toString();
 
     if (fName.endsWith(".toml")) {
-      return readTomlAsJson(file, callback);
+      return readTomlFile(file, table -> {
+        JsonObject obj = TomlUtil.toJson(table);
+        JsonWrapper json = JsonWrapper.wrap(obj);
+        callback.accept(json);
+      });
     } else {
       return readJsonFile(file, callback);
     }

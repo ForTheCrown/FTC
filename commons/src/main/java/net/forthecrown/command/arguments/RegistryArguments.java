@@ -10,14 +10,13 @@ import java.util.concurrent.CompletableFuture;
 import lombok.Getter;
 import net.forthecrown.command.Exceptions;
 import net.forthecrown.grenadier.Completions;
-import net.forthecrown.grenadier.internal.VanillaMappedArgument;
+import net.forthecrown.grenadier.internal.SimpleVanillaMapped;
 import net.forthecrown.registry.Holder;
 import net.forthecrown.registry.Registry;
-import net.minecraft.commands.CommandBuildContext;
 
 @Getter
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class RegistryArguments<T> implements ArgumentType<Holder<T>>, VanillaMappedArgument {
+public class RegistryArguments<T> implements ArgumentType<Holder<T>>, SimpleVanillaMapped {
 
   private final Registry<T> registry;
   private final String unknown;
@@ -47,7 +46,7 @@ public class RegistryArguments<T> implements ArgumentType<Holder<T>>, VanillaMap
   }
 
   @Override
-  public ArgumentType<?> getVanillaType(CommandBuildContext context) {
-    return Arguments.FTC_KEY.getVanillaType(context);
+  public ArgumentType<?> getVanillaType() {
+    return Arguments.FTC_KEY.getVanillaType();
   }
 }

@@ -1,6 +1,5 @@
-import net.forthecrown.gradle.API_VERSION
-import java.nio.file.Files
-import java.nio.file.StandardCopyOption
+import net.forthecrown.gradle.FtcExtension
+import net.forthecrown.gradle.MC_VERSION
 
 plugins {
   java
@@ -11,53 +10,39 @@ plugins {
 version = "1.0.0-SNAPSHOT"
 group = "net.forthecrown"
 
-val grenadier      = "net.forthecrown:grenadier:2.1.1"
-val grenadierAnnot = "net.forthecrown:grenadier-annotations:1.2.1"
+val grenadier      = "net.forthecrown:grenadier:2.1.3"
+val grenadierAnnot = "net.forthecrown:grenadier-annotations:1.2.2"
 val mathlib        = "org.spongepowered:math:2.1.0-SNAPSHOT"
 val toml           = "org.tomlj:tomlj:1.1.0"
 val configurate    = "org.spongepowered:configurate-core:4.1.2"
-val apiVersion     = API_VERSION
+val apiVersion     = MC_VERSION
 
 repositories {
   mavenCentral()
 }
 
-task("build-all") {
-  description = "Builds all modules"
+val buildAll = task("build-all-plugins") {
   group = "build"
-
-  subprojects {
-    dependsOn(":${this.name}:build")
-  }
-
-  doLast {
-    childProjects.values.forEach {
-      val base = it.extensions.findByType(BasePluginExtension::class.java)!!
-      val jarName = "libs/${base.archivesName.get()}-${it.version}.jar"
-
-      val buildFile = it.file("${it.buildDir}/$jarName")
-      val path = buildFile.toPath();
-      val outPath = buildDir.toPath().resolve(jarName)
-
-      if (Files.notExists(path)) {
-        return@forEach
-      }
-
-      Files.copy(path, outPath, StandardCopyOption.REPLACE_EXISTING)
-    }
-  }
+  description = "Builds all plugin modules"
 }
 
 subprojects {
   apply(plugin = "java")
   apply(plugin = "io.freefair.lombok")
-
-  if (name != "commons" && name != "class-loader-tools") {
-    apply(plugin = "ftc_plugin")
-  }
+  apply(plugin = "ftc_plugin")
 
   group = rootProject.group
   version = rootProject.version
+
+  afterEvaluate {
+    val ftcExtension = this.extensions.findByType(FtcExtension::class.java) ?: return@afterEvaluate
+
+    if (ftcExtension.skipDependency || !ftcExtension.apiFor.isNullOrEmpty()) {
+      return@afterEvaluate
+    }
+
+    buildAll.dependsOn(":${this.name}:buildAndCopyToRoot")
+  }
 
   repositories {
     mavenCentral()
@@ -66,7 +51,11 @@ subprojects {
   }
 
   dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.20-R0.1-SNAPSHOT")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
+    testImplementation("com.google.guava:guava:32.1.2-jre")
+    testImplementation("io.papermc.paper:paper-api:${apiVersion}-R0.1-SNAPSHOT")
+
+    compileOnly("io.papermc.paper:paper-api:${apiVersion}-R0.1-SNAPSHOT")
 
     compileOnly(grenadier)
     compileOnly(grenadierAnnot)
@@ -95,6 +84,8 @@ subprojects {
     compileJava {
       options.encoding = Charsets.UTF_8.name()
       options.release.set(17)
+      options.compilerArgs.add("-Xmaxerrs")
+      options.compilerArgs.add("3000")
     }
 
     processResources {

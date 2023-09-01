@@ -8,6 +8,12 @@ import net.forthecrown.text.TextWriter;
 public interface HelpEntry extends Predicate<CommandSource> {
 
   /**
+   * Gets the entry's main label
+   * @return Main label
+   */
+  String getMainLabel();
+
+  /**
    * Writes this entry's short text.
    * <p>
    * When multiple results are found in a help map query, this will be called

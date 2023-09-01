@@ -2,10 +2,10 @@ package net.forthecrown.text.format;
 
 import static net.forthecrown.text.UnitFormat.UNIT_GEM;
 import static net.forthecrown.text.UnitFormat.UNIT_RHINE;
-import static net.kyori.adventure.text.Component.blockNBT;
 import static net.kyori.adventure.text.Component.text;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.Set;
@@ -15,14 +15,20 @@ import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.text.PeriodFormat;
 import net.forthecrown.text.Text;
-import net.forthecrown.text.ViewerAwareMessage;
 import net.forthecrown.user.NameRenderFlags;
 import net.forthecrown.user.User;
+import net.forthecrown.user.UserLookup;
 import net.forthecrown.user.Users;
+import net.forthecrown.user.name.DisplayIntent;
+import net.forthecrown.user.name.UserNameFactory;
 import net.forthecrown.utils.Time;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
+import org.spongepowered.math.vector.Vectord;
+import org.spongepowered.math.vector.Vectorf;
+import org.spongepowered.math.vector.Vectori;
+import org.spongepowered.math.vector.Vectorl;
 
 public class TextFormatTypes {
 
@@ -130,6 +136,8 @@ public class TextFormatTypes {
       time = duration.toMillis();
     } else if (value instanceof Number number) {
       time = number.longValue();
+    } else if (value instanceof Instant instant) {
+      time = instant.toEpochMilli();
     } else {
       return DEFAULT.resolve(value, style, audience);
     }
@@ -168,6 +176,9 @@ public class TextFormatTypes {
    * - If the style contains the '-realName' argument,
    *   then this will use {@link User#displayName()} to
    *   format the display name.
+   *
+   * - If the style contains '-flat' the returned name
+   *   will have no hover event
    * </pre>
    * <p>
    * This argument accepts a {@link User}, {@link UUID}, {@link OfflinePlayer} and a
@@ -178,6 +189,8 @@ public class TextFormatTypes {
    */
   public static TextFormatType USER = (value, style, audience) -> {
     boolean nickname = style.isBlank() || !style.contains("-realName");
+    boolean flat = style.contains("-flat");
+
     User user;
 
     if (value instanceof User user1) {
@@ -185,7 +198,14 @@ public class TextFormatTypes {
     } else if (value instanceof OfflinePlayer player) {
       user = Users.get(player);
     } else if (value instanceof UUID uuid) {
-      user = Users.get(uuid);
+      UserLookup lookup = Users.getService().getLookup();
+      var entry = lookup.getEntry(uuid);
+
+      if (entry == null) {
+        return Text.valueOf(value, audience);
+      }
+
+      user = Users.get(entry);
     } else if (value instanceof CommandSource source) {
       if (!source.isPlayer()) {
         return source.displayName();
@@ -197,12 +217,22 @@ public class TextFormatTypes {
     }
 
     Set<NameRenderFlags> flags = EnumSet.noneOf(NameRenderFlags.class);
+    DisplayIntent intent;
+
+    if (flat) {
+      intent = DisplayIntent.HOVER_TEXT;
+    } else {
+      intent = DisplayIntent.UNSET;
+    }
 
     if (nickname) {
       flags.add(NameRenderFlags.ALLOW_NICKNAME);
     }
 
-    return user.displayName(audience, flags);
+    UserNameFactory factory = Users.getService().getNameFactory();
+    var ctx = factory.createContext(user, audience, flags).withIntent(intent);
+
+    return factory.formatDisplayName(user, ctx);
   };
 
   /**
@@ -255,6 +285,22 @@ public class TextFormatTypes {
    */
   public static final TextFormatType LOCATION = new LocationFormatType();
 
+  /**
+   * Formats a given arg to be a vector position. Example of this format's output: 'x23 y64 z89'
+   * for a {@link org.spongepowered.math.vector.Vector3i}, For something with more than 4 axes,
+   * the result would look like so: '[12, 45, 654, 85, 6545]' I don't know why you'd ever need to
+   * use a vector with more than 3 axes, but you can lmao
+   * <p>
+   * Accepts any form of vector from {@link Vectori}, {@link Vectord}, {@link Vectorf},
+   * {@link Vectorl}.
+   * <p>
+   * If the given argument is null or not one of the above-mentioned vector types,
+   * {@link Text#valueOf(Object)} is returned instead
+   */
+  public static final TextFormatType VECTOR = new VectorFormatType();
+
+  public static final TextFormatType NUMBER = new NumberType();
+
   public static final String DEFAULT_NAME = "default";
   public static final Registry<TextFormatType> formatTypes;
 
@@ -271,6 +317,8 @@ public class TextFormatTypes {
     formatTypes.register("time",      TIME);
     formatTypes.register("user",      USER);
     formatTypes.register("item",      ITEM);
+    formatTypes.register("vector",    VECTOR);
+    formatTypes.register("number",    NUMBER);
   }
 
   static TextFormatType unitFormatter(String unit) {

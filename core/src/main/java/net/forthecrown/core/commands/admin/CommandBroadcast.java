@@ -3,10 +3,13 @@ package net.forthecrown.core.commands.admin;
 import net.forthecrown.command.FtcCommand;
 import net.forthecrown.command.arguments.Arguments;
 import net.forthecrown.command.help.UsageFactory;
+import net.forthecrown.core.CorePlugin;
+import net.forthecrown.core.announcer.AutoAnnouncer;
 import net.forthecrown.grenadier.GrenadierCommand;
-import net.forthecrown.text.ChannelledMessage;
-import net.forthecrown.text.ChannelledMessage.MessageRenderer;
 import net.forthecrown.text.ViewerAwareMessage;
+import net.forthecrown.text.channel.ChannelledMessage;
+import net.forthecrown.text.placeholder.PlaceholderRenderer;
+import net.forthecrown.text.placeholder.Placeholders;
 
 public class CommandBroadcast extends FtcCommand {
 
@@ -46,10 +49,12 @@ public class CommandBroadcast extends FtcCommand {
         .then(argument("message", Arguments.CHAT)
             .executes(c -> {
               ViewerAwareMessage message = Arguments.getMessage(c, "message");
+              PlaceholderRenderer renderer = Placeholders.newRenderer().useDefaults();
+              AutoAnnouncer announcer = CorePlugin.plugin().getAnnouncer();
 
               ChannelledMessage channelled = ChannelledMessage.create(message)
                   .setBroadcast()
-                  .setRenderer(MessageRenderer.FTC_PREFIX)
+                  .setRenderer(announcer.renderer(renderer))
                   .setSource(c.getSource());
 
               channelled.send();

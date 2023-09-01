@@ -24,6 +24,7 @@ import net.forthecrown.registry.Holder;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.registry.RegistryListener;
+import net.forthecrown.user.currency.Currency;
 import net.forthecrown.user.Properties;
 import net.forthecrown.user.TimeField;
 import net.forthecrown.user.User;
@@ -40,6 +41,7 @@ import net.forthecrown.utils.ScoreIntMap.KeyValidator;
 import net.forthecrown.utils.Time;
 import net.forthecrown.utils.io.FtcCodecs;
 import net.forthecrown.utils.io.PathUtil;
+import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerQuitEvent.QuitReason;
@@ -70,6 +72,8 @@ public class UserServiceImpl implements UserService {
 
   private final Registry<UserProperty<?>> propertyRegistry;
 
+  private final Registry<Currency> currencies;
+
   private boolean componentRegistryFrozen = false;
 
   public UserServiceImpl(CorePlugin plugin) {
@@ -92,6 +96,8 @@ public class UserServiceImpl implements UserService {
     this.gems.setValidator(KeyValidator.IS_PLAYER);
     this.playtime.setValidator(KeyValidator.IS_PLAYER);
     this.votes.setValidator(KeyValidator.IS_PLAYER);
+
+    this.currencies = Registries.newFreezable();
 
     this.propertyRegistry = Registries.newFreezable();
     this.propertyRegistry.setListener(new RegistryListener<>() {
@@ -128,6 +134,10 @@ public class UserServiceImpl implements UserService {
     registerComponent(PropertyMap.class);
     registerComponent(BlockListImpl.class);
     registerComponent(UserTimestamps.class);
+    registerComponent(UserHomes.class);
+
+    currencies.register("rhines", Currency.wrap("Rhine", balances));
+    currencies.register("gems", Currency.wrap("Gem", gems));
   }
 
   public void shutdown() {
@@ -153,7 +163,7 @@ public class UserServiceImpl implements UserService {
       var user = userIt.next();
       storage.saveUser(user);
 
-      if (!user.isOnline()) {
+      if (!user.isOnline() && userMaps.isUserAutoUnloadingEnabled()) {
         userIt.remove();
       }
     }
@@ -211,7 +221,7 @@ public class UserServiceImpl implements UserService {
 
         return;
       } else {
-        LOGGER.info(
+        LOGGER.debug(
             "Adding {} seconds or {} hours to {}'s playtime",
             seconds, TimeUnit.SECONDS.toHours(seconds), user
         );
@@ -220,6 +230,7 @@ public class UserServiceImpl implements UserService {
       playtime.add(user.getUniqueId(), seconds);
     });
 
+    LOGGER.debug("calling unloadUser on onUserLeave");
     unloadUser(user);
   }
 
@@ -266,6 +277,10 @@ public class UserServiceImpl implements UserService {
   }
 
   private void executeOnAllUserInternal(Consumer<User> operation, boolean unload) {
+    if (!unload) {
+      userMaps.setUserAutoUnloadingEnabled(false);
+    }
+
     lookup.stream().forEach(entry -> {
       UserImpl user = userMaps.getUser(entry);
       operation.accept(user);
@@ -274,6 +289,13 @@ public class UserServiceImpl implements UserService {
         unloadUser(user);
       }
     });
+
+    userMaps.setUserAutoUnloadingEnabled(true);
+  }
+
+  @Override
+  public Registry<Currency> getCurrencies() {
+    return currencies;
   }
 
   @Override
@@ -294,7 +316,7 @@ public class UserServiceImpl implements UserService {
   @Override
   public Builder<UUID> createUuidProperty() {
     ensureNotFrozen();
-    return new BuilderImpl<>(FtcCodecs.STRING_UUID);
+    return new BuilderImpl<>(FtcCodecs.STRING_UUID).defaultValue(Identity.nil().uuid());
   }
 
   @Override
@@ -351,6 +373,12 @@ public class UserServiceImpl implements UserService {
   public Collection<UUID> getOtherAccounts(@NotNull UUID playerId) {
     Objects.requireNonNull(playerId);
     return altUsers.getOtherAccounts(playerId);
+  }
+
+  @Override
+  public Collection<UUID> getAltAccounts(@NotNull UUID playerId) {
+    Objects.requireNonNull(playerId);
+    return altUsers.getAlts(playerId);
   }
 
   @Override

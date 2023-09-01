@@ -7,15 +7,16 @@ import net.forthecrown.events.ChannelMessageEvent;
 import net.kyori.adventure.audience.Audience;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 class ChannelMessageListener implements Listener {
 
-  @EventHandler(ignoreCancelled = true)
+  @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
   public void onChannelMessage(ChannelMessageEvent event) {
     Audience source = event.getUserSource();
 
-    if (source == null) {
+    if (source == null || event.isAnnouncement()) {
       return;
     }
 

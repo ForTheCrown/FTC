@@ -1,35 +1,55 @@
 package net.forthecrown.utils;
 
-import io.papermc.paper.plugin.provider.source.DirectoryProviderSource;
-import io.papermc.paper.plugin.provider.type.paper.PaperPluginParent.PaperServerPluginProvider;
+import com.mojang.datafixers.DataFixer;
 import io.papermc.paper.util.StacktraceDeobfuscator;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.lang.reflect.Field;
+import java.util.Map;
+import net.forthecrown.Loggers;
 import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.nbt.paper.TagTranslators;
 import net.forthecrown.utils.math.Vectors;
+import net.minecraft.SharedConstants;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.MappedRegistry;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BannerPattern;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.CommandBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.TileState;
+import org.bukkit.block.banner.PatternType;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlockEntityState;
 import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlockStates;
+import org.bukkit.craftbukkit.v1_20_R1.block.CraftCommandBlock;
 import org.bukkit.craftbukkit.v1_20_R1.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_20_R1.util.CraftNamespacedKey;
 import org.bukkit.entity.Player;
+import org.slf4j.Logger;
 import org.spongepowered.math.vector.Vector3i;
 
 /**
@@ -37,6 +57,8 @@ import org.spongepowered.math.vector.Vector3i;
  */
 public final class VanillaAccess {
   private VanillaAccess() {}
+
+  public static final Logger LOGGER = Loggers.getLogger();
 
   /**
    * Gets a vanilla entity object
@@ -196,5 +218,76 @@ public final class VanillaAccess {
     }
 
     return c.getDeclaredField(FROZEN_FIELD);
+  }
+
+  public static void updateNeighbours(Block b) {
+    // Thank you once more, Bukkit, for not providing
+    // an API for this stuff. Cuz who could ever want
+    // to update a block state
+    Level world = VanillaAccess.getLevel(b.getWorld());
+    CraftBlock craft = (CraftBlock) b;
+    BlockPos pos = craft.getPosition();
+    BlockState state = craft.getNMS();
+
+    world.updateNeighborsAt(pos, Blocks.LEVER);
+    world.updateNeighborsAt(pos.relative(getConnectedDirection(state).getOpposite()), Blocks.LEVER);
+  }
+
+  // Copy and pasted method from LeverBlock class, it was protected there
+  // So I had to lol
+  protected static Direction getConnectedDirection(BlockState state) {
+    return switch (state.getValue(LeverBlock.FACE)) {
+      case CEILING -> Direction.DOWN;
+      case FLOOR -> Direction.UP;
+      default -> state.getValue(LeverBlock.FACING);
+    };
+  }
+
+  public static CommandSender getSender(TileState sender) {
+    CommandBlockEntity entity = ((CraftCommandBlock) sender).getTileEntity();
+    return entity.getCommandBlock().createCommandSourceStack().getBukkitSender();
+  }
+
+  public static DataFixer getFixer() {
+    return DataFixers.getDataFixer();
+  }
+
+  public static int getDataVersion() {
+    return SharedConstants.getCurrentVersion().getDataVersion().getVersion();
+  }
+
+  public static Map<PatternType, String> getPatternFilenames() {
+    Map<PatternType, String> typeFilenames = new Object2ObjectOpenHashMap<>();
+    Registry<BannerPattern> registry = BuiltInRegistries.BANNER_PATTERN;
+
+    registry.entrySet().forEach(entry -> {
+      var fileName = entry.getKey().location().getPath();
+      PatternType type = PatternType.getByIdentifier(entry.getValue().getHashname());
+
+      if (type == null) {
+        LOGGER.warn(
+            "Vanilla pattern type {} doesn't have matching bukkit value",
+            fileName
+        );
+        return;
+      }
+
+      typeFilenames.put(type, fileName);
+    });
+
+    return typeFilenames;
+  }
+
+  public static NamespacedKey getBlockEntityType(BlockData data) {
+    var state = getState(data);
+
+    Registry<BlockEntityType<?>> types = BuiltInRegistries.BLOCK_ENTITY_TYPE;
+
+    return types.holders()
+        .filter(holder -> holder.value().isValid(state))
+        .map(holder -> holder.key().location())
+        .map(CraftNamespacedKey::fromMinecraft)
+        .findFirst()
+        .orElse(null);
   }
 }

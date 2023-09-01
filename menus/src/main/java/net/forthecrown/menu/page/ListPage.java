@@ -9,7 +9,7 @@ import net.forthecrown.menu.ClickContext;
 import net.forthecrown.menu.MenuBuilder;
 import net.forthecrown.menu.MenuNode;
 import net.forthecrown.menu.Slot;
-import net.forthecrown.text.page.PageEntryIterator;
+import net.forthecrown.text.page.PagedIterator;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.context.ContextOption;
@@ -134,7 +134,7 @@ public abstract class ListPage<T> extends MenuPage {
   }
 
   protected int getMaxPage(User user, Context context, int pageSize) {
-    return PageEntryIterator.getMaxPage(pageSize, getList(user, context).size());
+    return PagedIterator.getMaxPage(pageSize, getList(user, context).size());
   }
 
   /**

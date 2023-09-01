@@ -13,6 +13,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.intellij.lang.annotations.Pattern;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,6 +46,11 @@ public class CrownType implements ExtendedItemType<RoyalCrown> {
   @Override
   public @NotNull RoyalCrown load(@NotNull CompoundTag item) {
     return new RoyalCrown(this, item);
+  }
+
+  @Override
+  public void rankUp(ItemStack itemStack, RoyalCrown value) {
+    value.upgrade(itemStack);
   }
 
   @Override

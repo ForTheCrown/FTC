@@ -9,6 +9,7 @@ import net.forthecrown.inventory.commands.CommandRoyalSword;
 import net.forthecrown.inventory.listeners.PlayerJoinListener;
 import net.forthecrown.inventory.listeners.WeaponListener;
 import net.forthecrown.inventory.weapon.ability.AbilityAnimation;
+import net.forthecrown.inventory.weapon.ability.SwordAbilityManager;
 import net.forthecrown.utils.TomlConfigs;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -25,17 +26,26 @@ public class ItemsPlugin extends JavaPlugin {
 
   @Override
   public void onEnable() {
+    ItemUserProperties.init();
+
     Events.register(new WeaponListener());
     Events.register(new PlayerJoinListener());
     new CommandRoyalSword();
 
-    reloadConfig();
+    reload();
+
+    ItemPlaceholders.registerAll();
   }
 
   @Override
   public void onLoad() {
     FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
     registry.register(SWORD_USE_ALLOWED);
+  }
+
+  public void reload() {
+    reloadConfig();
+    SwordAbilityManager.getInstance().loadAbilities();
   }
 
   @Override
@@ -46,5 +56,6 @@ public class ItemsPlugin extends JavaPlugin {
   @Override
   public void onDisable() {
     AbilityAnimation.getInstance().onDisable();
+    ItemPlaceholders.unregister();
   }
 }

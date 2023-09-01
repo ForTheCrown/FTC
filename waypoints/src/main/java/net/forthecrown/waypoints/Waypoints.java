@@ -467,7 +467,7 @@ public final class Waypoints {
       throw WExceptions.invalidWaypointTop(topMaterial);
     }
 
-    type.onCreate(user);
+    type.onCreate(user, pos);
 
     var existing = WaypointManager.getInstance()
         .getChunkMap()

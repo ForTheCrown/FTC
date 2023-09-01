@@ -7,6 +7,7 @@ import net.forthecrown.scripts.Scripts;
 import net.forthecrown.titles.UserTitles;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.io.source.Source;
+import net.forthecrown.utils.io.source.Sources;
 import org.spongepowered.math.GenericMath;
 
 @FunctionalInterface
@@ -51,7 +52,8 @@ public interface UseLimit {
     if (prim.isNumber()) {
       return fixed(prim.getAsInt());
     } else if (prim.isString()) {
-      return script(Scripts.scriptFileSource(prim.getAsString()));
+      Source direct = Sources.direct(element.getAsString(), "<use limit>");
+      return script(direct);
     }
 
     throw new IllegalArgumentException("Invalid useLimit JSON: " + element);

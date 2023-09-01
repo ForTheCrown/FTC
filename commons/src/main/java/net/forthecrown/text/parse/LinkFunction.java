@@ -14,7 +14,7 @@ public class LinkFunction extends TextFunction {
       = Pattern.compile("^[a-z][a-z0-9+\\-.]*:");
 
   static final Pattern URL_PATTERN
-      = Pattern.compile("(?:(https?)://)?([-\\w_.]+\\.\\w{2,})(/\\S*)?");
+      = Pattern.compile("(\\$\\{)*(?:(https?)://)?([-\\w_.]+\\.\\w{2,})(?::[0-9]+)?(/\\S*)?}?");
 
   static final Style CLEAN_STYLE = Style.empty();
   static final Style UNDERLINED_STYLE = Style.style()
@@ -32,7 +32,16 @@ public class LinkFunction extends TextFunction {
   }
 
   @Override
+  public boolean filter(MatchResult result) {
+    return !result.group().startsWith("${");
+  }
+
+  @Override
   public Component format(MatchResult result, TextContext context) {
+    if (result.group().startsWith("${")) {
+      return null;
+    }
+
     boolean clean = context.has(ChatParseFlag.CLEAN_LINKS);
     String clickUrl = result.group();
 

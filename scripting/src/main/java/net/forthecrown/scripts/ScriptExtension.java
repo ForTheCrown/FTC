@@ -26,11 +26,11 @@ public abstract class ScriptExtension {
 
   }
 
-  protected void onScriptCompile() {
+  protected void onScriptCompile(Script script) {
 
   }
 
-  protected void onScriptClose() {
+  protected void onScriptClose(Script script) {
 
   }
 }

@@ -1,6 +1,7 @@
 package net.forthecrown.text;
 
 import net.forthecrown.text.format.FormatBuilder;
+import net.forthecrown.text.placeholder.PlaceholderRenderer;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
@@ -15,13 +16,32 @@ public interface TextWriter extends ComponentLike {
 
   void viewer(@Nullable Audience audience);
 
+  PlaceholderRenderer placeholders();
+
+  void placeholders(PlaceholderRenderer renderer);
+
   void write(ComponentLike text);
 
   void clear();
 
-  default void field(Object field, Object value) {
+  default void field(Object field) {
     line(Text.valueOf(field, viewer()).applyFallbackStyle(getFieldStyle()));
     write(getFieldSeparator());
+  }
+
+  default void fieldSameLine(Object field, Object value) {
+    write(Text.valueOf(field, viewer()).applyFallbackStyle(getFieldStyle()));
+    write(getFieldSeparator());
+
+    Component valueText = Text.valueOf(value, viewer());
+
+    if (Text.isEmpty(valueText)) {
+      write(valueText.applyFallbackStyle(getFieldValueStyle()));
+    }
+  }
+
+  default void field(Object field, Object value) {
+    field(field);
 
     Component valueText = Text.valueOf(value, viewer());
 
@@ -183,4 +203,5 @@ public interface TextWriter extends ComponentLike {
   void setFieldValueStyle(Style fieldValueStyle);
 
   void setFieldSeparator(Component fieldSeparator);
+
 }

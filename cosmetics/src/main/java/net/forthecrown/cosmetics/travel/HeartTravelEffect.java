@@ -2,6 +2,7 @@ package net.forthecrown.cosmetics.travel;
 
 import java.util.List;
 import net.forthecrown.user.User;
+import net.forthecrown.utils.math.Vectors;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.spongepowered.math.vector.Vector3d;
@@ -32,7 +33,7 @@ public class HeartTravelEffect implements TravelEffect {
   @Override
   public void onHulkStart(User user, Location loc) {
     // Prepare tick locations
-    circleLocs = TravelUtil.getCirclePoints(-2.5, 1.5, SPIRAL_POINTS);
+    circleLocs = Vectors.getCirclePoints(-2.5, 1.5, SPIRAL_POINTS);
 
     TravelUtil.spawn4Hearts(loc, 0.2, Particle.END_ROD);
   }

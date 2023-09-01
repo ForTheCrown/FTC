@@ -1,9 +1,9 @@
 package net.forthecrown.utils;
 
 import static net.forthecrown.utils.PluginUtil.getCallingPlugin;
+import static net.kyori.adventure.util.Ticks.SINGLE_TICK_DURATION_MS;
 import static org.bukkit.Bukkit.getScheduler;
 
-import io.papermc.paper.util.Tick;
 import java.time.Duration;
 import java.util.function.Consumer;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -200,6 +200,7 @@ public final class Tasks {
   }
 
   private static long toTicks(Duration dur) {
-    return Tick.tick().fromDuration(dur);
+    long millis = dur.toMillis();
+    return millis / SINGLE_TICK_DURATION_MS;
   }
 }

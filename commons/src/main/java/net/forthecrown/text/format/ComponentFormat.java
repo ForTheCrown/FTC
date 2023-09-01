@@ -91,7 +91,13 @@ public class ComponentFormat implements ComponentLike {
       type = DEFAULT;
     } else {
       var opt = formatTypes.get(name);
-      type = opt.orElse(DEFAULT);
+
+      if (opt.isEmpty()) {
+        LOGGER.warn("Unknown ComponentFormat type '{}'", name);
+        type = DEFAULT;
+      } else {
+        type = opt.get();
+      }
     }
 
     int index = Integer.parseInt(indexInput);

@@ -29,10 +29,10 @@ import net.forthecrown.core.commands.tpa.TpPermissions;
 import net.forthecrown.core.user.UserLookupImpl.UserLookupEntry;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Grenadier;
-import net.forthecrown.text.ChannelledMessage;
-import net.forthecrown.text.ChannelledMessage.MessageHandler;
 import net.forthecrown.text.Text;
 import net.forthecrown.text.ViewerAwareMessage;
+import net.forthecrown.text.channel.ChannelledMessage;
+import net.forthecrown.text.channel.MessageHandler;
 import net.forthecrown.user.NameRenderFlags;
 import net.forthecrown.user.Properties;
 import net.forthecrown.user.TimeField;
@@ -67,7 +67,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -174,7 +174,7 @@ public final class UserImpl implements User {
   }
 
   @Override
-  public Inventory getInventory() throws UserOfflineException {
+  public PlayerInventory getInventory() throws UserOfflineException {
     ensureOnline();
     return getPlayer().getInventory();
   }
@@ -394,6 +394,10 @@ public final class UserImpl implements User {
     UserLookupEntry entry = lookup.getEntry(uniqueId);
 
     lookup.onNickChange(entry, nickname);
+
+    if (isOnline()) {
+      updateTabName();
+    }
   }
 
   public UserLookupEntry lookupEntry() {
@@ -421,6 +425,8 @@ public final class UserImpl implements User {
     } else {
       this.afkReason = null;
     }
+
+    updateTabName();
   }
 
   @Override
@@ -473,7 +479,7 @@ public final class UserImpl implements User {
       return Text.format("{0} now AFK{1}", NamedTextColor.GRAY, displayName, suffix);
     });
 
-    channelled.setHandler(MessageHandler.EMPTY_IF_NOT_VIEWING);
+    channelled.setHandler(MessageHandler.EMPTY_IF_VIEWER_WAS_REMOVED);
     channelled.send();
   }
 
@@ -582,7 +588,7 @@ public final class UserImpl implements User {
       return getPlayer().hasPermission(permission);
     }
 
-    var options = QueryOptions.builder(QueryMode.NON_CONTEXTUAL)
+    var options = QueryOptions.builder(QueryMode.CONTEXTUAL)
         .flag(Flag.RESOLVE_INHERITANCE, true)
         .build();
 
@@ -748,18 +754,27 @@ public final class UserImpl implements User {
   }
 
   @Override
-  public boolean checkTeleporting() {
+  public Component checkTeleportMessage() {
     if (!canTeleport()) {
       if (isTeleporting()) {
-        sendMessage(TpMessages.ALREADY_TELEPORTING);
-        return false;
+        return TpMessages.ALREADY_TELEPORTING;
       }
 
-      sendMessage(TpMessages.canTeleportIn(getTime(TimeField.NEXT_TELEPORT)));
-      return false;
+      return TpMessages.canTeleportIn(getTime(TimeField.NEXT_TELEPORT));
     }
 
-    return true;
+    return null;
+  }
+
+  @Override
+  public boolean checkTeleporting() {
+    Component component = checkTeleportMessage();
+    if (component == null) {
+      return true;
+    }
+
+    sendMessage(component);
+    return false;
   }
 
   @Override
@@ -793,7 +808,7 @@ public final class UserImpl implements User {
   public void onTpComplete() {
     if (currentTeleport.isDelayed()) {
       CoreConfig config = service.getConfig();
-      long cooldownMillis = config.getTpCooldown().toMillis();
+      long cooldownMillis = config.tpCooldown().toMillis();
       setTime(TimeField.NEXT_TELEPORT, System.currentTimeMillis() + cooldownMillis);
     }
 

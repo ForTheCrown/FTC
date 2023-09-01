@@ -4,16 +4,19 @@ import static net.forthecrown.utils.io.source.Sources.CHARSET;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.nbt.CompoundTag;
 
-record PathSource(Path path, String name) implements Source {
+record PathSource(Path path, Path directory, String name) implements Source {
 
   @Override
   public StringBuffer read() throws IOException {
@@ -26,31 +29,22 @@ record PathSource(Path path, String name) implements Source {
   }
 
   @Override
-  public JsonElement save() {
-    JsonObject obj = new JsonObject();
+  public <S> DataResult<S> save(DynamicOps<S> ops) {
+    var builder = ops.mapBuilder();
+    String strPath;
 
-    String stringUrl = path.toString();
-    obj.addProperty("path", stringUrl);
-
-    if (!name.equals(stringUrl)) {
-      obj.addProperty("name", stringUrl);
+    if (directory != null) {
+      strPath = directory.relativize(path).toString();
+    } else {
+      strPath = directory.toString();
     }
 
-    return obj;
-  }
+    builder.add("path", ops.createString(strPath));
 
-
-  @Override
-  public BinaryTag saveAsTag() {
-    CompoundTag tag = BinaryTags.compoundTag();
-
-    String stringUrl = path.toString();
-    tag.putString("path", stringUrl);
-
-    if (!name.equals(stringUrl)) {
-      tag.putString("name", name);
+    if (name != null && !Objects.equals(name, strPath)) {
+      builder.add("name", ops.createString(name));
     }
 
-    return tag;
+    return builder.build(ops.empty());
   }
 }

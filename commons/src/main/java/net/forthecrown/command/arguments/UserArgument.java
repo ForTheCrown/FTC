@@ -10,19 +10,18 @@ import java.util.concurrent.CompletableFuture;
 import net.forthecrown.command.Exceptions;
 import net.forthecrown.command.FtcSuggestions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.internal.VanillaMappedArgument;
+import net.forthecrown.grenadier.internal.SimpleVanillaMapped;
 import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.grenadier.types.EntitySelector;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserLookup.LookupEntry;
 import net.forthecrown.user.UserService;
 import net.forthecrown.user.Users;
-import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.arguments.ScoreHolderArgument;
 import net.minecraft.commands.arguments.selector.EntitySelectorParser;
 
 public class UserArgument
-    implements ArgumentType<UserParseResult>, VanillaMappedArgument
+    implements ArgumentType<UserParseResult>, SimpleVanillaMapped
 {
 
   public final boolean allowMultiple;
@@ -91,7 +90,7 @@ public class UserArgument
   }
 
   @Override
-  public ArgumentType<?> getVanillaType(CommandBuildContext context) {
+  public ArgumentType<?> getVanillaType() {
     if (allowOffline) {
       if (allowMultiple) {
         return ScoreHolderArgument.scoreHolders();

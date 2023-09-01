@@ -1,5 +1,6 @@
 package net.forthecrown.text.parse;
 
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -53,5 +54,9 @@ public enum ChatParseFlag {
     }
 
     return flags;
+  }
+
+  public static Set<ChatParseFlag> all() {
+    return EnumSet.allOf(ChatParseFlag.class);
   }
 }

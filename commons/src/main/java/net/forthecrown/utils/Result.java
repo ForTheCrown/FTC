@@ -1,6 +1,10 @@
 package net.forthecrown.utils;
 
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DataResult.PartialResult;
 import java.util.Objects;
+import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
@@ -39,6 +43,19 @@ public class Result<V> {
   public static <V> Result<V> error(String message, Object... args) {
     Objects.requireNonNull(message, "Null message");
     return new Result<>(null, message.formatted(args));
+  }
+
+  public static <V> Result<V> fromDataResult(DataResult<V> result) {
+    var either = result.get();
+
+    if (either.left().isPresent()) {
+      return success(either.left().get());
+    }
+
+    PartialResult<V> partial = either.right().get();
+    String error = partial.message();
+
+    return error(error);
   }
 
   /**
@@ -156,5 +173,46 @@ public class Result<V> {
     }
 
     consumer.accept(value);
+  }
+
+  public <T> Result<T> cast() {
+    return (Result<T>) this;
+  }
+
+  public <O, T> Result<T> combine(
+      Result<O> o,
+      BinaryOperator<String> errorCombiner,
+      BiFunction<O, V, T> combiner
+  ) {
+    boolean thisError = isError();
+    boolean otherError = o.isError();
+
+    if (thisError && otherError) {
+      String combined = errorCombiner.apply(error, o.getError());
+      return error(combined);
+    } else if (thisError) {
+      return cast();
+    } else if (otherError) {
+      return o.cast();
+    }
+
+    T combined = combiner.apply(o.getValue(), getValue());
+    return success(combined);
+  }
+
+  public Result<V> withError(Result<?> result, BinaryOperator<String> errorCombiner) {
+    boolean thisError = isError();
+    boolean otherError = result.isError();
+
+    if (thisError && otherError) {
+      String combined = errorCombiner.apply(error, result.getError());
+      return error(combined);
+    } else if (thisError) {
+      return cast();
+    } else if (otherError) {
+      return result.cast();
+    }
+
+    return cast();
   }
 }

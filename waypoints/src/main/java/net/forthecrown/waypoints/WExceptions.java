@@ -35,7 +35,7 @@ public interface WExceptions {
 
   static CommandSyntaxException unknownRegion(StringReader reader, int cursor) {
     return format(
-        "There's no region or online player named '{0}'.\nUse /listregions to list all regions.",
+        "There's no region, player or guild named '{0}'.\nUse /listregions to list all regions.",
         reader.getString().substring(cursor, reader.getCursor())
     );
   }

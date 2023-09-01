@@ -1,5 +1,6 @@
 package net.forthecrown.text;
 
+import static net.forthecrown.text.Messages.NULL;
 import static net.kyori.adventure.text.Component.space;
 import static net.kyori.adventure.text.Component.text;
 
@@ -8,6 +9,8 @@ import io.papermc.paper.adventure.PaperAdventure;
 import it.unimi.dsi.fastutil.objects.ObjectLists;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -23,6 +26,7 @@ import net.forthecrown.text.format.FormatBuilder;
 import net.forthecrown.text.parse.ChatParseFlag;
 import net.forthecrown.text.parse.ChatParser;
 import net.forthecrown.text.parse.TextContext;
+import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -73,6 +77,9 @@ public final class Text {
   public static final SimpleDateFormat DATE_FORMAT
       = new SimpleDateFormat("d LLL yyyy HH:mm z");
 
+  public static final DateTimeFormatter DATE_TIME_FORMATTER
+      = DateTimeFormatter.ofPattern(DATE_FORMAT.toPattern());
+
   /**
    * A simple style that has the italic text decoration disabled
    */
@@ -93,16 +100,29 @@ public final class Text {
       .hexColors()
       .build();
 
-  private static final Component NULL = text("null");
-
   public static final ComponentFlattener FLATTENER = ComponentFlattener.basic()
       .toBuilder()
       .complexMapper(TranslatableComponent.class, (component, consumer) -> {
+        var translator = GlobalTranslator.translator();
+        var format = translator.translate(component.key(), Locale.ENGLISH);
+
+        // This is a weird bug, the keys exist but not on the server's side??
+        // IDK, this is to stop an infinite recursion error from happening
+        if (format == null) {
+          consumer.accept(text(component.key()));
+
+          for (Component child : component.children()) {
+            consumer.accept(child);
+          }
+
+          return;
+        }
+
         consumer.accept(GlobalTranslator.render(component, Locale.ENGLISH));
       })
       .unknownMapper(component -> {
         throw new IllegalArgumentException(
-            String.format("Don't know how to split: %s", component)
+            String.format("Don't know how to flatten: %s", component)
         );
       })
       .build();
@@ -205,6 +225,17 @@ public final class Text {
    * @return The formatted message
    */
   public static Component renderString(Permissible permissible, String s) {
+    return ChatParser.parser().parse(s, TextContext.create(permissible, null));
+  }
+
+  /**
+   * Renders the given string with the permissions of the given user
+   *
+   * @param permissible The permissible rendering the message
+   * @param s           The string to render
+   * @return The formatted message
+   */
+  public static Component renderString(User permissible, String s) {
     return ChatParser.parser().parse(s, TextContext.create(permissible, null));
   }
 
@@ -393,9 +424,7 @@ public final class Text {
     net.minecraft.world.item.ItemStack nms = CraftItemStack.asNMSCopy(item);
     Component hoverName = PaperAdventure.asAdventure(nms.getHoverName());
 
-    if (nms.hasCustomHoverName()
-        && hoverName.decoration(TextDecoration.ITALIC) == State.NOT_SET
-    ) {
+    if (nms.hasCustomHoverName() && hoverName.decoration(TextDecoration.ITALIC) == State.NOT_SET) {
       hoverName = hoverName.decorate(TextDecoration.ITALIC);
     }
 
@@ -532,6 +561,10 @@ public final class Text {
     return text(DATE_FORMAT.format(date));
   }
 
+  public static Component formatDate(Instant instant) {
+    return text(DATE_FORMAT.format(Date.from(instant)));
+  }
+
   /**
    * Formats the given world name.
    * <p>
@@ -547,10 +580,6 @@ public final class Text {
   public static String formatWorldName(World world) {
     if (world.equals(Worlds.overworld())) {
       return "Overworld";
-    }
-
-    if (world.equals(Worlds.resource())) {
-      return "Resource World";
     }
 
     return capitalizeFully(world.getName()
@@ -643,6 +672,18 @@ public final class Text {
   }
 
   /* ----------------------------- FORMATTERS ------------------------------ */
+
+  public static ViewerAwareMessage vformat(String format, Object... args) {
+    return FormatBuilder.builder().setFormat(format).setArguments(args).asViewerAware();
+  }
+
+  public static ViewerAwareMessage vformat(String format, TextColor color, Object... args) {
+    return FormatBuilder.builder().setFormat(format, color).setArguments(args).asViewerAware();
+  }
+
+  public static ViewerAwareMessage vformat(String format, Style style, Object... args) {
+    return FormatBuilder.builder().setFormat(format, style).setArguments(args).asViewerAware();
+  }
 
   /**
    * Formats a given component in the same way as
@@ -795,7 +836,8 @@ public final class Text {
     // maybe a string or who knows, so just call
     // String#valueOf(Object) on it and translate any
     // resulting color codes, links and emotes into text
-    return renderString(String.valueOf(arg));
+    ChatParser parser = ChatParser.parser();
+    return parser.parse(String.valueOf(arg), TextContext.totalRender(viewer));
   }
 
   /* ------------------------- REGEX OPERATIONS -------------------------- */

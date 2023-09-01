@@ -11,7 +11,7 @@ import net.forthecrown.utils.context.Context;
 import net.kyori.adventure.text.Component;
 
 /**
- * A text formatter used to format a given {@link PageEntryIterator} into pages with a header,
+ * A text formatter used to format a given {@link PagedIterator} into pages with a header,
  * footer and body.
  * <p>
  * All the leg work of this paginator is actually done by the three following classes:
@@ -27,7 +27,7 @@ import net.kyori.adventure.text.Component;
  * @see Header
  * @see Footer
  * @see PageEntry
- * @see PageEntryIterator
+ * @see PagedIterator
  */
 @Getter
 @Setter
@@ -56,16 +56,16 @@ public class PageFormat<T> {
    *
    * @param it The iterator to format
    * @return The formatted message
-   * @see #write(PageEntryIterator, TextWriter, Context)
+   * @see #write(PagedIterator, TextWriter, Context)
    */
-  public Component format(PageEntryIterator<T> it, Context context) {
+  public Component format(PagedIterator<T> it, Context context) {
     var writer = TextWriters.newWriter();
     write(it, writer, context);
 
     return writer.asComponent();
   }
 
-  public Component format(PageEntryIterator<T> it) {
+  public Component format(PagedIterator<T> it) {
     return format(it, Context.EMPTY);
   }
 
@@ -79,7 +79,7 @@ public class PageFormat<T> {
    * @param it     The iterator to write and format
    * @param writer The destination of the component writing
    */
-  public void write(PageEntryIterator<T> it, TextWriter writer, Context context) {
+  public void write(PagedIterator<T> it, TextWriter writer, Context context) {
     // Header might be null so also make sure
     // to not write the new line, otherwise you're gonna have
     // an empty line lol

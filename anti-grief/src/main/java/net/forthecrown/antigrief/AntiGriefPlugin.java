@@ -26,18 +26,25 @@ public class AntiGriefPlugin extends JavaPlugin {
     Punishments.get().load();
 
     AntiGriefCommands.createCommands();
-    AntiGriefListeners.registerAll();
+    AntiGriefListeners.registerAll(this);
 
     FtcServer server = FtcServer.server();
     SettingsBook<User> settingsBook = server.getGlobalSettingsBook();
+
     EavesDropper.createSettings(settingsBook);
     StaffChat.createSettings(settingsBook);
+    StaffNote.createSettings(settingsBook);
   }
 
   @Override
   public void reloadConfig() {
     pluginConfig = TomlConfigs.loadPluginConfig(this, AntiGriefConfig.class);
     BannedWords.load();
+  }
+
+  public void reload() {
+    reloadConfig();
+    Punishments.get().load();
   }
 
   @Override

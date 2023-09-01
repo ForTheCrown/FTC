@@ -3,9 +3,11 @@ package net.forthecrown.command;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.lang.StackWalker.Option;
+import java.util.Collection;
 import net.forthecrown.command.arguments.Arguments;
 import net.forthecrown.command.arguments.ExpandedEntityArgument;
 import net.forthecrown.command.arguments.UserParseResult;
+import net.forthecrown.command.arguments.chat.MessageArgument.Result;
 import net.forthecrown.command.help.FtcSyntaxConsumer;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Readers;
@@ -15,13 +17,12 @@ import net.forthecrown.grenadier.annotations.ArgumentModifier;
 import net.forthecrown.grenadier.annotations.CommandDataLoader;
 import net.forthecrown.grenadier.annotations.TypeRegistry;
 import net.forthecrown.registry.Holder;
-import net.forthecrown.text.page.PageEntryIterator;
+import net.forthecrown.text.PlayerMessage;
+import net.forthecrown.text.page.PagedIterator;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.PluginUtil;
-import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.inventory.ItemStacks;
-import net.minecraft.server.commands.FunctionCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -45,13 +46,27 @@ public final class Commands {
     CommandDataLoader loader = CommandDataLoader.resources(caller.getClassLoader());
     ctx.addLoader(loader);
 
+    var variables = ctx.getVariables();
+
     ArgumentModifier<UserParseResult, User> resultToUser = (context, input) -> {
       return input.get(context.getSource(), true);
     };
-    ctx.getVariables().put("result_to_user", resultToUser);
-
+    ArgumentModifier<UserParseResult, Collection<User>> resultToUsers = (context, input) -> {
+      return input.getUsers(context.getSource(), true);
+    };
     ArgumentModifier<Holder, Object> holderToValue = (context, input) -> input.getValue();
-    ctx.getVariables().put("holder_to_value", holderToValue);
+    ArgumentModifier<Result, PlayerMessage> resultToMessage = (context, input) -> {
+      return input.toPlayerMessage(context.getSource().asBukkit());
+    };
+    ArgumentModifier<Result, PlayerMessage> resultToAdminMessage = (context, input) -> {
+      return input.toPlayerMessage();
+    };
+
+    variables.put("result_to_message", resultToMessage);
+    variables.put("result_to_admin_message", resultToAdminMessage);
+    variables.put("result_to_user", resultToUser);
+    variables.put("holder_to_value", holderToValue);
+    variables.put("result_to_users", resultToUsers);
 
     return ctx;
   }
@@ -80,6 +95,9 @@ public final class Commands {
   }
 
   public static void ensureIndexValid(int index, int size) throws CommandSyntaxException {
+    if (index < 1) {
+      throw Exceptions.format("Index {0} is less than 1", index);
+    }
     if (index > size) {
       throw Exceptions.invalidIndex(index, size);
     }
@@ -92,7 +110,7 @@ public final class Commands {
       throw Exceptions.NOTHING_TO_LIST;
     }
 
-    var max = PageEntryIterator.getMaxPage(pageSize, size);
+    var max = PagedIterator.getMaxPage(pageSize, size);
 
     if (page >= max) {
       throw Exceptions.invalidPage(page + 1, max);

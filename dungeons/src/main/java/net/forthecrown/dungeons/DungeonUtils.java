@@ -92,13 +92,7 @@ public final class DungeonUtils {
 
 
   public static void giveOrDropItem(Inventory inv, Location loc, ItemStack... item) {
-    if (inv.firstEmpty() == -1) {
-      for (var i: item) {
-        loc.getWorld().dropItem(loc, i);
-      }
-    } else {
-      inv.addItem(item);
-    }
+    ItemStacks.giveOrDrop(inv, item);
   }
 
   public static void clearModifiers(AttributeInstance instance) {

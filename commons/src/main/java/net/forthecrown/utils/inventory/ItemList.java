@@ -2,7 +2,6 @@ package net.forthecrown.utils.inventory;
 
 import com.google.common.base.Preconditions;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -87,15 +86,7 @@ public interface ItemList extends List<ItemStack> {
   }
 
   default boolean containsAtLeastAll(Collection<ItemStack> items) {
-    Object2IntMap<ItemStack> totalRequired = new Object2IntOpenHashMap<>();
-
-    items.forEach(itemStack -> {
-      totalRequired.compute(itemStack, (itemStack1, integer) -> {
-        int amount = integer == null ? 0 : integer;
-        amount += itemStack1.getAmount();
-        return amount;
-      });
-    });
+    Object2IntMap<ItemStack> totalRequired = ItemStacks.countItems(items);
 
     for (var e: totalRequired.object2IntEntrySet()) {
       if (containsAtLeast(e.getKey(), e.getIntValue())) {

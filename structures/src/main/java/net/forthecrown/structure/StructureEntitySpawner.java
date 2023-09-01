@@ -23,23 +23,24 @@ public interface StructureEntitySpawner {
     };
   }
 
-  static void placeEntity(World world,
-                          Vector3d pos,
-                          Rotation rotation,
-                          EntityType type,
-                          CompoundTag tag
+  static void placeEntity(
+      World world,
+      Vector3d pos,
+      Rotation rotation,
+      EntityType type,
+      CompoundTag tag
   ) {
     tag = tag.copy();
 
     ListTag posList = tag.getList("Pos", TagTypes.doubleType());
     ListTag rotList = tag.getList("Rotation", TagTypes.floatType());
 
-    double x = posList.get(0).asNumber().doubleValue();
-    double y = posList.get(1).asNumber().doubleValue();
-    double z = posList.get(2).asNumber().doubleValue();
+    double x = posList.getDouble(0);
+    double y = posList.getDouble(1);
+    double z = posList.getDouble(2);
 
-    float yaw = rotList.get(0).asNumber().floatValue();
-    float pitch = rotList.get(1).asNumber().floatValue();
+    float yaw = rotList.getFloat(0);
+    float pitch = rotList.getFloat(1);
 
     Location location = new Location(world, x, y, z, yaw, pitch);
     Vector dir = location.getDirection();

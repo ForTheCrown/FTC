@@ -11,36 +11,42 @@ description = "Manages user titles and rank tiers"
 executes = openMenu()
 
 literal("reload") {
+  requires = permission(ADMIN_PERMISSION)
   description = "Reloads the plugin"
   executes = reloadPlugin()
 }
 
-argument(ARG, user) {
-  label = "<user>"
-  description = "Displays a <user>'s titles and their rank tier"
+literal("info").argument(ARG, user) {
+  requires = permission(ADMIN_PERMISSION)
+  map_result = @result_to_user
   executes = showTitlesInfo()
+  description = "Displays a <user>'s titles and their rank tier"
+}
 
-  map_result = resultToUser()
+literal("set").argument(ARG, user).argument(TITLE, @title) {
+  requires = permission(ADMIN_PERMISSION)
+  map_result = @result_to_user
+  executes = setTitle()
+  description = "Set's a <user>'s active title to <title>"
+}
 
-  literal("titles") {
-    literal("set").argument(TITLE, @title) {
-      executes = setTitle()
-      description = "Set's a <user>'s active title to <title>"
-    }
+literal("add").argument(ARG, user).argument(TITLES, @titles) {
+  requires = permission(ADMIN_PERMISSION)
+  map_result = @result_to_user
+  executes = addTitles()
+  description = "Adds a <title> to a <user>'s available titles"
+}
 
-    literal("add").argument(TITLE, @title) {
-      executes = addTitle()
-      description = "Adds a <title> to a <user>'s available titles"
-    }
+literal("remove").argument(ARG, user).argument(TITLES, @titles) {
+  requires = permission(ADMIN_PERMISSION)
+  map_result = @result_to_user
+  executes = removeTitles()
+  description = "Removes a <title> from a <user>'s available titles"
+}
 
-    literal("remove").argument(TITLE, @title) {
-      executes = removeTitle()
-      description = "Removes a <title> from a <user>'s available titles"
-    }
-  }
-
-  literal("tier").argument(TIER, @tier) {
-    executes = setTier()
-    description = "Sets a <user>'s rank tier to <tier>"
-  }
+literal("tier").argument(ARG, user).argument(TIER, @tier) {
+  requires = permission(ADMIN_PERMISSION)
+  map_result = @result_to_user
+  executes = setTier()
+  description = "Sets a <user>'s rank tier to <tier>"
 }

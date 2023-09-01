@@ -12,9 +12,7 @@ import net.forthecrown.command.arguments.chat.MessageArgument.Result;
 import net.forthecrown.grenadier.internal.VanillaMappedArgument;
 import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.text.ChatEmotes;
-import net.forthecrown.text.Text;
 import net.forthecrown.text.ViewerAwareMessage;
-import net.kyori.adventure.text.Component;
 import net.minecraft.commands.CommandBuildContext;
 
 public class ChatArgument
@@ -23,7 +21,7 @@ public class ChatArgument
 
   @Override
   public ViewerAwareMessage parse(StringReader reader) throws CommandSyntaxException {
-    char peek = reader.peek();
+    char peek = reader.canRead() ? reader.peek() : 'a';
 
     if (peek == '{' || peek == '[' || peek == '"') {
       var result = ArgumentTypes.component().parse(reader);
@@ -35,7 +33,7 @@ public class ChatArgument
     }
 
     Result result = Arguments.MESSAGE.parse(reader);
-    return viewer -> result.formatAdmin(viewer);
+    return result.toPlayerMessage();
   }
 
   @Override

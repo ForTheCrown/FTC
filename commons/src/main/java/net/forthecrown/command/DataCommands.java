@@ -261,10 +261,7 @@ public class DataCommands extends Nodes {
       component = Text.displayTag(tag, true);
     }
 
-    context.getSource().sendMessage(
-        text(name + " data: ")
-            .append(component)
-    );
+    context.getSource().sendMessage(text(name + " data: ").append(component));
     return 0;
   }
 

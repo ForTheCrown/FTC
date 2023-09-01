@@ -12,9 +12,10 @@ import net.forthecrown.command.arguments.chat.MessageArgument.Result;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.grenadier.types.SuffixedNumberArgument;
+import net.forthecrown.text.PlayerMessage;
 import net.forthecrown.text.ViewerAwareMessage;
 import net.forthecrown.user.User;
-import net.kyori.adventure.text.Component;
+import net.forthecrown.utils.inventory.ItemList;
 import org.bukkit.command.CommandSender;
 
 public interface Arguments {
@@ -29,6 +30,8 @@ public interface Arguments {
   UserArgument ONLINE_USER = new UserArgument(false, false);
 
   FtcKeyArgument FTC_KEY = new FtcKeyArgument();
+
+  ItemListArgument ITEM_LIST = new ItemListArgument();
 
   SuffixedNumberArgument<Integer> RHINES = createRhineArgument();
 
@@ -50,6 +53,11 @@ public interface Arguments {
 
   static Result getUserMessage(CommandContext<CommandSource> c, String arg) {
     return c.getArgument(arg, Result.class);
+  }
+
+  static PlayerMessage getPlayerMessage(CommandContext<CommandSource> c, String arg) {
+    Result result = c.getArgument(arg, Result.class);
+    return result.toPlayerMessage(c.getSource().asBukkit());
   }
 
   static ViewerAwareMessage getMessage(CommandContext<CommandSource> c, String arg) {
@@ -84,5 +92,12 @@ public interface Arguments {
     units.put("s", 20);
     units.put("d", McConstants.TICKS_PER_DAY);
     return ArgumentTypes.suffixedInt(units);
+  }
+
+  static ItemList getItemList(CommandContext<CommandSource> c, String argName)
+      throws CommandSyntaxException
+  {
+    ItemListResult result = c.getArgument(argName, ItemListResult.class);
+    return result.get(c.getSource());
   }
 }

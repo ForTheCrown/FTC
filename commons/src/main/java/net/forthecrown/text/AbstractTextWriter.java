@@ -5,11 +5,11 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 import lombok.Getter;
 import lombok.Setter;
+import net.forthecrown.text.placeholder.PlaceholderRenderer;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.format.Style;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -60,13 +60,14 @@ public abstract class AbstractTextWriter implements ComponentLike, TextWriter {
   protected Style fieldValueStyle = Style.empty();
 
   /**
-   * The separator {@link #field(ComponentLike, ComponentLike)} uses to separate fields and values
+   * The separator {@link #field(Object, Object)} uses to separate fields and values
    */
   @Getter
   @Setter
   protected Component fieldSeparator = DEF_FIELD_SEPARATOR;
 
   protected Audience viewer;
+  private PlaceholderRenderer renderer;
 
   /**
    * Empty constructor
@@ -92,8 +93,13 @@ public abstract class AbstractTextWriter implements ComponentLike, TextWriter {
   }
 
   @Override
-  public @NotNull Component asComponent() {
-    return null;
+  public PlaceholderRenderer placeholders() {
+    return renderer;
+  }
+
+  @Override
+  public void placeholders(PlaceholderRenderer renderer) {
+    this.renderer = renderer;
   }
 
   protected abstract void onNewLine();
@@ -113,11 +119,15 @@ public abstract class AbstractTextWriter implements ComponentLike, TextWriter {
   @Override
   public void write(ComponentLike text) {
     Objects.requireNonNull(text, "Text was null");
-    var component = Text.valueOf(text, viewer);
+    Component component = Text.valueOf(text, viewer);
 
     if (component.equals(Component.newline())) {
       newLine();
       return;
+    }
+
+    if (renderer != null) {
+      component = renderer.render(component, viewer);
     }
 
     Iterator<Component> it = Text.split(NEW_LINE_PATTERN, component).iterator();

@@ -42,17 +42,22 @@ class DiscordAppender extends AbstractAppender {
       "net.minecraft.stats.RecipeBookServer"
   );
 
-  private final String channelName;
+  private final Config config;
 
-  public DiscordAppender(String channelName) {
+  public DiscordAppender(Config config) {
     super(APPENDER_NAME, null, null, false, null);
-    this.channelName = channelName;
+
+    this.config = config;
 
     setStarted();
   }
 
   @Override
   public void append(LogEvent event) {
+    if (!config.forwardingEnabled()) {
+      return;
+    }
+
     var loggerName = event.getLoggerName();
 
     // Filter out ignored loggers
@@ -93,7 +98,7 @@ class DiscordAppender extends AbstractAppender {
       }
     }
 
-    findChannel(channelName).ifPresent(channel -> {
+    findChannel(config.forwardingChannel()).ifPresent(channel -> {
       DiscordUtil.queueMessage(channel, builder.toString());
     });
   }

@@ -19,7 +19,7 @@ public class DayChange implements Runnable {
   public void schedule() {
     stop();
 
-    LocalTime resetTime = CorePlugin.plugin().getFtcConfig().getDayUpdateTime();
+    LocalTime resetTime = CorePlugin.plugin().getFtcConfig().dayUpdateTime();
 
     ZonedDateTime now = ZonedDateTime.now();
     LocalTime currentTime = now.toLocalTime();

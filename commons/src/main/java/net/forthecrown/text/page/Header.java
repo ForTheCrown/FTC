@@ -38,7 +38,7 @@ import org.apache.commons.lang3.ArrayUtils;
  *
  * @param <T> The type to format
  * @see PageFormat
- * @see PageEntryIterator
+ * @see PagedIterator
  */
 public class Header<T> implements PageElement<T> {
 
@@ -95,7 +95,7 @@ public class Header<T> implements PageElement<T> {
   // --- METHODS ---
 
   @Override
-  public void write(PageEntryIterator<T> it, TextWriter writer, Context context) {
+  public void write(PagedIterator<T> it, TextWriter writer, Context context) {
     write(elements[TYPE_PREPEND], writer, it, context, false);
     write( elements[TYPE_REPEAT], writer, it, context, false);
 
@@ -115,7 +115,7 @@ public class Header<T> implements PageElement<T> {
    */
   private static <T> void write(PageElement<T>[] elements,
                                 TextWriter writer,
-                                PageEntryIterator<T> it,
+                                PagedIterator<T> it,
                                 Context context,
                                 boolean reverse
   ) {

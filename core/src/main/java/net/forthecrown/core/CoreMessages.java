@@ -2,14 +2,21 @@ package net.forthecrown.core;
 
 import static net.forthecrown.text.Messages.AFK_SUFFIX;
 import static net.forthecrown.text.Text.format;
+import static net.forthecrown.text.Text.isEmpty;
+import static net.forthecrown.text.Text.vformat;
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
+import static net.kyori.adventure.text.event.ClickEvent.runCommand;
 
 import java.util.Collection;
 import java.util.UUID;
+import javax.annotation.Nullable;
+import net.forthecrown.core.user.UserHomes;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.text.Text;
 import net.forthecrown.text.TextJoiner;
+import net.forthecrown.text.UnitFormat;
+import net.forthecrown.text.ViewerAwareMessage;
 import net.forthecrown.user.Properties;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
@@ -78,6 +85,123 @@ public interface CoreMessages {
   Component CLEARED_ATTRIBUTE_MODS = text("Cleared attribute modifiers", NamedTextColor.GRAY);
 
   Component REMOVED_ATTRIBUTE_MOD = text("Removed attribute modifier", NamedTextColor.GRAY);
+
+  String WITHDRAW_FORMAT_SINGLE = "You got &e{0}&r that's worth &6{1}&r.";
+
+  String WITHDRAW_FORMAT_MULTIPLE = "You got &e{0}&r that are worth &6{1}&r.";
+
+
+  /**
+   * Message stating that a default home was set
+   */
+  TextComponent HOMES_DEF_SET = text("Default home set", NamedTextColor.GOLD);
+
+  /**
+   * Message stating that you're teleporting home
+   */
+  TextComponent TELEPORTING_HOME = text("Teleporting home", NamedTextColor.GRAY);
+
+  /**
+   * Home list header for when you're viewing your own homes
+   */
+  TextComponent HOMES_LIST_HEADER_SELF = text("Your homes", NamedTextColor.GOLD);
+
+  /**
+   * Creates a message stating that a home by the given name was set to the viewer's current
+   * location
+   *
+   * @param name The name of the home that was set
+   * @return The formatted message
+   */
+  static Component homeSet(String name) {
+    return format("Set home &6{0}&r to current location",
+        NamedTextColor.YELLOW, name
+    );
+  }
+
+  /**
+   * Creates a message stating the user is teleporting to a home by the given name.
+   *
+   * @param homeName The home's name
+   * @return The formatted message
+   */
+  static Component teleportingHome(String homeName) {
+    return format("Teleporting to {0}.", NamedTextColor.GRAY, homeName);
+  }
+
+  /**
+   * Lists the homes in the given home map. This only lists the entries, this does not include any
+   * header
+   *
+   * @param homes The home map to list
+   * @param cmd   The command prefix to use for the entry's {@link net.kyori.adventure.text.event.ClickEvent}s
+   * @return The formatted message
+   */
+  static Component listHomes(UserHomes homes, String cmd) {
+    return TextJoiner.onComma()
+        .add(
+            homes.getHomes().entrySet().stream()
+                .map(entry -> {
+                  return text("[" + entry.getKey() + "]", NamedTextColor.GOLD)
+                      .hoverEvent(Text.prettyLocation(entry.getValue(), false))
+                      .clickEvent(runCommand(cmd + entry.getKey()));
+                })
+        )
+        .asComponent();
+  }
+
+  /**
+   * Creates a home list header with the given user's display name
+   *
+   * @param user The homes' owner
+   * @return The formatted message
+   */
+  static Component homeListHeader(User user) {
+    return format("{0, user}'s homes", NamedTextColor.GOLD, user);
+  }
+
+  /**
+   * Creates a message saying the given user's home with the given name was deleted
+   *
+   * @param user The user whose home was deleted
+   * @param home The name of the deleted home
+   * @return The formatted message
+   */
+  static Component deletedHomeOther(User user, String home) {
+    return format("Deleted &6{0, user}&r's home: '&6{1}&r'",
+        NamedTextColor.YELLOW,
+        user, home
+    );
+  }
+
+  /**
+   * Creates a message saying that a home by the given name was deleted
+   *
+   * @param home The name of the deleted home
+   * @return The formatted message
+   */
+  static Component deletedHomeSelf(String home) {
+    return format("Deleted home '&6{0}&r'",
+        NamedTextColor.YELLOW, home
+    );
+  }
+
+
+  static Component withdrew(int items, int earned) {
+    String format = items == 1 ? WITHDRAW_FORMAT_SINGLE : WITHDRAW_FORMAT_MULTIPLE;
+
+    return format(format,
+        NamedTextColor.GRAY,
+        UnitFormat.coins(items), earned
+    );
+  }
+
+  static Component deposit(int coins, int earned) {
+    return format("You deposited &e{0}&r and received &6{1, rhines}&r.",
+        NamedTextColor.GRAY,
+        UnitFormat.coins(coins), earned
+    );
+  }
 
   /**
    * Lists all blocked users
@@ -338,6 +462,43 @@ public interface CoreMessages {
         NamedTextColor.GRAY,
         Component.text(attr.key().asString())
             .hoverEvent(hover)
+    );
+  }
+
+
+  static ViewerAwareMessage paidMultiple(int paid, int amount) {
+    return vformat("Paid &6{0, number}&r players &6{1, rhines}&r, total: &6{2, rhines}&r.",
+        NamedTextColor.YELLOW,
+        paid, amount,
+        paid * amount
+    );
+  }
+
+  static ViewerAwareMessage payTarget(User sender, int amount, @Nullable Component message) {
+    if (isEmpty(message)) {
+      return vformat("You received &6{1, rhines}&r from &e{0, user}&r.",
+          NamedTextColor.GRAY,
+          sender, amount
+      );
+    }
+
+    return vformat("You received &6{1, rhines}&r from &e{0, user}&r: &f{2}",
+        NamedTextColor.GRAY,
+        sender, amount, message
+    );
+  }
+
+  static ViewerAwareMessage paySender(User target, int amount, @Nullable ViewerAwareMessage message) {
+    if (isEmpty(message)) {
+      return vformat("Paid &6{0, rhines}&r to &e{1, user}&r.",
+          NamedTextColor.GRAY,
+          amount, target
+      );
+    }
+
+    return vformat("Paid &6{0, rhines}&r to &e{1, user}&r: &f{2}",
+        NamedTextColor.GRAY,
+        amount, target, message
     );
   }
 }

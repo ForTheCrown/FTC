@@ -1,0 +1,19 @@
+#-----------------------------------------------------------------------------------------#
+# Material          | Price | Max Earnings | Compact Material | Compact Multiplier | Slot #
+#-----------------------------------------------------------------------------------------#
+| dirt              | 2     |              |                   |                   | 4, 1 |
+| stone             | 2     |              |                   |                   | 2, 2 |
+| granite           | 3     |              |                   |                   | 3, 2 |
+| diorite           | 3     |              |                   |                   | 4, 2 |
+| andesite          | 3     |              |                   |                   | 5, 2 |
+| cobblestone       | 2     |              |                   |                   | 6, 2 |
+| gravel            | 2     |              |                   |                   | 2, 3 |
+| sand              | 2     |              |                   |                   | 3, 3 |
+| calcite           | 5     |              |                   |                   | 4, 3 |
+| deepslate         | 2     |              |                   |                   | 5, 3 |
+| cobbled_deepslate | 2     |              |                   |                   | 6, 3 |
+| smooth_basalt     | 3     |              |                   |                   | 2, 4 |
+| basalt            | 3     |              |                   |                   | 3, 4 |
+| netherrack        | 2     |              |                   |                   | 4, 4 |
+| blackstone        | 3     |              |                   |                   | 5, 4 |
+| end_stone         | 3     |              |                   |                   | 6, 4 |

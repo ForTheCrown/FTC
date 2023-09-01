@@ -23,7 +23,7 @@ import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.nbt.ListTag;
 import net.forthecrown.nbt.TagTypes;
-import net.forthecrown.utils.ChunkedMap;
+import net.forthecrown.utils.collision.ChunkedMap;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.math.Bounds3i;
@@ -97,7 +97,7 @@ public class DungeonLevel implements Iterable<DungeonPiece> {
     piece.level = this;
 
     if (piece instanceof RoomPiece) {
-      chunkMap.add(piece);
+      chunkMap.add(piece, piece.getBounds());
     }
 
     for (var c : piece.getChildren().values()) {

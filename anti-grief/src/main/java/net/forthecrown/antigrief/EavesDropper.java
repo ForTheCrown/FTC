@@ -1,12 +1,27 @@
 package net.forthecrown.antigrief;
 
+import static net.kyori.adventure.text.Component.text;
+
 import java.util.List;
+import java.util.Set;
 import net.forthecrown.command.settings.BookSetting;
 import net.forthecrown.command.settings.Setting;
 import net.forthecrown.command.settings.SettingsBook;
+import net.forthecrown.text.Text;
+import net.forthecrown.text.ViewerAwareMessage;
+import net.forthecrown.text.channel.ChannelledMessage;
+import net.forthecrown.text.channel.MessageRenderer;
 import net.forthecrown.user.Properties;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserProperty;
+import net.forthecrown.utils.Audiences;
+import net.forthecrown.utils.math.WorldVec3i;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 
 public final class EavesDropper {
   private EavesDropper() {}
@@ -58,6 +73,13 @@ public final class EavesDropper {
    */
   public static final UserProperty<Boolean> EAVES_DROP_GUILD_CHAT
       = Properties.booleanProperty("eavesDrop_guildChat", false);
+
+  public static final Component PREFIX = text()
+      .color(NamedTextColor.DARK_GRAY)
+      .append(text("[", NamedTextColor.GRAY))
+      .append(text("ED"))
+      .append(text("] ", NamedTextColor.GRAY))
+      .build();
 
   static void createSettings(SettingsBook<User> settingsBook) {
     Setting muted = Setting.create(EAVES_DROP_MUTED)
@@ -147,5 +169,116 @@ public final class EavesDropper {
     settings.add(veins.toBookSettng());
   }
 
+  public static void reportMessage(
+      Audience source,
+      Set<Audience> targets,
+      UserProperty<Boolean> viewProperty,
+      ViewerAwareMessage message,
+      MessageRenderer renderer
+  ) {
+    ChannelledMessage ch = createChannelled(viewProperty, viewer -> {
+      return renderer.render(viewer, message.create(viewer));
+    });
 
+    ch.setRenderer((viewer, baseMessage) -> {
+      Mute mute = Punishments.muteStatus(source);
+      Component muteText = text(mute.getPrefix());
+      return Component.textOfChildren(PREFIX, muteText, baseMessage);
+    });
+
+    ch.filterTargets(audience -> {
+      return !Audiences.equals(source, audience) && !targets.contains(audience);
+    });
+
+    ch.send();
+  }
+
+  private static ChannelledMessage createChannelled(
+      UserProperty<Boolean> viewProperty,
+      ViewerAwareMessage message
+  ) {
+    ChannelledMessage ch = ChannelledMessage.create(message);
+    ch.setChannelName("eaves_dropper");
+    ch.addTargets(Bukkit.getOnlinePlayers());
+    ch.addTarget(Bukkit.getConsoleSender());
+    ch.setRenderer(MessageRenderer.prefixing(PREFIX));
+
+    ch.filterTargets(audience -> {
+      User user = Audiences.getUser(audience);
+
+      if (user == null) {
+        return true;
+      }
+
+      if (!user.hasPermission(GriefPermissions.EAVESDROP)) {
+        return false;
+      }
+
+      return user.get(viewProperty);
+    });
+
+    return ch;
+  }
+
+  public static void reportSign(Player player, Block block, List<Component> lines) {
+    if (isEmpty(lines) || player.hasPermission(GriefPermissions.EAVESDROP_ADMIN)) {
+      return;
+    }
+
+    var pos = WorldVec3i.of(block);
+
+    var ch = createChannelled(EAVES_DROP_SIGN, viewer -> {
+      var formatted = Text.vformat(
+          """
+          &7{0, user} placed a sign at {1, location, -world -clickable}:
+          &71)&r {2}
+          &72)&r {3}
+          &73)&r {4}
+          &74)&r {5}""",
+          player,
+          pos,
+          lines.get(0),
+          lines.get(1),
+          lines.get(2),
+          lines.get(3)
+      );
+
+      return formatted.create(viewer);
+    });
+
+    // Remove player from the list
+    ch.filterTargets(audience -> !Audiences.equals(audience, player));
+    ch.send();
+  }
+
+  private static boolean isEmpty(List<Component> lines) {
+    if (lines.isEmpty()) {
+      return true;
+    }
+
+    for (var c : lines) {
+      if (!Text.plain(c).isBlank()) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  public static void reportOreMining(Block block, int veinSize, Player player) {
+    ChannelledMessage ch = createChannelled(EAVES_DROP_MINING, viewer -> {
+      return Text.format(
+          "&e{0, user}&r found &e{1, number} {2}&r at &e{3, location, -clickable -world}&r.",
+          NamedTextColor.GRAY,
+          player,
+          veinSize,
+          block.getType(),
+          block.getLocation()
+      );
+    });
+
+    // Remove player from the list
+    ch.filterTargets(audience -> !Audiences.equals(audience, player));
+    ch.send();
+  }
 }

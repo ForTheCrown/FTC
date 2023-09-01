@@ -1,18 +1,19 @@
 package net.forthecrown.titles;
 
-import static net.forthecrown.titles.TitleSettings.SEE_RANKS;
-
 import java.nio.file.Path;
+import lombok.Getter;
 import net.forthecrown.FtcServer;
 import net.forthecrown.Loggers;
 import net.forthecrown.command.Commands;
 import net.forthecrown.grenadier.annotations.AnnotatedCommandContext;
 import net.forthecrown.registry.Registries;
+import net.forthecrown.titles.commands.CommandBecomeBaron;
 import net.forthecrown.titles.commands.TitlesCommand;
-import net.forthecrown.user.name.UserNameFactory;
-import net.forthecrown.user.name.DisplayIntent;
 import net.forthecrown.user.UserService;
 import net.forthecrown.user.Users;
+import net.forthecrown.user.name.UserNameFactory;
+import net.forthecrown.utils.TomlConfigs;
+import net.forthecrown.utils.io.PluginJar;
 import net.forthecrown.utils.io.SerializationHelper;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.slf4j.Logger;
@@ -20,6 +21,9 @@ import org.slf4j.Logger;
 public class TitlesPlugin extends JavaPlugin {
 
   private static final Logger LOGGER = Loggers.getLogger();
+
+  @Getter
+  private TitlesConfig titlesConfig;
 
   @Override
   public void onEnable() {
@@ -32,17 +36,31 @@ public class TitlesPlugin extends JavaPlugin {
     AnnotatedCommandContext ctx = Commands.createAnnotationContext();
     ctx.registerCommand(new TitlesCommand());
 
+    new CommandBecomeBaron(this);
+
     FtcServer server = FtcServer.server();
     TitleSettings.add(server.getGlobalSettingsBook());
+
+    TitlePlaceholders.registerAll();
+  }
+
+  @Override
+  public void onDisable() {
+    var nameFactory = Users.getService().getNameFactory();
+    nameFactory.removePrefix("title_prefix");
+    TitlePlaceholders.unregister();
+  }
+
+  @Override
+  public void reloadConfig() {
+    titlesConfig = TomlConfigs.loadPluginConfig(this, TitlesConfig.class);
   }
 
   void addPrefixElement(UserNameFactory factory) {
-    factory.addPrefix((user, context) -> {
+    factory.addPrefix("title_prefix", 1, (user, context) -> {
       // Don't display rank prefix if the user has disabled it,
       // only in certain circumstances though
-      if (context.intentMatches(DisplayIntent.UNSET, DisplayIntent.HOVER_TEXT)
-          && !context.viewerProperty(SEE_RANKS)
-      ) {
+      if (!UserRanks.showRank(context)) {
         return null;
       }
 
@@ -59,8 +77,7 @@ public class TitlesPlugin extends JavaPlugin {
 
   public void loadTitles() {
     UserRanks.clearNonConstants();
-
-    saveResource("ranks.toml", false);
+    PluginJar.saveResources("ranks.toml", ranksFile());
 
     SerializationHelper.readAsJson(ranksFile(), wrapper -> {
       for (var e : wrapper.entrySet()) {

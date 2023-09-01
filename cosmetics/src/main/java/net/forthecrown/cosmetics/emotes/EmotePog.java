@@ -3,11 +3,11 @@ package net.forthecrown.cosmetics.emotes;
 import static net.kyori.adventure.text.Component.text;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.text.ChannelledMessage;
+import net.forthecrown.text.channel.ChannelledMessage;
 import net.forthecrown.command.FtcCommand;
 import net.forthecrown.command.arguments.Arguments;
 import net.forthecrown.grenadier.GrenadierCommand;
-import net.forthecrown.text.ChannelledMessage.MessageHandler;
+import net.forthecrown.text.channel.MessageHandler;
 import net.forthecrown.text.Text;
 import net.forthecrown.text.ViewerAwareMessage;
 import net.forthecrown.user.User;
@@ -55,7 +55,7 @@ public class EmotePog extends FtcCommand {
         : message;
 
     ChannelledMessage.create(nonNullMessage)
-        .setHandler(MessageHandler.EMPTY_IF_NOT_VIEWING)
+        .setHandler(MessageHandler.EMPTY_IF_VIEWER_WAS_REMOVED)
         .setSource(user)
         .setBroadcast()
         .setAnnouncement(false)

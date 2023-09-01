@@ -1,0 +1,51 @@
+{
+  "map": {
+    "aliases": ["worldmap"],
+    "make_command": true,
+    "shortText": "Show's the server's dynmap link",
+    "fullText": [
+      "${prefix} The server's dynmap:\n",
+      {
+        "text": "http://mc.forthecrown.net:19213/",
+        "clickEvent": {
+          "action": "open_url",
+          "value": "http://mc.forthecrown.net:19213/"
+        },
+        "hoverEvent": {
+          "action": "show_text",
+          "contents": "Click me!"
+        }
+      }
+    ]
+  },
+  "bank": {
+    "aliases": ["bankhelp"],
+    "make_command": true,
+    "shortText": "Shows info about the bank",
+    "fullText": [
+      "${prefix} &eBank Info:\n",
+      "&eThe Bank&r can provide you with extra items in your adventure on &6FTC\n",
+      "To enter the bank, you need a &a[Bank Ticket]&r earned by voting for the server with &6/vote.\n",
+      "Entering &ethe vault&r will consume the ticket, allowing you to &eloot the chests&r for a short period of time"
+    ]
+  },
+  "ip": {
+    "make_command": true,
+    "shortText": "Show's the server's IP",
+    "fullText": [
+      "${prefix} &eServer's IP:\n",
+      {
+        "text": "mc.forthecrown.net (Click to copy)",
+        "color": "aqua",
+        "clickEvent": {
+          "action": "copy_to_clipboard",
+          "value": "mc.forthecrown.net"
+        },
+        "hoverEvent": {
+          "action": "show_text",
+          "contents": "Click me!"
+        }
+      }
+    ]
+  }
+}

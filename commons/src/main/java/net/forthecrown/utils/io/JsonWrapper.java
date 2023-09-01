@@ -18,6 +18,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,6 +28,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.IntFunction;
+import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.utils.math.Vectors;
@@ -149,6 +151,14 @@ public final class JsonWrapper {
     JsonArray array = new JsonArray();
     iterable.forEach(e -> array.add(function.apply(e)));
     source.add(name, array);
+  }
+
+  public void addInstant(String key, Instant instant) {
+    add(key, JsonUtils.writeInstant(instant));
+  }
+
+  public Instant getInstant(String key, Instant defaultValue) {
+    return get(key, JsonUtils::readInstant, defaultValue);
   }
 
   public String getString(String name) {
@@ -281,6 +291,10 @@ public final class JsonWrapper {
     }
 
     return wrap(getObject(name));
+  }
+
+  public Stream<JsonElement> getStream(String name) {
+    return JsonUtils.stream(getArray(name));
   }
 
   public void add(String name, JsonWrapper buf) {

@@ -4,20 +4,27 @@ import com.google.common.base.Preconditions;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.Getter;
 import lombok.Setter;
+import net.forthecrown.Loggers;
 import net.forthecrown.user.TimeField;
 import net.forthecrown.user.UserLookup.LookupEntry;
 
 import java.util.*;
+import org.slf4j.Logger;
 
 public class UserMaps implements Iterable<UserImpl> {
 
-  private final Map<UUID, UserImpl> loaded = new Object2ObjectOpenHashMap<>();
-  private final Map<UUID, UserImpl> online = new Object2ObjectOpenHashMap<>();
+  private static final Logger LOGGER = Loggers.getLogger();
+
+  private final Map<UUID, UserImpl> loaded = new Object2ObjectOpenHashMap<>(100);
+  private final Map<UUID, UserImpl> online = new Object2ObjectOpenHashMap<>(100);
 
   private final UserServiceImpl service;
 
   @Getter @Setter
   private boolean loadingEnabled = false;
+
+  @Getter @Setter
+  private boolean userAutoUnloadingEnabled = true;
 
   public UserMaps(UserServiceImpl service) {
     this.service = service;
@@ -31,7 +38,7 @@ public class UserMaps implements Iterable<UserImpl> {
     return loaded.values();
   }
 
-  public UserImpl getUser(LookupEntry entry) {
+  public synchronized UserImpl getUser(LookupEntry entry) {
     Objects.requireNonNull(entry);
 
     Preconditions.checkState(
@@ -55,7 +62,7 @@ public class UserMaps implements Iterable<UserImpl> {
     return user;
   }
 
-  public boolean remove(UserImpl user) {
+  public synchronized boolean remove(UserImpl user) {
     var removed = loaded.remove(user.getUniqueId());
     online.remove(user.getUniqueId());
 

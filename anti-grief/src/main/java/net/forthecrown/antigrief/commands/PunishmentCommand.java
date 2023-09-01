@@ -1,16 +1,11 @@
 package net.forthecrown.antigrief.commands;
 
-import static net.forthecrown.antigrief.Punishment.INDEFINITE_EXPIRY;
-
 import com.google.common.base.Strings;
-import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import java.time.Duration;
-import java.util.concurrent.CompletableFuture;
+import java.time.Instant;
 import javax.annotation.Nullable;
 import net.forthecrown.antigrief.GExceptions;
 import net.forthecrown.antigrief.PunishEntry;
@@ -21,7 +16,6 @@ import net.forthecrown.command.FtcCommand;
 import net.forthecrown.command.arguments.Arguments;
 import net.forthecrown.command.help.UsageFactory;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.Completions;
 import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.grenadier.types.options.ArgumentOption;
@@ -47,15 +41,8 @@ public class PunishmentCommand extends FtcCommand {
     register();
   }
 
-  static final ArgumentOption<String> REASON
-      = Options.argument(new ReasonParser())
-      .addLabel("reason", "cause")
-      .build();
-
-  static final ArgumentOption<Duration> TIME
-      = Options.argument(ArgumentTypes.time())
-      .addLabel("time", "length")
-      .build();
+  static final ArgumentOption<String> REASON = Options.argument(new ReasonParser(), "reason");
+  static final ArgumentOption<Duration> TIME = Options.argument(ArgumentTypes.time(), "length");
 
   static final OptionsArgument ARGS = OptionsArgument.builder()
       .addOptional(REASON)
@@ -74,14 +61,12 @@ public class PunishmentCommand extends FtcCommand {
   public void createCommand(GrenadierCommand command) {
     command
         .then(argument("user", Arguments.USER)
-            .executes(c -> punish(c, null, INDEFINITE_EXPIRY))
+            .executes(c -> punish(c, null, null))
 
             .then(argument("args", ARGS)
                 .executes(c -> {
                   var args = c.getArgument("args", ParsedOptions.class);
-                  long length = args.has(TIME)
-                      ? args.getValue(TIME).toMillis()
-                      : INDEFINITE_EXPIRY;
+                  var length = args.getValue(TIME);
 
                   return punish(c, args.getValue(REASON), length);
                 })
@@ -89,13 +74,14 @@ public class PunishmentCommand extends FtcCommand {
         );
   }
 
-  private int punish(CommandContext<CommandSource> c, @Nullable String reason, long length)
-      throws CommandSyntaxException {
+  int punish(CommandContext<CommandSource> c, @Nullable String reason, Duration length)
+      throws CommandSyntaxException
+  {
     User user = Arguments.getUser(c, "user");
     return punish(user, c.getSource(), reason, length);
   }
 
-  int punish(User user, CommandSource source, @Nullable String reason, long length)
+  int punish(User user, CommandSource source, @Nullable String reason, Duration length)
       throws CommandSyntaxException
   {
     if (!Punishments.canPunish(source, user)) {
@@ -126,7 +112,7 @@ public class PunishmentCommand extends FtcCommand {
     new PardonCommand("unmute", PunishType.MUTE, "pardonmute");
     new PardonCommand("unjail", PunishType.JAIL, "pardonjail");
 
-    new PardonCommand("unban", PunishType.BAN, "pardon", "pardonban");
+    new PardonCommand("unban", PunishType.BAN, "pardonban");
     new PardonCommand("unbanip", PunishType.IP_BAN, "pardonip", "ippardon", "pardonipban");
   }
 
@@ -137,7 +123,18 @@ public class PunishmentCommand extends FtcCommand {
     }
 
     @Override
-    int punish(User user, CommandSource source, @Nullable String reason, long length)
+    public void createCommand(GrenadierCommand command) {
+      command.then(argument("user", Arguments.USER)
+          .executes(c -> punish(c, null, null))
+
+          .then(argument("reason", StringArgumentType.greedyString())
+              .executes(c -> punish(c, c.getArgument("reason", String.class), null))
+          )
+      );
+    }
+
+    @Override
+    int punish(User user, CommandSource source, @Nullable String reason, Duration length)
         throws CommandSyntaxException
     {
       if (!user.isOnline()) {
@@ -156,33 +153,13 @@ public class PunishmentCommand extends FtcCommand {
           reason,
           null,
           PunishType.KICK,
-          System.currentTimeMillis(), INDEFINITE_EXPIRY
+          Instant.now(),
+          null
       ));
 
-      Punishments.announce(source, user, PunishType.KICK, INDEFINITE_EXPIRY, reason);
+      Punishments.announce(source, user, PunishType.KICK, null, reason);
       return 0;
     }
   }
 
-  static class ReasonParser implements ArgumentType<String> {
-
-    @Override
-    public String parse(StringReader reader) throws CommandSyntaxException {
-      if (reader.peek() == '"' || reader.peek() == '\'') {
-        return reader.readQuotedString();
-      }
-
-      var remaining = reader.getRemaining();
-      reader.setCursor(reader.getTotalLength());
-
-      return remaining;
-    }
-
-    @Override
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
-                                                              SuggestionsBuilder builder
-    ) {
-      return Completions.suggest(builder, "\"\"", "''");
-    }
-  }
 }

@@ -6,7 +6,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.user.UserLookup.LookupEntry;
+import net.forthecrown.user.currency.Currency;
 import net.forthecrown.user.name.UserNameFactory;
+import net.forthecrown.utils.ScoreIntMap;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -59,6 +61,30 @@ public interface UserService {
    * @param operation Operation to execute
    */
   void executeOnAllUsersAsync(Consumer<User> operation);
+
+  /**
+   * Gets the server's currency registry.
+   * <p>
+   * Note: This registry provides ways to access currency values, not all values within in this
+   * registry are guaranteed to be serialized within the user data directory, or even be serialized
+   * at all.
+   * <p>
+   * The following currencies will always be present:
+   * <pre>
+   * 1. 'rhines' Main server currency
+   * 2. 'gems' Cosmetics currency
+   * </pre>
+   * This registry will be frozen after the server has been loaded
+   *
+   * @return Currency registry
+   */
+  Registry<Currency> getCurrencies();
+
+  /**
+   * Gets a score map of total player votes
+   * @return Total player votes
+   */
+  ScoreIntMap<UUID> getVotes();
 
   /**
    * Gets the user property registry.
@@ -140,6 +166,8 @@ public interface UserService {
   boolean isAltAccount(@NotNull UUID playerId);
 
   Collection<UUID> getOtherAccounts(@NotNull UUID playerId);
+
+  Collection<UUID> getAltAccounts(@NotNull UUID playerId);
 
   boolean isAltForAny(@NotNull UUID playerId, @NotNull Collection<Player> players);
 

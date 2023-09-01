@@ -30,7 +30,10 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Sign;
+import org.bukkit.block.data.type.HangingSign;
 import org.bukkit.block.data.type.WallSign;
+import org.bukkit.block.sign.Side;
+import org.bukkit.block.sign.SignSide;
 
 public class CommandSign extends FtcCommand {
 
@@ -45,7 +48,9 @@ public class CommandSign extends FtcCommand {
       entry("dark_oak"),
       entry("mangrove"),
       entry("crimson"),
-      entry("warped")
+      entry("warped"),
+      entry("cherry"),
+      entry("bamboo")
   );
 
   public CommandSign() {
@@ -60,17 +65,17 @@ public class CommandSign extends FtcCommand {
   private static Entry<String, SignType> entry(String name) {
     Material wallSign = Material.matchMaterial(name + "_wall_sign");
     Material sign = Material.matchMaterial(name + "_sign");
+    Material hanging = Material.matchMaterial(name + "_hanging_sign");
+
     Objects.requireNonNull(wallSign);
     Objects.requireNonNull(sign);
+    Objects.requireNonNull(hanging);
 
-    return entry(name, wallSign, sign);
+    return entry(name, wallSign, sign, hanging);
   }
 
-  private static Entry<String, SignType> entry(String name,
-                                               Material wall,
-                                               Material normal
-  ) {
-    return Map.entry(name, new SignType(normal, wall));
+  private static Entry<String, SignType> entry(String name, Material wall, Material normal, Material hanging) {
+    return Map.entry(name, new SignType(normal, wall, hanging));
   }
 
   @Override
@@ -84,6 +89,7 @@ public class CommandSign extends FtcCommand {
     prefixed.usage("<line: number(1..4)> -clear", "Clears <line>");
     prefixed.usage("type <type>", "Sets the sign's type");
     prefixed.usage("glow <true | false>", "Makes a sign glow/not glow");
+    prefixed.usage("waxed <true | false>", "Sets a sign to be waxed or not");
   }
 
   @Override
@@ -92,9 +98,9 @@ public class CommandSign extends FtcCommand {
         .then(argument("pos", ArgumentTypes.blockPosition())
             .then(literal("clear")
                 .executes(c -> {
-                  Sign sign = get(c);
+                  SignInfo sign = get(c);
 
-                  SignLines.EMPTY.apply(sign);
+                  SignLines.EMPTY.apply(sign.side);
                   sign.update();
 
                   c.getSource().sendSuccess(text("Cleared sign"));
@@ -105,12 +111,12 @@ public class CommandSign extends FtcCommand {
             .then(literal("glow")
                 .then(argument("glow_state", BoolArgumentType.bool())
                     .executes(c -> {
-                      Sign sign = get(c);
+                      SignInfo sign = get(c);
 
                       boolean glowing
                           = c.getArgument("glow_state", Boolean.class);
 
-                      sign.setGlowingText(glowing);
+                      sign.sign.setGlowingText(glowing);
                       sign.update();
 
                       c.getSource().sendSuccess(
@@ -121,13 +127,30 @@ public class CommandSign extends FtcCommand {
                 )
             )
 
+            .then(literal("waxed")
+                .then(argument("waxed_state", BoolArgumentType.bool())
+                    .executes(c -> {
+                      SignInfo sign = get(c);
+                      boolean waxed = c.getArgument("waxed_state", Boolean.class);
+
+                      sign.sign.setWaxed(waxed);
+                      sign.update();
+
+                      c.getSource().sendSuccess(
+                          Text.format("Set sign waxed {0}", waxed)
+                      );
+                      return 0;
+                    })
+                )
+            )
+
             .then(literal("type")
                 .then(argument("type", ArgumentTypes.map(types))
                     .executes(c -> {
-                      Sign sign = get(c);
+                      SignInfo sign = get(c);
                       SignType type = c.getArgument("type", SignType.class);
 
-                      type.apply(sign);
+                      type.apply(sign.sign());
 
                       c.getSource().sendSuccess(
                           text("Set sign's type to: " + type.name())
@@ -140,9 +163,9 @@ public class CommandSign extends FtcCommand {
             .then(literal("copy")
                 .executes(c -> {
                   User user = getUserSender(c);
-                  Sign sign = get(c);
+                  SignInfo sign = get(c);
 
-                  SignLines lines = new SignLines(sign);
+                  SignLines lines = new SignLines(sign.side());
                   copies.put(user.getUniqueId(), lines);
 
                   user.sendMessage(
@@ -156,14 +179,14 @@ public class CommandSign extends FtcCommand {
             .then(literal("paste")
                 .executes(c -> {
                   User user = getUserSender(c);
-                  Sign sign = get(c);
+                  SignInfo sign = get(c);
 
                   SignLines lines = copies.get(user.getUniqueId());
                   if (lines == null) {
                     throw Exceptions.create("You have no sign copied");
                   }
 
-                  lines.apply(sign);
+                  lines.apply(sign.side());
                   sign.update();
 
                   user.sendMessage(
@@ -182,14 +205,13 @@ public class CommandSign extends FtcCommand {
                 .then(literal("set")
                     .then(argument("line", Arguments.CHAT)
                         .suggests((c, b) -> {
-                          Sign sign = get(c);
+                          SignInfo sign = get(c);
                           int line = c.getArgument("index", Integer.class);
                           var token = b.getRemainingLowerCase();
 
-                          var lineComponent = sign.line(line - 1);
+                          var lineComponent = sign.side().line(line - 1);
 
-                          String lineText = LegacyComponentSerializer
-                              .legacyAmpersand()
+                          String lineText = LegacyComponentSerializer.legacyAmpersand()
                               .serialize(lineComponent);
 
                           if (Completions.matches(token, lineText)) {
@@ -199,11 +221,7 @@ public class CommandSign extends FtcCommand {
 
                           return MessageSuggestions.get(
                               c, b, true,
-                              (builder, source) -> {
-                                Completions.suggest(
-                                    builder, "-clear"
-                                );
-                              }
+                              (builder, source) -> Completions.suggest(builder, "-clear")
                           );
                         })
 
@@ -220,7 +238,8 @@ public class CommandSign extends FtcCommand {
 
   private int set(CommandContext<CommandSource> c, Component text) throws CommandSyntaxException {
     int index = c.getArgument("index", Integer.class);
-    Sign sign = get(c);
+    SignInfo info = get(c);
+    SignSide sign = info.side();
 
     if (Text.isDashClear(text)) {
       sign.line(index - 1, Component.empty());
@@ -236,39 +255,60 @@ public class CommandSign extends FtcCommand {
       );
     }
 
-    sign.update();
+    info.update();
     return 0;
   }
 
-  private Sign get(CommandContext<CommandSource> c) throws CommandSyntaxException {
+  private SignInfo get(CommandContext<CommandSource> c) throws CommandSyntaxException {
     Location l = ArgumentTypes.getLocation(c, "pos");
 
     if (!(l.getBlock().getState() instanceof Sign)) {
       throw CoreExceptions.notSign(l);
     }
 
-    return (Sign) l.getBlock().getState();
+    Sign sign = (Sign) l.getBlock().getState();
+    Side side;
+
+    if (c.getSource().isEntity()) {
+      final int maxDist = 5;
+      final int maxDistSq = maxDist * maxDist;
+
+      var loc = c.getSource().getLocation();
+
+      if (loc.distanceSquared(sign.getLocation()) > maxDistSq) {
+        side = Side.FRONT;
+      } else {
+        side = sign.getInteractableSideFor(loc);
+      }
+    } else {
+      side = Side.FRONT;
+    }
+
+    SignSide signSide = sign.getSide(side);
+    return new SignInfo(sign, signSide);
+  }
+
+  record SignInfo(Sign sign, SignSide side) {
+
+    public void update() {
+      sign.update(false, false);
+    }
   }
 
   /**
    * A small data class to store the data written on a sign or data which can be applied to a sign
    */
-  record SignLines(Component line0,
-                   Component line1,
-                   Component line2,
-                   Component line3
-  ) {
+  record SignLines(Component line0, Component line1, Component line2, Component line3) {
 
-    public static final SignLines EMPTY = new SignLines(Component.empty(), Component.empty(),
-        Component.empty(), Component.empty());
+    public static final SignLines EMPTY = new SignLines(
+        Component.empty(),
+        Component.empty(),
+        Component.empty(),
+        Component.empty()
+    );
 
-    public SignLines(Sign sign) {
-      this(
-          sign.line(0),
-          sign.line(1),
-          sign.line(2),
-          sign.line(3)
-      );
+    public SignLines(SignSide sign) {
+      this(sign.line(0), sign.line(1), sign.line(2), sign.line(3));
     }
 
     /**
@@ -276,7 +316,7 @@ public class CommandSign extends FtcCommand {
      *
      * @param sign The sign to edit
      */
-    public void apply(Sign sign) {
+    public void apply(SignSide sign) {
       sign.line(0, emptyIfNull(line0));
       sign.line(1, emptyIfNull(line1));
       sign.line(2, emptyIfNull(line2));
@@ -288,7 +328,7 @@ public class CommandSign extends FtcCommand {
     }
   }
 
-  record SignType(Material sign, Material wallSign) {
+  record SignType(Material sign, Material wallSign, Material hanging) {
 
     public String name() {
       return sign.name()
@@ -303,6 +343,13 @@ public class CommandSign extends FtcCommand {
         WallSign newData = (WallSign) wallSign.createBlockData();
         newData.setFacing(wallData.getFacing());
         newData.setWaterlogged(wallData.isWaterlogged());
+
+        sign.setBlockData(newData);
+      } else if (data instanceof HangingSign hanging) {
+        HangingSign newData = (HangingSign) this.hanging.createBlockData();
+        newData.setRotation(hanging.getRotation());
+        newData.setWaterlogged(hanging.isWaterlogged());
+        newData.setAttached(hanging.isAttached());
 
         sign.setBlockData(newData);
       } else if (data instanceof org.bukkit.block.data.type.Sign signData) {

@@ -2,11 +2,12 @@ package net.forthecrown.antigrief;
 
 import com.google.common.base.Strings;
 import com.google.gson.JsonElement;
+import java.time.Duration;
+import java.time.Instant;
 import lombok.Data;
 import net.forthecrown.text.Text;
 import net.forthecrown.text.TextWriter;
 import net.forthecrown.utils.Tasks;
-import net.forthecrown.utils.Time;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -56,7 +57,7 @@ public class Punishment {
   /**
    * Timestamp of when the punishment was issued
    */
-  private final long began;
+  private final Instant began;
 
   /**
    * Timestamp of when the punishment expire/when it did expire.
@@ -64,7 +65,8 @@ public class Punishment {
    * If a punishment wasn't given an expiry date, this will be
    * {@link #INDEFINITE_EXPIRY}
    */
-  private final long expires;
+  @Nullable
+  private final Instant expires;
 
   /**
    * If this punishment was lifted via a staff pardon, this will be the name of who pardoned it.
@@ -91,22 +93,19 @@ public class Punishment {
    * @param callback The callback to call once the punishment expires
    */
   public void startTask(Runnable callback) {
-    if (expires == INDEFINITE_EXPIRY) {
+    if (expires == null) {
       return;
     }
 
     cancelTask();
+    Instant now = Instant.now();
 
-    long until = Time.timeUntil(expires);
-
-    // Until being less than or equal to 0 means
-    // that this task was supposed to be executed
-    // some time in the past, so run it now lol
-    if (until <= 0) {
+    if (now.isAfter(expires)) {
       callback.run();
     }
 
-    Tasks.runLater(callback, Time.millisToTicks(until));
+    Duration until = Duration.between(now, expires);
+    Tasks.runLater(callback, until);
   }
 
   /**
@@ -146,7 +145,7 @@ public class Punishment {
     writeField(writer, "Began", Text.formatDate(began));
     writeField(writer, "Type", type.presentableName());
 
-    if (expires != INDEFINITE_EXPIRY) {
+    if (expires != null) {
       writeField(writer, "Expires", Text.formatDate(expires));
     }
 
@@ -181,7 +180,7 @@ public class Punishment {
     JsonWrapper json = JsonWrapper.create();
 
     json.add(KEY_SOURCE, source);
-    json.addTimeStamp(KEY_BEGAN, began);
+    json.addInstant(KEY_BEGAN, began);
     json.addEnum(KEY_TYPE, type);
 
     if (!Strings.isNullOrEmpty(reason)) {
@@ -192,8 +191,8 @@ public class Punishment {
       json.add(KEY_EXTRA, extra);
     }
 
-    if (expires != INDEFINITE_EXPIRY) {
-      json.addTimeStamp(KEY_EXPIRES, expires);
+    if (expires != null) {
+      json.addInstant(KEY_EXPIRES, expires);
     }
 
     if (wasPardoned()) {
@@ -212,8 +211,8 @@ public class Punishment {
         json.getString(KEY_REASON, null),
         json.getString(KEY_EXTRA, null),
         json.getEnum(KEY_TYPE, PunishType.class, PunishType.SOFT_MUTE),
-        json.getDate(KEY_BEGAN).getTime(),
-        json.getTimeStamp(KEY_EXPIRES, INDEFINITE_EXPIRY)
+        json.getInstant(KEY_BEGAN, Instant.now()),
+        json.getInstant(KEY_EXPIRES, null)
     );
 
     if (json.has(KEY_PARDON_DATE)) {

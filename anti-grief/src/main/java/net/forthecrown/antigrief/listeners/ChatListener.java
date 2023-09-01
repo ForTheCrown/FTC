@@ -5,7 +5,7 @@ import net.forthecrown.antigrief.BannedWords;
 import net.forthecrown.antigrief.Mute;
 import net.forthecrown.antigrief.Punishments;
 import net.forthecrown.antigrief.StaffChat;
-import net.forthecrown.text.ViewerAwareMessage;
+import net.forthecrown.text.PlayerMessage;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.Audiences;
@@ -15,7 +15,7 @@ import org.bukkit.event.Listener;
 
 class ChatListener implements Listener {
 
-  @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
+  @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
   public void onAsyncChat(AsyncChatEvent event) {
     Mute mute = Punishments.checkMute(event.getPlayer());
 
@@ -25,7 +25,14 @@ class ChatListener implements Listener {
     }
 
     if (mute == Mute.SOFT) {
-      event.viewers().removeIf(audience -> !Audiences.equals(audience, event.getPlayer()));
+      event.viewers().removeIf(audience -> {
+        if (Audiences.equals(audience, event.getPlayer())) {
+          return false;
+        }
+
+        Mute viewerMute = Punishments.muteStatus(audience);
+        return viewerMute != Mute.SOFT;
+      });
     }
 
     if (BannedWords.checkAndWarn(event.getPlayer(), event.message())) {
@@ -38,7 +45,7 @@ class ChatListener implements Listener {
 
       StaffChat.newMessage()
           .setLogged(true)
-          .setMessage(ViewerAwareMessage.wrap(event.message()))
+          .setMessage(PlayerMessage.allFlags(event.signedMessage().message()))
           .setSource(user.getCommandSource())
           .send();
     }

@@ -19,10 +19,7 @@ public interface BlockBuffer {
     return place(world, transform, false);
   }
 
-  CompletableFuture<Void> place(World world,
-                                Transform transform,
-                                boolean updatePhysics
-  );
+  CompletableFuture<Void> place(World world, Transform transform, boolean updatePhysics);
 
   default BufferBlock getBlock(Vector3i pos) {
     return getBlock(pos.x(), pos.y(), pos.z());

@@ -1,0 +1,46 @@
+name = "worldloader"
+description = "FTC chunk loader command. Different from Chunky"
+
+literal("reload") {
+  description = "Reloads the WorldLoader config"
+  executes = reloadConfig()
+}
+
+literal("generate").argument("world", world) {
+  description = [
+    "Starts pre-generating a <world>, will load everything inside",
+    "the world's world border"
+  ]
+  executes = loadWorld()
+
+  argument("options" @options) {
+    executes = loadWorld()
+    label = "[center=<x,z>] [radius=<x,z>]"
+    description = [
+      "Starts pre-generating a <world>, will load the world according",
+      "to the specified options"
+    ]
+  }
+}
+
+literal("stop").argument("world", world) {
+  description = "Stops pre-generating a <world>"
+  executes = stopLoading()
+}
+
+literal("remake").argument("world", world) {
+  argument("seed", greedy_string) {
+    label = "[<seed>]"
+    description = [
+      "Remakes a <world>",
+      "This will unload the world, delete its files and then remake the world",
+      "with the same world border and game rules.",
+      "If <seed> is set, uses that seed, else, generates a random seed,",
+      "Use '-current' to use the world's current seed to remake it"
+    ]
+
+    executes = remakeWorld()
+  }
+
+  executes = remakeWorld()
+}

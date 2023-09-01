@@ -3,6 +3,8 @@ package net.forthecrown.utils.io;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.RecordBuilder;
+import com.mojang.serialization.RecordBuilder.AbstractStringBuilder;
 import java.nio.ByteBuffer;
 import java.util.stream.Collector;
 import java.util.stream.IntStream;
@@ -15,6 +17,7 @@ import net.forthecrown.nbt.ByteTag;
 import net.forthecrown.nbt.CollectionTag;
 import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.nbt.DoubleTag;
+import net.forthecrown.nbt.EndTag;
 import net.forthecrown.nbt.FloatTag;
 import net.forthecrown.nbt.IntArrayTag;
 import net.forthecrown.nbt.IntTag;
@@ -24,6 +27,7 @@ import net.forthecrown.nbt.LongTag;
 import net.forthecrown.nbt.NumberTag;
 import net.forthecrown.nbt.ShortTag;
 import net.forthecrown.nbt.StringTag;
+import net.forthecrown.nbt.TypeIds;
 
 public class TagOps implements DynamicOps<BinaryTag> {
   private static final Collector<Pair<String, BinaryTag>, CompoundTag, CompoundTag> MAP_COLLECTOR
@@ -169,27 +173,32 @@ public class TagOps implements DynamicOps<BinaryTag> {
 
   @Override
   public DataResult<BinaryTag> mergeToList(BinaryTag list, BinaryTag value) {
-    if (!(list instanceof CollectionTag t)) {
+    if (value.getId() == TypeIds.END) {
+      return Results.error("Cannot add TAG_End to list");
+    }
+
+    if (!(list instanceof CollectionTag) && !(list instanceof EndTag)) {
       return Results.error("Not a list: " + list);
     }
 
-    var listTag = t.copy();
+    CollectionTag col;
+    if (list instanceof CollectionTag t) {
+      col = t;
+    } else {
+      col = BinaryTags.listTag();
+    }
+
+    var listTag = col.copy();
     if (!listTag.addTag(value)) {
-      return Results.error(
-          "Element %s is not a matching type for %s list",
-          value, list
-      );
+      return Results.error("Element %s is not a matching type for %s list", value, list);
     }
 
     return Results.success(listTag);
   }
 
   @Override
-  public DataResult<BinaryTag> mergeToMap(BinaryTag map,
-                                          BinaryTag key,
-                                          BinaryTag value
-  ) {
-    if (!map.isCompound()) {
+  public DataResult<BinaryTag> mergeToMap(BinaryTag map, BinaryTag key, BinaryTag value) {
+    if (!map.isCompound() && map.getId() != TypeIds.END) {
       return Results.error("Not a map: " + map);
     }
 
@@ -197,7 +206,14 @@ public class TagOps implements DynamicOps<BinaryTag> {
       return Results.error("Not a string: " + key);
     }
 
-    CompoundTag t1 = map.asCompound();
+    if (value.getId() == TypeIds.END) {
+      return Results.error("Cannot add TAG_End to map");
+    }
+
+    CompoundTag t1 = map.getId() == TypeIds.END
+        ? BinaryTags.compoundTag()
+        : map.asCompound().copy();
+
     String keyString = key.toString();
 
     CompoundTag result = t1.copy();
@@ -206,9 +222,7 @@ public class TagOps implements DynamicOps<BinaryTag> {
   }
 
   @Override
-  public DataResult<Stream<Pair<BinaryTag, BinaryTag>>> getMapValues(
-      BinaryTag input
-  ) {
+  public DataResult<Stream<Pair<BinaryTag, BinaryTag>>> getMapValues(BinaryTag input) {
     if (!input.isCompound()) {
       return Results.error("Not a map: " + input);
     }
@@ -252,5 +266,47 @@ public class TagOps implements DynamicOps<BinaryTag> {
     }
 
     return input;
+  }
+
+  @Override
+  public RecordBuilder<BinaryTag> mapBuilder() {
+    return new TagMapBuilder(this);
+  }
+
+  private static class TagMapBuilder extends AbstractStringBuilder<BinaryTag, CompoundTag> {
+
+    protected TagMapBuilder(DynamicOps<BinaryTag> ops) {
+      super(ops);
+    }
+
+    @Override
+    protected CompoundTag append(String key, BinaryTag value, CompoundTag builder) {
+      builder.put(key, value);
+      return builder;
+    }
+
+    @Override
+    protected CompoundTag initBuilder() {
+      return BinaryTags.compoundTag();
+    }
+
+    @Override
+    protected DataResult<BinaryTag> build(CompoundTag builder, BinaryTag prefix) {
+      if (prefix != null && prefix.getId() != TypeIds.END) {
+        if (prefix.isCompound()) {
+          CompoundTag tag = prefix.asCompound();
+          CompoundTag result = BinaryTags.compoundTag();
+
+          result.putAll(tag);
+          result.putAll(builder);
+
+          return DataResult.success(result);
+        }
+
+        return Results.error("build() called with a non-compound tag");
+      }
+
+      return DataResult.success(builder);
+    }
   }
 }

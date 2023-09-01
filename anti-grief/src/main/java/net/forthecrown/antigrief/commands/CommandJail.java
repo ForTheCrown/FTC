@@ -1,12 +1,12 @@
 package net.forthecrown.antigrief.commands;
 
-import static net.forthecrown.antigrief.Punishment.INDEFINITE_EXPIRY;
 import static net.forthecrown.antigrief.commands.PunishmentCommand.ARGS;
 import static net.forthecrown.antigrief.commands.PunishmentCommand.REASON;
 import static net.forthecrown.antigrief.commands.PunishmentCommand.TIME;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.time.Duration;
 import javax.annotation.Nullable;
 import net.forthecrown.antigrief.GExceptions;
 import net.forthecrown.antigrief.GriefPermissions;
@@ -60,14 +60,12 @@ public class CommandJail extends FtcCommand {
     command
         .then(argument("user", Arguments.USER)
             .then(argument("jail", AntiGriefCommands.JAIL_CELL_ARG)
-                .executes(c -> punish(c, null, INDEFINITE_EXPIRY))
+                .executes(c -> punish(c, null, null))
 
                 .then(argument("args", ARGS)
                     .executes(c -> {
                       var args = c.getArgument("args", ParsedOptions.class);
-                      long length = args.has(TIME)
-                          ? args.getValue(TIME).toMillis()
-                          : INDEFINITE_EXPIRY;
+                      var length = args.getValue(TIME);
 
                       return punish(c, args.getValue(REASON), length);
                     })
@@ -76,8 +74,9 @@ public class CommandJail extends FtcCommand {
         );
   }
 
-  private int punish(CommandContext<CommandSource> c, @Nullable String reason, long length)
-      throws CommandSyntaxException {
+  private int punish(CommandContext<CommandSource> c, @Nullable String reason, Duration length)
+      throws CommandSyntaxException
+  {
     CommandSource source = c.getSource();
     User user = Arguments.getUser(c, "user");
 

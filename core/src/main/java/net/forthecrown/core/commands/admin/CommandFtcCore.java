@@ -2,10 +2,10 @@ package net.forthecrown.core.commands.admin;
 
 import net.forthecrown.core.CorePlugin;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.annotations.CommandData;
+import net.forthecrown.grenadier.annotations.CommandFile;
 import net.kyori.adventure.text.Component;
 
-@CommandData("file = 'commands/ftccore.gcn'")
+@CommandFile("commands/ftccore.gcn")
 public class CommandFtcCore {
 
   void reload(CommandSource source) {

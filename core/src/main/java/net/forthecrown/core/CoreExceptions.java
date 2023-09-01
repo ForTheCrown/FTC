@@ -3,7 +3,9 @@ package net.forthecrown.core;
 import static net.forthecrown.command.Exceptions.create;
 import static net.forthecrown.command.Exceptions.format;
 
+import com.mojang.brigadier.ImmutableStringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.command.Exceptions;
 import net.forthecrown.user.User;
 import org.bukkit.Location;
 import org.bukkit.enchantments.Enchantment;
@@ -39,6 +41,46 @@ public interface CoreExceptions {
   CommandSyntaxException NO_LORE = create("Item has no lore");
 
   CommandSyntaxException NO_ATTR_MODS = create("No attribute modifiers to remove");
+
+
+  CommandSyntaxException NO_DEF_HOME = create("No default home set. Use /sethome.");
+
+  CommandSyntaxException CANNOT_SET_HOME = create("Cannot set home here.");
+
+  CommandSyntaxException CANNOT_RETURN = create("Cannot return to previous location");
+
+  CommandSyntaxException NOT_INVITED = create("You have not been invited");
+
+
+  CommandSyntaxException SENDER_PAY_DISABLED = create("You have disabled paying." +
+      "\nUse /paytoggle to enable it."
+  );
+
+  CommandSyntaxException CANNOT_PAY_SELF = create("You cannot pay yourself.");
+
+  static CommandSyntaxException overHomeLimit(User user) {
+    var perm = CorePermissions.MAX_HOMES;
+
+    return format("Cannot create more homes (Over limit of {0, number}).",
+        perm.getTier(user).orElse(perm.getMinTier())
+    );
+  }
+
+  static CommandSyntaxException unknownHome(ImmutableStringReader reader, String name) {
+    return Exceptions.unknown("home", reader, name);
+  }
+
+  static CommandSyntaxException notInvited(User user) {
+    return format("{0, user} has not invited you.", user);
+  }
+
+  static CommandSyntaxException noHomeWaypoint(User user) {
+    return format("{0, user} does not have a home waypoint", user);
+  }
+
+  static CommandSyntaxException badWorldHome(String name) {
+    return format("Cannot teleport to {0}.", name);
+  }
 
   static CommandSyntaxException enchantNotFound(Enchantment enchantment) {
     return format("Held item does not have '{0}' enchantment",

@@ -1,0 +1,19 @@
+
+# The max range /wild will move you to in a world
+spawn_range = 15000
+
+# Max attempts made to find a wild destination location
+max_attempts = 1024
+
+# Biomes you cannot /wild into
+banned_biomes = [
+  "OCEAN",
+  "FROZEN_OCEAN",
+  "DEEP_OCEAN",
+  "WARM_OCEAN",
+  "LUKEWARM_OCEAN",
+  "COLD_OCEAN",
+  "DEEP_LUKEWARM_OCEAN",
+  "DEEP_COLD_OCEAN",
+  "DEEP_FROZEN_OCEAN"
+]

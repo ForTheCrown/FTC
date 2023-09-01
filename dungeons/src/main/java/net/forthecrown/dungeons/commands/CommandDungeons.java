@@ -17,7 +17,7 @@ import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.text.Text;
 import org.bukkit.entity.Player;
 
-@CommandData("file = 'commands/dungeons.gcn'")
+@CommandData("file = commands/dungeons.gcn")
 public class CommandDungeons {
 
   @VariableInitializer
@@ -72,8 +72,8 @@ public class CommandDungeons {
   void killBoss(CommandSource source, @Argument("boss") DungeonBoss boss)
       throws CommandSyntaxException
   {
-    if (boss.isAlive()) {
-      throw Exceptions.format("Boss '{0}' is alive", boss.name());
+    if (!boss.isAlive()) {
+      throw Exceptions.format("Boss '{0}' is not alive", boss.name());
     }
 
     boss.kill(false);

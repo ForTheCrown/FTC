@@ -3,9 +3,14 @@ package net.forthecrown.scripts;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.nio.file.Path;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import net.forthecrown.utils.io.source.Source;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.mozilla.javascript.Scriptable;
 import org.slf4j.Logger;
 
 public interface Script extends AutoCloseable {
@@ -36,6 +41,12 @@ public interface Script extends AutoCloseable {
   default String getName() {
     return getSource().name();
   }
+
+  /**
+   * Gets the script service
+   * @return Script service
+   */
+  ScriptService getService();
 
   /**
    * Gets the string argument array passed to the script when it's compiled
@@ -166,6 +177,34 @@ public interface Script extends AutoCloseable {
     throws IllegalStateException;
 
   /**
+   * Puts a value into the bindings with a getter and setter callback
+   *
+   * <p>
+   * Example:
+   * <br>
+   * Java: <code><pre>
+   * Script script = // ...
+   * script.putValue("binding", () -> 0, (val) -> {});</pre></code>
+   *
+   * <br>
+   * JavaScript: <code><pre>
+   * print(`binding=${binding}`); // Will print 'binding=0'
+   *
+   * // Will call the 'setter' consumer
+   * binding = 1
+   *
+   * print(`binding=${binding}`); // Will still print 'binding=0'
+   * </pre></code>
+   * @param bindingName Binding name
+   * @param getter Value supplier
+   * @param setter Value consumer
+   * @return {@code this}
+   * @throws IllegalStateException If {@link #isCompiled()} returns false
+   */
+  Script putValue(@NotNull String bindingName, Supplier<Object> getter, Consumer<Object> setter)
+    throws  IllegalStateException;
+
+  /**
    * Removes a value from the script's bindings
    *
    * @param bindingName Binding name
@@ -175,6 +214,21 @@ public interface Script extends AutoCloseable {
    * @throws IllegalStateException If {@link #isCompiled()} returns false
    */
   Object remove(@NotNull String bindingName) throws IllegalStateException;
+
+  /**
+   * Gets an entry set of all bindings within the script
+   * @return Script binding entries
+   * @throws IllegalStateException If the script is not compiled
+   */
+  Set<Entry<Object, Object>> bindingEntries() throws IllegalStateException;
+
+  /**
+   * Gets the script's {@code this} object. This is the object that contains all the bindings and
+   * values the script has
+   * @return Script's bindings object
+   * @throws IllegalStateException If the script is not compiled
+   */
+  Scriptable getScriptObject() throws IllegalStateException;
 
   /**
    * Imports a class, making it accessible to the script. Imported classes will persist between
@@ -191,6 +245,11 @@ public interface Script extends AutoCloseable {
    * This function will load the input from the {@link #getSource()} and then pass it to a
    * preprocessor that compiles ES6+ code to a version of javascript compatible with the
    * internal Rhino scripting engine
+   * <p>
+   * This function running successfully will also mean all classes imported via
+   * {@link #importClass(Class)} will be placed into the script.
+   * {@link ScriptExtension#onScriptCompile(Script)} will be executed on all extensions and the
+   * extension object itself will be placed into the script's bindings
    *
    * @return {@code this}
    * @throws ScriptLoadException If the script failed to load, will always have a cause
@@ -269,7 +328,7 @@ public interface Script extends AutoCloseable {
    * Closes the script.
    * <p>
    * Deletes the compiled script object, all script bindings and calls
-   * {@link ScriptExtension#onScriptClose()} for all extensions and closes all child scripts
+   * {@link ScriptExtension#onScriptClose(Script)} for all extensions and closes all child scripts
    */
   @Override
   void close();

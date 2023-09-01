@@ -7,6 +7,7 @@ import net.forthecrown.core.CorePermissions;
 import net.forthecrown.events.ChannelMessageEvent;
 import net.forthecrown.text.Messages;
 import net.forthecrown.user.User;
+import net.forthecrown.user.UserBlockList;
 import net.forthecrown.user.Users;
 import net.forthecrown.user.event.UserAfkEvent;
 import net.forthecrown.utils.Audiences;
@@ -38,7 +39,7 @@ public class IgnoreListListener implements Listener {
       User target = Audiences.getUser(first);
 
       if (target != null) {
-        boolean blocked = Users.testBlocked(
+        boolean blocked = UserBlockList.testBlocked(
             user, target,
             Messages.BLOCKED_SENDER,
             Messages.BLOCKED_TARGET
@@ -62,7 +63,7 @@ public class IgnoreListListener implements Listener {
 
   @EventHandler(ignoreCancelled = true)
   public void onUserAfk(UserAfkEvent event) {
-    event.addFilter(user -> !Users.areBlocked(user, event.getUser()));
+    event.addFilter(user -> !UserBlockList.areBlocked(user, event.getUser()));
   }
 
   static void filter(User user, Collection<Audience> viewers) {
@@ -77,7 +78,7 @@ public class IgnoreListListener implements Listener {
         return false;
       }
 
-      return Users.areBlocked(viewer, user);
+      return UserBlockList.areBlocked(viewer, user);
     });
   }
 }

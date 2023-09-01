@@ -3,4 +3,4 @@
 allowMaxPlayerRandomization = true
 
 # Base motd the serverlist uses
-baseMotd = "&6&lForTheCrown &7- &e${messsage}\n&7Currently on ${version}"
+baseMotd = "&6&lForTheCrown &7- &e${message}\n&7Currently on ${version}"

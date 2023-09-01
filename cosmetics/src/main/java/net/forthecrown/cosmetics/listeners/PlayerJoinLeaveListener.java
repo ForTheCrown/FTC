@@ -20,7 +20,7 @@ public class PlayerJoinLeaveListener implements Listener {
   public void onUserJoin(UserJoinEvent event) {
 
     event.setRenderer((user, viewer) -> {
-      var displayName = user.displayName(viewer, DisplayIntent.TABLIST);
+      var displayName = user.displayName(viewer, DisplayIntent.JOIN_LEAVE_MESSAGE);
 
       Component base = event.hasNameChanged()
           ? Messages.newNameJoinMessage(displayName, event.getLastOnlineName())
@@ -37,7 +37,7 @@ public class PlayerJoinLeaveListener implements Listener {
       var displayName = user.displayName(
           viewer,
           Set.of(NameRenderFlags.ALLOW_NICKNAME),
-          DisplayIntent.TABLIST
+          DisplayIntent.JOIN_LEAVE_MESSAGE
       );
 
       Component base = Messages.leaveMessage(displayName, event.getReason());

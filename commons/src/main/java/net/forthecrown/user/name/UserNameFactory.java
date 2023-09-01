@@ -94,15 +94,29 @@ public interface UserNameFactory {
 
   /**
    * Adds a prefix name element
+   * <p>
+   * Priority determines the order in which name elements are rendered. Starting from smallest
+   * priority to larger. First element in the priority-ordered list to return a non-null, non-empty
+   * text will be rendered, rest are ignored
+   *
    * @param element Name element
    */
-  void addPrefix(NameElement element);
+  void addPrefix(String id, int priority, NameElement element);
 
   /**
    * Adds a suffix name element
+   * <p>
+   * Priority determines the order in which name elements are rendered. Starting from smallest
+   * priority to larger. First element in the priority-ordered list to return a non-null, non-empty
+   * text will be rendered, rest are ignored
+   *
    * @param element Name element
    */
-  void addSuffix(NameElement element);
+  void addSuffix(String id, int priority, NameElement element);
+
+  void removePrefix(String id);
+
+  void removeSuffix(String id);
 
   /**
    * Adds a profile field. This element will be rendered in the user's hover event text or

@@ -1,0 +1,18 @@
+
+# Use chunky's chunk loader when available
+useChunkyWhenAvailable = true
+
+# Max amount of chunks that can be loaded at the same time
+maxChunksLoading = 25
+
+# How many chunks have to be loaded before a load-progress
+# message is logged in the console
+logFrequency = 2000
+
+# Default LoadMode used for loading worlds, possible values:
+# async_parallel: All chunks are loaded in parallel threads
+# async_series: All chunks are loaded on an async thread after each other
+defaultLodeMode = "async_series"
+
+# Maximum border length of worlds that can be loaded
+maxWorldSize = 50_000

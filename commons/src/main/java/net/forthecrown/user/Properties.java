@@ -64,6 +64,15 @@ public final class Properties {
     return Users.getService().createTextProperty();
   }
 
+  public static <E extends Enum<E>> UserProperty<E> enumProperty(String name, E defaultValue) {
+    Class<E> type = defaultValue.getDeclaringClass();
+
+    return enumProperty(type)
+        .key(name)
+        .defaultValue(defaultValue)
+        .build();
+  }
+
   public static <E extends Enum<E>> UserProperty.Builder<E> enumProperty(Class<E> type) {
     return Users.getService().createEnumProperty(type);
   }

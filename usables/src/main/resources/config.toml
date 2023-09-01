@@ -1,0 +1,3 @@
+# Kit given to players joining for the first time
+# Leave blank to disable
+firstJoinKit = "noobs"

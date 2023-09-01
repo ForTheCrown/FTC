@@ -17,6 +17,11 @@ public abstract class AbstractHelpEntry implements HelpEntry {
   public abstract CommandDisplayInfo createDisplay();
 
   @Override
+  public String getMainLabel() {
+    return createDisplay().label();
+  }
+
+  @Override
   public void writeShort(TextWriter writer, CommandSource source) {
     var info = createDisplay();
     var desc = info.description();

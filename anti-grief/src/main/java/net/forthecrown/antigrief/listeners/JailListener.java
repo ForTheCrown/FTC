@@ -12,7 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-public class JailListener implements Listener {
+class JailListener implements Listener {
 
   static final Component NO_COMMANDS_IN_JAIL
       = Component.text("Cannot use commands while jailed", NamedTextColor.RED);

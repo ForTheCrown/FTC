@@ -1,0 +1,18 @@
+#--------------------------------------------------------------------------------------#
+# Material       | Price | Max Earnings | Compact Material | Compact Multiplier | Slot #
+#--------------------------------------------------------------------------------------#
+| stick          | 4     |              |                  |                    | 2, 2 |
+| kelp           | 2     |              |                  |                    | 3, 2 |
+| cactus         | 2     |              |                  |                    | 4, 2 |
+| melon          | 8     |              |                  |                    | 5, 2 |
+| vine           | 10    |              |                  |                    | 6, 2 |
+| sugar_cane     | 3     |              | paper            | 3                  | 2, 3 |
+| potato         | 4     |              |                  |                    | 3, 3 |
+| wheat          | 7     |              | bread            | 3                  | 4, 3 |
+| carrot         | 4     |              |                  |                    | 5, 3 |
+| pumpkin        | 3     |              |                  |                    | 6, 3 |
+| beetroot_seeds | 3     |              |                  |                    | 2, 4 |
+| beetroot       | 5     |              |                  |                    | 3, 4 |
+| chorus_fruit   | 10    |              |                  |                    | 4, 4 |
+| sweet_berries  | 5     |              |                  |                    | 5, 4 |
+| wheat_seeds    | 3     |              |                  |                    | 6, 4 |

@@ -1,0 +1,4 @@
+maxDailyChallenges = 5
+maxWeeklyChallenges = 4
+maxStreak = 366
+allowRepeatingChallenges = false

@@ -56,7 +56,8 @@ public class ChatHandleListener implements Listener {
     INSTANCE;
 
     @Override
-    public @NotNull Component render(@NotNull Player source,
+    public @NotNull Component render(
+        @NotNull Player source,
         @NotNull Component displayName,
         @NotNull Component message,
         @NotNull Audience viewer

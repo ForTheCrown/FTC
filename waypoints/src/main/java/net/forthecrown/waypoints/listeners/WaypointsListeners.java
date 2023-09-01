@@ -11,5 +11,6 @@ public final class WaypointsListeners {
     register(new PlayerJoinListener());
     register(new DayChangeListener());
     register(new ServerLoadListener());
+    register(new HomeListener());
   }
 }

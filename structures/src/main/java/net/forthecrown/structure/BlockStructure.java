@@ -1,5 +1,7 @@
 package net.forthecrown.structure;
 
+import static net.forthecrown.utils.VanillaAccess.getDataVersion;
+
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Collections;
@@ -111,9 +113,8 @@ public class BlockStructure {
   /* --------------------------- SERIALIZATION ---------------------------- */
 
   public void save(CompoundTag tag) {
-    if (!header.isEmpty()) {
-      tag.put(TAG_HEADER, header);
-    }
+    tag.put(TAG_HEADER, header);
+    tag.putInt(TAG_DATA_VERSION, getDataVersion());
 
     if (!palettes.isEmpty()) {
       CompoundTag paletteTag = BinaryTags.compoundTag();
@@ -139,6 +140,9 @@ public class BlockStructure {
   public void load(CompoundTag tag) {
     clear();
 
+    int dataVersion = getDataVersion();
+    int oldVersion = tag.getInt(TAG_DATA_VERSION, getDataVersion());
+
     if (tag.containsKey(TAG_HEADER)) {
       this.header.merge(tag.get(TAG_HEADER).asCompound());
     }
@@ -149,7 +153,7 @@ public class BlockStructure {
         CompoundTag pTag = e.getValue().asCompound();
 
         BlockPalette palette = new BlockPalette(this);
-        palette.load(pTag);
+        palette.load(pTag, oldVersion, dataVersion);
 
         if (name.equals(DEFAULT_PALETTE_NAME)) {
           defaultSize = palette.getSize();

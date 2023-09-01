@@ -8,8 +8,15 @@ import net.forthecrown.command.settings.SettingsBook;
 import net.forthecrown.core.commands.tpa.TpPermissions;
 import net.forthecrown.user.Properties;
 import net.forthecrown.user.User;
+import net.forthecrown.user.UserProperty;
 
 public class PrefsBook {
+
+  public static final UserProperty<Boolean> IGNORE_AUTO_BROADCASTS
+      = Properties.booleanProperty("ignoringBroadcasts", false);
+
+  public static final UserProperty<Boolean> PAY
+      = Properties.booleanProperty("paying", true);
 
   static void init(SettingsBook<User> settings) {
     Setting flying = Setting.create(Properties.FLYING)
@@ -65,10 +72,39 @@ public class PrefsBook {
             "profiletoggle", "toggleprofile", "profilepublic"
         );
 
+    Setting ignoreac = Setting.createInverted(IGNORE_AUTO_BROADCASTS)
+        .setDisplayName("Broadcasts")
+        .setDescription("Toggles seeing automatic announcements")
+        .setToggle("N{1} ignoring auto announcements")
+        .setEnableDescription("See auto-announcer")
+        .setDisableDescription("Hide auto-announcer")
+
+        .createCommand(
+            "ignoreac",
+            Permissions.DEFAULT,
+            Permissions.ADMIN,
+            "ignorebroadcasts", "ignorebc"
+        );
+
+    Setting paying = Setting.create(PAY)
+        .setDisplayName("Paying")
+        .setDescription("Disables/Enables being able to send and receive rhines from other players")
+        .setToggle("Can n{1} send or receive payments")
+        .setToggleDescription("{Enable} sending and receiving rhines")
+
+        .createCommand(
+            "paytoggle",
+            CorePermissions.PAY,
+            Permissions.ADMIN,
+            "togglepay", "payingtoggle"
+        );
+
     List<BookSetting<User>> list = settings.getSettings();
     list.add(flying.toBookSettng());
     list.add(god.toBookSettng());
     list.add(tpa.toBookSettng());
     list.add(profilePrivate.toBookSettng());
+    list.add(ignoreac.toBookSettng());
+    list.add(paying.toBookSettng());
   }
 }

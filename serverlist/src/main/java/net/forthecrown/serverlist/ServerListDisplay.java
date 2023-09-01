@@ -155,7 +155,7 @@ public class ServerListDisplay {
   public void load() {
     registry.clear();
 
-    SerializationHelper.readTomlAsJson(loaderFile, wrapper -> {
+    SerializationHelper.readAsJson(loaderFile, wrapper -> {
       for (var e : wrapper.entrySet()) {
         if (!Registries.isValidKey(e.getKey())) {
           LOGGER.warn("Invalid icon key found! '{}'", e.getKey());

@@ -25,6 +25,10 @@ class DayChangeListener implements Listener {
     Map<Waypoint, Result> toRemove = new HashMap<>();
 
     for (var w : manager.getWaypoints()) {
+      if (!w.getType().isBuildable()) {
+        continue;
+      }
+
       Result result = WaypointScan.scan(w);
 
       if (result == Result.SUCCESS || result == Result.CANNOT_BE_DESTROYED) {

@@ -60,11 +60,11 @@ public interface UnitFormat {
    * Formats the given amount of playtime, in seconds, and returns a formatted message with playtime
    * measured in hours.
    *
-   * @param number The amount of playtime seconds
+   * @param seconds The amount of playtime seconds
    * @return The formatted message
    */
-  static Component playTime(Number number) {
-    return unit(TimeUnit.SECONDS.toHours(number.longValue()), UNIT_HOUR);
+  static Component playTime(Number seconds) {
+    return unit(TimeUnit.SECONDS.toHours(seconds.longValue()), UNIT_HOUR);
   }
 
   /**
@@ -101,8 +101,12 @@ public interface UnitFormat {
     );
   }
 
-  private static String plural(String unit, double dval) {
+  static String plural(String unit, double dval) {
     if (dval == 1) {
+      return unit;
+    }
+
+    if (unit.endsWith("exp")) {
       return unit;
     }
 

@@ -1,0 +1,18 @@
+
+# Link to webstore
+webstoreLink = ""
+
+# Note: 'earnings' here is just an internal number which represents
+# how many rhines a user has earned from selling a certain item type.
+# This 'earnings' value is used to calculate price loss
+
+# Default maximum earnings value for items in the sellshop
+# Will be used if no max earnings value is set for a material
+# in the .shop files
+defaultMaxEarnings = 500000
+
+# Delay between shop earnings being reduced
+earningLossInterval = "1d"
+
+# The amount of earnings lost everytime shop earnings are reduced
+earningLoss = 5000

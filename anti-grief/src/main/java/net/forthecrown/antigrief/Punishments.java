@@ -1,18 +1,19 @@
 package net.forthecrown.antigrief;
 
-import static net.forthecrown.antigrief.Punishment.INDEFINITE_EXPIRY;
 import static net.kyori.adventure.text.Component.text;
 
 import com.google.common.base.Strings;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import net.forthecrown.Loggers;
 import net.forthecrown.Permissions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.text.ChannelledMessage;
-import net.forthecrown.text.ChannelledMessage.MessageRenderer;
 import net.forthecrown.text.PeriodFormat;
 import net.forthecrown.text.ViewerAwareMessage;
+import net.forthecrown.text.channel.ChannelledMessage;
+import net.forthecrown.text.channel.MessageRenderer;
 import net.forthecrown.text.format.FormatBuilder;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.Audiences;
@@ -90,41 +91,47 @@ public final class Punishments {
   /**
    * Punishes a user and handles all the formalities of doing so
    *
-   * @param target The target of the punishment
-   * @param source The source doing the punishing
-   * @param reason The reason of the punishment, can be null
-   * @param length The length of the punishment, {@link Punishment#INDEFINITE_EXPIRY} for eternal
-   *               punishment
-   * @param type   The type of the punishment
-   * @param extra  Any extra data for the punishment, only used to jail the user, the extra is the
-   *               jail cell they're in
+   * @param target   The target of the punishment
+   * @param source   The source doing the punishing
+   * @param reason   The reason of the punishment, can be null
+   * @param duration The length of the punishment, {@link Punishment#INDEFINITE_EXPIRY} for eternal
+   *                 punishment
+   * @param type     The type of the punishment
+   * @param extra    Any extra data for the punishment, only used to jail the user, the extra is the
+   *                 jail cell they're in
    */
   public static void handlePunish(
       User target,
       CommandSource source,
       @Nullable String reason,
-      long length,
+      @Nullable Duration duration,
       PunishType type,
       @Nullable String extra
   ) {
+    Instant now = Instant.now();
+
+    Instant expires = duration == null
+        ? null
+        : now.plus(duration);
+
     Punishment punishment = new Punishment(
         source.textName(),
         reason == null || reason.isEmpty() ? type.defaultReason() : reason,
         extra, type,
-        System.currentTimeMillis(),
-        length == INDEFINITE_EXPIRY ? INDEFINITE_EXPIRY : System.currentTimeMillis() + length
+        now,
+        expires
     );
 
     PunishEntry entry = entry(target);
     assert entry != null;
 
+    announce(source, target, type, duration, reason);
+
     entry.punish(punishment);
 
-    announce(source, target, type, length, reason);
-
-    var lengthString = length == INDEFINITE_EXPIRY
+    var lengthString = duration == null
         ? "Eternal"
-        : PeriodFormat.of(length).toString();
+        : PeriodFormat.of(duration).toString();
 
     LOGGER.info("{} punished {} with {}, reason: {}, length: {}",
         source.textName(), target.getName(),
@@ -137,17 +144,17 @@ public final class Punishments {
   /**
    * Announces the punishment
    *
-   * @param source The source giving out the punishment
-   * @param target The target of the punishment
-   * @param type   The punishment's type
-   * @param length The punishment's length
-   * @param reason The reason
+   * @param source   The source giving out the punishment
+   * @param target   The target of the punishment
+   * @param type     The punishment's type
+   * @param duration The punishment's length
+   * @param reason   The reason
    */
   public static void announce(
       CommandSource source,
       User target,
       PunishType type,
-      long length,
+      Duration duration,
       String reason
   ) {
     _announce(source, viewer -> {
@@ -156,9 +163,10 @@ public final class Punishments {
           .color(NamedTextColor.YELLOW)
           .append(target.displayName(viewer).color(NamedTextColor.GOLD));
 
-      if (length != INDEFINITE_EXPIRY) {
-        builder.append(text(" for "))
-            .append(PeriodFormat.of(length).asComponent().color(NamedTextColor.GOLD));
+      if (duration != null) {
+        builder
+            .append(text(" for "))
+            .append(PeriodFormat.of(duration).asComponent().color(NamedTextColor.GOLD));
       }
 
       if (!Strings.isNullOrEmpty(reason)) {

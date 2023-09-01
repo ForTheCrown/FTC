@@ -2,8 +2,10 @@ package net.forthecrown.discord;
 
 import static net.forthecrown.discord.DiscordAppender.APPENDER_NAME;
 
+import github.scarsz.discordsrv.DiscordSRV;
 import lombok.Getter;
 import net.forthecrown.discord.commands.AppenderCommand;
+import net.forthecrown.discord.listener.AnnouncementForwardingListener;
 import net.forthecrown.discord.listener.ServerLoadListener;
 import net.forthecrown.events.Events;
 import net.forthecrown.utils.TomlConfigs;
@@ -22,7 +24,9 @@ public class DiscordPlugin extends JavaPlugin {
     reloadConfig();
 
     new AppenderCommand();
+
     Events.register(new ServerLoadListener());
+    DiscordSRV.api.subscribe(new AnnouncementForwardingListener(this));
   }
 
   @Override
@@ -44,7 +48,7 @@ public class DiscordPlugin extends JavaPlugin {
     root.removeAppender(APPENDER_NAME);
 
     if (!remove) {
-      root.addAppender(new DiscordAppender(config.getName()), getAppenderLevel(), null);
+      root.addAppender(new DiscordAppender(this.pluginConfig), getAppenderLevel(), null);
     }
 
     LoggerConfig discordSRV = new LoggerConfig("DiscordSRV", Level.OFF, false);
@@ -54,7 +58,7 @@ public class DiscordPlugin extends JavaPlugin {
   }
 
   Level getAppenderLevel() {
-    String name = pluginConfig.getForwarderLevel();
+    String name = pluginConfig.forwarderLevel();
     return Level.toLevel(name, Level.ERROR);
   }
 }

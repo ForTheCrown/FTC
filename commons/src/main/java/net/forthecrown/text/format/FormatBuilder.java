@@ -2,6 +2,7 @@ package net.forthecrown.text.format;
 
 import java.util.Objects;
 import net.forthecrown.text.Text;
+import net.forthecrown.text.ViewerAwareMessage;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
@@ -44,6 +45,10 @@ public class FormatBuilder implements ComponentLike {
   public FormatBuilder setViewer(Audience viewer) {
     this.viewer = viewer;
     return this;
+  }
+
+  public ViewerAwareMessage asViewerAware() {
+    return viewer1 -> setViewer(viewer1).asComponent();
   }
 
   @Override

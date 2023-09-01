@@ -114,7 +114,7 @@ public class SwordAbilityManager {
     }
 
     var path = getLoaderFile();
-    SerializationHelper.readTomlAsJson(path, wrapper -> {
+    SerializationHelper.readAsJson(path, wrapper -> {
       enabled = wrapper.getBool("enabled", true);
       wrapper.remove("enabled");
 

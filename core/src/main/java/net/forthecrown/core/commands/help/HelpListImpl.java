@@ -1,20 +1,28 @@
 package net.forthecrown.core.commands.help;
 
 import com.google.common.base.Strings;
+import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.chars.Char2IntMap;
 import it.unimi.dsi.fastutil.chars.Char2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectIntPair;
 import it.unimi.dsi.fastutil.objects.ObjectLists;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import net.forthecrown.Loggers;
 import net.forthecrown.command.Commands;
@@ -27,14 +35,21 @@ import net.forthecrown.command.help.UsageFactory;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Completions;
 import net.forthecrown.text.TextWriters;
+import net.forthecrown.text.ViewerAwareMessage;
 import net.forthecrown.text.page.Footer;
 import net.forthecrown.text.page.Header;
 import net.forthecrown.text.page.PageEntry;
-import net.forthecrown.text.page.PageEntryIterator;
+import net.forthecrown.text.page.PagedIterator;
 import net.forthecrown.text.page.PageFormat;
+import net.forthecrown.text.placeholder.Placeholders;
 import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.context.ContextOption;
 import net.forthecrown.utils.context.ContextSet;
+import net.forthecrown.utils.io.JsonUtils;
+import net.forthecrown.utils.io.JsonWrapper;
+import net.forthecrown.utils.io.PathUtil;
+import net.forthecrown.utils.io.PluginJar;
+import net.forthecrown.utils.io.SerializationHelper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -44,6 +59,11 @@ import org.slf4j.Logger;
 public class HelpListImpl implements FtcHelpList {
 
   public static final Logger LOGGER = Loggers.getLogger();
+
+  private static final Comparator<ObjectIntPair<HelpEntry>> COMPARATOR;
+
+  private static final Comparator<HelpEntry> ALPHABETIC_COMPARATOR
+      = Comparator.comparing(HelpEntry::getMainLabel);
 
   /** Map of all keywords, mapped to their bound values */
   private final Map<String, Collection<HelpEntry>> keywordLookup
@@ -72,8 +92,17 @@ public class HelpListImpl implements FtcHelpList {
   private final PageFormat<Component> singleEntryPaginator
       = PageFormat.create();
 
+  private final Path file;
+
+  static {
+    Comparator<ObjectIntPair<HelpEntry>> cmp = Comparator.comparingInt(ObjectIntPair::rightInt);
+    COMPARATOR = cmp.thenComparing(pair -> pair.left().getMainLabel());
+  }
+
   @SuppressWarnings({"unchecked", "rawtypes"})
   public HelpListImpl() {
+    this.file = PathUtil.pluginPath("help_topics.json");
+
     // Initialize the page format used to display help entries
 
     // Footer format
@@ -179,12 +208,16 @@ public class HelpListImpl implements FtcHelpList {
 
       // Remove the ones the source doesn't have permission to see
       entries.removeIf(entry -> !entry.test(source));
+      entries.sort(ALPHABETIC_COMPARATOR);
     } else {
-      entries.addAll(lookup(normalize(tag), source));
+      List<ObjectIntPair<HelpEntry>> lookupResult = lookup(normalize(tag), source);
+      lookupResult.sort(COMPARATOR);
+      lookupResult.stream().map(Pair::left).forEach(entries::add);
     }
 
     var writer = TextWriters.newWriter();
     writer.setFieldStyle(Style.style(NamedTextColor.YELLOW));
+    writer.placeholders(Placeholders.newRenderer().useDefaults());
 
     Context context = contextSet.createContext()
         .set(sourceOption, source)
@@ -205,7 +238,7 @@ public class HelpListImpl implements FtcHelpList {
       // Ensure list isn't empty and page number is valid
       Commands.ensurePageValid(page, pageSize, text.size());
 
-      var it = PageEntryIterator.of(text, page, pageSize);
+      var it = PagedIterator.of(text, page, pageSize);
       singleEntryPaginator.write(it, writer, context);
 
       return writer.asComponent();
@@ -215,24 +248,29 @@ public class HelpListImpl implements FtcHelpList {
     Commands.ensurePageValid(page, pageSize, entries.size());
 
     // Format all results onto a page
-    var iterator = PageEntryIterator.of(entries, page, pageSize);
+    var iterator = PagedIterator.of(entries, page, pageSize);
 
     pageFormat.write(iterator, writer, context);
     return writer.asComponent();
   }
 
-  private Collection<HelpEntry> lookup(String tag, CommandSource source) {
+  private List<ObjectIntPair<HelpEntry>> lookup(String tag, CommandSource source) {
     // Try just calling the keyword lookup
-    Collection<HelpEntry> result = getEntries(tag);
-    result.removeIf(entry -> !entry.test(source));
+    Collection<HelpEntry> entries = getEntries(tag);
+    entries.removeIf(entry -> !entry.test(source));
 
-    if (!result.isEmpty()) {
+    if (!entries.isEmpty()) {
+      List<ObjectIntPair<HelpEntry>> result = new ObjectArrayList<>();
+      for (HelpEntry entry : entries) {
+        result.add(ObjectIntPair.of(entry, 0));
+      }
       return result;
     }
 
     // Keyword lookup failed, loop through all keywords to find the ones
     // that match the most
-    result = new ObjectArrayList<>();
+    List<ObjectIntPair<HelpEntry>> result = new ObjectArrayList<>();
+    final int maxDistance = 3;
 
     for (var v: getAll()) {
       if (!v.test(source)) {
@@ -246,7 +284,7 @@ public class HelpListImpl implements FtcHelpList {
         int dis = levenshteinDistance(tag, s);
 
         // -1 means above max threshold
-        if (dis == -1) {
+        if (dis == -1 || dis > maxDistance) {
           continue;
         }
 
@@ -254,11 +292,11 @@ public class HelpListImpl implements FtcHelpList {
         // someone or something out of a window
         if (dis == 0) {
           result = new ObjectArrayList<>();
-          result.add(v);
+          result.add(ObjectIntPair.of(v, dis));
           return result;
         }
 
-        result.add(v);
+        result.add(ObjectIntPair.of(v, dis));
         break;
       }
     }
@@ -354,6 +392,10 @@ public class HelpListImpl implements FtcHelpList {
     entries.removeIf(entry -> entry instanceof CommandHelpEntry);
 
     existingCommands.forEach((s, command) -> {
+      if (command instanceof LoadedEntryCommand) {
+        return;
+      }
+
       CommandHelpEntry entry = new CommandHelpEntry(command);
 
       UsageFactory factory = arguments -> {
@@ -397,5 +439,49 @@ public class HelpListImpl implements FtcHelpList {
     return s.toLowerCase()
         .trim()
         .replaceAll(" ", "_");
+  }
+
+  private void clearDynamicallyLoaded() {
+    keywordLookup.forEach((label, entries) -> {
+      entries.removeIf(entry -> entry instanceof LoadedHelpEntry);
+    });
+    entries.removeIf(entry -> entry instanceof LoadedHelpEntry);
+    existingCommands.values().removeIf(cmd -> cmd instanceof LoadedEntryCommand);
+  }
+
+  public void load() {
+    clearDynamicallyLoaded();
+
+    PluginJar.saveResources("help_topics.json");
+    SerializationHelper.readJsonFile(file, this::loadFrom);
+  }
+
+  private void loadFrom(JsonWrapper json) {
+    for (Entry<String, JsonElement> entry : json.entrySet()) {
+      if (!entry.getValue().isJsonObject()) {
+        LOGGER.error("Help entry {} is not an object", entry.getKey());
+        continue;
+      }
+
+      JsonWrapper entryJson = JsonWrapper.wrap(entry.getValue().getAsJsonObject());
+
+      Set<String> labels = new ObjectOpenHashSet<>();
+      labels.add(entry.getKey());
+      labels.addAll(entryJson.getList("aliases", JsonElement::getAsString));
+
+      ViewerAwareMessage shortText = entryJson.get("shortText", JsonUtils::readMessage);
+      ViewerAwareMessage fullText = entryJson.get("fullText", JsonUtils::readMessage);
+
+      boolean makeCommand = entryJson.getBool("make_command");
+
+      LoadedHelpEntry helpEntry = new LoadedHelpEntry(labels, entry.getKey(), shortText, fullText);
+
+      if (makeCommand) {
+        helpEntry.setCommand(new LoadedEntryCommand(entry.getKey(), helpEntry));
+        helpEntry.getCommand().register();
+      }
+
+      addEntry(helpEntry);
+    }
   }
 }

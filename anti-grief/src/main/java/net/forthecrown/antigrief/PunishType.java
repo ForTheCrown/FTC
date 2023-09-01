@@ -1,7 +1,8 @@
 package net.forthecrown.antigrief;
 
-import static net.forthecrown.antigrief.Punishment.INDEFINITE_EXPIRY;
-
+import com.destroystokyo.paper.profile.PlayerProfile;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Date;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -106,13 +107,13 @@ public enum PunishType {
   BAN(GriefPermissions.PUNISH_BAN) {
     @Override
     public void onPunishmentEnd(User user, PunishEntry entry, Punishment punishment) {
-      BanList list = Bukkit.getBanList(BanList.Type.NAME);
-      list.pardon(user.getName());
+      BanList<PlayerProfile> list = Bukkit.getBanList(Type.PROFILE);
+      list.pardon(user.getProfile());
     }
 
     @Override
     public void onPunishmentStart(User user, PunishEntry entry, Punishment punishment) {
-      PunishType.placeInBanList(user, punishment, Type.NAME);
+      PunishType.placeInBanList(user, punishment, Type.PROFILE, user.getProfile());
     }
   },
 
@@ -124,13 +125,22 @@ public enum PunishType {
     public void onPunishmentEnd(User user, PunishEntry entry, Punishment punishment) {
       // When the punishment ends, remove them from
       // the ip ban list
-      BanList list = Bukkit.getBanList(BanList.Type.IP);
+      BanList<InetAddress> list = Bukkit.getBanList(BanList.Type.IP);
       list.pardon(user.getIp());
     }
 
     @Override
     public void onPunishmentStart(User user, PunishEntry entry, Punishment punishment) {
-      PunishType.placeInBanList(user, punishment, Type.IP);
+      InetAddress addr;
+
+      try {
+        addr = InetAddress.getByName(user.getIp());
+      } catch (UnknownHostException exc) {
+        Loggers.getLogger().error("Cannot IP of user '{}'", user, exc);
+        return;
+      }
+
+      PunishType.placeInBanList(user, punishment, Type.IP, addr);
     }
   };
 
@@ -186,33 +196,30 @@ public enum PunishType {
   }
 
 
-  private static void placeInBanList(User user,
-                                     Punishment punishment,
-                                     Type type
-  ) {
+
+  private static <T> void placeInBanList(User user, Punishment punishment, Type type, T key) {
     Logger logger = Loggers.getLogger();
-    String key = type == Type.IP
-        ? user.getIp()
-        : user.getUniqueId().toString();
 
     // Add IP ban list entry, we're not going
     // manage bans ourselves after all, that's dumb
-    BanList list = Bukkit.getBanList(type);
-    var banEntry = list.addBan(
+    BanList<T> list = Bukkit.getBanList(type);
+    BanEntry<T> banEntry = list.addBan(
         key,
         punishment.getReason(),
-        punishment.getExpires() == INDEFINITE_EXPIRY
+
+        punishment.getExpires() == null
             ? null
-            : new Date(punishment.getExpires()),
+            : Date.from((punishment.getExpires())),
 
         punishment.getSource()
     );
 
     if (banEntry == null) {
-      throw new IllegalStateException("Failed to create ban entry for " + user);
+      logger.error("Failed to create entry for user '{}' in {} ban list", user, type.name());
+      return;
     }
 
-    logger.info(
+    logger.debug(
         "Created banlist entry for {}, entry={}",
         user, toString(banEntry)
     );

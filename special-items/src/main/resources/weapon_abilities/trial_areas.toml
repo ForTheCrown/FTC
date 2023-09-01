@@ -1,0 +1,97 @@
+# Sets info about the trial areas of the various weapon upgrades
+# ------------------------------------------------------------------------------
+# Format:
+# ------------------------------------------------------------------------------
+# 'position':
+#  The position the player will be teleported to when they enter the trial
+# 
+# examples:
+# - position = { x = -452.5, y = 12, z = -247.5 }
+# ------------------------------------------------------------------------------
+# 'rotation':
+#  The rotation the player will have after being teleported
+#
+# examples:
+# - rotation = { yaw = 90, pitch = 0 }
+# ------------------------------------------------------------------------------
+# 'info':
+#  Sets the text that's shown to players, and the delay the text is shown after
+#
+# examples:
+# info = [
+#   { info = "Foo bar", delay = 0 },
+#   { info = "More info", delay = "3s" }
+# ]
+# ------------------------------------------------------------------------------
+# 'script':
+#  Sets the script that's loaded by the ability loader. This script will be
+#  loaded when the trial area is, and closed either when the server closes, or
+#  when the abilities are reloaded
+#
+# examples:
+# - script = "script/path.js"
+# ------------------------------------------------------------------------------
+# 'ability_level':
+#  Sets the ability's level for the sword's given to player's inside the trial
+#  By default, this value is 1
+#
+# examples:
+# - ability_level = 2
+# ------------------------------------------------------------------------------
+
+# The world the trial areas are located in
+trial_world = "world_void"
+
+# Sets the name of the inventory storage category that players' inventories
+# Are placed into after teleporting into the trial area.
+# If unset, doesn't separate inventories
+#
+# NOT USED: Inventory separation is handled by collision triggers
+# inventory_store = "weapon_ability/pre_trial_inventory"
+
+[dash]
+position = { x = -452.5, y = 12, z = -247.5 }
+rotation = { yaw = 90, pitch = 0 }
+give_sword = true
+ability_level = 2
+info = [
+  { info = "&7The &e%ability&7 lets you jolt forward a bit", delay = 0    },
+  { info = "&eTry it out by crossing the pit",               delay = "3s" },
+  { info = "&eComplete the trial and you'll get a reward",   delay = "3s" }
+]
+
+[far_reach]
+position = { x = -459.5, y = 20.0, z = -288.5 }
+rotation = { yaw = 180, pitch = 0 }
+give_sword = true
+script = "ability_trials/far_reach.js"
+ability_level = 7
+cooldown_override = "1.3s"
+info = [
+  { info = "&7The &e%ability&7 lets you hit enemies further away", delay = 0    },
+  { info = "&eTry it out on these skeletons",                      delay = "3s" }
+ #{ info = "&7Kill &e3&7 of them to finish!",                      delay = "3s" }
+]
+
+[twirl]
+position = { x = -525.5, y = 5, z = -298.5 }
+rotation = { yaw = 0, pitch = 0 }
+give_sword = true
+ability_level = 1
+info = [
+  { info = "&e%ability&7 lets you deal damage to all enemies around", delay = 0    },
+  { info = "&7Position yourself in the middle of the mummies and",    delay = "3s" },
+  { info = "&7then right-click to attack all of them at once!",       delay = 0    }
+]
+
+[fireball]
+position = { x = -524.5, y = 5, z = -265.5 }
+rotation = { yaw = 0, pitch = 90 }
+give_sword = true
+ability_level = 1
+info = [
+  { info = "&e%ability &7lets you live out your cosplay dreams", delay = 0    },
+  { info = "&7and become a ghast",                               delay = 0    },
+  { info = "&eRight-Click&7 to throw a fireball",                delay = "3s" },
+  { info = "&eThrow a fireball at the target to get across",     delay = "3s" }
+]

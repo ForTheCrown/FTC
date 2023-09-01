@@ -9,7 +9,7 @@ import net.forthecrown.command.FtcCommand;
 import net.forthecrown.command.arguments.Arguments;
 import net.forthecrown.command.help.UsageFactory;
 import net.forthecrown.grenadier.GrenadierCommand;
-import net.forthecrown.user.Users;
+import net.forthecrown.user.UserBlockList;
 import net.forthecrown.waypoints.WExceptions;
 import net.forthecrown.waypoints.WMessages;
 import net.forthecrown.waypoints.WPermissions;
@@ -52,7 +52,7 @@ public class CommandInvite extends FtcCommand {
 
               var targets = Arguments.getUsers(c, "users");
 
-              Optional<CommandSyntaxException> opt = Users.filterPlayers(
+              Optional<CommandSyntaxException> opt = UserBlockList.filterPlayers(
                   user,
                   targets,
                   INVITES_ALLOWED,

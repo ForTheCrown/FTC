@@ -6,7 +6,7 @@ import org.bukkit.event.server.ServerEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * An event fired (hopefully) before any actual FTC modules are disabled that will allow actions to
+ * An event fired before any actual FTC modules are disabled that will allow actions to
  * be performed before any plugins are unloaded to prevent class loading errors, because shutdown
  * events are too much for Paper or Spigot to make
  *

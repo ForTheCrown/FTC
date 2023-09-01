@@ -14,6 +14,7 @@ import net.forthecrown.text.Text;
 import net.forthecrown.text.parse.ChatParseFlag;
 import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.io.PathUtil;
+import net.forthecrown.utils.io.PluginJar;
 import net.kyori.adventure.text.ComponentLike;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.command.CommandSender;
@@ -30,7 +31,7 @@ public final class BannedWords {
   private static final int COOLDOWN_TIME = 3 * 60 * 20;
 
   public static void load() {
-    InputStream stream = getFileOrResource("banned_words.json");
+    InputStream stream = getBannedWordsInputStream();
     JsonElement element = JsonParser.parseReader(
         new InputStreamReader(stream, StandardCharsets.UTF_8)
     );
@@ -90,8 +91,11 @@ public final class BannedWords {
     return result;
   }
 
-  private static InputStream getFileOrResource(String path) {
-    var file = PathUtil.pluginPath(path);
+  private static InputStream getBannedWordsInputStream() {
+    final String stringPath = "banned_words.json";
+
+    PluginJar.saveResources(stringPath);
+    var file = PathUtil.pluginPath(stringPath);
 
     if (Files.exists(file)) {
       try {
@@ -102,6 +106,6 @@ public final class BannedWords {
     }
 
     var plugin = JavaPlugin.getPlugin(AntiGriefPlugin.class);
-    return plugin.getResource(path);
+    return plugin.getResource(stringPath);
   }
 }

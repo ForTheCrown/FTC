@@ -11,6 +11,8 @@ import org.bukkit.Bukkit;
 
 public class CommandMemory extends FtcCommand {
 
+  static final int BYTES_PER_MB = (int) Math.pow(1024, 2);
+
   public CommandMemory() {
     super("memory");
 
@@ -24,47 +26,56 @@ public class CommandMemory extends FtcCommand {
 
   @Override
   public void createCommand(GrenadierCommand command) {
-    command
-        .executes(c -> {
-          Component worlds = TextJoiner.onNewLine()
-              .add(Bukkit.getWorlds().stream()
-                  .map(world -> {
-                    return Text.format(
-                        "&e{0}: " +
-                            "&eEntities:&7 {1}, " +
-                            "&eLoaded Chunks:&7 {2}, " +
-                            "&eTile entities:&7 {3}, " +
-                            "&eTicking tile entities:&7 {4}",
+    command.executes(c -> {
 
-                        world.getName(),
-                        world.getEntityCount(),
-                        world.getLoadedChunks().length,
-                        world.getTileEntityCount(),
-                        world.getTickableTileEntityCount()
-                    );
-                  })
-              )
-              .asComponent();
+      var worlds = TextJoiner.onNewLine()
+          .add(Bukkit.getWorlds().stream()
+              .map(world -> {
+                return Text.format(
+                    "&6{0}: "
+                        + "&eEntities:&7 {1}, "
+                        + "&eLoaded Chunks:&7 {2}, "
+                        + "&eTile entities:&7 {3}, "
+                        + "&eTicking tile entities:&7 {4}",
 
-          c.getSource().sendMessage(
-              Text.format(
-                  """
-                      &eUptime:&7 {0, time}
-                      &eTPS:&7 {1}
-                      &eMax memory:&7 {2} Mb
-                      &eFree memory:&7 {3} Mb
-                      &eWorlds: &7{4}
-                      """,
+                    world.getName(),
+                    world.getEntityCount(),
+                    world.getChunkCount(),
+                    world.getTileEntityCount(),
+                    world.getTickableTileEntityCount()
+                );
+              })
+          )
+          .asComponent();
 
-                  ManagementFactory.getRuntimeMXBean().getUptime(),
-                  getTPS(),
-                  Runtime.getRuntime().maxMemory() / 1_000_000,
-                  Runtime.getRuntime().freeMemory() / 1_000_000,
-                  worlds
-              )
-          );
-          return 0;
-        });
+      Runtime runtime = Runtime.getRuntime();
+      long maxMem = runtime.maxMemory();
+      long totalMem = runtime.totalMemory();
+      long freeMem = runtime.freeMemory();
+
+      c.getSource().sendMessage(
+          Text.format(
+              """
+              &eUptime:&7 {0, time, -timestamp}
+              &eTPS:&7 {1}
+              &eMax memory:&7 {2} Mib
+              &eTotal memory:&7 {3} Mib
+              &eFree memory:&7 {4} Mib
+              &eAverage tick time:&7 {5, time}
+              &eWorlds: \n&7{6}
+              """,
+
+              ManagementFactory.getRuntimeMXBean().getStartTime(),
+              getTPS(),
+              maxMem / BYTES_PER_MB,
+              totalMem / BYTES_PER_MB,
+              freeMem / BYTES_PER_MB,
+              Bukkit.getAverageTickTime(),
+              worlds
+          )
+      );
+      return 0;
+    });
   }
 
   private Component getTPS() {

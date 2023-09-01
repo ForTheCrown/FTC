@@ -11,11 +11,16 @@ import lombok.Setter;
 import net.forthecrown.Loggers;
 import net.forthecrown.Worlds;
 import net.forthecrown.inventory.ItemsPlugin;
+import net.forthecrown.scripts.Scripts;
 import net.forthecrown.text.PeriodFormat;
 import net.forthecrown.text.Text;
+import net.forthecrown.usables.Usables;
+import net.forthecrown.usables.objects.UsableEntity;
+import net.forthecrown.usables.scripts.ScriptInstance;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.Time;
+import net.forthecrown.utils.io.source.Source;
 import net.forthecrown.utils.math.Vectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -70,7 +75,7 @@ public class AbilityAnimation {
     animation.setLocation(location.clone());
     animation.itemTaken = false;
 
-    List<Vector3d> points = TravelUtil.getCirclePoints(
+    List<Vector3d> points = Vectors.getCirclePoints(
         PARTICLE_Y_OFFSET,
         ItemsPlugin.config().swordAnim_initialDistance,
         CIRCLE_POINTS
@@ -327,17 +332,20 @@ public class AbilityAnimation {
             )
         );
 
-        UsableEntity entity = Usables.getInstance().createEntity(holder);
-        entity.cancelVanilla(true);
+        UsableEntity entity = Usables.entity(holder);
+        entity.setCancelVanilla(true);
         entity.setSilent(false);
 
-        var action = new ActionScript(ItemsPlugin.config().swordAnim_claimScript);
-        entity.getActions().add(action);
+        var config = ItemsPlugin.config();
+        Source claimSource = Scripts.scriptFileSource(config.swordAnim_claimScript);
+        Source claimTest = Scripts.scriptFileSource(config.swordAnim_claimTest);
 
-        var check = new TestScript(ItemsPlugin.config().swordAnim_claimTest);
-        entity.getChecks().add(check);
+        var action = new ScriptInstance(claimSource);
+        entity.getActions().addLast(action);
 
-        entity.save(holder.getPersistentDataContainer());
+        var check = new ScriptInstance(claimTest);
+        entity.getConditions().addLast(check);
+        entity.save();
 
         animation.setStashHolder(holder);
 

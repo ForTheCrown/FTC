@@ -35,9 +35,7 @@ public abstract class BookSetting<C> {
     return createButton(
         toggle,
         current,
-        Strings.isNullOrEmpty(cmd)
-            ? null
-            : ClickEvent.runCommand(cmd),
+        Strings.isNullOrEmpty(cmd) ? null : ClickEvent.runCommand(cmd),
         hover
     );
   }

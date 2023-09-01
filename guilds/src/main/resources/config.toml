@@ -1,0 +1,6 @@
+weekendModifier = 1.5
+maxExpMultiplier = 8
+roleUpdateInterval = "10m"
+guildsChannelCategory = 0
+webhookAvatarPath = "steven_avatar.png"
+weekendMultiplierEnabled = true

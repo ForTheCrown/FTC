@@ -108,6 +108,8 @@ public interface Exceptions {
    */
   CommandSyntaxException INVENTORY_FULL = create("Your inventory is full.");
 
+  CommandSyntaxException NOT_ENOUGH_ROOM = create("Not enough space in your inventory");
+
   CommandSyntaxException INVENTORY_EMPTY = create("Your inventory is empty.");
 
   /**
@@ -217,5 +219,16 @@ public interface Exceptions {
 
   static CommandSyntaxException unknownUser(StringReader reader, String name) {
     return unknown("user", reader, name);
+  }
+
+
+  /**
+   * Creates an exception which states the user cannot afford the given amount of Rhines
+   *
+   * @param amount The amount the user cannot afford
+   * @return The created exception
+   */
+  static CommandSyntaxException cannotAfford(Number amount) {
+    return format("Cannot afford {0, rhines}", amount);
   }
 }

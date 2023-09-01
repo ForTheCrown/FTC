@@ -9,8 +9,9 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 
+const val MC_VERSION = "1.20.1"
 const val API_VERSION = "1.20"
-const val NMS_DEPENDENCY = "io.papermc.paper:dev-bundle:${API_VERSION}-R0.1-SNAPSHOT"
+const val NMS_DEPENDENCY = "io.papermc.paper:dev-bundle:${MC_VERSION}-R0.1-SNAPSHOT"
 const val NMS_CONFIG_NAME = "paperweightDevelopmentBundle"
 
 const val GENERATE_CONFIG_DIR = "build/generated-sources/"
@@ -18,6 +19,8 @@ const val GENERATED_CONFIG_PATH = "$GENERATE_CONFIG_DIR/paper-plugin.yml"
 
 const val CREATE_PLUGIN_YML = "createPluginYml"
 const val FTC_GROUP = "ForTheCrown"
+
+private const val BUILD_ALL_PLUGINS = "build-all-plugins"
 
 class FtcGradlePlugin: Plugin<Project> {
 
@@ -40,7 +43,7 @@ class FtcGradlePlugin: Plugin<Project> {
       add("ftc", ftcExtension)
     }
 
-    createPluginYmlTask(target, yml)
+    createPluginYmlTask(target, yml, ftcExtension)
     createRootBuildTask(target, yml)
   }
 
@@ -89,12 +92,16 @@ class FtcGradlePlugin: Plugin<Project> {
     return true
   }
 
-  private fun createPluginYmlTask(target: Project, yml: FtcPaperYml) {
+  private fun createPluginYmlTask(target: Project, yml: FtcPaperYml, ftcExtension: FtcExtension) {
     val task = target.task(CREATE_PLUGIN_YML)
     task.group = FTC_GROUP
     task.description = "Creates a paper-plugin.yml"
 
     task.doFirst {
+      if (ftcExtension.skipDependency || !ftcExtension.apiFor.isNullOrEmpty()) {
+        return@doFirst
+      }
+
       scanForProjectDependencies(it.project, yml)
       setArchiveName(it.project, yml)
       createPluginYml(it)
@@ -138,13 +145,7 @@ class FtcGradlePlugin: Plugin<Project> {
     val dependencyName: String
 
     if (projExt != null) {
-      if (!projExt.name.startsWith("FTC")) {
-        println("Found invalid plugin name! dependencyProject=${it.dependencyProject.name}")
-      }
-
       dependencyName = "project:${proj.name}"
-    } else if (proj.name == "commons") {
-      dependencyName = "project:commons"
     } else {
       return
     }

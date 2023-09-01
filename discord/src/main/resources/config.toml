@@ -3,3 +3,6 @@
 forwardingEnabled = true
 forwarderLevel = "ERROR"
 forwardingChannel = "error-log"
+
+updateChannelId = 0
+forwardDiscordAnnouncementsToServer = true

@@ -2,9 +2,6 @@ package net.forthecrown.waypoints.type;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Optional;
-import java.util.function.Function;
-import lombok.Getter;
-import lombok.Setter;
 import net.forthecrown.user.TimeField;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.math.Bounds3i;
@@ -13,13 +10,12 @@ import net.forthecrown.waypoints.WaypointManager;
 import net.forthecrown.waypoints.WaypointPrefs;
 import net.forthecrown.waypoints.WaypointProperties;
 import net.forthecrown.waypoints.Waypoints;
-import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3i;
 
-@Getter
-public final class PlayerWaypointType extends WaypointType {
+public class PlayerWaypointType extends WaypointType {
 
   public static final Material[] PLAYER_COLUMN = {
       Material.STONE_BRICKS,
@@ -27,18 +23,16 @@ public final class PlayerWaypointType extends WaypointType {
       Material.CHISELED_STONE_BRICKS,
   };
 
-  @Setter
-  private TextColor nameColor;
-
-  @Setter
-  private Function<Waypoint, String> nameProvider;
-
   public PlayerWaypointType() {
     super("Player-Made", PLAYER_COLUMN);
   }
 
+  public PlayerWaypointType(String displayName, Material[] column) {
+    super(displayName, column);
+  }
+
   @Override
-  public void onCreate(User creator) throws CommandSyntaxException {
+  public void onCreate(User creator, Vector3i topPos) throws CommandSyntaxException {
     Waypoints.validateMoveInCooldown(creator);
   }
 
@@ -78,5 +72,10 @@ public final class PlayerWaypointType extends WaypointType {
   @Override
   public boolean isDestroyed(Waypoint waypoint) {
     return WaypointTypes.isDestroyed(getColumn(), waypoint.getPosition(), waypoint.getWorld());
+  }
+
+  @Override
+  protected boolean internalIsBuildable() {
+    return true;
   }
 }

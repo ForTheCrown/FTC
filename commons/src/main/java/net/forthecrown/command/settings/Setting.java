@@ -12,54 +12,38 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.forthecrown.command.Exceptions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.SyntaxExceptions;
 import net.forthecrown.text.Messages;
 import net.forthecrown.text.Text;
+import net.forthecrown.text.UserClickCallback;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserProperty;
-import net.forthecrown.utils.Audiences;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.event.ClickCallback.Options;
 import net.kyori.adventure.text.event.ClickEvent;
 import org.bukkit.permissions.Permission;
-import org.jetbrains.annotations.NotNull;
 
+@Getter
+@Setter
 @Accessors(chain = true)
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Setting {
 
-  @Getter
   private final SettingAccess access;
 
-  @Getter
-  @Setter
   private SettingValidator validator = SettingValidator.NOP;
-
-  @Getter
-  @Setter
   private String displayName;
-
-  @Getter
-  @Setter
   private String description = "";
-
-  @Getter
-  @Setter
   private String enableDescription = "Enables this setting";
-
-  @Getter
-  @Setter
   private String disableDescription = "Disables this setting";
-
-  @Getter
-  @Setter
   private String toggle = "{0} this setting";
 
-  @Getter
+  @Setter(AccessLevel.PRIVATE)
   private SettingCommand command;
 
+  @Setter(AccessLevel.PRIVATE)
+  @Getter(AccessLevel.PRIVATE)
   private BookSetting<User> setting;
 
   public static Setting create(SettingAccess access) {
@@ -67,13 +51,7 @@ public class Setting {
   }
 
   public static Setting createInverted(SettingAccess access) {
-    Setting setting = create(access);
-
-    String disable = setting.disableDescription;
-    setting.disableDescription = setting.enableDescription;
-    setting.enableDescription = disable;
-
-    return setting;
+    return create(access.negate());
   }
 
   public static Setting create(UserProperty<Boolean> property) {
@@ -158,22 +136,9 @@ public class Setting {
   }
 
   private ClickCallback<Audience> createCallback(boolean state, SettingsBook<User> book) {
-    return new ClickCallback<Audience>() {
-      @Override
-      public void accept(@NotNull Audience audience) {
-        User user = Audiences.getUser(audience);
-
-        if (user == null) {
-          return;
-        }
-
-        try {
-          setState(user, state);
-          book.open(user, user);
-        } catch (CommandSyntaxException exc) {
-          SyntaxExceptions.handle(exc, user.getCommandSource());
-        }
-      }
+    return (UserClickCallback) user -> {
+      setState(user, state);
+      book.open(user, user);
     };
   }
 
@@ -187,8 +152,13 @@ public class Setting {
 
     return setting = new BookSetting<>() {
 
-      ClickCallback<Audience> enableCallback;
-      ClickCallback<Audience> disableCallback;
+      ClickEvent enableCallback;
+      ClickEvent disableCallback;
+
+      static final Options options = Options.builder()
+          .uses(-1)
+          .lifetime(Duration.ofDays(365))
+          .build();
 
       @Override
       public Component displayName() {
@@ -200,29 +170,26 @@ public class Setting {
         boolean state = access.getState(context);
 
         if (enableCallback == null) {
-          enableCallback = createCallback(true, getBook());
+          var callback = createCallback(true, getBook());
+          this.enableCallback = ClickEvent.callback(callback, options);
         }
 
         if (disableCallback == null) {
-          disableCallback = createCallback(false, getBook());
+          var callback = createCallback(false, getBook());
+          this.disableCallback = ClickEvent.callback(callback, options);
         }
-
-        final Options options = Options.builder()
-            .uses(-1)
-            .lifetime(Duration.ofDays(365))
-            .build();
 
         Component enable = BookSetting.createButton(
             true,
             state,
-            ClickEvent.callback(enableCallback, options),
+            enableCallback,
             text(enableDescription)
         );
 
         Component disable = BookSetting.createButton(
             false,
             state,
-            ClickEvent.callback(disableCallback, options),
+            disableCallback,
             text(disableDescription)
         );
 
@@ -232,7 +199,7 @@ public class Setting {
       @Override
       public boolean shouldInclude(User context) {
         CommandSource source = context.getCommandSource();
-        return command.test(source);
+        return command.canUse(source);
       }
     };
   }

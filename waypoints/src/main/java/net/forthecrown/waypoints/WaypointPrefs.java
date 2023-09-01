@@ -21,7 +21,7 @@ public class WaypointPrefs {
       .build();
 
   public static final UserProperty<Boolean> HULK_SMASHING = Properties.booleanProperty()
-      .key("hulkSmash_active")
+      .key("hulkSmashing")
       .defaultValue(false)
       .build();
 

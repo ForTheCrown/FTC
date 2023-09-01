@@ -3,6 +3,8 @@ package net.forthecrown.core;
 import static net.forthecrown.Permissions.register;
 import static net.forthecrown.Permissions.registerCmd;
 
+import net.forthecrown.utils.TieredPermission;
+import net.forthecrown.utils.TieredPermission.TierPriority;
 import org.bukkit.permissions.Permission;
 
 public interface CorePermissions {
@@ -56,4 +58,16 @@ public interface CorePermissions {
   Permission HEAL                    = registerCmd("heal");
   Permission DISPOSAL                = registerCmd("disposal");
   Permission REPAIR                  = registerCmd("repair");
+
+  Permission PAY                     = registerCmd("pay");
+
+  Permission HOME                    = registerCmd("home");
+  Permission HOME_OTHERS             = register(HOME, "others");
+
+  TieredPermission MAX_HOMES = TieredPermission.builder()
+      .prefix("ftc.homes.")
+      .priority(TierPriority.HIGHEST)
+      .allowUnlimited()
+      .tiersBetween(1, 5)
+      .build();
 }

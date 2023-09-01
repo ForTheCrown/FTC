@@ -2,10 +2,15 @@ package net.forthecrown.antigrief;
 
 import com.google.gson.JsonElement;
 import java.util.List;
+import net.forthecrown.Permissions;
+import net.forthecrown.command.settings.Setting;
+import net.forthecrown.command.settings.SettingsBook;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.text.Text;
 import net.forthecrown.text.TextWriter;
+import net.forthecrown.user.Properties;
 import net.forthecrown.user.User;
+import net.forthecrown.user.UserProperty;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -16,10 +21,29 @@ import net.kyori.adventure.text.format.NamedTextColor;
  */
 public record StaffNote(String info, long issued, String source) {
 
-  public static final String
-      KEY_INFO = "content",
-      KEY_ISSUED = "issued",
-      KEY_SOURCE = "source";
+  public static final String KEY_INFO = "content";
+  public static final String KEY_ISSUED = "issued";
+  public static final String KEY_SOURCE = "source";
+
+  public static final UserProperty<Boolean> VIEWS_NOTES
+      = Properties.booleanProperty("viewsNotes", false);
+
+  public static void createSettings(SettingsBook<User> settingsBook) {
+    Setting setting = Setting.create(VIEWS_NOTES)
+        .setDisplayName("Staff Notes")
+        .setDescription("Toggles seeing staff notes whenever a player joins")
+        .setToggle("{0} seeing staff notes when players join")
+        .setToggleDescription("{Enable} seeing staff notes when players join")
+
+        .createCommand(
+            "togglenotes",
+            GriefPermissions.PUNISH_NOTES,
+            Permissions.ADMIN,
+            "notestoggle", "staffnotetoggle", "togglestaffnotes"
+        );
+
+    settingsBook.getSettings().add(setting.toBookSettng());
+  }
 
   public JsonElement serialize() {
     JsonWrapper json = JsonWrapper.create();

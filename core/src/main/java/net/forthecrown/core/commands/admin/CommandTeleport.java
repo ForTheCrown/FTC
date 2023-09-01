@@ -13,7 +13,7 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Grenadier;
 import net.forthecrown.grenadier.Readers;
 import net.forthecrown.grenadier.annotations.Argument;
-import net.forthecrown.grenadier.annotations.CommandData;
+import net.forthecrown.grenadier.annotations.CommandFile;
 import net.forthecrown.grenadier.annotations.VariableInitializer;
 import net.forthecrown.grenadier.types.EntitySelector;
 import net.forthecrown.text.Text;
@@ -28,7 +28,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.util.Vector;
 
-@CommandData("file = 'commands/tp.gcn'")
+@CommandFile("commands/tp.gcn")
 public class CommandTeleport {
 
   public static final String YAW_ARG = "yaw";

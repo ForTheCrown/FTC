@@ -49,9 +49,9 @@ public class CommandNickname extends FtcCommand {
   public static void checkNickAllowed(String nick) throws CommandSyntaxException {
     var config = CorePlugin.plugin().getFtcConfig();
 
-    if (config.getMaxNickLength() < nick.length()) {
+    if (config.maxNickLength() < nick.length()) {
       throw Exceptions.format("Nickname '{0}' is too long (max length {1, number})",
-          nick, config.getMaxNickLength()
+          nick, config.maxNickLength()
       );
     }
 

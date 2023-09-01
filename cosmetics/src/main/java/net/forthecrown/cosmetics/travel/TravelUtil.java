@@ -1,10 +1,7 @@
 package net.forthecrown.cosmetics.travel;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.spongepowered.math.vector.Vector3d;
 
 public class TravelUtil {
   private TravelUtil() {}
@@ -40,25 +37,6 @@ public class TravelUtil {
       {2.2f, 0.958f}, {2.2f, 0.042f}, {2.440f, 0.264f}, {2.440f, 0.736f}, {2.5f, 0.5f},
       {-2.2f, 0.958f}, {-2.2f, 0.042f}, {-2.440f, 0.264f}, {-2.440f, 0.736f}, {-2.5f, 0.5f}
   };
-
-  /**
-   * @param radius       the radius of the circle
-   * @param amountPoints the amount of points that make up the circle
-   * @param extraY       Extra y to add to the locs
-   * @return a list of locations that make up a circle
-   */
-  public static List<Vector3d> getCirclePoints(double extraY, double radius, int amountPoints) {
-    List<Vector3d> result = new ArrayList<>();
-    for (int i = 0; i < amountPoints; ++i) {
-      final double angle = Math.toRadians(((double) i / amountPoints) * 360d);
-
-      double x = Math.cos(angle) * radius;
-      double z = Math.sin(angle) * radius;
-
-      result.add(new Vector3d(x, extraY, z));
-    }
-    return result;
-  }
 
   /**
    * Spawns particles on a circle around a given location.

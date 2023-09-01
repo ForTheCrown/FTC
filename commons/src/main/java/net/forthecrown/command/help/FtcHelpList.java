@@ -5,8 +5,8 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
-import net.forthecrown.command.FtcCommand;
 import net.forthecrown.BukkitServices;
+import net.forthecrown.command.FtcCommand;
 import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.text.Component;
 
@@ -48,5 +48,4 @@ public interface FtcHelpList {
   Collection<HelpEntry> getEntries(String keyword);
 
   void update();
-
 }

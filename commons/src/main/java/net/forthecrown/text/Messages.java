@@ -8,7 +8,7 @@ import static net.kyori.adventure.text.event.ClickEvent.runCommand;
 import javax.annotation.Nullable;
 import net.forthecrown.Worlds;
 import net.forthecrown.user.User;
-import net.forthecrown.user.Users;
+import net.forthecrown.user.UserBlockList;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -24,7 +24,7 @@ public interface Messages {
   Style CHAT_URL = Style.style(TextDecoration.UNDERLINED)
       .hoverEvent(text("Click to open link!"));
 
-  TextComponent FTC_PREFIX = Text.gradient("[FTC] ", NamedTextColor.BLACK, NamedTextColor.GOLD);
+  TextComponent FTC_PREFIX = Text.gradient("[FTC] ", NamedTextColor.RED, NamedTextColor.GOLD);
 
   /**
    * Common text which simply states "Click to allow"
@@ -173,7 +173,7 @@ public interface Messages {
   TextComponent AFK_SUFFIX = text(" [AFK]", NamedTextColor.GRAY);
 
   /**
-   * Format used by {@link Users#testBlocked(User, User, String, String)} for separated players.
+   * Format used by {@link UserBlockList#testBlocked(User, User, String, String)} for separated players.
    */
   String SEPARATED_FORMAT = "You are forcefully separated from {0, user}!";
 
@@ -390,7 +390,8 @@ public interface Messages {
         state ? NamedTextColor.YELLOW : NamedTextColor.GRAY,
         /* Arg 0 */ state ? "Enabled" : "Disabled",
         /* Arg 1 */ state ? "ow" : "o longer",
-        /* Arg 2 */ state ? "o longer" : "ow"
+        /* Arg 2 */ state ? "o longer" : "ow",
+        /* Arg3  */ state ? "Disabled" : "Enabled"
     );
   }
 

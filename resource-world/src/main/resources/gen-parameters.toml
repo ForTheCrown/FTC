@@ -1,0 +1,145 @@
+
+# The distance the spawn flat-ness and biome check should go
+spawnCheckRadius = 20
+
+# Maximum Y level spawn can generate at, if a seed would have spawn be above this
+# the seed will be considered invalid
+maxSpawnY = 75
+
+# Maximum y level difference between blocks near spawn
+maxYDif = 2
+
+# Maximum attempts (per thread) the seed finder will make to find a valid world seed
+findAttempts = 1024
+
+# The amount of threads used to find a seed
+finderThreads = 3
+
+# This value determines how may chunks are skipped when checking all the chunks
+# in a world.
+#
+# For example, a value of '8' would mean only every eight chunk is checked, instead
+# of all chunks.
+#
+# A smaller value means the generator will get a more accurate reading of how many
+# types of chunks are in a seed, but at the cost of speed because in a 5K x 5K
+# world, a value of '1' would mean ~1,562,000 iterations, where as a value of '8'
+# would be ~195,000 iterations
+#
+# This iteration happens to count the chunks in the world to fulfill the
+# 'requiredBiomeTags' and 'requiredBiomes' values
+#
+biomeCheckSkipover = 8
+
+# Allows for the disabling of the biome checker. This means the 'requiredBiomeTags'
+# and 'requiredBiomes' values will also not be checked
+#
+# Faster results, but worse worlds
+skipBiomeCheck = false
+
+# Allows for the disabling of the structure checker. This means the 'requireStructures'
+# value will not be checked.
+#
+# Faster results, but worse worlds
+skipStructureCheck = false
+
+# Allows for the disabling of the spawn area checker. This means the spawn area
+# for the ResourceWorld won't be validated.
+#
+# Faster results, but also means spawn can generate in crazy terrain that's hard
+# for players to navigate... or just looks ugly with the spawn
+#
+skipSpawnCheck = false
+
+# In the event that the seed finder fails to find any valid seeds. This option
+# allows/disallows the finder to return the best seed it could get in that case
+#
+# The returned seed will basically be the shiniest piece of garbage the finder
+# could come up with
+#
+# If this is false, and the finder fails to find a seed, the ResourceWorld simply
+# won't get reset
+#
+allowInvalidSeeds = true
+
+# Biomes the world spawn can be generated inside
+spawnBiomes = [
+  "minecraft:plains",
+  "minecraft:sunflower_plains",
+  "minecraft:snowy_plains",
+  "minecraft:desert"
+]
+
+# Required biome tags
+#
+# Input examples:
+# { tag = "minecraft:is_forest", min = 20, max = 9999 }
+# { tag = "minecraft:is_forest", min = 20 }
+# { tag = "minecraft:is_forest", max = 9999 }
+#   min: The minimum amount of chunks that must contain a biome with the tag
+#   max: the maximum amount of chunks that can contain a biome with the tag
+#
+# "minecraft:is_forest"
+#   Just says a biome with that tag must be contained in the world, no min
+#   or max limits
+#
+# For a seed to be valid, it must have have biomes that match ALL of the specified
+# tags, and, if ranges are set, must have them in the specified range
+#
+requiredBiomeTags = [
+  { tag = "minecraft:is_forest",   min = 1, max = 999 },
+  { tag = "minecraft:is_mountain", min = 1, max = 999 }
+]
+
+# Biomes a world MUST have to be considered valid
+#
+# Input examples:
+# { biome = "minecraft:cherry_grove", min = 20, max = 9999 }
+# { biome = "minecraft:cherry_grove", min = 20 }
+# { biome = "minecraft:cherry_grove", max = 9999 }
+#   min: The minimum amount of chunks that must contain a biome with the tag
+#   max: the maximum amount of chunks that can contain a biome with the tag
+#
+# "minecraft:cherry_grove"
+#   Just says a biome with that tag must be contained in the world, no min
+#   or max limits
+#
+# For a seed to be valid, it must have ALL biomes specified in this list, and,
+# if ranges are also set, must have them in the specified amounts
+#
+requiredBiomes = [
+  "minecraft:cherry_grove"
+]
+
+# Heightmap used to test height (for example, testing if the spawn is flag enough)
+#
+# Possible values:
+# 'motion_blocking' - Highest block that contains fluid or blocks motion
+# 'motion_blocking_no_leaves' - Highest block that contains a luid or blocks motion,
+#    also includes blocks with the 'minecraft:leaves' tag
+# 'ocean_floor' - Highest solid non-air block
+# 'ocean_floor_wg' - Same as above, used for world generation
+# 'world_surface' - Highest non-air block
+# 'world_surface_wg' - Highest non-air block, used for world generation
+#
+heightMap = "ocean_floor_wg"
+
+# List of all required structures
+#
+# A world must contain ALL of the structures specified in this list, and, if ranges
+# are also set, must contain them in the specified amounts
+#
+# Input examples:
+# { struct = "minecraft:ancient_city", min = 20, max = 9999 }
+# { struct = "minecraft:ancient_city", min = 20 }
+# { struct = "minecraft:ancient_city", max = 9999 }
+#   min: The minimum amount of chunks that must contain a biome with the tag
+#   max: the maximum amount of chunks that can contain a biome with the tag
+#
+# "minecraft:ancient_city"
+#   Just says a biome with that tag must be contained in the world, no min
+#   or max limits
+#
+requiredStructures = [
+  { struct = "minecraft:ancient_city", min = 1, max = 999 }
+]

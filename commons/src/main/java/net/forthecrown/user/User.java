@@ -8,11 +8,13 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.text.Text;
 import net.forthecrown.text.ViewerAwareMessage;
 import net.forthecrown.user.name.DisplayIntent;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.ForwardingAudience;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -20,6 +22,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.permissions.Permission;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,6 +43,11 @@ public interface User extends ForwardingAudience.Single {
   @Override
   default @NotNull Audience audience() {
     return isOnline() ? getPlayer() : Audience.empty();
+  }
+
+  @Override
+  default void sendMessage(@NotNull ComponentLike message) {
+    sendMessage(Text.valueOf(message, this));
   }
 
   /**
@@ -129,7 +137,7 @@ public interface User extends ForwardingAudience.Single {
    * @return User's inventory
    * @throws UserOfflineException If the user is not online
    */
-  Inventory getInventory() throws UserOfflineException;
+  PlayerInventory getInventory() throws UserOfflineException;
 
   /**
    * Gets the user's game mode, identical to {@link Player#getGameMode()}
@@ -384,6 +392,10 @@ public interface User extends ForwardingAudience.Single {
 
   void removeBalance(int balance);
 
+  default boolean hasBalance(int balance) {
+    return getBalance() >= balance;
+  }
+
   /* ----------------------------- PROPERTY ACCESS ------------------------------ */
 
   <T> boolean has(UserProperty<T> property);
@@ -430,6 +442,8 @@ public interface User extends ForwardingAudience.Single {
   void updateTabName();
 
   /* ----------------------------- TELEPORTING ------------------------------ */
+
+  Component checkTeleportMessage();
 
   /**
    * Tests if a user can teleport. This function will also tell the user when

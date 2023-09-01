@@ -29,7 +29,7 @@ public class ServerlistPlugin extends JavaPlugin {
   @Override
   public void reloadConfig() {
     saveResource("config.toml", false);
-    SerializationHelper.readTomlAsJson(
+    SerializationHelper.readAsJson(
         PathUtil.pluginPath("config.toml"),
         json -> {
           boolean allowRandom = json.getBool("allowMaxPlayerRandomization", true);

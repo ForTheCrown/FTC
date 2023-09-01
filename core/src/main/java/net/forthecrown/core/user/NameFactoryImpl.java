@@ -4,15 +4,16 @@ import static net.kyori.adventure.text.Component.text;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import net.forthecrown.Permissions;
 import net.forthecrown.text.BufferedTextWriter;
 import net.forthecrown.text.Text;
 import net.forthecrown.text.TextWriter;
 import net.forthecrown.text.TextWriters;
-import net.forthecrown.user.NameElements;
 import net.forthecrown.user.NameRenderFlags;
 import net.forthecrown.user.Properties;
 import net.forthecrown.user.User;
@@ -38,8 +39,11 @@ public class NameFactoryImpl implements UserNameFactory {
   private static final Style BORDER_STYLE
       = Style.style(NamedTextColor.GOLD, TextDecoration.STRIKETHROUGH);
 
-  private NameElement prefix = NameElements.EMPTY;
-  private NameElement suffix = NameElements.EMPTY;
+  private static final Comparator<ElementInfo> INFO_COMPARATOR
+      = Comparator.comparingInt(ElementInfo::priority);
+
+  private final List<ElementInfo> prefix = new ArrayList<>();
+  private final List<ElementInfo> suffix = new ArrayList<>();
 
   // Array maps to make the order fields are displayed in be more consistent
   private final Map<String, ProfileDisplayElement> profileFields = new Object2ObjectArrayMap<>();
@@ -80,7 +84,7 @@ public class NameFactoryImpl implements UserNameFactory {
     }
 
     if (ctx.intent().isHoverTextAllowed()) {
-      Component hover = createHoverText(user, ctx);
+      Component hover = createHoverText(user, ctx.withIntent(DisplayIntent.HOVER_TEXT));
       builder.hoverEvent(hover);
     }
 
@@ -108,18 +112,23 @@ public class NameFactoryImpl implements UserNameFactory {
     return formatElement(user, context, suffix);
   }
 
-  private Component formatElement(User user, DisplayContext ctx, NameElement element) {
-    if (element == null) {
+  private Component formatElement(User user, DisplayContext ctx, List<ElementInfo> list) {
+    if (list == null || list.isEmpty()) {
       return null;
     }
 
-    Component text = element.createDisplay(user, ctx);
+    for (ElementInfo elementInfo : list) {
+      var element = elementInfo.element;
+      Component text = element.createDisplay(user, ctx);
 
-    if (Text.isEmpty(text)) {
-      return null;
+      if (Text.isEmpty(text)) {
+        continue;
+      }
+
+      return text;
     }
 
-    return text;
+    return null;
   }
 
   @Override
@@ -279,26 +288,71 @@ public class NameFactoryImpl implements UserNameFactory {
         flags.contains(NameRenderFlags.ALLOW_NICKNAME),
         flags.contains(NameRenderFlags.USER_ONLINE),
         self,
-        DisplayIntent.UNSET
+        DisplayIntent.UNSET,
+        this
     );
   }
 
   @Override
-  public void addPrefix(NameElement element) {
-    if (prefix != NameElements.EMPTY) {
-      prefix = NameElements.combine(prefix, element);
-    } else {
-      prefix = element;
-    }
+  public void addPrefix(String id, int priority, NameElement element) {
+    addElement(prefix, id, priority, element);
   }
 
   @Override
-  public void addSuffix(NameElement element) {
-    if (suffix != NameElements.EMPTY) {
-      suffix = NameElements.combine(suffix, element);
-    } else {
-      suffix = element;
+  public void addSuffix(String id, int priority, NameElement element) {
+    addElement(suffix, id, priority, element);
+  }
+
+  @Override
+  public void removePrefix(String id) {
+    removeElement(prefix, id);
+  }
+
+  @Override
+  public void removeSuffix(String id) {
+    removeElement(suffix, id);
+  }
+
+  void addElement(List<ElementInfo> list, String id, int prio, NameElement element) {
+    Objects.requireNonNull(id, "Null ID");
+    Objects.requireNonNull(element, "Null element");
+
+    int existing = findElement(id, list);
+
+    if (existing != -1) {
+      throw new IllegalStateException("Name element with ID '" + id + "' already registered");
     }
+
+    ElementInfo info = new ElementInfo(id, prio, element);
+    list.add(info);
+    list.sort(INFO_COMPARATOR);
+  }
+
+  void removeElement(List<ElementInfo> info, String id) {
+    Objects.requireNonNull(id, "Null ID");
+    int index = findElement(id, info);
+
+    if (index == -1) {
+      return;
+    }
+
+    info.remove(index);
+  }
+
+  int findElement(String id, List<ElementInfo> infos) {
+    if (infos == null || infos.isEmpty()) {
+      return -1;
+    }
+
+    for (int i = 0; i < infos.size(); i++) {
+      var info = infos.get(i);
+
+      if (info.id.equals(id)) {
+        return i;
+      }
+    }
+
+    return -1;
   }
 
   @Override
@@ -319,5 +373,9 @@ public class NameFactoryImpl implements UserNameFactory {
   @Override
   public void removeAdminField(String id) {
     adminFields.remove(id);
+  }
+
+  record ElementInfo(String id, int priority, NameElement element) {
+
   }
 }

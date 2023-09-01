@@ -10,8 +10,6 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 import java.util.UUID;
@@ -24,9 +22,12 @@ import net.forthecrown.Loggers;
 import net.forthecrown.utils.PluginUtil;
 import org.apache.commons.io.file.PathUtils;
 import org.bukkit.plugin.Plugin;
+import org.slf4j.Logger;
 
 public final class PathUtil {
   private PathUtil() {}
+
+  private static final Logger LOGGER = Loggers.getLogger();
 
   public static final Pattern UUID_PATTERN
       = Pattern.compile(
@@ -133,6 +134,8 @@ public final class PathUtil {
           } else if (!tolerateErrors) {
             final int finalDeleted = deleted;
             return result.map(integer -> integer + finalDeleted);
+          } else {
+            LOGGER.error(result.error().get().message());
           }
         }
 
@@ -145,6 +148,8 @@ public final class PathUtil {
                 "Couldn't perform operation on file '%s': '%s'",
                 p, exc.getMessage()
             );
+          } else {
+            LOGGER.error("Error iterating over path {}", p, exc);
           }
         }
       }

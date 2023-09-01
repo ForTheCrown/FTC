@@ -2,6 +2,7 @@ package net.forthecrown.utils;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.Objects;
 import net.forthecrown.utils.math.WorldVec3i;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -14,12 +15,7 @@ import org.bukkit.block.Block;
  * This class denotes a location saved as an underscore-separated string. Example:
  * 'world_void_156_41_1265'
  */
-public record LocationFileName(
-    String world,
-    int x,
-    int y,
-    int z
-) {
+public record LocationFileName(String world, int x, int y, int z) {
 
   /**
    * Delimiter character used to separate coordinates from each other and from world name
@@ -46,14 +42,15 @@ public record LocationFileName(
   }
 
   public static LocationFileName parse(StringReader reader) throws CommandSyntaxException {
+    int start = reader.getCursor();
+
     //Read the world name at the start
     while (reader.canRead() && !StringReader.isAllowedNumber(reader.peek())) {
       reader.skip();
     }
 
     // Get the world name, - 1 from the length since it ends with the "_" before the integer
-    String read = reader.getRead();
-    String world = read.substring(0, read.length() - 1);
+    String world = reader.getString().substring(start, reader.getCursor() - 1);
 
     //Read cords
     int x = reader.readInt();
@@ -74,7 +71,7 @@ public record LocationFileName(
   }
 
   public World getWorld() {
-    return Bukkit.getWorld(world);
+    return Objects.requireNonNull(Bukkit.getWorld(world), "No world named '" + world + "' found");
   }
 
   public Block getBlock() {

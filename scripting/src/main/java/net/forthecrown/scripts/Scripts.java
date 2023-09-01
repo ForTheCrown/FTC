@@ -1,8 +1,13 @@
 package net.forthecrown.scripts;
 
 import com.google.gson.JsonElement;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.JsonOps;
 import java.nio.file.Path;
 import java.util.Objects;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.utils.io.TagOps;
 import net.forthecrown.utils.io.source.Source;
 import net.forthecrown.utils.io.source.Sources;
 
@@ -30,8 +35,24 @@ public final class Scripts {
   }
 
   public static Source loadScriptSource(JsonElement element, boolean assumeRawJs) {
+    return loadScriptSource0(new Dynamic<>(JsonOps.INSTANCE, element), assumeRawJs);
+  }
+
+  public static Source loadScriptSource(BinaryTag tag, boolean assumeRawJs) {
+    return loadScriptSource0(new Dynamic<>(TagOps.OPS, tag), assumeRawJs);
+  }
+
+  public static <S> DataResult<Source> loadScriptSource(Dynamic<S> dynamic, boolean assumeRawJs) {
+    try {
+      return DataResult.success(loadScriptSource0(dynamic, assumeRawJs));
+    } catch (IllegalArgumentException exc) {
+      return DataResult.error(exc::getMessage);
+    }
+  }
+
+  private static <S> Source loadScriptSource0(Dynamic<S> dynamic, boolean assumeRawJs) {
     var path = getService().getScriptsDirectory();
-    return Sources.loadFromJson(element, path, assumeRawJs);
+    return Sources.load(dynamic, path, assumeRawJs);
   }
 
   public static Script loadScript(JsonElement element, boolean assumeRawJs) {

@@ -15,6 +15,7 @@ import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
 import org.intellij.lang.annotations.Pattern;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -60,6 +61,12 @@ public class RoyalSwordType implements ExtendedItemType<RoyalSword> {
   @Override
   public @NotNull RoyalSword load(@NotNull CompoundTag item) {
     return new RoyalSword(this, item);
+  }
+
+  @Override
+  public void rankUp(ItemStack itemStack, RoyalSword value) {
+    value.incrementRank(itemStack);
+    value.update(itemStack);
   }
 
   @Override

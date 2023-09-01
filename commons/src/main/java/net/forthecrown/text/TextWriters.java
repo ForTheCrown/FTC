@@ -16,7 +16,7 @@ public final class TextWriters {
    *
    * @return The created writer
    */
-  public static AbstractTextWriter newWriter() {
+  public static DefaultTextWriter newWriter() {
     return new DefaultTextWriter(Component.text());
   }
 
@@ -26,7 +26,7 @@ public final class TextWriters {
    * @param builder The builder to wrap
    * @return The created writer
    */
-  public static AbstractTextWriter wrap(TextComponent.Builder builder) {
+  public static DefaultTextWriter wrap(TextComponent.Builder builder) {
     return new DefaultTextWriter(builder);
   }
 

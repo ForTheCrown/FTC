@@ -2,31 +2,31 @@ package net.forthecrown.utils;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import java.lang.reflect.AnnotatedType;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.grenadier.types.TimeArgument;
 import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.utils.io.PluginJar;
+import net.forthecrown.utils.io.configurate.ComponentSerializerType;
 import net.forthecrown.utils.io.configurate.TomlConfigurationLoader;
+import net.forthecrown.utils.math.WorldVec3i;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.loader.HeaderMode;
-import org.spongepowered.configurate.objectmapping.FieldDiscoverer;
 import org.spongepowered.configurate.objectmapping.ObjectMapper;
-import org.spongepowered.configurate.objectmapping.ObjectMapper.Factory;
 import org.spongepowered.configurate.serialize.SerializationException;
 import org.spongepowered.configurate.serialize.TypeSerializer;
 import org.spongepowered.configurate.serialize.TypeSerializerCollection;
-import org.spongepowered.configurate.util.MapFactories;
-import org.spongepowered.configurate.util.MapFactory;
 import org.spongepowered.math.vector.Vector2d;
 import org.spongepowered.math.vector.Vector2f;
 import org.spongepowered.math.vector.Vector2i;
@@ -52,8 +52,15 @@ public final class TomlConfigs {
   }
 
   public static <T> T loadConfig(String configName, JavaPlugin plugin, Class<T> type) {
-    plugin.saveResource(configName, false);
     Path path = PathUtil.pluginPath(plugin, configName);
+
+    try {
+      PathUtil.ensureParentExists(path);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+
+    PluginJar.saveResources(plugin, configName);
 
     try {
       ConfigurationNode node = load(path);
@@ -87,6 +94,9 @@ public final class TomlConfigs {
         )
 
         .registerExact(Duration.class, createDurationSerializer())
+        .registerExact(WorldVec3i.class, new WorldVec3iSerializer())
+
+        .register(Component.class, new ComponentSerializerType())
 
         // Auto generated via a TypeScript script
         .registerExact(Vector2f.class, new Vector2fSerializer())
@@ -107,8 +117,23 @@ public final class TomlConfigs {
         .registerExact(VectorNl.class, new VectorNlSerializer());
   }
 
+  public static Duration parseDuration(String strValue) throws CommandSyntaxException {
+    StringReader reader = new StringReader(strValue);
+    TimeArgument parser = ArgumentTypes.time();
+    Duration result = parser.parse(reader);
+
+    while (reader.canRead() && reader.peek() == ':') {
+      reader.skip();
+
+      Duration dur = parser.parse(reader);
+      result = result.plus(dur);
+    }
+
+    return result;
+  }
+
   public static TypeSerializer<Duration> createDurationSerializer() {
-    return new TypeSerializer<Duration>() {
+    return new TypeSerializer<>() {
       @Override
       public Duration deserialize(Type type, ConfigurationNode node) throws SerializationException {
         var strValue = node.getString();
@@ -123,21 +148,8 @@ public final class TomlConfigs {
           return Duration.ofMillis(longVal);
         }
 
-        StringReader reader = new StringReader(strValue);
-        TimeArgument parser = ArgumentTypes.time();
-        Duration result;
-
         try {
-          result = parser.parse(reader);
-
-          while (reader.canRead() && reader.peek() == ':') {
-            reader.skip();
-
-            Duration dur = parser.parse(reader);
-            result = result.plus(dur);
-          }
-
-          return result;
+          return parseDuration(strValue);
         } catch (CommandSyntaxException exc) {
           throw new SerializationException(exc);
         }
@@ -159,6 +171,48 @@ public final class TomlConfigs {
   }
 }
 
+
+class WorldVec3iSerializer implements TypeSerializer<WorldVec3i> {
+
+  @Override
+  public WorldVec3i deserialize(Type type, ConfigurationNode node) throws SerializationException {
+    if (node.isNull()) {
+      return null;
+    }
+
+    World world;
+
+    if (node.hasChild("world")) {
+      world = Bukkit.getWorld(node.node("world").getString());
+    } else {
+      world = null;
+    }
+
+    int x = node.node("x").getInt();
+    int y = node.node("y").getInt();
+    int z = node.node("z").getInt();
+
+    return new WorldVec3i(world, x, y, z);
+  }
+
+  @Override
+  public void serialize(Type type, @Nullable WorldVec3i obj, ConfigurationNode node)
+      throws SerializationException
+  {
+    if (obj == null) {
+      node.set(null);
+      return;
+    }
+
+    if (obj.getWorld() != null) {
+      node.node("world").set(obj.getWorld().getName());
+    }
+
+    node.node("x").set(obj.x());
+    node.node("y").set(obj.y());
+    node.node("z").set(obj.z());
+  }
+}
 
 // Auto generated via a TypeScript script
 

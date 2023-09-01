@@ -81,7 +81,7 @@ public final class TagUtil {
     return PaperNbt.toDataContainer(tag, TagUtil::newContainer);
   }
 
-  public static CraftPersistentDataContainer newContainer() {
+  public static PersistentDataContainer newContainer() {
     return new CraftPersistentDataContainer(REGISTRY);
   }
 

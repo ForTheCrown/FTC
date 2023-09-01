@@ -94,26 +94,19 @@ public class PluginJar {
     return getResourceFileSystem(plugin).getPath(s, others);
   }
 
-  /**
-   * Saves a file/directory from the plugin jar resources to the FTC data folder
-   *
-   * @param sourceDir The path to the directory/file inside the jar, will also act as the path the
-   *                  file/directory is saved to.
-   * @param flags     Flags to use for determining whether a file should be overwritten or not, Set
-   *                  to 0 to never override existing files
-   * @throws IOException If an IO error occurred
-   * @see #saveResources(String, Path, int)
-   */
-  public static void saveResources(String sourceDir, int flags) {
-    JavaPlugin caller = PluginUtil.getCallingPlugin();
-    Path dest = caller.getDataFolder().toPath().resolve(sourceDir);
-    _saveResources(caller, sourceDir, dest, flags);
+  public static void saveResources(JavaPlugin plugin, String sourceDir) {
+    Path dest = plugin.getDataFolder().toPath().resolve(sourceDir);
+    _saveResources(plugin, sourceDir, dest, 0);
   }
 
   public static void saveResources(String sourceDir) {
     JavaPlugin caller = PluginUtil.getCallingPlugin();
     Path dest = caller.getDataFolder().toPath().resolve(sourceDir);
     _saveResources(caller, sourceDir, dest, 0);
+  }
+
+  public static void saveResources(JavaPlugin plugin, String sourceDir, Path dest) {
+    _saveResources(plugin, sourceDir, dest, 0);
   }
 
   public static void saveResources(String sourceDir, Path dest) {

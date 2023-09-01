@@ -7,12 +7,16 @@ import net.forthecrown.FtcServer;
 import net.forthecrown.InventoryStorage;
 import net.forthecrown.WorldEditHook;
 import net.forthecrown.command.help.FtcHelpList;
+import net.forthecrown.core.announcer.AutoAnnouncer;
 import net.forthecrown.core.commands.CoreCommands;
 import net.forthecrown.core.commands.help.HelpListImpl;
 import net.forthecrown.core.grave.GraveImpl;
 import net.forthecrown.core.listeners.CoreListeners;
+import net.forthecrown.core.listeners.MobHealthBar;
+import net.forthecrown.core.placeholder.PlaceholderServiceImpl;
 import net.forthecrown.core.user.UserServiceImpl;
 import net.forthecrown.grenadier.Grenadier;
+import net.forthecrown.text.placeholder.PlaceholderService;
 import net.forthecrown.user.UserService;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.PeriodicalSaver;
@@ -22,15 +26,17 @@ import org.bukkit.plugin.java.JavaPlugin;
 @Getter
 public class CorePlugin extends JavaPlugin {
 
+  private CoreConfig ftcConfig;
+  private PeriodicalSaver saver;
+
   private UserServiceImpl userService;
   private HelpListImpl helpList;
   private FtcServerImpl ftcServer;
-
-  private CoreConfig ftcConfig;
-
-  private PeriodicalSaver saver;
-
+  private PlaceholderServiceImpl placeholderService;
   private DayChange dayChange;
+  private AutoAnnouncer announcer;
+  private JoinInfo joinInfo;
+  private Wild wild;
 
   public static CorePlugin plugin() {
     return getPlugin(CorePlugin.class);
@@ -47,6 +53,10 @@ public class CorePlugin extends JavaPlugin {
     userService = new UserServiceImpl(this);
     ftcServer = new FtcServerImpl();
     dayChange = new DayChange();
+    announcer = new AutoAnnouncer();
+    placeholderService = new PlaceholderServiceImpl(this);
+    joinInfo = new JoinInfo();
+    wild = new Wild();
 
     BukkitServices.register(FtcServer.class, ftcServer);
     BukkitServices.register(FtcHelpList.class, helpList);
@@ -54,17 +64,29 @@ public class CorePlugin extends JavaPlugin {
     BukkitServices.register(Cooldowns.class, CooldownsImpl.getCooldowns());
     BukkitServices.register(UserService.class, userService);
     BukkitServices.register(WorldEditHook.class, new WorldEditHookImpl());
+    BukkitServices.register(PlaceholderService.class, placeholderService);
 
     Users.setService(userService);
     userService.initialize();
-    userService.load();
 
-    CoreListeners.registerAll();
-    CoreCommands.createCommands();
+    CoreListeners.registerAll(this);
+    CoreCommands.createCommands(this);
     PrefsBook.init(ftcServer.getGlobalSettingsBook());
 
-    saver = PeriodicalSaver.create(this::save, () -> ftcConfig.autosaveInterval);
-    reloadConfig();
+    saver = PeriodicalSaver.create(this::save, () -> ftcConfig.autosaveInterval());
+
+    reload();
+  }
+
+  @Override
+  public void onLoad() {
+    CoreFlags.registerAll();
+  }
+
+  @Override
+  public void onDisable() {
+    save();
+    MobHealthBar.shutdown();
   }
 
   @Override
@@ -86,6 +108,7 @@ public class CorePlugin extends JavaPlugin {
 
   public void save() {
     userService.save();
+    ftcServer.save();
 
     InventoryStorageImpl.getStorage().save();
     CooldownsImpl.getCooldowns().save();
@@ -93,7 +116,20 @@ public class CorePlugin extends JavaPlugin {
 
   public void reload() {
     reloadConfig();
+
     userService.load();
+    announcer.load();
+
+    announcer.start();
+    saver.start();
+
+    joinInfo.load();
+
+    placeholderService.load();
+    ftcServer.load();
+    helpList.load();
+    wild.load();
+
     InventoryStorageImpl.getStorage().load();
     CooldownsImpl.getCooldowns().load();
   }

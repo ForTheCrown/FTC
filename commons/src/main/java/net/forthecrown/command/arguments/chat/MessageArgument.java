@@ -11,13 +11,16 @@ import java.util.concurrent.CompletableFuture;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.grenadier.internal.VanillaMappedArgument;
+import net.forthecrown.text.PlayerMessage;
 import net.forthecrown.text.Text;
+import net.forthecrown.text.parse.ChatParseFlag;
 import net.forthecrown.text.parse.ChatParser;
 import net.forthecrown.text.parse.TextContext;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.minecraft.commands.CommandBuildContext;
 import org.bukkit.command.CommandSender;
+import org.bukkit.permissions.Permissible;
 
 public class MessageArgument
     implements ArgumentType<MessageArgument.Result>, VanillaMappedArgument
@@ -52,6 +55,15 @@ public class MessageArgument
 
     public Component getFormatted() {
       return Text.renderString(text);
+    }
+
+    public PlayerMessage toPlayerMessage(Permissible source) {
+      var flags = ChatParseFlag.allApplicable(source);
+      return new PlayerMessage(text, flags);
+    }
+
+    public PlayerMessage toPlayerMessage() {
+      return new PlayerMessage(text, TextContext.totalRender().flags());
     }
 
     public Component formatAdmin(Audience viewer) {

@@ -202,9 +202,10 @@ public class Registry<V> implements Iterable<V> {
    * @throws NullPointerException     If the given value or key were null
    * @see #register(Holder)
    */
-  public @NotNull Holder<V> register(@Pattern(Registries.VALID_KEY_REGEX) String key,
-                                     @NotNull V value,
-                                     @NonNegative int id
+  public @NotNull Holder<V> register(
+      @Pattern(Registries.VALID_KEY_REGEX) String key,
+      @NotNull V value,
+      @NonNegative int id
   ) throws IllegalArgumentException, NullPointerException {
     return register(new Holder<>(removeNamespace(key).intern(), id, value));
   }
@@ -521,14 +522,15 @@ public class Registry<V> implements Iterable<V> {
    * @param key The key to get the entry of
    * @return An optional that's empty if this registry does not contain the given key, otherwise it
    * contains the entry associated with the given key
-   * @throws IllegalArgumentException If the key failed the {@link Registries#ensureValidKey(String)} test
    */
   public @NotNull Optional<Holder<V>> getHolder(@Pattern(Registries.VALID_KEY_REGEX) String key)
       throws IllegalArgumentException
   {
-    return Optional.ofNullable(byKey.get(
-        Registries.ensureValidKey(removeNamespace(key)).intern()
-    ));
+    if (!Registries.isValidKey(key)) {
+      return Optional.empty();
+    }
+
+    return Optional.ofNullable(byKey.get(removeNamespace(key).intern()));
   }
 
   /**

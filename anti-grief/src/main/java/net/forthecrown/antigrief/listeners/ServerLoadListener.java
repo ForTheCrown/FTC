@@ -8,7 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.server.ServerLoadEvent;
 import org.slf4j.Logger;
 
-public class ServerLoadListener implements Listener {
+class ServerLoadListener implements Listener {
 
   @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
   public void onServerLoad(ServerLoadEvent event) {

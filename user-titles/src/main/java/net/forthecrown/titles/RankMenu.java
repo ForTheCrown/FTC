@@ -108,8 +108,7 @@ public final class RankMenu {
       this.listPage = new ExtraRankListPage(this, tier);
 
       initMenu(
-          Menus.builder(MAX_INV_SIZE)
-              .setTitle(tier.getDisplayName()),
+          Menus.builder(MAX_INV_SIZE).setTitle(tier.getDisplayName()),
           true
       );
     }

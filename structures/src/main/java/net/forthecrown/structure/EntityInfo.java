@@ -61,6 +61,10 @@ public class EntityInfo {
     );
   }
 
+  public CompoundTag getTag() {
+    return copyTag(tag);
+  }
+
   /* ----------------------------- CLONE BUILDERS ------------------------------ */
 
   public EntityInfo copy() {

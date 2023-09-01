@@ -41,6 +41,7 @@ public class PlayerFunction extends TextFunction {
         .append(displayName)
         .hoverEvent(displayName.hoverEvent())
         .clickEvent(displayName.clickEvent())
+        .insertion(displayName.insertion())
         .color(NamedTextColor.AQUA)
         .build();
   }

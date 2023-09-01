@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import lombok.Getter;
-import net.forthecrown.Loggers;
 import net.forthecrown.utils.PluginUtil;
 import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.utils.io.SerializationHelper;
@@ -56,11 +55,7 @@ public class DataUpdaters {
   }
 
   public void load() {
-    SerializationHelper.readFile(
-        completedTxt,
-        Files::readAllLines,
-        strings -> completed.addAll(strings)
-    );
+    SerializationHelper.readFile(completedTxt, Files::readAllLines, completed::addAll);
   }
 
   public void save() {

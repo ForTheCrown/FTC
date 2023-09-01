@@ -71,19 +71,11 @@ public class WeaponListener implements Listener {
     onInteract(event, null, event.getClickedBlock(), event.getAction().isLeftClick());
   }
 
-  private void onInteract(PlayerEvent event,
-                          Entity entity,
-                          Block block,
-                          boolean leftClick
-  ) {
+  private void onInteract(PlayerEvent event, Entity entity, Block block, boolean leftClick) {
     onInteract(event.getPlayer(), entity, block, leftClick);
   }
 
-  private void onInteract(Player player,
-                          Entity entity,
-                          Block block,
-                          boolean leftClick
-  ) {
+  private void onInteract(Player player, Entity entity, Block block, boolean leftClick) {
     if (!SwordAbilityManager.getInstance().isEnabled() && !LOGGER.isDebugEnabled()) {
       return;
     }

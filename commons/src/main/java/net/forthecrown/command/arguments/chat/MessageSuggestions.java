@@ -299,23 +299,26 @@ public class MessageSuggestions {
     return suggests.getSuggestions(c, builder);
   }
 
-  public static <S> CompletableFuture<Suggestions> get(CommandContext<S> c,
-                                                       SuggestionsBuilder builder
+  public static <S> CompletableFuture<Suggestions> get(
+      CommandContext<S> c,
+      SuggestionsBuilder builder
   ) {
     return get(c, builder, false);
   }
 
-  public static <S> CompletableFuture<Suggestions> get(CommandContext<S> c,
-                                                       SuggestionsBuilder builder, boolean override
+  public static <S> CompletableFuture<Suggestions> get(
+      CommandContext<S> c,
+      SuggestionsBuilder builder, boolean override
   ) {
     return get(c, builder, override, null);
   }
 
   @SuppressWarnings("unchecked")
-  public static <S> CompletableFuture<Suggestions> get(CommandContext<S> c,
-                                                       SuggestionsBuilder builder,
-                                                       boolean override,
-                                                       SuggestionFunction customSuggestions
+  public static <S> CompletableFuture<Suggestions> get(
+      CommandContext<S> c,
+      SuggestionsBuilder builder,
+      boolean override,
+      SuggestionFunction customSuggestions
   ) {
     var suggester = of(
         ((CommandSource) c.getSource()).asBukkit(),

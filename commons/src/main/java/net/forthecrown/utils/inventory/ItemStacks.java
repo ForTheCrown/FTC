@@ -4,6 +4,13 @@ import com.google.common.base.Strings;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
+import it.unimi.dsi.fastutil.Hash;
+import it.unimi.dsi.fastutil.Hash.Strategy;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenCustomHashMap;
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +25,11 @@ import net.forthecrown.nbt.string.Snbt;
 import net.forthecrown.nbt.string.TagParseException;
 import net.forthecrown.text.Text;
 import net.forthecrown.utils.AbstractListIterator;
+import net.forthecrown.utils.VanillaAccess;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.minecraft.SharedConstants;
 import net.minecraft.util.datafix.DataFixers;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -71,6 +79,18 @@ public final class ItemStacks {
    */
   public static final String LEGACY_TAG_DATA_VERSION = "dataVersion";
   public static final String DATA_VERSION_TAG = "DataVersion";
+
+  private static final Hash.Strategy<ItemStack> ITEM_HASH = new Strategy<>() {
+    @Override
+    public int hashCode(ItemStack o) {
+      return Objects.hash(o.getType(), o.getItemMeta());
+    }
+
+    @Override
+    public boolean equals(ItemStack a, ItemStack b) {
+      return a.isSimilar(b);
+    }
+  };
 
   /* ------------------------------- TAGS --------------------------------- */
 
@@ -143,12 +163,6 @@ public final class ItemStacks {
     return getUnhandledTags(meta).containsKey(key);
   }
 
-  private static int getDataVersion() {
-    return SharedConstants.getCurrentVersion()
-        .getDataVersion()
-        .getVersion();
-  }
-
   /**
    * Saves an item stack to NBT
    *
@@ -170,7 +184,7 @@ public final class ItemStacks {
       BinaryTag legacyDataVersion = tag.remove(LEGACY_TAG_DATA_VERSION);
       tag.put(DATA_VERSION_TAG, legacyDataVersion);
     } else if (!tag.contains(DATA_VERSION_TAG)) {
-      tag.putInt(DATA_VERSION_TAG, getDataVersion());
+      tag.putInt(DATA_VERSION_TAG, VanillaAccess.getDataVersion());
     }
 
     if (tag.contains("tag")) {
@@ -282,6 +296,150 @@ public final class ItemStacks {
    */
   public static boolean notEmpty(@Nullable ItemStack stack) {
     return !isEmpty(stack);
+  }
+
+  public static boolean hasRoom(Inventory inventory, Collection<ItemStack> items) {
+    Objects.requireNonNull(inventory);
+    Objects.requireNonNull(items);
+
+    if (items.isEmpty()) {
+      return true;
+    }
+
+    // Count item quantities
+    Object2IntMap<ItemStack> counted = countItems(items);
+    ItemStack[] storage = inventory.getStorageContents();
+
+    for (ItemStack item : storage) {
+      if (isEmpty(item)) {
+        var firstEntry = firstNonEmpty(counted);
+
+        if (firstEntry == null) {
+          continue;
+        }
+
+        var entryItem = firstEntry.getKey();
+        int maxStack = entryItem.getMaxStackSize();
+
+        int remaining = firstEntry.getIntValue();
+        firstEntry.setValue(remaining - maxStack);
+
+        continue;
+      }
+
+      var remaining = counted.getInt(item);
+
+      if (remaining < 1) {
+        continue;
+      }
+
+      int maxStack = item.getMaxStackSize();
+      int untilMax = maxStack - item.getAmount();
+
+      counted.put(item, remaining - untilMax);
+    }
+
+    return counted.values().intStream().allMatch(pair -> pair < 1);
+  }
+
+  private static Entry<ItemStack> firstNonEmpty(
+      Object2IntMap<ItemStack> map
+  ) {
+    for (Entry<ItemStack> n : map.object2IntEntrySet()) {
+      if (n.getIntValue() < 1) {
+        continue;
+      }
+
+      return n;
+    }
+
+    return null;
+  }
+
+  public static boolean hasRoom(Inventory inventory, ItemStack item) {
+    return hasRoom(inventory, item, item.getAmount());
+  }
+
+  public static boolean hasRoom(Inventory inventory, ItemStack item, int requiredCount) {
+    if (requiredCount < 1) {
+      return true;
+    }
+
+    final int maxStack = item.getMaxStackSize();
+    int remaining = requiredCount;
+
+    ItemStack[] storage = inventory.getStorageContents();
+
+    for (ItemStack i : storage) {
+      if (isEmpty(i)) {
+        remaining -= maxStack;
+      } else if (!item.isSimilar(i)) {
+        continue;
+      } else {
+        int untilMax = maxStack - i.getAmount();
+        remaining -= untilMax;
+      }
+
+      if (remaining < 1) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  public static Object2IntMap<ItemStack> countItems(Collection<ItemStack> items) {
+    Object2IntMap<ItemStack> map = new Object2IntOpenCustomHashMap<>(ITEM_HASH);
+    for (ItemStack item : items) {
+      map.computeInt(item, (itemStack, integer) -> {
+        if (integer == null) {
+          return itemStack.getAmount();
+        }
+
+        return integer + itemStack.getAmount();
+      });
+    }
+    return map;
+  }
+
+  public static void giveOrDrop(Inventory inventory, ItemStack... items) {
+    if (items.length == 1) {
+      giveOrDropItem(inventory, items[0]);
+      return;
+    }
+
+    giveOrDrop(inventory, List.of(items));
+  }
+
+  public static void giveOrDrop(Inventory inventory, Collection<ItemStack> items) {
+    for (ItemStack item : items) {
+      giveOrDropItem(inventory, item);
+    }
+  }
+
+  /**
+   * Deprecated version of the give or drop function, used in some JS scripts
+   * @deprecated Use {@link #giveOrDropItem(Inventory, ItemStack)}
+   */
+  @Deprecated
+  public static void giveOrDropItem(Inventory inventory, Location location, ItemStack itemStack) {
+    giveOrDrop(inventory, itemStack);
+  }
+
+  public static void giveOrDropItem(Inventory inventory, ItemStack itemStack) {
+    if (ItemStacks.isEmpty(itemStack)) {
+      throw new IllegalArgumentException("Empty item stack");
+    }
+
+    if (hasRoom(inventory, itemStack)) {
+      inventory.addItem(itemStack.clone());
+      return;
+    }
+
+    Location location = inventory.getLocation();
+    Objects.requireNonNull(location, "Inventory has no location");
+
+    location.getWorld().dropItem(location, itemStack.clone());
   }
 
   /* ------------------------ INVENTORY ITERATION ------------------------- */

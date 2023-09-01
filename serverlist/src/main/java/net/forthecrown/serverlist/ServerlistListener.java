@@ -3,7 +3,8 @@ package net.forthecrown.serverlist;
 import com.destroystokyo.paper.event.server.PaperServerListPingEvent;
 import java.util.Random;
 import net.forthecrown.events.DayChangeEvent;
-import net.forthecrown.text.placeholder.PlaceholderList;
+import net.forthecrown.text.placeholder.PlaceholderRenderer;
+import net.forthecrown.text.placeholder.Placeholders;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -29,9 +30,10 @@ public class ServerlistListener implements Listener {
       base = Bukkit.motd();
     }
 
-    PlaceholderList placeholders = PlaceholderList.newList()
+    PlaceholderRenderer placeholders = Placeholders.newRenderer()
         .useDefaults()
-        .add("version", Bukkit::getMinecraftVersion);
+        .add("version", Bukkit::getMinecraftVersion)
+        .add("ip", event.getAddress().getHostName());
 
     placeholders.add("message", placeholders.render(pair.right()));
 

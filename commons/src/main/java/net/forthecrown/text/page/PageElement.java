@@ -17,5 +17,5 @@ public interface PageElement<T> {
    * @param it     The page being iterated through
    * @param writer The destination of the text
    */
-  void write(PageEntryIterator<T> it, TextWriter writer, Context context);
+  void write(PagedIterator<T> it, TextWriter writer, Context context);
 }

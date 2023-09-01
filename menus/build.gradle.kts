@@ -11,6 +11,6 @@ dependencies {
 }
 
 pluginYml {
-  name = "FTC-MenuService"
+  name = "FTC-Menus"
   main = "net.forthecrown.menu.internal.MenusPlugin"
 }

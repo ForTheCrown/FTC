@@ -3,13 +3,10 @@ package net.forthecrown.utils;
 import static net.kyori.adventure.text.Component.text;
 
 import com.google.common.base.Preconditions;
-import java.util.Collection;
 import javax.annotation.Nullable;
 import net.forthecrown.Loggers;
-import net.forthecrown.command.settings.BookSetting;
 import net.forthecrown.text.Text;
 import net.forthecrown.text.TextInfo;
-import net.kyori.adventure.inventory.Book;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -192,14 +189,6 @@ public class BookBuilder {
     currentPage = text(); // empty page
     lineCount = 0; // No lines yet
     return this;
-  }
-
-  public int getLineCount() {
-    return lineCount;
-  }
-
-  public int getPageCount() {
-    return pageCount;
   }
 
   public boolean canAddLine() {

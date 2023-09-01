@@ -6,6 +6,8 @@ import net.forthecrown.utils.math.Bounds3i;
 import net.forthecrown.waypoints.Waypoint;
 import net.forthecrown.waypoints.WaypointProperties;
 import net.forthecrown.waypoints.Waypoints;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
@@ -22,6 +24,11 @@ public final class RegionPoleType extends WaypointType {
 
   public RegionPoleType() {
     super("Region Pole", REGION_POLE_COLUMN);
+  }
+
+  @Override
+  public TextColor getNameColor() {
+    return NamedTextColor.YELLOW;
   }
 
   @Override

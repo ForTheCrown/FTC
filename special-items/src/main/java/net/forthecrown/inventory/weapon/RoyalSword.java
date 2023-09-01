@@ -1,7 +1,5 @@
 package net.forthecrown.inventory.weapon;
 
-import static net.forthecrown.text.Text.nonItalic;
-
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import java.util.UUID;
@@ -17,11 +15,13 @@ import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.nbt.IntTag;
 import net.forthecrown.registry.Holder;
-import net.forthecrown.utils.Tasks;
 import net.forthecrown.text.Text;
 import net.forthecrown.text.TextWriter;
+import net.forthecrown.utils.Tasks;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -50,8 +50,12 @@ public class RoyalSword extends ExtendedItem {
       TAG_ABILITY_USES = "abilityUses";
 
   public static final Component BORDER = Component.text(
-      "------------------------------",
-      nonItalic(NamedTextColor.DARK_GRAY)
+      "                              ",
+      Style.style()
+          .color(NamedTextColor.GRAY)
+          .decorate(TextDecoration.STRIKETHROUGH)
+          .decoration(TextDecoration.ITALIC, false)
+          .build()
   );
 
   @Setter

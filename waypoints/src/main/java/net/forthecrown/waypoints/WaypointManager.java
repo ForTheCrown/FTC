@@ -16,7 +16,7 @@ import net.forthecrown.Loggers;
 import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.user.Users;
-import net.forthecrown.utils.WorldChunkMap;
+import net.forthecrown.utils.collision.WorldChunkMap;
 import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.utils.io.SerializationHelper;
 import net.forthecrown.waypoints.event.WaypointRemoveEvent;

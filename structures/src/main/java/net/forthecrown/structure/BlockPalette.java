@@ -156,7 +156,7 @@ public class BlockPalette {
     }
   }
 
-  public void load(CompoundTag tag) {
+  public void load(CompoundTag tag, int oldVersion, int newVersion) {
     clear();
 
     if (tag.containsKey(TAG_BLOCKS)) {
@@ -167,6 +167,8 @@ public class BlockPalette {
         var positions = bTag.getLongArray(TAG_POS_LIST);
         BlockInfo info = BlockInfo.load(bTag);
 
+        info = StructureDataFixer.fix(info, oldVersion, newVersion);
+
         block2Positions.put(info, new LongArrayList(positions));
       }
     }
@@ -176,7 +178,7 @@ public class BlockPalette {
           tag.get(TAG_ENTITIES).asList(),
           tag1 -> {
             var info = EntityInfo.load(tag1);
-            return info;
+            return StructureDataFixer.fix(info, oldVersion, newVersion);
           }
       ));
     }

@@ -58,12 +58,10 @@ internal fun createPluginYml(it: Task) {
     builder.append("dependencies:\n")
 
     dependsMap.forEach { (key, value) ->
-      if (shouldSkipDependency(key, it.project)) {
-        return@forEach
-      }
+      val depName = resolveDependency(key, it.project) ?: return@forEach;
 
       builder
-        .append("  - name: '${formatDependencyName(it.project, key)}'\n")
+        .append("  - name: '${depName}'\n")
         .append("    required: ${!value.optional}\n")
         .append("    bootstrap: ${value.bootstrap}\n")
     }
@@ -87,40 +85,62 @@ internal fun createPluginYml(it: Task) {
   Files.writeString(path, builder.toString(), StandardCharsets.UTF_8)
 }
 
-fun shouldSkipDependency(name: String, project: Project): Boolean {
-  if (name.startsWith("project:")) {
-    val projName = name.replace("project:", "")
-
-    if (project.name == "core" && projName == "commons") {
-      return true
-    }
-
-    if (projName == project.name || projName == "class-loader-tools") {
-      return true
-    }
+fun resolveDependency(name: String, project: Project): String? {
+  if (!name.startsWith("project:")) {
+    return name;
   }
 
-  return false
+  val projName = name.replaceFirst("project:", "")
+  return resolveProjectDependency(projName, project);
 }
 
-fun formatDependencyName(project: Project, name: String): String {
-  val prefix = "project:"
+fun resolveProjectDependency(name: String, importing: Project): String? {
+  val project = findProject(name, importing)
 
-  if (!name.startsWith(prefix)) {
+  if (project == null) {
     return name
+  };
+
+  val ftcExt = project.extensions.findByType(FtcExtension::class.java) ?: return project.name
+
+  if (ftcExt.skipDependency) {
+    return null
   }
 
-  var projName = name.substring(prefix.length)
-  if (projName == "commons") {
-    projName = "core"
+  val implProj = ftcExt.apiFor;
+
+  if (implProj.isNullOrEmpty()) {
+    println("implProject: null|empty")
+    return getProjectPluginName(project)
   }
 
-  val depProj = project.rootProject.project(projName) ?: error("Unknown project '${projName}")
+  val depProj = findProject(implProj, project)
 
-  val ext = depProj.extensions.findByType(FtcPaperYml::class.java)
-    ?: error("Project '${projName}' has no FTC Extension")
+  if (depProj == null) {
+    println("Implementation project '${implProj}' for project '${project.name}' cannot be found")
+    return getProjectPluginName(project);
+  }
 
-  return ext.name
+  if (depProj == importing) {
+    return null
+  }
+
+  return getProjectPluginName(depProj);
+}
+
+fun findProject(name: String, parent: Project): Project? {
+  val root = parent.rootProject;
+  return root.findProject(name);
+}
+
+fun getProjectPluginName(project: Project): String {
+  val paperYml = project.extensions.findByType(FtcPaperYml::class.java)
+
+  if (paperYml == null) {
+    return project.name;
+  } else {
+    return paperYml.name;
+  }
 }
 
 fun printOrderList(
@@ -136,11 +156,7 @@ fun printOrderList(
   builder.append("$name:\n")
 
   orderList.list.forEach {
-    if (shouldSkipDependency(it.key, project)) {
-      return@forEach
-    }
-
-    val depName = formatDependencyName(project, it.key)
+    val depName = resolveDependency(it.key, project) ?: return@forEach
 
     builder
       .append("  - name: '$depName'\n")

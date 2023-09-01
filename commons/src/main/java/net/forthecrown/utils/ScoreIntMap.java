@@ -16,7 +16,8 @@ import java.util.function.IntSupplier;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.forthecrown.text.page.PageEntryIterator;
+import net.forthecrown.Loggers;
+import net.forthecrown.text.page.PagedIterator;
 import net.forthecrown.user.UserLookup;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.ScoreIntMap.Entry;
@@ -58,6 +59,8 @@ public class ScoreIntMap<K> implements Iterable<Entry<K>> {
   @Getter
   private boolean unsaved = true;
 
+  private boolean fatalErrors = true;
+
   @Setter
   @Getter
   private KeyValidator<K> validator;
@@ -89,7 +92,12 @@ public class ScoreIntMap<K> implements Iterable<Entry<K>> {
       String reason = validator.test(key);
 
       if (!Strings.isNullOrEmpty(reason)) {
-        throw new IllegalArgumentException(reason);
+        if (fatalErrors) {
+          throw new IllegalArgumentException(reason);
+        } else {
+          Loggers.getLogger().error(reason);
+          return;
+        }
       }
     }
 
@@ -216,8 +224,8 @@ public class ScoreIntMap<K> implements Iterable<Entry<K>> {
    * @param pageSize The page's size
    * @return The page's iterator
    */
-  public PageEntryIterator<Entry<K>> pageIterator(int page, int pageSize) {
-    return PageEntryIterator.reversed(sortedList, page, pageSize);
+  public PagedIterator<Entry<K>> pageIterator(int page, int pageSize) {
+    return PagedIterator.reversed(sortedList, page, pageSize);
   }
 
   /**

@@ -1,3 +1,5 @@
+import net.forthecrown.gradle.MC_VERSION
+
 plugins {
   java
 
@@ -14,10 +16,11 @@ dependencies {
   compileOnly(project(":scripting"))
   compileOnly(project(":menus"))
   compileOnly(project(":user-titles"))
+  compileOnly(project(":usables"))
 
   compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.1.0-SNAPSHOT")
 
-  paperweight.paperDevBundle("1.20-R0.1-SNAPSHOT")
+  paperweight.paperDevBundle("${MC_VERSION}-R0.1-SNAPSHOT")
 }
 
 pluginYml {

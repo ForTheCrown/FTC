@@ -5,7 +5,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.TypeAdapter;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.experimental.UtilityClass;
 import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.nbt.DoubleTag;
@@ -16,7 +15,6 @@ import net.forthecrown.nbt.LongArrayTag;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -50,13 +48,12 @@ import org.spongepowered.math.vector.Vectorl;
  * This class was created using a generator, if one method has a bug or error, they all have it
  * lmao
  */
-@UtilityClass
-public class Vectors {
+public final class Vectors {
 
   /**
    * Name of the X axis: 'x'
    */
-  public final String
+  public static final String
   AXIS_X = "x",
 
   /**
@@ -77,8 +74,8 @@ public class Vectors {
   /**
    * ID/index of the X axis
    */
-  public final int
-  AXIS_ID_X = 0,
+  public static final int
+      AXIS_ID_X = 0,
 
   /**
    * ID/index of the Y Axis
@@ -98,7 +95,7 @@ public class Vectors {
   /**
    * Axis ID to Axis name array
    */
-  public final String[] AXES = {
+  public static final String[] AXES = {
       AXIS_X,
       AXIS_Y,
       AXIS_Z,
@@ -112,17 +109,21 @@ public class Vectors {
    * indexes
    */
 
-  public final int NAMEABLE_AXES_LENGTH = AXES.length;
+  public static final int NAMEABLE_AXES_LENGTH = AXES.length;
 
   /**
    * The amount of bits to shift a coordinate by to convert to or from a chunk coordinate
    */
-  public final int CHUNK_BITS = 4;
+  public static final int CHUNK_BITS = 4;
 
   /**
    * The size of a chunk in blocks
    */
-  public final int CHUNK_SIZE = 1 << CHUNK_BITS;
+  public static final int CHUNK_SIZE = 1 << CHUNK_BITS;
+
+  public static final long CHUNK_COORDINATE_MASK = 0xFFFFFFFFL;
+
+  public static final long CHUNK_COORDINATE_SIZE = 32;
 
   /* --------------------------- TYPE ADAPTERS ---------------------------- */
 
@@ -131,6 +132,10 @@ public class Vectors {
 
   public static final TypeAdapter<Vector3d> V3D_ADAPTER
       = JsonUtils.createAdapter(Vectors::writeJson, Vectors::read3d);
+
+  private Vectors() {
+    throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+  }
 
   /* ----------------------------------------------------------- */
 
@@ -155,14 +160,14 @@ public class Vectors {
 
   /* ---------------------------------------------------------------------- */
 
-  public double getYaw(Vector3d v) {
+  public static double getYaw(Vector3d v) {
     double x = v.x();
     double z = v.z();
     double atan2 = TrigMath.atan2(-x, z);
     return Math.toDegrees((atan2 + TrigMath.TWO_PI) % TrigMath.TWO_PI);
   }
 
-  public double getPitch(Vector3d v) {
+  public static double getPitch(Vector3d v) {
     double x = v.x();
     double y = v.y();
     double z = v.z();
@@ -176,85 +181,100 @@ public class Vectors {
 
   /* ------------------------ BUKKIT CONVERSTIONS ------------------------- */
 
-  public Vector3i from(Block block) {
+  public static Vector3i from(Block block) {
     return Vector3i.from(block.getX(), block.getY(), block.getZ());
   }
 
-  public Block getBlock(Vector3i v, World w) {
+  public static Block getBlock(Vector3i v, World w) {
     return w.getBlockAt(v.x(), v.y(), v.z());
   }
 
-  public Vector toVec(Vector3i v) {
+  public static Vector toVec(Vector3i v) {
     return new Vector(v.x(), v.y(), v.z());
   }
 
-  public Vector toVec(Vector3d v) {
+  public static Vector toVec(Vector3d v) {
     return new Vector(v.x(), v.y(), v.z());
   }
 
-  public Vector3i intFrom(Location l) {
+  public static Vector3i intFrom(Location l) {
     return Vector3i.from(l.getBlockX(), l.getBlockY(), l.getBlockZ());
   }
 
-  public Vector3i intFrom(Vector l) {
+  public static Vector3i intFrom(Vector l) {
     return Vector3i.from(l.getBlockX(), l.getBlockY(), l.getBlockZ());
   }
 
-  public Vector3d doubleFrom(Location l) {
+  public static Vector3d doubleFrom(Location l) {
     return Vector3d.from(l.getX(), l.getY(), l.getZ());
   }
 
-  public Vector3d doubleFrom(Vector l) {
+  public static Vector3d doubleFrom(Vector l) {
     return Vector3d.from(l.getX(), l.getY(), l.getZ());
   }
 
-  public Vector3i from(BlockFace face) {
+  public static Vector3i from(BlockFace face) {
     return Vector3i.from(face.getModX(), face.getModY(), face.getModZ());
   }
 
   /* ----------------------------- MINECRAFT CONVERSIONS ------------------------------ */
 
-  public BlockPos toMinecraft(Vector3i v) {
+  public static BlockPos toMinecraft(Vector3i v) {
     return new BlockPos(v.x(), v.y(), v.z());
   }
 
-  public Vec3 toMinecraft(Vector3d v) {
+  public static Vec3 toMinecraft(Vector3d v) {
     return new Vec3(v.x(), v.y(), v.z());
   }
 
-  public ChunkPos getChunk(Vector3i v) {
-    return new ChunkPos(
+  public static Vector2i getChunk(Vector3i v) {
+    return new Vector2i(
         v.x() >> CHUNK_BITS,
         v.z() >> CHUNK_BITS
     );
   }
 
-  public long toLong(Vector3i v) {
+  public static long toChunkLong(Vector2i pos) {
+    return toChunkLong(pos.x(), pos.y());
+  }
+
+  public static long toChunkLong(int chunkX, int chunkZ) {
+    return (long) chunkX & CHUNK_COORDINATE_MASK
+        | ((long) chunkZ & CHUNK_COORDINATE_MASK) << CHUNK_COORDINATE_SIZE;
+  }
+
+  public static Vector2i fromChunkLong(long l) {
+    int x = (int) (l & CHUNK_COORDINATE_MASK);
+    int z = (int) (l >>> CHUNK_COORDINATE_SIZE & CHUNK_COORDINATE_MASK);
+    return Vector2i.from(x, z);
+  }
+
+  public static long toLong(Vector3i v) {
     // Copied from net.minecraft.core.BlockPos.asLong(int, int, int)
     // ^ Short way of saying I do not understand this at all lol
     // All I know is it packs coordinates, so it uses less space
     // and works for what I need
     return (((long) v.x() & 0x3FFFFFF) << 38)
-         | (((long) v.y() & 0xFFF))
-         | (((long) v.z() & 0x3FFFFFF) << 12);
+        | (((long) v.y() & 0xFFF))
+        | (((long) v.z() & 0x3FFFFFF) << 12);
   }
 
-  public Vector3i fromLong(long l) {
+  public static Vector3i fromLong(long l) {
     var bPos = BlockPos.of(l);
     return Vector3i.from(bPos.getX(), bPos.getY(), bPos.getZ());
   }
 
-  public int toChunk(int block) {
+  public static int toChunk(int block) {
     return block >> CHUNK_BITS;
   }
 
-  public int toBlock(int chunk) {
+  public static int toBlock(int chunk) {
     return chunk << CHUNK_BITS;
   }
 
   /* ----------------------------- INT VECTORS ------------------------------ */
 
-  public JsonElement writeJson(Vectori vec) {
+  public static JsonElement writeJson(Vectori vec) {
     int[] arr = vec.toArray();
 
     if (arr.length > NAMEABLE_AXES_LENGTH) {
@@ -275,12 +295,12 @@ public class Vectors {
     return json.getSource();
   }
 
-  public BinaryTag writeTag(Vectori vec) {
+  public static BinaryTag writeTag(Vectori vec) {
     int[] arr = vec.toArray();
     return BinaryTags.intArrayTag(arr);
   }
 
-  public Vector2i read2i(JsonElement element) {
+  public static Vector2i read2i(JsonElement element) {
     JsonWrapper json = JsonWrapper.wrap(element.getAsJsonObject());
 
     return Vector2i.from(
@@ -289,7 +309,7 @@ public class Vectors {
     );
   }
 
-  public Vector2i read2i(BinaryTag tag) {
+  public static Vector2i read2i(BinaryTag tag) {
     int[] arr = ((IntArrayTag) tag).toIntArray();
     return Vector2i.from(
         arr[AXIS_ID_X],
@@ -297,7 +317,7 @@ public class Vectors {
     );
   }
 
-  public Vector3i read3i(JsonElement element) {
+  public static Vector3i read3i(JsonElement element) {
     if (element.isJsonArray()) {
       var arr = element.getAsJsonArray();
 
@@ -317,7 +337,7 @@ public class Vectors {
     );
   }
 
-  public Vector3i read3i(BinaryTag tag) {
+  public static Vector3i read3i(BinaryTag tag) {
     int[] arr = ((IntArrayTag) tag).toIntArray();
     return Vector3i.from(
         arr[AXIS_ID_X],
@@ -326,7 +346,7 @@ public class Vectors {
     );
   }
 
-  public Vector4i read4i(JsonElement element) {
+  public static Vector4i read4i(JsonElement element) {
     JsonWrapper json = JsonWrapper.wrap(element.getAsJsonObject());
 
     return Vector4i.from(
@@ -337,7 +357,7 @@ public class Vectors {
     );
   }
 
-  public Vector4i read4i(BinaryTag tag) {
+  public static Vector4i read4i(BinaryTag tag) {
     int[] arr = ((IntArrayTag) tag).toIntArray();
     return Vector4i.from(
         arr[AXIS_ID_X],
@@ -347,7 +367,7 @@ public class Vectors {
     );
   }
 
-  public VectorNi readNi(JsonElement element) {
+  public static VectorNi readNi(JsonElement element) {
     JsonArray arr = element.getAsJsonArray();
     int[] resultArr = new int[arr.size()];
 
@@ -359,14 +379,14 @@ public class Vectors {
     return new VectorNi(resultArr);
   }
 
-  public VectorNi readNi(BinaryTag tag) {
+  public static VectorNi readNi(BinaryTag tag) {
     int[] arr = ((IntArrayTag) tag).toIntArray();
     return new VectorNi(arr);
   }
 
   // --- LONG VECTORS --- //
 
-  public JsonElement writeJson(Vectorl vec) {
+  public static JsonElement writeJson(Vectorl vec) {
     long[] arr = vec.toArray();
 
     if (arr.length > NAMEABLE_AXES_LENGTH) {
@@ -387,12 +407,12 @@ public class Vectors {
     return json.getSource();
   }
 
-  public BinaryTag writeTag(Vectorl vec) {
+  public static BinaryTag writeTag(Vectorl vec) {
     long[] arr = vec.toArray();
     return BinaryTags.longArrayTag(arr);
   }
 
-  public Vector2l read2l(JsonElement element) {
+  public static Vector2l read2l(JsonElement element) {
     JsonWrapper json = JsonWrapper.wrap(element.getAsJsonObject());
 
     return Vector2l.from(
@@ -401,7 +421,7 @@ public class Vectors {
     );
   }
 
-  public Vector2l read2l(BinaryTag tag) {
+  public static Vector2l read2l(BinaryTag tag) {
     long[] arr = ((LongArrayTag) tag).toLongArray();
     return Vector2l.from(
         arr[AXIS_ID_X],
@@ -409,7 +429,7 @@ public class Vectors {
     );
   }
 
-  public Vector3l read3l(JsonElement element) {
+  public static Vector3l read3l(JsonElement element) {
     JsonWrapper json = JsonWrapper.wrap(element.getAsJsonObject());
 
     return Vector3l.from(
@@ -419,7 +439,7 @@ public class Vectors {
     );
   }
 
-  public Vector3l read3l(BinaryTag tag) {
+  public static Vector3l read3l(BinaryTag tag) {
     long[] arr = ((LongArrayTag) tag).toLongArray();
     return Vector3l.from(
         arr[AXIS_ID_X],
@@ -428,7 +448,7 @@ public class Vectors {
     );
   }
 
-  public Vector4l read4l(JsonElement element) {
+  public static Vector4l read4l(JsonElement element) {
     JsonWrapper json = JsonWrapper.wrap(element.getAsJsonObject());
 
     return Vector4l.from(
@@ -439,7 +459,7 @@ public class Vectors {
     );
   }
 
-  public Vector4l read4l(BinaryTag tag) {
+  public static Vector4l read4l(BinaryTag tag) {
     long[] arr = ((LongArrayTag) tag).toLongArray();
     return Vector4l.from(
         arr[AXIS_ID_X],
@@ -449,7 +469,7 @@ public class Vectors {
     );
   }
 
-  public VectorNl readNl(JsonElement element) {
+  public static VectorNl readNl(JsonElement element) {
     JsonArray arr = element.getAsJsonArray();
     long[] resultArr = new long[arr.size()];
 
@@ -461,14 +481,14 @@ public class Vectors {
     return new VectorNl(resultArr);
   }
 
-  public VectorNl readNl(BinaryTag tag) {
+  public static VectorNl readNl(BinaryTag tag) {
     long[] arr = ((LongArrayTag) tag).toLongArray();
     return new VectorNl(arr);
   }
 
   // --- FLOAT VECTORS --- //
 
-  public JsonElement writeJson(Vectorf vec) {
+  public static JsonElement writeJson(Vectorf vec) {
     float[] arr = vec.toArray();
 
     if (arr.length > NAMEABLE_AXES_LENGTH) {
@@ -489,11 +509,11 @@ public class Vectors {
     return json.getSource();
   }
 
-  public BinaryTag writeTag(Vectorf vec) {
+  public static BinaryTag writeTag(Vectorf vec) {
     return BinaryTags.floatList(vec.toArray());
   }
 
-  public Vector2f read2f(JsonElement element) {
+  public static Vector2f read2f(JsonElement element) {
     JsonWrapper json = JsonWrapper.wrap(element.getAsJsonObject());
 
     return Vector2f.from(
@@ -502,7 +522,7 @@ public class Vectors {
     );
   }
 
-  public Vector2f read2f(BinaryTag tag) {
+  public static Vector2f read2f(BinaryTag tag) {
     ListTag listTag = (ListTag) tag;
     float[] arr = new float[listTag.size()];
 
@@ -515,7 +535,7 @@ public class Vectors {
     );
   }
 
-  public Vector3f read3f(JsonElement element) {
+  public static Vector3f read3f(JsonElement element) {
     JsonWrapper json = JsonWrapper.wrap(element.getAsJsonObject());
 
     return Vector3f.from(
@@ -525,7 +545,7 @@ public class Vectors {
     );
   }
 
-  public Vector3f read3f(BinaryTag tag) {
+  public static Vector3f read3f(BinaryTag tag) {
     ListTag listTag = (ListTag) tag;
     float[] arr = new float[listTag.size()];
 
@@ -539,7 +559,7 @@ public class Vectors {
     );
   }
 
-  public Vector4f read4f(JsonElement element) {
+  public static Vector4f read4f(JsonElement element) {
     JsonWrapper json = JsonWrapper.wrap(element.getAsJsonObject());
 
     return Vector4f.from(
@@ -550,7 +570,7 @@ public class Vectors {
     );
   }
 
-  public Vector4f read4f(BinaryTag tag) {
+  public static Vector4f read4f(BinaryTag tag) {
     ListTag listTag = (ListTag) tag;
     float[] arr = new float[listTag.size()];
 
@@ -565,7 +585,7 @@ public class Vectors {
     );
   }
 
-  public VectorNf readNf(JsonElement element) {
+  public static VectorNf readNf(JsonElement element) {
     JsonArray arr = element.getAsJsonArray();
     float[] resultArr = new float[arr.size()];
 
@@ -577,7 +597,7 @@ public class Vectors {
     return new VectorNf(resultArr);
   }
 
-  public VectorNf readNf(BinaryTag tag) {
+  public static VectorNf readNf(BinaryTag tag) {
     ListTag listTag = (ListTag) tag;
     float[] arr = new float[listTag.size()];
 
@@ -589,7 +609,7 @@ public class Vectors {
 
   // --- DOUBLE VECTORS --- //
 
-  public JsonElement writeJson(Vectord vec) {
+  public static JsonElement writeJson(Vectord vec) {
     double[] arr = vec.toArray();
 
     if (arr.length > NAMEABLE_AXES_LENGTH) {
@@ -610,11 +630,11 @@ public class Vectors {
     return json.getSource();
   }
 
-  public BinaryTag writeTag(Vectord vec) {
+  public static BinaryTag writeTag(Vectord vec) {
     return BinaryTags.doubleList(vec.toArray());
   }
 
-  public Vector2d read2d(JsonElement element) {
+  public static Vector2d read2d(JsonElement element) {
     JsonWrapper json = JsonWrapper.wrap(element.getAsJsonObject());
 
     return Vector2d.from(
@@ -623,7 +643,7 @@ public class Vectors {
     );
   }
 
-  public Vector2d read2d(BinaryTag tag) {
+  public static Vector2d read2d(BinaryTag tag) {
     ListTag listTag = (ListTag) tag;
     double[] arr = new double[listTag.size()];
 
@@ -636,7 +656,7 @@ public class Vectors {
     );
   }
 
-  public Vector3d read3d(JsonElement element) {
+  public static Vector3d read3d(JsonElement element) {
     if (element.isJsonArray()) {
       var arr = element.getAsJsonArray();
 
@@ -656,7 +676,7 @@ public class Vectors {
     );
   }
 
-  public Vector3d read3d(BinaryTag tag) {
+  public static Vector3d read3d(BinaryTag tag) {
     ListTag listTag = (ListTag) tag;
     double[] arr = new double[listTag.size()];
 
@@ -670,7 +690,7 @@ public class Vectors {
     );
   }
 
-  public Vector4d read4d(JsonElement element) {
+  public static Vector4d read4d(JsonElement element) {
     JsonWrapper json = JsonWrapper.wrap(element.getAsJsonObject());
 
     return Vector4d.from(
@@ -681,7 +701,7 @@ public class Vectors {
     );
   }
 
-  public Vector4d read4d(BinaryTag tag) {
+  public static Vector4d read4d(BinaryTag tag) {
     ListTag listTag = (ListTag) tag;
     double[] arr = new double[listTag.size()];
 
@@ -696,7 +716,7 @@ public class Vectors {
     );
   }
 
-  public VectorNd readNd(JsonElement element) {
+  public static VectorNd readNd(JsonElement element) {
     JsonArray arr = element.getAsJsonArray();
     double[] resultArr = new double[arr.size()];
 
@@ -708,7 +728,7 @@ public class Vectors {
     return new VectorNd(resultArr);
   }
 
-  public VectorNd readNd(BinaryTag tag) {
+  public static VectorNd readNd(BinaryTag tag) {
     ListTag listTag = (ListTag) tag;
     double[] arr = new double[listTag.size()];
 

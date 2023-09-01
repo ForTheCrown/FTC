@@ -1,8 +1,10 @@
 package net.forthecrown.core.commands;
 
 import net.forthecrown.command.Commands;
-import net.forthecrown.command.UserMapCommand;
+import net.forthecrown.command.CurrencyCommand;
 import net.forthecrown.command.UserMapTopCommand;
+import net.forthecrown.core.CorePlugin;
+import net.forthecrown.core.commands.admin.CommandAlts;
 import net.forthecrown.core.commands.admin.CommandBroadcast;
 import net.forthecrown.core.commands.admin.CommandCooldown;
 import net.forthecrown.core.commands.admin.CommandFtcCore;
@@ -20,13 +22,19 @@ import net.forthecrown.core.commands.admin.CommandSkull;
 import net.forthecrown.core.commands.admin.CommandSpecificGameMode;
 import net.forthecrown.core.commands.admin.CommandSpeed;
 import net.forthecrown.core.commands.admin.CommandSudo;
+import net.forthecrown.core.commands.admin.CommandTab;
 import net.forthecrown.core.commands.admin.CommandTeleport;
 import net.forthecrown.core.commands.admin.CommandTeleportExact;
 import net.forthecrown.core.commands.admin.CommandTime;
+import net.forthecrown.core.commands.admin.CommandTimeFields;
 import net.forthecrown.core.commands.admin.CommandTop;
 import net.forthecrown.core.commands.admin.CommandVanish;
 import net.forthecrown.core.commands.admin.CommandWorld;
 import net.forthecrown.core.commands.docs.CommandDocGen;
+import net.forthecrown.core.commands.home.CommandDeleteHome;
+import net.forthecrown.core.commands.home.CommandHome;
+import net.forthecrown.core.commands.home.CommandHomeList;
+import net.forthecrown.core.commands.home.CommandSetHome;
 import net.forthecrown.core.commands.item.ItemModCommands;
 import net.forthecrown.core.commands.tpa.CommandTpDeny;
 import net.forthecrown.core.commands.tpa.CommandTpDenyAll;
@@ -38,12 +46,13 @@ import net.forthecrown.core.user.UserServiceImpl;
 import net.forthecrown.grenadier.annotations.AnnotatedCommandContext;
 import net.forthecrown.text.UnitFormat;
 import net.forthecrown.user.Users;
+import net.forthecrown.user.currency.Currency;
 import net.kyori.adventure.text.Component;
 
 public final class CoreCommands {
   private CoreCommands() {}
 
-  public static void createCommands() {
+  public static void createCommands(CorePlugin plugin) {
     new CommandHelp();
 
     new CommandProfile();
@@ -91,6 +100,17 @@ public final class CoreCommands {
     new CommandTell();
     new CommandReply();
     new CommandSuicide();
+    new CommandRoll();
+    new CommandWild(plugin.getWild());
+
+    new CommandWithdraw();
+    new CommandDeposit();
+    new CommandPay();
+
+    new CommandHome();
+    new CommandHomeList();
+    new CommandDeleteHome();
+    new CommandSetHome();
 
     CommandSelfOrUser.createCommands();
     CommandDumbThing.createCommands();
@@ -105,39 +125,24 @@ public final class CoreCommands {
     ctx.registerCommand(new CommandTeleport());
     ctx.registerCommand(new CommandVanish());
     ctx.registerCommand(new CommandFtcCore());
+    ctx.registerCommand(new CommandTab());
+    ctx.registerCommand(new CommandAlts());
+    ctx.registerCommand(new CommandTimeFields());
   }
 
   static void createCurrencyCommands() {
     UserServiceImpl users = (UserServiceImpl) Users.getService();
+    var currencies = users.getCurrencies();
 
-    new UserMapCommand(
-        "balance",
-        "Rhines",
-        users.getBalances(),
-        UnitFormat::rhines,
-        "bal", "bank", "cash", "money", "ebal"
-    );
+    currencies.get("rhines").ifPresent(currency -> {
+      new CurrencyCommand("balance", currency, "bal", "bank", "cash", "money", "ebal");
+    });
 
-    new UserMapCommand(
-        "gems",
-        "Gems",
-        users.getGems(),
-        UnitFormat::gems
-    );
+    currencies.get("gems").ifPresent(currency -> {
+      new CurrencyCommand("gems", currency);
+    });
 
-    new UserMapCommand(
-        "votes",
-        "Votes",
-        users.getVotes(),
-        UnitFormat::votes
-    );
-
-    new UserMapCommand(
-        "playtime",
-        "Playtime-Hours",
-        users.getPlaytime(),
-        UnitFormat::playTime
-    );
+    new CurrencyCommand("votes", Currency.wrap("Vote", users.getVotes()));
   }
 
   static void createMapTopCommands() {

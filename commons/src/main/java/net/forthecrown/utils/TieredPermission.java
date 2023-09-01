@@ -165,6 +165,10 @@ public class TieredPermission {
       return range(Range.between(1, end));
     }
 
+    public Builder tiersBetween(int min, int max) {
+      return range(Range.between(min, max));
+    }
+
     public Builder range(Range<Integer> range) {
       tiers.clear();
       for (int i = range.getMinimum(); i <= range.getMaximum(); i++) {

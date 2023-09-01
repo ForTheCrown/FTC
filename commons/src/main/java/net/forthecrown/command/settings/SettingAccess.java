@@ -25,4 +25,18 @@ public interface SettingAccess {
   boolean getState(User user);
 
   void setState(User user, boolean state);
+
+  default SettingAccess negate() {
+    return new SettingAccess() {
+      @Override
+      public boolean getState(User user) {
+        return !SettingAccess.this.getState(user);
+      }
+
+      @Override
+      public void setState(User user, boolean state) {
+        SettingAccess.this.setState(user, !state);
+      }
+    };
+  }
 }

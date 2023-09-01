@@ -9,7 +9,7 @@ import net.forthecrown.command.arguments.Arguments;
 import net.forthecrown.command.help.UsageFactory;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.GrenadierCommand;
-import net.forthecrown.text.ChannelledMessage;
+import net.forthecrown.text.channel.ChannelledMessage;
 import net.forthecrown.text.Text;
 import net.forthecrown.text.ViewerAwareMessage;
 import net.forthecrown.utils.Audiences;

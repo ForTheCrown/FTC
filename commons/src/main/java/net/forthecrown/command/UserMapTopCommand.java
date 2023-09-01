@@ -9,7 +9,6 @@ import net.forthecrown.command.help.UsageFactory;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.text.Text;
-import net.forthecrown.text.UnitFormat;
 import net.forthecrown.text.ViewerAwareMessage;
 import net.forthecrown.text.page.Header;
 import net.forthecrown.text.page.PageFormat;
@@ -36,7 +35,7 @@ public class UserMapTopCommand extends FtcCommand {
   ) {
     this(name, map, unitMaker, title, id -> {
       var user = Users.get(id);
-      return viewer -> user.displayName(viewer);
+      return user::displayName;
     }, aliases);
   }
 
@@ -133,10 +132,7 @@ public class UserMapTopCommand extends FtcCommand {
 
     Commands.ensurePageValid(page, pageSize, map.size());
 
-    source.sendMessage(format.format(
-        map.pageIterator(page, pageSize),
-        Context.EMPTY
-    ));
+    source.sendMessage(format.format(map.pageIterator(page, pageSize), Context.EMPTY));
     return 0;
   }
 }

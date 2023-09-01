@@ -4,7 +4,8 @@ import java.util.Objects;
 import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
-import net.forthecrown.text.ChannelledMessage;
+import net.forthecrown.text.channel.ChannelledMessage;
+import net.forthecrown.text.channel.MessageRenderer;
 import net.forthecrown.text.ViewerAwareMessage;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.Audiences;
@@ -23,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 public class ChannelMessageEvent extends Event implements Cancellable {
 
+  public static final String UNSET_NAME = "UNSET";
   @Getter
   private static final HandlerList handlerList = new HandlerList();
 
@@ -62,9 +64,11 @@ public class ChannelMessageEvent extends Event implements Cancellable {
    * Determines if the message is also shown to the 'source' of the message
    * @see #getSource()
    */
-  private boolean shownToSender;
+  private final boolean shownToSender;
 
-  private boolean announcement;
+  private final boolean announcement;
+
+  private final MessageRenderer renderer;
 
   public ChannelMessageEvent(ChannelledMessage message) {
     this.initialMessage = message.getMessage();
@@ -74,6 +78,7 @@ public class ChannelMessageEvent extends Event implements Cancellable {
     this.channelName    = message.getChannelName();
     this.shownToSender  = message.isShownToSender();
     this.announcement   = message.isAnnouncement();
+    this.renderer       = message.getRenderer();
   }
 
   /**

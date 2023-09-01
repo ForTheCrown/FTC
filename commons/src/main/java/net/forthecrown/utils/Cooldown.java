@@ -36,9 +36,7 @@ public class Cooldown {
    * @param category The category to check
    * @return If the sender is on cooldown for the given category
    */
-  public static boolean contains(@NotNull Audience sender,
-                                 @NotNull String category
-  ) {
+  public static boolean contains(@NotNull Audience sender, @NotNull String category) {
     return Cooldowns.cooldowns().onCooldown(getUniqueId(sender), category);
   }
 
@@ -50,9 +48,7 @@ public class Cooldown {
    * @param ticks  The duration of the cooldown
    * @return Same as {@link Cooldown#containsOrAdd(Audience, String, int)}
    */
-  public static boolean containsOrAdd(Audience sender,
-                                      @Nonnegative int ticks
-  ) {
+  public static boolean containsOrAdd(Audience sender, @Nonnegative int ticks) {
     return containsOrAdd(sender, TRANSIENT_CATEGORY, ticks);
   }
 
@@ -66,9 +62,10 @@ public class Cooldown {
    * @return True if category contains sender, false if it doesn't, if false, adds sender to
    * category
    */
-  public static boolean containsOrAdd(Audience sender,
-                                      @NotNull String category,
-                                      @Nonnegative int ticks
+  public static boolean containsOrAdd(
+      Audience sender,
+      @NotNull String category,
+      @Nonnegative int ticks
   ) {
     boolean contains = contains(sender, category);
 
@@ -86,9 +83,7 @@ public class Cooldown {
    * @param sender      The sender to add
    * @param timeInTicks The time to add them for
    */
-  public static void add(@NotNull Audience sender,
-                         @Nonnegative int timeInTicks
-  ) {
+  public static void add(@NotNull Audience sender, @Nonnegative int timeInTicks) {
     add(sender, TRANSIENT_CATEGORY, timeInTicks);
   }
 
@@ -107,9 +102,7 @@ public class Cooldown {
    * @param sender   The sender to add
    * @param category The category to add them to
    */
-  public static void add(@NotNull Audience sender,
-                         @NotNull String category
-  ) {
+  public static void add(@NotNull Audience sender, @NotNull String category) {
     add(sender, category, NO_END_COOLDOWN);
   }
 

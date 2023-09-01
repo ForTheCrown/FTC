@@ -68,12 +68,30 @@ public interface ExecResult<T> {
   <V> ExecResult<V> map(@NotNull Function<T, V> function);
 
   /**
-   * Flat maps
-   * @param mapper
-   * @return
-   * @param <V>
+   * Flat maps this result's value to another result
+   * @param mapper Mapping function
+   * @return Exec result
    */
   <V> ExecResult<V> flatMap(@NotNull Function<T, Result<V>> mapper);
+
+  /**
+   * Flat maps this result with a function that takes the script as input.
+   * <p>
+   * This can be used to chain script invocations like so: <code><pre>
+   * Script script = // ...
+   * script.evaluate()
+   *   .flatMapScript(s -> s.invoke("foo"))
+   *   .logError()</pre></code>
+   * <p>
+   * The specified {@code function} will only be run if {@link #isSuccess()} returns {@code true}
+   * for this result
+   * <p>
+   * If the {@code function} returns {@code null}, then this method will return {@code this}
+   *
+   * @param function Function to map result value
+   * @return Returned result
+   */
+  <V> ExecResult<V> flatMapScript(@NotNull Function<Script, ExecResult<V>> function);
 
   /**
    * Throws an {@link IllegalStateException} if this result is a failed result, determined by

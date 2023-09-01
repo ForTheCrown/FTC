@@ -17,7 +17,7 @@ import net.forthecrown.command.settings.SettingAccess;
 import net.forthecrown.command.settings.SettingsBook;
 import net.forthecrown.discord.FtcDiscord;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.text.ChannelledMessage;
+import net.forthecrown.text.channel.ChannelledMessage;
 import net.forthecrown.text.Text;
 import net.forthecrown.text.TextWriter;
 import net.forthecrown.text.TextWriters;

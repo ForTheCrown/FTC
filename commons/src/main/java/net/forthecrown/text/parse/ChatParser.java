@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import lombok.Getter;
 import net.forthecrown.text.ChatEmotes;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.PatternReplacementResult;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
@@ -87,6 +88,13 @@ public class ChatParser {
 
       TextReplacementConfig config = TextReplacementConfig.builder()
           .match(pattern)
+
+          .condition((result1, matchCount, replaced) -> {
+            return func.filter(result1)
+                ? PatternReplacementResult.REPLACE
+                : PatternReplacementResult.CONTINUE;
+          })
+
           .replacement((result1, builder) -> {
             if (result1.group().startsWith("\\")) {
               return Component.text(result1.group().substring(1));

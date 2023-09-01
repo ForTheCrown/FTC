@@ -5,6 +5,7 @@ import java.util.UUID;
 import net.forthecrown.FtcServer;
 import net.forthecrown.Loggers;
 import net.forthecrown.core.CorePlugin;
+import net.forthecrown.core.JoinInfo;
 import net.forthecrown.core.user.UserImpl;
 import net.forthecrown.core.user.UserLookupImpl;
 import net.forthecrown.core.user.UserServiceImpl;
@@ -17,10 +18,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.slf4j.Logger;
@@ -29,8 +30,10 @@ class PlayerLoggingListener implements Listener {
 
   public static final Logger LOGGER = Loggers.getLogger();
 
-  private UserServiceImpl service() {
-    return JavaPlugin.getPlugin(CorePlugin.class).getUserService();
+  private final CorePlugin plugin;
+
+  public PlayerLoggingListener(CorePlugin plugin) {
+    this.plugin = plugin;
   }
 
   @EventHandler(ignoreCancelled = true)
@@ -40,7 +43,7 @@ class PlayerLoggingListener implements Listener {
     UUID id = player.getUniqueId();
     String name = player.getName();
 
-    UserServiceImpl service = service();
+    UserServiceImpl service = plugin.getUserService();
     UserLookupImpl lookup = service.getLookup();
 
     LookupEntry entry;
@@ -100,12 +103,15 @@ class PlayerLoggingListener implements Listener {
     UserLogEvent.maybeAnnounce(userEvent);
 
     PacketListeners.listeners().inject(player);
+
+    JoinInfo joinInfo = plugin.getJoinInfo();
+    joinInfo.show(user);
   }
 
-  @EventHandler(ignoreCancelled = true)
+  @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
   public void onPlayerQuit(PlayerQuitEvent event) {
     Player player = event.getPlayer();
-    UserServiceImpl service = service();
+    UserServiceImpl service = plugin.getUserService();
     LookupEntry entry = service.getLookup().getEntry(player.getUniqueId());
     UserImpl user = service.getUser(entry);
 

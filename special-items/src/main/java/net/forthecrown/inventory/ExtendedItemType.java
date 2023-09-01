@@ -62,4 +62,7 @@ public interface ExtendedItemType<T extends ExtendedItem> extends FtcKeyed {
     t.update(itemStack);
   }
 
+  default void rankUp(ItemStack itemStack, T value) {
+
+  }
 }

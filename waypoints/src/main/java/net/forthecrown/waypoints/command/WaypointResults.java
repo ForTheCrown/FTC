@@ -6,6 +6,7 @@ import net.forthecrown.command.arguments.ParseResult;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.text.Messages;
 import net.forthecrown.user.User;
+import net.forthecrown.user.UserBlockList;
 import net.forthecrown.user.UserLookup.LookupEntry;
 import net.forthecrown.user.Users;
 import net.forthecrown.waypoints.WExceptions;
@@ -88,7 +89,7 @@ public interface WaypointResults {
       if (source.isPlayer()) {
         var senderUser = Users.get(source.asPlayer());
 
-        Users.testBlockedException(senderUser, user,
+        UserBlockList.testBlockedException(senderUser, user,
             Messages.BLOCKED_SENDER,
             Messages.BLOCKED_TARGET
         );

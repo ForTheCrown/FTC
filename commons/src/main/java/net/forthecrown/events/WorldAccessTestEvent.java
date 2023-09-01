@@ -35,6 +35,22 @@ public class WorldAccessTestEvent extends Event implements Cancellable {
     this.world = world;
   }
 
+  public static void testOrThrow(CommandSender user, World world, CommandSyntaxException noMessage)
+      throws CommandSyntaxException
+  {
+    AccessResult result = testWorldAccess(user, world);
+
+    if (result.accessible()) {
+      return;
+    }
+
+    if (result.denyReason() == null) {
+      throw noMessage;
+    }
+
+    throw Exceptions.create(result.denyReason());
+  }
+
   public static AccessResult testWorldAccess(CommandSender user, World world) {
     if (user.hasPermission(Permissions.WORLD_BYPASS)) {
       return AccessResult.ACCESSIBLE;

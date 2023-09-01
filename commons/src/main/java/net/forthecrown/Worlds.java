@@ -2,7 +2,9 @@ package net.forthecrown;
 
 import static org.bukkit.NamespacedKey.minecraft;
 
+import java.nio.file.Path;
 import java.util.Objects;
+import net.forthecrown.utils.io.PathUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
@@ -63,5 +65,27 @@ public final class Worlds {
    */
   public static World nether() {
     return nonNull(NETHER_KEY);
+  }
+
+  /**
+   * Destroys the world, unloading it and then deleting all of it's data
+   * @param world World to delete
+   * @return {@code false}, if {@link org.bukkit.Server#unloadWorld(String, boolean)} fails
+   */
+  public static boolean desroyWorld(World world) {
+    Path worldDatafile = world.getWorldFolder().toPath();
+
+    if (Bukkit.isTickingWorlds()) {
+      Loggers.getLogger().warn("Unloading world {} mid-tick, this may be dangerous",
+          world.getName()
+      );
+    }
+
+    if (!Bukkit.unloadWorld(world, false)) {
+      return false;
+    }
+
+    PathUtil.safeDelete(worldDatafile, true, true);
+    return true;
   }
 }

@@ -31,5 +31,9 @@ public abstract class TextFunction {
     return true;
   }
 
+  public boolean filter(MatchResult result) {
+    return true;
+  }
+
   public abstract Component format(MatchResult result, TextContext context);
 }

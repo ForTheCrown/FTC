@@ -9,7 +9,7 @@ import net.forthecrown.command.help.UsageFactory;
 import net.forthecrown.core.CorePermissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.GrenadierCommand;
-import net.forthecrown.text.ChannelledMessage;
+import net.forthecrown.text.channel.ChannelledMessage;
 import net.forthecrown.text.Text;
 import net.forthecrown.text.ViewerAwareMessage;
 import net.forthecrown.user.User;
@@ -104,9 +104,12 @@ public class CommandTell extends FtcCommand {
       } else if (Audiences.equals(viewer, sender)) {
         firstDisplay = text("me");
         secondDisplay = Text.sourceDisplayName(target, viewer);
-      } else {
+      } else if (Audiences.equals(viewer, target)) {
         firstDisplay = Text.sourceDisplayName(sender, viewer);
         secondDisplay = text("me");
+      } else {
+        firstDisplay = Text.sourceDisplayName(sender, viewer);
+        secondDisplay = Text.sourceDisplayName(target, viewer);
       }
 
       return Text.format("[&e{0}&r -> &e{1}&r] &f{2}", NamedTextColor.GOLD,

@@ -1,0 +1,13 @@
+name = "resource_world"
+aliases = "rw" | "resourceworld"
+description = "ResourceWorld admin command"
+
+literal("reload") {
+  description = "Reloads the ResourceWorld plugin config and data"
+  executes = reloadPlugin()
+}
+
+literal("reset") {
+  description = "Resets the Resource World"
+  executes = resetWorld()
+}

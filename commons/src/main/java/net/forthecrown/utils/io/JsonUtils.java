@@ -14,6 +14,8 @@ import com.google.gson.internal.bind.TypeAdapters;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -23,13 +25,17 @@ import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import net.forthecrown.text.PlayerMessage;
 import net.forthecrown.text.Text;
+import net.forthecrown.text.ViewerAwareMessage;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -208,8 +214,37 @@ public final class JsonUtils {
       return Text.renderString(primitive.getAsString());
     }
 
+    if (element instanceof JsonArray array) {
+      var builder = Component.text();
+      for (JsonElement jsonElement : array) {
+        Component text = readText(jsonElement);
+        builder.append(text);
+      }
+      return builder.build();
+    }
+
     return GsonComponentSerializer.gson()
         .deserializeFromTree(element);
+  }
+
+  public static ViewerAwareMessage readMessage(JsonElement element) {
+    if (element.isJsonPrimitive()) {
+      String str = element.getAsString();
+      return viewer -> Text.valueOf(str, viewer);
+    }
+
+    // If is PlayerMessage
+    if (element.isJsonObject()) {
+      var obj = element.getAsJsonObject();
+
+      if (obj.has("message")) {
+        return PlayerMessage.load(new Dynamic<>(JsonOps.INSTANCE, element))
+            .getOrThrow(false, s -> {});
+      }
+    }
+
+    Component base = readText(element);
+    return ViewerAwareMessage.wrap(base);
   }
 
   public static JsonElement writeText(Component component) {
@@ -217,11 +252,18 @@ public final class JsonUtils {
         .serializeToTree(component);
   }
 
+  public static Duration readDuration(JsonElement element) {
+    return FtcCodecs.DURATION.decode(new Dynamic<>(JsonOps.INSTANCE, element))
+        .map(Pair::getFirst)
+        .getOrThrow(false, string -> {});
+  }
+
   static final Gson gson = new GsonBuilder()
       .setPrettyPrinting()
       .create();
 
   public static void writeFile(JsonElement json, Path f) throws IOException {
+    PathUtil.ensureParentExists(f);
     var writer = Files.newBufferedWriter(f, StandardCharsets.UTF_8);
 
     JsonWriter jWriter = gson.newJsonWriter(writer);
@@ -267,6 +309,20 @@ public final class JsonUtils {
 
   public static JsonArray ofStream(Stream<JsonElement> stream) {
     return (JsonArray) JsonOps.INSTANCE.createList(stream);
+  }
+
+  public static Instant readInstant(JsonElement element) {
+    long timestamp = readTimestamp(element, -1);
+
+    if (timestamp == -1) {
+      return null;
+    }
+
+    return Instant.ofEpochMilli(timestamp);
+  }
+
+  public static JsonElement writeInstant(Instant instant) {
+    return writeTimestamp(instant.toEpochMilli());
   }
 
   @SuppressWarnings({"unchecked", "rawtypes"})

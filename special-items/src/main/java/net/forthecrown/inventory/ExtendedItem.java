@@ -7,6 +7,7 @@ import static net.forthecrown.inventory.ExtendedItems.TAG_TYPE;
 import com.google.common.base.Preconditions;
 import java.util.UUID;
 import lombok.Getter;
+import lombok.Setter;
 import net.forthecrown.enchantment.FtcEnchant;
 import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.nbt.CompoundTag;
@@ -39,9 +40,13 @@ public abstract class ExtendedItem {
   @Getter
   private boolean finished = false;
 
+  @Getter @Setter
+  protected boolean displayItem;
+
   public ExtendedItem(ExtendedItemType<?> type, CompoundTag tag) {
     this.type = type;
     this.owner = tag.getUUID(TAG_OWNER);
+    this.displayItem = tag.getBoolean("display_item");
   }
 
   public ExtendedItem(ExtendedItemType<?> type, UUID owner) {
@@ -84,6 +89,10 @@ public abstract class ExtendedItem {
 
     if (owner != null) {
       tag.putUUID(TAG_OWNER, owner);
+    }
+
+    if (displayItem) {
+      tag.putBoolean("display_item", true);
     }
 
     save(tag);

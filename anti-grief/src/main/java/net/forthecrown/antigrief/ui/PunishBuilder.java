@@ -1,5 +1,6 @@
 package net.forthecrown.antigrief.ui;
 
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -18,7 +19,7 @@ public class PunishBuilder {
 
   String reason;
   String extra;
-  long length;
+  Duration length;
 
   public void punish(CommandSource source) {
     Punishments.handlePunish(entry.getUser(), source, reason, length, type, extra);

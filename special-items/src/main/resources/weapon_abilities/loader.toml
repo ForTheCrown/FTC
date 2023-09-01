@@ -1,0 +1,293 @@
+# Dynamically loads sword abilities
+#
+# The recipe list for each item is stored inside the 'items.txt' in this
+# directory
+#
+# ------------------------------------------------------------------------------
+# Format:
+# ------------------------------------------------------------------------------
+# 'item' (required):
+#  NBT of the item used to represent an ability in the crafting menu, the
+#  'displayName' and 'description' will be applied to the item and will override
+#  existing values
+#
+#  To easily get the NBT of an item for this, simply hold an item ingame, and do
+#  '/itemdata view' then click the text it gives you to copy the NBT data, and
+#  voila! That's the NBT to use. Be aware! You will need to ensure no string
+#  escaping ocurrs with that NBT though.
+#
+# examples:
+# - item = "{id:'minecraft:ender_pearl',Count:1b}"
+# ------------------------------------------------------------------------------
+# 'displayName' (required):
+#  The display name shown to users
+#
+# examples:
+# - displayName = "&eA Display Name"
+# - displayName = { text = "A JSON component", color = "red" }
+# - displayName = "A colorless display name"
+# ------------------------------------------------------------------------------
+# 'description' (optional):
+#  An array of text shown in the displayName's hover text
+#
+# examples:
+# - description = [ "Foo", "Bar" ]
+# - description = [
+#     { text = "JSON-style component" },
+#     "Regular text"
+#   ]
+# ------------------------------------------------------------------------------
+# 'maxLevel' (required, if 'genericMaxLevel' is not set):
+#  Determines the maximum level a sword ability can have.
+#  Abilities cannot be levelled past this maxLevel
+#
+# examples:
+# - maxLevel = 5
+# ------------------------------------------------------------------------------
+# 'advancement' (optional):
+#  The advancement required for the ability
+#
+# examples:
+# - advancement = "minecraft:monsters_hunted"
+# ------------------------------------------------------------------------------
+# 'useLimit' (optional, if genericUseLimit is not set):
+#  Sets the amount of times the ability can be used before it degrades away.
+#
+#  This value accepts either an integer or a JavaScript expression as valid
+#  values. The JS expression must return an integer.
+#
+#  The expression will have access to 2 bindings, a 'user' and a 'tier' value.
+#  The 'tier' value is the user's tier mapped to an integer value of 0 to 3
+#
+# examples:
+# - useLimit = 14
+# - useLimit = "200 + (tier * 15)"
+# ------------------------------------------------------------------------------
+# cooldown (required, if 'genericCooldown' is not set):
+#  The cooldown, in ticks, can either be a fixed value or a range of 2 values,
+#  which will then be scaled between depending on the sword of the rank.
+#
+#  The input for this value can be an integer, which is used as ticks, or a
+#  string in the same style as the time argument in commands, eg: '10m' for
+#  10 minutes.
+#  A comma-separated list of these values is also accepted
+#  Lastly, a 'localTime' string is also accepted, see examples, for how to
+#  use it.
+#
+# time input examples:
+# - 60: 3 Seconds, counted as ticks
+# - 00:00:03: 3 Seconds, localTime syntax
+# - "300t": 300 ticks
+# - "10s":  10 seconds
+# - "10.45s":  10.45 seconds, aka 209 ticks
+# - "10m, 10s": 10 minutes and 10 seconds
+#
+# examples:
+# - cooldown = [ "8s", "1.4s" ]
+#   ^ Will scale with sword's level
+#
+# - cooldown = "3s
+#   ^ Fixed constant, will not scale with sword's level
+# ------------------------------------------------------------------------------
+# 'inputArgs' (optional):
+#  Optional args to be given to the 'script' value
+#
+# examples:
+# - inputArgs = [ "foo" ]
+# - inputArgs = [ "foo", "bar" ]
+# - inputArgs = "-foo --foobar=value"
+#   ^ Will be split into a string[]
+# ------------------------------------------------------------------------------
+# 'script' (required):
+#  Specifies the script file/JavaScript code to compile and evaluate.
+#  The script's main scope will be ran when it's started.
+#
+#  See the `Script parameters and functions` section for additional details
+#  about how this script works
+#
+# examples:
+# - script = "script/path.js"
+# - script = { path = "path/to/script.js" }
+# - script = { js = "print("Hello, world!")" }
+# ------------------------------------------------------------------------------
+# Script parameters and functions:
+# ------------------------------------------------------------------------------
+# args: binding object, the String[] of arguments supplied by 'inputArgs'
+#       value in this file
+#
+# type: binding object, the WeaponAbilityType of the current ability instance
+#
+# level: binding object, the ability's current level
+#
+# onLeftClick(player, clicked): (optional, if onRightClick is declared)
+#  Called when the sword holder (player) left clicks.
+#  As such, the 'clicked' parameter, may be an entity, block or null
+#
+# onRightClick(player, entity): (optional, if onLeftClick is declared)
+#  Called when the sword holder (player) right clicks.
+#  As such, the 'clicked' parameter, may be an entity, block or null
+#
+# onLoad(compoundTag): (optional)
+#  Called when the ability is loaded, optional function
+#
+# onSave(compoundTag): (optional)
+#  Called when the ability is saved, optional function
+#
+# getCooldown(swordRank): (optional)
+#  Called to get a cooldown, optional function
+#  If this function isn't declared, uses the cooldown and scales it
+#  to get a cooldown.
+#  This method is allowed to return the same types as the 'cooldown' value
+#  in this file.
+#  swordRank is the SwordRank object of the sword that holds the ability
+#
+# displayName(): (optional)
+#  Called to create the ability's displayName, if not declared, uses the
+#  'displayName' set in this TOML file.
+# ------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
+# Example ability:
+# ------------------------------------------------------------------------------
+# [ability_name]
+# displayName = "Weapon Ability"
+# description = [ "Does a thing" ]
+# maxLevel = 3
+# cooldown = 00:00:05
+# useLimit = "250 + (tier * 10)"
+# item = "{id:'minecraft:stick',Count:32b}"
+# script = "abilities/ability_script.js"
+# ------------------------------------------------------------------------------
+
+
+# ------------------------------------------------------------------------------
+# Generic values:
+# ------------------------------------------------------------------------------
+# Determines if abilities are enabled at all, if not set at all, assumes true
+# If false, then will only be enabled if the plugin is on 'debug mode'
+# If true, abilities are still loaded, their click callbacks are never called
+enabled = true
+
+# Base cooldown value that applies to all abilities, unless they override it
+# with their own value
+genericCooldown = [ "5s", "24t" ]
+
+genericUseLimit = "250 + (tier * 50)"
+# ------------------------------------------------------------------------------
+
+
+# ------------------------------------------------------------------------------
+# Abilities:
+# ------------------------------------------------------------------------------
+['ender_pearl']
+displayName = "Ender Pearl"
+description = [
+  "Throws an Ender Pearl on Right-Click"
+]
+cooldown = [ "8s", "1.3s" ]
+advancement = "minecraft:adventure/bullseye"
+script = "abilities/ender_pearl.js"
+item = "{id:\"minecraft:ender_pearl\",Count:1b}"
+levelUses = [ 750, 1500 ]
+
+["twirl"]
+displayName = "Twirl"
+description = [
+  "Damages all entities around you in a swirl"
+]
+cooldown = [ "6s", "4s" ]
+useLimit = "150 + (tier * 50)"
+advancement = "minecraft:nether/loot_bastion"
+script = "abilities/twirl.js"
+item = "{id:'minecraft:feather',Count:1b}"
+levelUses = [ 600, 1200 ]
+
+["dash"]
+displayName = "Dash"
+description = [
+  "Gives you a little boost"
+]
+cooldown = [ "8s", "1.3s" ]
+useLimit = "350 + (tier * 50)"
+advancement = "minecraft:adventure/adventuring_time"
+script = "abilities/dash.js"
+item = "{id:'minecraft:iron_boots',Count:1b}"
+levelUses = [ 1750, 3500 ]
+
+["far_reach"]
+displayName = "Far Reach"
+description = [
+  "Allows you to hit entities up to 5 blocks away"
+]
+cooldown = [ "6s", "3s" ]
+advancement = "minecraft:adventure/sniper_duel"
+script = "abilities/far_reach.js"
+item = "{id:'minecraft:iron_sword',Count:1b}"
+levelUses = [ 1000, 2000 ]
+
+["tnt"]
+displayName = "TNT"
+description = [
+  "Drops a primed TNT on Right-Click"
+]
+advancement = "minecraft:adventure/totem_of_undying"
+useLimit = "35 + (tier * 5)"
+cooldown = [ "20s", "5s" ]
+script = "abilities/tnt.js"
+item = "{Count:1b,id:'minecraft:tnt'}"
+levelUses = [ 175, 350 ]
+
+["fireball"]
+displayName = "Fire Ball"
+description = [
+  "Throws a Fire ball on Right-Click"
+]
+cooldown = [ "8s", "3s" ]
+advancement = "minecraft:end/levitate"
+useLimit = "35 + (tier * 5)"
+script = "abilities/fireball.js"
+item = "{Count:1b,id:'minecraft:fire_charge'}"
+levelUses = [ 350 ]
+
+# Note on potion types: They don't use the ResourceLocation names, eg:
+# 'minecraft:regeneration' for the '--potion-type' values, they use the 'names'
+# which are the names of the potion type constants inside the MC codebase, but
+# I got tired of over-engineering the potion_effect.js script, so goodluck
+["potion/regeneration"]
+displayName = "Regeneration"
+description = [
+  "Gives you regen on Right-Click"
+]
+cooldown = [ "30s", "15s" ]
+useLimit = "125 + (tier * 25)"
+advancement = "minecraft:nether/all_effects"
+inputArgs = "--potion-type=REGENERATION --duration=13.5s --amplifier=level"
+script = "abilities/potion_effect.js"
+item = "{Count:1b,id:'minecraft:potion',tag:{Potion:'minecraft:regeneration'}}"
+levelUses = [ 1000 ]
+
+["potion/strength"]
+displayName = "Strength"
+description = [
+  "Gives you Strength on Right-Click"
+]
+cooldown = [ "20s", "10s" ]
+useLimit = "125 + (tier * 25)"
+advancement = "minecraft:adventure/kill_all_mobs"
+inputArgs = "--potion-type=INCREASE_DAMAGE --duration=6s --amplifier=level"
+script = "abilities/potion_effect.js"
+item = "{Count:1b,id:'minecraft:potion',tag:{Potion:'minecraft:strength'}}"
+levelUses = [ 1000 ]
+
+["potion/weakness"]
+displayName = "Weakness"
+description = [
+  "Gives an enemy weakness on Left-Click"
+]
+cooldown = [ "20s", "10s" ]
+useLimit = "125 + (tier * 25)"
+advancement = "minecraft:adventure/kill_mob_near_sculk_catalyst"
+inputArgs = "--potion-type=WEAKNESS --amplifier=level --duration=6s --left-click --give-target"
+script = "abilities/potion_effect.js"
+item = "{Count:1b,id:'minecraft:potion',tag:{Potion:'minecraft:weakness'}}"
+levelUses = [ 1000 ]

@@ -1,15 +1,16 @@
 package net.forthecrown.utils.io.source;
 
-import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
-import java.io.IOException;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.JsonOps;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Objects;
-import net.forthecrown.utils.io.JsonWrapper;
+import net.forthecrown.nbt.BinaryTag;
+import net.forthecrown.utils.io.TagOps;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,25 +23,31 @@ public final class Sources {
     return fromPath(path, null);
   }
 
-  public static Source fromPath(@NotNull Path path, @Nullable Path scriptDirectory) {
+  public static Source fromPath(@NotNull Path path, @Nullable Path parentDirectory) {
     Objects.requireNonNull(path, "Null path");
 
     String name;
 
-    if (scriptDirectory == null) {
+    if (parentDirectory == null) {
       name = path.toString();
     } else {
-      Path relative = scriptDirectory.relativize(path);
+      Path relative = parentDirectory.relativize(path);
       name = relative.toString();
     }
 
-    return new PathSource(path, name);
+    return new PathSource(path, parentDirectory, name);
   }
 
   public static Source fromUrl(@NotNull String url) throws MalformedURLException {
     Objects.requireNonNull(url, "Null url");
     URL urlObject = new URL(url);
     return fromUrl(urlObject);
+  }
+
+  public static Source fromUrl(@NotNull String url, String name) throws MalformedURLException {
+    Objects.requireNonNull(url, "Null url");
+    URL urlObject = new URL(url);
+    return fromUrl(urlObject, name);
   }
 
   public static Source fromUrl(@NotNull URL url, String name) {
@@ -64,56 +71,48 @@ public final class Sources {
     return new DirectSource(src, name);
   }
 
-  public static Source loadFromJson(
-      JsonElement element,
-      Path parentDirectory,
-      boolean assumeDirect
-  ) {
-    Objects.requireNonNull(element, "Null source element");
+  public static <S> Source load(Dynamic<S> dynamic, Path directory, boolean assumeDirect) {
+    String strValue = dynamic.asString(null);
 
-    if (element.isJsonPrimitive()) {
-      var str = element.getAsString();
-      return assumeDirect ? direct(str) : fromPath(parentDirectory.resolve(str), parentDirectory);
+    if (strValue != null) {
+      return assumeDirect ? direct(strValue) : fromPath(directory.resolve(strValue), directory);
     }
 
-    Preconditions.checkArgument(element.isJsonObject(),
-        "Element must either be primitive or object"
-    );
+    String name = dynamic.get("name")
+        .map(dynamic1 -> dynamic1.asString(null))
+        .result().orElse(null);
 
-    JsonWrapper json = JsonWrapper.wrap(element.getAsJsonObject());
-    String name = json.getString("name");
+    var raw = dynamic.get("raw").asString(null);
+    var js = dynamic.get("js").asString(null);
+    var url = dynamic.get("url").asString(null);
+    var path = dynamic.get("path").asString(null);
 
-    if (json.has("path")) {
-      String path = json.getString("path");
-      return fromPath(parentDirectory.resolve(path), parentDirectory);
+    if (raw != null) {
+      return direct(raw, name);
     }
 
-    if (json.has("url")) {
-      String urlString = json.getString("url");
+    if (js != null) {
+      return direct(js, name);
+    }
 
+    if (path != null) {
+      return fromPath(directory.resolve(path), directory);
+    }
+
+    if (url != null) {
       try {
-        URL url = new URL(urlString);
         return fromUrl(url, name);
-      } catch (IOException exc) {
+      } catch (MalformedURLException exc) {
         throw new IllegalStateException(exc);
       }
     }
 
-    if (json.has("raw")) {
-      String code = json.getString("raw");
-      return direct(code, name);
-    }
-
-    // Backwards compatability with 'js' value in JSON
-    if (json.has("js")) {
-      String code = json.getString("js");
-      return direct(code, name);
-    }
-
     throw new IllegalArgumentException(
-        "JSON object must have 1 of 3 values declared, a 'url', 'path', or 'raw' value"
-            + ", optional 'name' value is also allowed"
-            + ", json=" + element
+        "Invalid ScriptSource object: " + dynamic.getValue() + ". "
+        + "Requires 1 of 3 values: "
+            + " \n'path' for file sources, "
+            + " \n'url' for sources that use a URL and "
+            + " \n'raw' for sources that are a direct value"
     );
   }
 }
