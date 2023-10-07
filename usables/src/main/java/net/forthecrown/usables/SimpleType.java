@@ -10,7 +10,7 @@ import net.forthecrown.grenadier.CommandSource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class SimpleType<T> implements UsageType<T> {
+public class SimpleType<T> implements ObjectType<T> {
 
   private final Supplier<T> supplier;
 

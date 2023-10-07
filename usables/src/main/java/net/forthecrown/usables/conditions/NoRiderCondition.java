@@ -4,13 +4,13 @@ import net.forthecrown.usables.Condition;
 import net.forthecrown.usables.Interaction;
 import net.forthecrown.usables.SimpleType;
 import net.forthecrown.usables.UsableComponent;
-import net.forthecrown.usables.UsageType;
+import net.forthecrown.usables.ObjectType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 public class NoRiderCondition implements Condition {
 
-  public static final UsageType<NoRiderCondition> TYPE = new SimpleType<>(NoRiderCondition::new);
+  public static final ObjectType<NoRiderCondition> TYPE = new SimpleType<>(NoRiderCondition::new);
 
   @Override
   public boolean test(Interaction interaction) {
@@ -23,7 +23,7 @@ public class NoRiderCondition implements Condition {
   }
 
   @Override
-  public UsageType<? extends UsableComponent> getType() {
+  public ObjectType<? extends UsableComponent> getType() {
     return TYPE;
   }
 }

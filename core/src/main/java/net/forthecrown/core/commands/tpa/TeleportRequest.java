@@ -34,6 +34,8 @@ public class TeleportRequest extends PlayerRequest {
   @Getter
   private final boolean tpaHere;
 
+  boolean accepted;
+
   public TeleportRequest(UUID senderId, UUID targetId, boolean tpaHere) {
     super(senderId, targetId);
     this.tpaHere = tpaHere;
@@ -78,12 +80,14 @@ public class TeleportRequest extends PlayerRequest {
    * {@link UserTeleport} to teleport either the sender or target to the other user.
    */
   public void accept() throws CommandSyntaxException {
+    accepted = true;
+
     super.accept();
 
     var sender = getSender();
     var target = getTarget();
 
-    sender.sendMessage(requestAccepted(target));
+    sender.sendMessage(requestAccepted(target.displayName(sender)));
     target.sendMessage(REQUEST_ACCEPTED);
 
     // If tpaHere, target is teleporting,
@@ -104,7 +108,7 @@ public class TeleportRequest extends PlayerRequest {
     var sender = getSender();
     var target = getTarget();
 
-    sender.sendMessage(requestDenied(target));
+    sender.sendMessage(requestDenied(target.displayName(sender)));
     target.sendMessage(REQUEST_DENIED);
 
     stop();
@@ -118,7 +122,7 @@ public class TeleportRequest extends PlayerRequest {
     var target = getTarget();
 
     sender.sendMessage(REQUEST_CANCELLED);
-    target.sendMessage(requestCancelled(sender));
+    target.sendMessage(requestCancelled(sender.displayName(target)));
 
     stop();
   }

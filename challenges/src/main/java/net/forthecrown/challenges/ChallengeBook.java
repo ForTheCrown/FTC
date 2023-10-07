@@ -159,10 +159,6 @@ public class ChallengeBook {
     }
 
     builder.addEmptyLine();
-    Challenge payChallenge = manager
-        .getChallengeRegistry()
-        .get("daily/pay")
-        .orElse(null);
 
     for (var e : completed.object2BooleanEntrySet()) {
       var c = e.getKey();

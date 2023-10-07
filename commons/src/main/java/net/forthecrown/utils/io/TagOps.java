@@ -49,6 +49,10 @@ public class TagOps implements DynamicOps<BinaryTag> {
 
   @Override
   public <U> U convertTo(DynamicOps<U> outOps, BinaryTag input) {
+    if (outOps == this) {
+      return (U) input;
+    }
+
     if (input instanceof ListTag list) {
       return outOps.createList(
           list.stream().map(tag -> convertTo(outOps, tag))

@@ -19,8 +19,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 @Getter
 public class UsablesPlugin extends JavaPlugin {
 
-  private Registry<UsageType<? extends Action>> actions;
-  private Registry<UsageType<? extends Condition>> conditions;
+  private Registry<ObjectType<? extends Action>> actions;
+  private Registry<ObjectType<? extends Condition>> conditions;
 
   private CmdUsables<Warp> warps;
   private CmdUsables<Kit> kits;

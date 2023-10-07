@@ -155,7 +155,7 @@ public class GuildSettings {
 
     // Update dynmap
     if (DynmapUtil.isInstalled()) {
-      GuildDynmap.updateGuildChunks(getGuild());
+      GuildWebmaps.updateGuildChunks(getGuild());
     }
 
     // Only change color for donators
@@ -179,7 +179,7 @@ public class GuildSettings {
 
     // Update dynmap
     if (DynmapUtil.isInstalled()) {
-      GuildDynmap.updateGuildChunks(getGuild());
+      GuildWebmaps.updateGuildChunks(getGuild());
     }
   }
 

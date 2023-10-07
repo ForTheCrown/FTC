@@ -10,7 +10,8 @@ import lombok.Setter;
 public class PackMeta {
 
   private Path mainScript;
+  private Path directory;
 
-  private final List<String> importedPacks = new ArrayList<>();
-
+  private final List<String> requiredPlugins = new ArrayList<>();
+  private final List<PackExport> exports = new ArrayList<>();
 }

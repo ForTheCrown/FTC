@@ -249,7 +249,12 @@ public class PropertyMap implements UserComponent {
 
       // Serialize and add to JSON
       var val = values[i];
-      json.add(holder.getKey(), holder.getValue().serialize(val));
+
+      try {
+        json.add(holder.getKey(), holder.getValue().serialize(val));
+      } catch (Throwable t) {
+        LOGGER.error("Error serializing property {}", holder.getKey(), t);
+      }
     }
 
     if (unknownProperties != null && unknownProperties.size() > 0) {

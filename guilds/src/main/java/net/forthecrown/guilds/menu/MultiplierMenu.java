@@ -49,7 +49,7 @@ public class MultiplierMenu extends MenuPage {
               var modifiers = Guilds.getManager().getExpModifier();
               var config = Guilds.getPlugin().getGuildConfig();
 
-              boolean active = modifiers.isWeekend() && config.weekendMultiplierEnabled;
+              boolean active = modifiers.isWeekend() && config.weekendModifier() > 0;
 
               var item = ItemStacks.builder(
                   active ? Material.FIRE_CHARGE : Material.FIREWORK_STAR
@@ -59,8 +59,8 @@ public class MultiplierMenu extends MenuPage {
                 item.addEnchant(Enchantment.BINDING_CURSE, 1).setFlags(ItemFlag.HIDE_ENCHANTS);
               }
 
-              if (config.weekendMultiplierEnabled) {
-                item.setName("&eWeekend Multiplier " + config.weekendModifier + "x");
+              if (config.weekendModifier() > 0) {
+                item.setName("&eWeekend Multiplier " + config.weekendModifier() + "x");
               }
 
               item.addLore("&7Currently: " + (active ? "&aActive" : "&6Inactive"));

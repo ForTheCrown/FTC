@@ -1,6 +1,7 @@
 package net.forthecrown.core.commands.admin;
 
 import net.forthecrown.Permissions;
+import net.forthecrown.command.Exceptions;
 import net.forthecrown.command.FtcCommand;
 import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.utils.math.WorldBounds3i;
@@ -38,6 +39,10 @@ public class CommandGetOffset extends FtcCommand {
         .executes(c -> {
           Player player = c.getSource().asPlayer();
           WorldBounds3i region = WorldBounds3i.ofPlayerSelection(player);
+
+          if (region == null) {
+            throw Exceptions.NO_REGION_SELECTION;
+          }
 
           Vector3i dif = region.size();
           Vector3i dimensions = region.dimensions();

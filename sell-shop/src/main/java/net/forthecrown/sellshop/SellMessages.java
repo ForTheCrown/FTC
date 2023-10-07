@@ -1,11 +1,7 @@
 package net.forthecrown.sellshop;
 
-import static net.forthecrown.text.Messages.CLICK_ME;
 import static net.forthecrown.text.Text.format;
-import static net.kyori.adventure.text.Component.newline;
-import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
-import static net.kyori.adventure.text.event.ClickEvent.openUrl;
 
 import net.forthecrown.text.Text;
 import net.kyori.adventure.text.Component;
@@ -15,16 +11,17 @@ import org.bukkit.inventory.ItemStack;
 
 public interface SellMessages {
 
-  Component SHOP_WEB_MESSAGE = text("Our webstore", NamedTextColor.GRAY)
-      .append(newline())
-      .append(
-          text("forthecrown.buycraft.net", NamedTextColor.AQUA)
-              .hoverEvent(CLICK_ME)
-              .clickEvent(openUrl("https://forthecrown.buycraft.net/"))
-      );
-
   static Component soldItems(SellResult result, Material material) {
     return soldItems(result.getSold(), result.getEarned(), material);
+  }
+
+  static Component soldItemsTotal(int sold, int earned, Material material) {
+    return format("Sold a total of &e{0}&r for &6{1, rhines}&r.",
+        NamedTextColor.GRAY,
+
+        Text.itemAndAmount(new ItemStack(material), sold),
+        earned
+    );
   }
 
   static Component soldItems(int sold, int earned, Material material) {

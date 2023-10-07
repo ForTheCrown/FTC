@@ -5,7 +5,6 @@ import java.util.Random;
 import net.forthecrown.guilds.Guilds;
 import net.forthecrown.guilds.unlockables.UnlockableChunkUpgrade;
 import net.forthecrown.utils.inventory.ItemStacks;
-import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -37,12 +36,8 @@ public class GuildDurabilityListener implements Listener {
       return;
     }
 
-    randomCancel(event);
-  }
-
-  private void randomCancel(Cancellable cancellable) {
     if (random.nextBoolean()) {
-      cancellable.setCancelled(true);
+      event.setCancelled(true);
     }
   }
 }

@@ -16,7 +16,7 @@ public class ItemChallengeLoader {
   static final String KEY_TYPE = "type";
   static final String KEY_WILDCARD = "wildcard_allowed";
 
-  public static Result<ItemChallenge> parse(JsonObject element) {
+  public static Result<ItemChallenge> load(JsonObject element) {
     JsonWrapper json = JsonWrapper.wrap(element);
 
     if (!json.has(KEY_SLOT)) {

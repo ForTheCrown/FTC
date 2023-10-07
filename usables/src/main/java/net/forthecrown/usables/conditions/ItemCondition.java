@@ -20,7 +20,7 @@ import net.forthecrown.usables.Condition;
 import net.forthecrown.usables.Interaction;
 import net.forthecrown.usables.UsableComponent;
 import net.forthecrown.usables.Usables;
-import net.forthecrown.usables.UsageType;
+import net.forthecrown.usables.ObjectType;
 import net.forthecrown.utils.inventory.ItemList;
 import net.forthecrown.utils.inventory.ItemLists;
 import net.forthecrown.utils.io.FtcCodecs;
@@ -32,8 +32,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class ItemCondition implements Condition {
 
-  public static final UsageType<ItemCondition> HAS_ITEMS = new ItemConditionType(true);
-  public static final UsageType<ItemCondition> MISSING_ITEMS = new ItemConditionType(false);
+  public static final ObjectType<ItemCondition> HAS_ITEMS = new ItemConditionType(true);
+  public static final ObjectType<ItemCondition> MISSING_ITEMS = new ItemConditionType(false);
 
   private final boolean requires;
   private final ItemList list;
@@ -83,7 +83,7 @@ public class ItemCondition implements Condition {
   }
 
   @Override
-  public UsageType<? extends UsableComponent> getType() {
+  public ObjectType<? extends UsableComponent> getType() {
     return requires ? HAS_ITEMS : MISSING_ITEMS;
   }
 
@@ -93,7 +93,7 @@ public class ItemCondition implements Condition {
   }
 }
 
-class ItemConditionType implements UsageType<ItemCondition> {
+class ItemConditionType implements ObjectType<ItemCondition> {
 
   private final boolean requires;
 

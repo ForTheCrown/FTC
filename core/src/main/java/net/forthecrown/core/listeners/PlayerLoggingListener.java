@@ -6,10 +6,11 @@ import net.forthecrown.FtcServer;
 import net.forthecrown.Loggers;
 import net.forthecrown.core.CorePlugin;
 import net.forthecrown.core.JoinInfo;
+import net.forthecrown.core.TabList;
 import net.forthecrown.core.user.UserImpl;
 import net.forthecrown.core.user.UserLookupImpl;
+import net.forthecrown.core.user.UserLookupImpl.UserLookupEntry;
 import net.forthecrown.core.user.UserServiceImpl;
-import net.forthecrown.packet.PacketListeners;
 import net.forthecrown.user.TimeField;
 import net.forthecrown.user.UserLookup.LookupEntry;
 import net.forthecrown.user.event.UserJoinEvent;
@@ -46,7 +47,7 @@ class PlayerLoggingListener implements Listener {
     UserServiceImpl service = plugin.getUserService();
     UserLookupImpl lookup = service.getLookup();
 
-    LookupEntry entry;
+    UserLookupEntry entry;
     boolean firstJoin;
 
     if (!player.hasPlayedBefore()) {
@@ -69,10 +70,11 @@ class PlayerLoggingListener implements Listener {
       }
     }
 
+    lookup.changeIp(entry, player.getAddress().getAddress().getHostAddress());
+
     UserImpl user = service.getUser(entry);
     user.setOnline(true);
     user.setPlayer(player);
-    user.setIp(player.getAddress().getHostName());
 
     String lastOnlineName = user.getLastOnlineName();
     boolean nameUpdated = updateOnlineName(user, name);
@@ -83,6 +85,7 @@ class PlayerLoggingListener implements Listener {
 
     if (nameUpdated) {
       transferScores(lastOnlineName, name);
+      lookup.onNameChange(entry, name);
     }
 
     event.joinMessage(null);
@@ -102,10 +105,10 @@ class PlayerLoggingListener implements Listener {
     userEvent.callEvent();
     UserLogEvent.maybeAnnounce(userEvent);
 
-    PacketListeners.listeners().inject(player);
-
     JoinInfo joinInfo = plugin.getJoinInfo();
     joinInfo.show(user);
+
+    TabList.update();
   }
 
   @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
@@ -118,6 +121,8 @@ class PlayerLoggingListener implements Listener {
     event.quitMessage(null);
 
     service.onUserLeave(user, event.getReason(), true);
+
+    TabList.update();
   }
 
   boolean updateOnlineName(UserImpl user, String name) {

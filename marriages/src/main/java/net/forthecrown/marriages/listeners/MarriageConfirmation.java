@@ -28,11 +28,12 @@ public final class MarriageConfirmation {
     var target = getTarget(user);
 
     user.sendMessage(
-        MMessages.priestTextConfirm(user, target)
+        Component.text()
+            .append(MMessages.priestTextConfirm(user, target).create(user))
             .append(Component.space())
             .append(confirmPrompt(user))
     );
-  }, builder -> builder.lifetime(Duration.ofDays(365)));
+  }, builder -> builder.uses(-1).lifetime(Duration.ofDays(365)));
 
   public static ClickEvent CONFIRM_MARRY = ClickEvent.callback((UserClickCallback) user -> {
     var target = getTarget(user);
@@ -50,7 +51,7 @@ public final class MarriageConfirmation {
     // Wait for your spouse
     waitingFinish.add(user.getUniqueId());
     user.sendMessage(MMessages.PRIEST_TEXT_WAITING);
-  }, builder -> builder.lifetime(Duration.ofDays(365)));
+  }, builder -> builder.uses(-1).lifetime(Duration.ofDays(365)));
 
   static Component confirmPrompt(User user) {
     boolean valid;
@@ -88,7 +89,8 @@ public final class MarriageConfirmation {
     }
 
     User targetUser = Users.get(target);
-    return Text.format("[I wish to marry {0, user}]", NamedTextColor.AQUA, targetUser);
+    return Text.vformat("[I wish to marry {0, user}]", NamedTextColor.AQUA, targetUser)
+        .create(user);
   }
 
   static User getTarget(User user) throws CommandSyntaxException {

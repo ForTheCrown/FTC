@@ -4,7 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import it.unimi.dsi.fastutil.objects.ObjectArrays;
 import java.time.Duration;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.EnumSet;
 import lombok.Getter;
@@ -15,27 +15,19 @@ import net.forthecrown.user.TimeField;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserComponent;
 import net.forthecrown.utils.ArrayIterator;
-import net.forthecrown.utils.Time;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
 import org.bukkit.Material;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
-import org.spongepowered.math.GenericMath;
 
 public class UserShopData implements UserComponent, Iterable<UserShopData.Entry> {
 
   private static final Logger LOGGER = Loggers.getLogger();
 
-  /**
-   * The JSON key of the auto sell material list
-   */
-  public static final String KEY_AUTO_SELL = "autoSelling";
-
-  /**
-   * The JSON key of the earned materials object
-   */
-  public static final String KEY_EARNED = "earned";
+  private static final String KEY_AUTO_SELL = "autoSelling";
+  private static final String KEY_EARNED = "earned";
+  private static final String KEY_LAST_DROP = "last_earnings_drop";
 
   /**
    * An empty entry array
@@ -54,6 +46,8 @@ public class UserShopData implements UserComponent, Iterable<UserShopData.Entry>
    */
   @Getter
   private final EnumSet<Material> autoSelling = EnumSet.noneOf(Material.class);
+
+  private Instant lastEarningsDrop;
 
   private final User user;
 
@@ -153,34 +147,55 @@ public class UserShopData implements UserComponent, Iterable<UserShopData.Entry>
   }
 
   public void onLogin() {
-    long lastLogin = user.getTime(TimeField.LAST_LOGIN);
+    int drop = getEarningsDrop();
 
-    LocalDate now = LocalDate.now();
-    LocalDate lastLoginDate = Time.localDate(lastLogin);
+    if (drop <= 0) {
+      return;
+    }
 
-    var config = SellShopPlugin.getPlugin().getShopConfig();
+    LOGGER.info("Lowering {}'s earnings by {}", user, drop);
 
-    int loss = config.getEarningLoss();
-    Duration interval = config.getEarningLossInterval();
+    lastEarningsDrop = Instant.now();
 
-    long intervalMillis = interval.toMillis();
-    long loginInterval = Duration.between(lastLoginDate, now).toMillis();
-
-    float decreases = (float) loginInterval / intervalMillis;
-
-    int amount = GenericMath.floor(decreases * loss);
-    var it = ArrayIterator.modifiable(earnings);
-
-    LOGGER.info("Lowering {}'s earnings by {}", user, amount);
-
+    var it = iterator();
     while (it.hasNext()) {
       var entry = it.next();
-      entry.value = entry.value - amount;
+      entry.value = entry.value - drop;
 
       if (entry.value <= 0) {
         it.remove();
       }
     }
+  }
+
+  private int getEarningsDrop() {
+    var config = SellShopPlugin.getPlugin().getShopConfig();
+    var interval = config.earningLossInterval();
+
+    Instant lastReset;
+
+    if (lastEarningsDrop == null) {
+      long lastJoin = user.getTime(TimeField.LAST_LOGIN);
+      lastReset = Instant.ofEpochMilli(lastJoin);
+    } else {
+      lastReset = lastEarningsDrop;
+    }
+
+    Instant now = Instant.now();
+    Instant nextReset = lastReset.plus(interval);
+
+    if (now.isBefore(nextReset)) {
+      return 0;
+    }
+
+    Duration between = Duration.between(lastEarningsDrop, nextReset);
+
+    long betweenMillis = between.toMillis();
+    long intervalMillis = interval.toMillis();
+
+    long divided = betweenMillis / intervalMillis;
+
+    return (int) (config.earningLoss() * divided);
   }
 
   @Override
@@ -215,6 +230,10 @@ public class UserShopData implements UserComponent, Iterable<UserShopData.Entry>
           json.getList(KEY_AUTO_SELL, element1 -> JsonUtils.readEnum(Material.class, element1))
       );
     }
+
+    if (json.has(KEY_LAST_DROP)) {
+      lastEarningsDrop = json.getInstant(KEY_LAST_DROP, null);
+    }
   }
 
   @Override
@@ -244,6 +263,10 @@ public class UserShopData implements UserComponent, Iterable<UserShopData.Entry>
       }
 
       json.add(KEY_AUTO_SELL, autoSell);
+    }
+
+    if (lastEarningsDrop != null) {
+      json.addInstant(KEY_LAST_DROP, lastEarningsDrop);
     }
 
     return json.nullIfEmpty();

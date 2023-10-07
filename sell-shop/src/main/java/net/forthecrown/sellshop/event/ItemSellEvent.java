@@ -2,13 +2,14 @@ package net.forthecrown.sellshop.event;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.Getter;
+import net.forthecrown.user.User;
+import net.forthecrown.user.event.UserEvent;
 import org.bukkit.Material;
-import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
-public class ItemSellEvent extends Event {
+public class ItemSellEvent extends UserEvent {
 
   @Getter
   private static final HandlerList handlerList = new HandlerList();
@@ -20,7 +21,14 @@ public class ItemSellEvent extends Event {
 
   private final CommandSyntaxException failure;
 
-  public ItemSellEvent(int sold, int earned, Material material, CommandSyntaxException failure) {
+  public ItemSellEvent(
+      User user,
+      int sold,
+      int earned,
+      Material material,
+      CommandSyntaxException failure
+  ) {
+    super(user);
     this.sold = sold;
     this.earned = earned;
     this.material = material;

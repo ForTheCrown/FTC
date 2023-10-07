@@ -65,13 +65,13 @@ public class MenuReader {
   @Getter
   private Slot slot;
 
-  public SellShopMenu read(SellShop shop) {
+  public SellShopMenu read(SellShop shop, int defaultMax) {
     ensureKeyPresent(json, KEY_TITLE);
     ensureKeyPresent(json, KEY_CONTENT_FILE);
     ensureKeyPresent(json, KEY_SLOT);
     ensureKeyPresent(json, KEY_HEADER);
 
-    var priceMap = readItemPrices();
+    var priceMap = readItemPrices(defaultMax);
     var item = readItem();
 
     Component title = json.getComponent(KEY_TITLE);
@@ -89,7 +89,7 @@ public class MenuReader {
     return Slot.load(slotElement);
   }
 
-  private ItemPriceMap readItemPrices() {
+  private ItemPriceMap readItemPrices(int defaultMaxEarnings) {
     // Get path
     var pathString = json.getString(KEY_CONTENT_FILE);
     var path = directory.resolve(pathString);
@@ -97,7 +97,7 @@ public class MenuReader {
     // Ensure file at given path exists
     Validate.isTrue(Files.exists(path), "Given price file: '%s' does not exist", path);
 
-    return PriceMapReader.readFile(path);
+    return PriceMapReader.readFile(path, defaultMaxEarnings);
   }
 
   private MenuNodeItem readItem() {

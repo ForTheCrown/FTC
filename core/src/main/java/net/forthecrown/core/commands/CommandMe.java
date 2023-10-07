@@ -21,7 +21,7 @@ public class CommandMe extends FtcCommand {
 
     setAliases("me");
     setPermission(Permissions.DEFAULT);
-    setDescription("I have no idea what the point of this command is -Julie");
+    setDescription("Petty, please stop using this command");
 
     register();
   }
@@ -46,6 +46,11 @@ public class CommandMe extends FtcCommand {
         .addInfo("Broadcasts the <action> in chat")
         .addInfo("Lets you trick people into thinking you died")
         .addInfo("by doing '/me was blown up by Creeper'");
+  }
+
+  @Override
+  public String getHelpListName() {
+    return "me";
   }
 
   @Override

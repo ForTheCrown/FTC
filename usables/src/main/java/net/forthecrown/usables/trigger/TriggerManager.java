@@ -8,7 +8,9 @@ import java.util.Set;
 import lombok.Getter;
 import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.nbt.CompoundTag;
-import net.forthecrown.usables.trigger.Trigger.Type;
+import net.forthecrown.usables.trigger.AreaTrigger.Type;
+import net.forthecrown.usables.virtual.RegionAction;
+import net.forthecrown.usables.virtual.Triggers;
 import net.forthecrown.utils.collision.CollisionListener;
 import net.forthecrown.utils.collision.CollisionSystem;
 import net.forthecrown.utils.collision.CollisionSystems;
@@ -20,11 +22,11 @@ public class TriggerManager {
 
   private final Path file;
 
-  private final Map<String, Trigger> triggers = new Object2ObjectOpenHashMap<>();
+  private final Map<String, AreaTrigger> triggers = new Object2ObjectOpenHashMap<>();
 
   @Getter
-  private final CollisionSystem<Player, Trigger> collisionSystem;
-  private final WorldChunkMap<Trigger> chunkMap;
+  private final CollisionSystem<Player, AreaTrigger> collisionSystem;
+  private final WorldChunkMap<AreaTrigger> chunkMap;
 
   public TriggerManager(Path file) {
     this.chunkMap = new WorldChunkMap<>();
@@ -62,7 +64,7 @@ public class TriggerManager {
       var name = t.getKey();
       var tag = (CompoundTag) t.getValue();
 
-      Trigger trigger = new Trigger();
+      AreaTrigger trigger = new AreaTrigger();
       trigger.setName(name);
       trigger.load(tag);
 
@@ -70,7 +72,7 @@ public class TriggerManager {
     }
   }
 
-  public void remove(Trigger trigger) {
+  public void remove(AreaTrigger trigger) {
     if (triggers.remove(trigger.getName()) == null) {
       return;
     }
@@ -83,7 +85,7 @@ public class TriggerManager {
     }
   }
 
-  public void add(Trigger trigger) {
+  public void add(AreaTrigger trigger) {
     if (Strings.isNullOrEmpty(trigger.getName())) {
       throw new IllegalArgumentException("Attempted to add Trigger with empty name");
     }
@@ -100,7 +102,7 @@ public class TriggerManager {
     }
   }
 
-  public Trigger get(String name) {
+  public AreaTrigger get(String name) {
     return triggers.get(name);
   }
 
@@ -108,36 +110,70 @@ public class TriggerManager {
     return triggers.keySet();
   }
 
-  private static class TriggerCollisions implements CollisionListener<Player, Trigger> {
+  private static class TriggerCollisions implements CollisionListener<Player, AreaTrigger> {
 
     private static final Set<Type> VALID_ENTER_TYPES = Set.of(Type.ENTER, Type.EITHER, Type.MOVE);
     private static final Set<Type> VALID_EXIT_TYPES = Set.of(Type.EXIT, Type.EITHER, Type.MOVE);
 
-    @Override
-    public void onEnter(Player source, Trigger trigger) {
-      if (!VALID_ENTER_TYPES.contains(trigger.getType())) {
+    private static final Set<RegionAction> ON_ENTER = Set.of(
+        RegionAction.ON_REGION_ENTER,
+        RegionAction.ON_REGION_ENTER_EXIT,
+        RegionAction.ON_REGION_MOVE_INSIDE_OF
+    );
+
+    private static final Set<RegionAction> ON_EXIT = Set.of(
+        RegionAction.ON_REGION_EXIT,
+        RegionAction.ON_REGION_ENTER_EXIT,
+        RegionAction.ON_REGION_MOVE_INSIDE_OF
+    );
+
+    private static final Set<RegionAction> ON_MOVE_INSIDE = Set.of(
+        RegionAction.ON_REGION_MOVE_INSIDE_OF
+    );
+
+    private void runExternal(AreaTrigger trigger, Player player, Set<RegionAction> actions) {
+      var refs = trigger.getExternalTriggers().getAll(actions);
+
+      if (refs.isEmpty()) {
         return;
       }
 
-      trigger.interact(source);
+      Triggers.runReferences(
+          refs, player, null,
+          interaction -> {
+            var ctx = interaction.context();
+            ctx.put("triggerName", trigger.getName());
+            ctx.put("area", trigger.getArea());
+          },
+          null
+      );
     }
 
     @Override
-    public void onExit(Player source, Trigger trigger) {
-      if (!VALID_EXIT_TYPES.contains(trigger.getType())) {
-        return;
+    public void onEnter(Player source, AreaTrigger trigger) {
+      if (VALID_ENTER_TYPES.contains(trigger.getType())) {
+        trigger.interact(source);
       }
 
-      trigger.interact(source);
+      runExternal(trigger, source, ON_ENTER);
     }
 
     @Override
-    public void onMoveInside(Player source, Trigger trigger) {
-      if (trigger.getType() != Type.MOVE) {
-        return;
+    public void onExit(Player source, AreaTrigger trigger) {
+      if (VALID_EXIT_TYPES.contains(trigger.getType())) {
+        trigger.interact(source);
       }
 
-      trigger.interact(source);
+      runExternal(trigger, source, ON_EXIT);
+    }
+
+    @Override
+    public void onMoveInside(Player source, AreaTrigger trigger) {
+      if (trigger.getType() == Type.MOVE) {
+        trigger.interact(source);
+      }
+
+      runExternal(trigger, source, ON_MOVE_INSIDE);
     }
   }
 }

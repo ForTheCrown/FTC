@@ -33,25 +33,23 @@ public class CommandWorldLoader {
 
   public static final ArgumentOption<Integer> RADIUS_X
       = Options.argument(IntegerArgumentType.integer(1))
-      .addLabel("radius_x")
-      .mutuallyExclusiveWith(RADIUS)
+      .setLabel("radius_x")
       .build();
 
   public static final ArgumentOption<Integer> RADIUS_Z
       = Options.argument(IntegerArgumentType.integer(1))
-      .mutuallyExclusiveWith(RADIUS)
-      .requires(RADIUS_X)
-      .addLabel("radius_z")
+      .setLabel("radius_z")
       .build();
 
   public static final ArgumentOption<ParsedPosition> CENTER
       = Options.argument(ArgumentTypes.blockPosition2d(), "center");
 
   public static final OptionsArgument ARGS = OptionsArgument.builder()
-      .addOptional(CENTER)
-      .addOptional(RADIUS)
-      .addOptional(RADIUS_X)
-      .addOptional(RADIUS_Z)
+      .addRequired(RADIUS, e -> e.exclusiveWith(RADIUS_X, RADIUS_Z))
+
+      .addRequired(RADIUS_Z, e -> e.exclusiveWith(RADIUS).requires(RADIUS_X))
+      .addRequired(RADIUS_X, e -> e.exclusiveWith(RADIUS).requires(RADIUS_Z))
+
       .build();
 
   private static final Logger LOGGER = Loggers.getLogger();

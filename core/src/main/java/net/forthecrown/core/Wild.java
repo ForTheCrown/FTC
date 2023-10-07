@@ -10,7 +10,7 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.nio.file.Path;
 import java.util.Random;
 import java.util.Set;
-import net.forthecrown.McConstants;
+import net.forthecrown.Loggers;
 import net.forthecrown.command.Exceptions;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
@@ -23,8 +23,11 @@ import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
+import org.slf4j.Logger;
 
 public class Wild {
+
+  private static final Logger LOGGER = Loggers.getLogger();
 
   private final Path path;
   private final Random random;
@@ -33,6 +36,8 @@ public class Wild {
 
   private int maxRange = 15000;
   private int maxAttempts = 1024;
+
+  private boolean fallingWild = false;
 
   public Wild() {
     this.path = PathUtil.pluginPath("wild.toml");
@@ -104,13 +109,27 @@ public class Wild {
 
         validationY = y;
       } else {
-        y = McConstants.MAX_Y;
         validationY = world.getHighestBlockYAt(x, z, HeightMap.WORLD_SURFACE);
+
+        if (fallingWild) {
+          y = validationY + 100;
+        } else {
+          y = validationY;
+        }
+
+        // Decrement to prevent biome testing error, if we didn't do this, you might get
+        // teleported to an ocean biome, because the block above the water is a birch_forest
+        // or something, but below the water blocks is ocean
+        validationY--;
       }
 
       Biome biome = world.getBiome(x, validationY, z);
 
       if (bannedBiomes.contains(biome)) {
+        continue;
+      }
+
+      if (!isPassable(world, x, y, z) || !isPassable(world, x, y + 1, z)) {
         continue;
       }
 
@@ -149,6 +168,11 @@ public class Wild {
     maxAttempts = json.getInt("max_attempts", 1024);
 
     bannedBiomes.addAll(json.getList("banned_biomes", e -> JsonUtils.readEnum(Biome.class, e)));
+    fallingWild = json.getBool("falling_wild", false);
+  }
+
+  public boolean fallingWild() {
+    return fallingWild;
   }
 
   private interface PlayerFilter {

@@ -15,7 +15,7 @@ import net.forthecrown.usables.Condition;
 import net.forthecrown.usables.Interaction;
 import net.forthecrown.usables.UsableCodecs;
 import net.forthecrown.usables.UsableComponent;
-import net.forthecrown.usables.UsageType;
+import net.forthecrown.usables.ObjectType;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.scoreboard.Objective;
@@ -29,12 +29,12 @@ public class TestScore implements Condition {
 
   static final ArgumentOption<Objective> OBJ_ARG
       = Options.argument(ArgumentTypes.objective())
-      .addLabel("objective")
+      .setLabel("objective")
       .build();
 
   static final ArgumentOption<IntRange> BOUNDS_ARG
       = Options.argument(ArgumentTypes.intRange())
-      .addLabel("bounds")
+      .setLabel("bounds")
       .build();
 
   static final OptionsArgument PARSER = OptionsArgument.builder()
@@ -42,7 +42,7 @@ public class TestScore implements Condition {
       .addRequired(BOUNDS_ARG)
       .build();
 
-  public static final UsageType<TestScore> TYPE = BuiltType.<TestScore>builder()
+  public static final ObjectType<TestScore> TYPE = BuiltType.<TestScore>builder()
       .suggester(PARSER::listSuggestions)
       .parser((reader, source) -> {
         ParsedOptions options = PARSER.parse(reader);
@@ -99,7 +99,7 @@ public class TestScore implements Condition {
   }
 
   @Override
-  public UsageType<? extends UsableComponent> getType() {
+  public ObjectType<? extends UsableComponent> getType() {
     return TYPE;
   }
 

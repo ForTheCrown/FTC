@@ -6,8 +6,10 @@ import net.forthecrown.command.FtcCommand;
 import net.forthecrown.command.help.UsageFactory;
 import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.guilds.GuildPermissions;
+import net.forthecrown.guilds.GuildPlugin;
 import net.forthecrown.guilds.Guilds;
 import net.forthecrown.guilds.menu.GuildMenus;
+import net.kyori.adventure.text.Component;
 
 public class GuildCommands {
 
@@ -57,6 +59,14 @@ public class GuildCommands {
 
     @Override
     public void populateUsages(UsageFactory factory) {
+      factory.usage("reload")
+          .setPermission(GuildPermissions.GUILD_ADMIN)
+          .addInfo("Reloads the Guilds plugin");
+
+      factory.usage("reload-config")
+          .setPermission(GuildPermissions.GUILD_ADMIN)
+          .addInfo("Reloads the Guilds config");
+
       for (var n: NODES) {
         for (var name: n.getArgumentName()) {
           var prefixed = factory.withPrefix(name)
@@ -95,6 +105,30 @@ public class GuildCommands {
       }
 
       command
+          .then(literal("reload")
+              .requires(source -> source.hasPermission(GuildPermissions.GUILD_ADMIN))
+
+              .executes(c -> {
+                GuildPlugin plugin = Guilds.getPlugin();
+                plugin.reloadConfig();
+                plugin.getManager().load();
+
+                c.getSource().sendSuccess(Component.text("Reloaded guilds plugin"));
+                return 0;
+              })
+          )
+
+          .then(literal("reload-config")
+              .requires(source -> source.hasPermission(GuildPermissions.GUILD_ADMIN))
+
+              .executes(c -> {
+                GuildPlugin plugin = Guilds.getPlugin();
+                plugin.reloadConfig();
+                c.getSource().sendSuccess(Component.text("Reloaded guilds config"));
+                return 0;
+              })
+          )
+
           .executes(context -> {
             var user = getUserSender(context);
 

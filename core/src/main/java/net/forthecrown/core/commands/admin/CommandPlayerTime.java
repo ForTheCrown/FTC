@@ -11,7 +11,6 @@ import net.forthecrown.command.FtcCommand;
 import net.forthecrown.command.arguments.Arguments;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.GrenadierCommand;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 public class CommandPlayerTime extends FtcCommand {
@@ -21,6 +20,7 @@ public class CommandPlayerTime extends FtcCommand {
 
     setAliases("ptime");
     setPermission(Permissions.ADMIN);
+    setDescription("Changes the game time for a player");
 
     register();
   }
@@ -74,7 +74,8 @@ public class CommandPlayerTime extends FtcCommand {
     return literal(name)
         .executes(c -> {
           Player player = get(c);
-          long timeAdd = player.getWorld().getFullTime() - (player.getPlayerTime() % TICKS_PER_DAY);
+          long worldTime = player.getWorld().getFullTime();
+          long timeAdd = worldTime - (worldTime % TICKS_PER_DAY);
           long time = timeAdd + multiplier;
 
           return setTime(c.getSource(), player, time);
@@ -83,10 +84,8 @@ public class CommandPlayerTime extends FtcCommand {
 
   int timeThing(CommandContext<CommandSource> c, boolean add) throws CommandSyntaxException {
     int time = c.getArgument("time", Integer.class);
-    World world = c.getSource().getWorld();
     Player player = get(c);
-
-    long actualTime = time + (add ? world.getFullTime() : 0);
+    long actualTime = time + (add ? player.getPlayerTime() : 0);
     return setTime(c.getSource(), player, actualTime);
   }
 

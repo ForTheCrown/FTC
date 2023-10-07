@@ -7,14 +7,15 @@ import java.util.function.Predicate;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.forthecrown.utils.math.WorldBounds3i;
+import net.forthecrown.utils.math.AreaSelection;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 
 @Getter
 public class StructureFillConfig {
 
-  private final WorldBounds3i area;
+  private final AreaSelection area;
+
   private final boolean includingFunctionBlocks;
   private final Predicate<Block> blockPredicate;
   private final Predicate<Entity> entityPredicate;
@@ -23,6 +24,7 @@ public class StructureFillConfig {
 
   private StructureFillConfig(Builder builder) {
     this.area = Objects.requireNonNull(builder.area);
+
     this.blockPredicate = builder.blockPredicate;
     this.entityPredicate = builder.entityPredicate;
     this.includingFunctionBlocks = builder.includeFunctionBlocks;
@@ -55,7 +57,8 @@ public class StructureFillConfig {
   @Getter
   public static class Builder {
 
-    private WorldBounds3i area;
+    private AreaSelection area;
+
     private boolean includeFunctionBlocks;
     private Predicate<Block> blockPredicate = block -> true;
     private Predicate<Entity> entityPredicate = entity -> true;

@@ -1,5 +1,6 @@
 package net.forthecrown.scripts;
 
+import com.mojang.datafixers.util.Unit;
 import java.util.Optional;
 import java.util.function.Function;
 import net.forthecrown.utils.Result;
@@ -100,4 +101,14 @@ public interface ExecResult<T> {
    * @throws IllegalStateException If this result is a failed result
    */
   void throwIfError() throws IllegalStateException;
+
+  /**
+   * Converts this execution result to a regular result.
+   * <p>
+   * If this result is a success (indicated with {@link #isSuccess()}) But the return value itself
+   * is {@code null}, then this result will return the {@link Unit} instance
+   *
+   * @return Converted result
+   */
+  Result<T> toRegularResult();
 }

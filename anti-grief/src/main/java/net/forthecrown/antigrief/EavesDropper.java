@@ -187,7 +187,7 @@ public final class EavesDropper {
     });
 
     ch.filterTargets(audience -> {
-      return !Audiences.equals(source, audience) && !targets.contains(audience);
+      return !Audiences.equals(source, audience) && !Audiences.contains(audience, targets);
     });
 
     ch.send();

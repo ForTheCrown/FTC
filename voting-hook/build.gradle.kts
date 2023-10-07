@@ -7,6 +7,7 @@ repositories {
 
   // VotingPlugin
   maven("https://nexus.bencodez.com/repository/maven-public")
+  maven("https://nexuslite.gcnt.net/repos/other/")
 }
 
 dependencies {

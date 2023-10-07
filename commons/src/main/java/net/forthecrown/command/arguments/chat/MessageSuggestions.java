@@ -50,9 +50,16 @@ public class MessageSuggestions {
 
     while (reader.canRead()) {
       if (peekMatches('<', ChatParseFlag.GRADIENTS.getPermission())) {
-        suggestGradient();
+        suggestSquareBracketFunction();
         continue;
       }
+/*
+      if (peekMatches('@', ChatParseFlag.TAGGING.getPermission())) {
+        reader.skip();
+        suggest(reader.getCursor(), this::suggestPlayers);
+        reader.readUnquotedString();
+        continue;
+      }*/
 
       if (peekMatches('&', ChatParseFlag.COLORS.getPermission())) {
         suggestColorCode();
@@ -135,7 +142,7 @@ public class MessageSuggestions {
     }
   }
 
-  private void suggestGradient() {
+  private void suggestSquareBracketFunction() {
     suggest(reader.getCursor(), (builder, source) -> {
       Completions.suggest(builder, GRADIENT_START);
     });

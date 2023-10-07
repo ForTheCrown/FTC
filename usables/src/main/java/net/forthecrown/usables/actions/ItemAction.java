@@ -19,7 +19,7 @@ import net.forthecrown.usables.Action;
 import net.forthecrown.usables.Interaction;
 import net.forthecrown.usables.UsableComponent;
 import net.forthecrown.usables.Usables;
-import net.forthecrown.usables.UsageType;
+import net.forthecrown.usables.ObjectType;
 import net.forthecrown.usables.objects.Kit;
 import net.forthecrown.usables.objects.UsableObject;
 import net.forthecrown.utils.inventory.ItemList;
@@ -32,8 +32,8 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 public class ItemAction implements Action {
 
-  public static final UsageType<ItemAction> GIVE_TYPE = new ItemActionType(true);
-  public static final UsageType<ItemAction> REMOVE_TYPE = new ItemActionType(false);
+  public static final ObjectType<ItemAction> GIVE_TYPE = new ItemActionType(true);
+  public static final ObjectType<ItemAction> REMOVE_TYPE = new ItemActionType(false);
 
   private final boolean give;
   private final ItemList list;
@@ -59,7 +59,7 @@ public class ItemAction implements Action {
   }
 
   @Override
-  public UsageType<? extends UsableComponent> getType() {
+  public ObjectType<? extends UsableComponent> getType() {
     return give ? GIVE_TYPE : REMOVE_TYPE;
   }
 
@@ -69,7 +69,7 @@ public class ItemAction implements Action {
   }
 }
 
-class ItemActionType implements UsageType<ItemAction> {
+class ItemActionType implements ObjectType<ItemAction> {
 
   private final boolean give;
 

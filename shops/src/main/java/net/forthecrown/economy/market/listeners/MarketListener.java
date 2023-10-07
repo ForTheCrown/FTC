@@ -3,10 +3,12 @@ package net.forthecrown.economy.market.listeners;
 import static net.kyori.adventure.text.Component.newline;
 import static net.kyori.adventure.text.Component.text;
 
+import net.forthecrown.Loggers;
 import net.forthecrown.economy.market.MarketEviction;
 import net.forthecrown.economy.market.MarketManager;
 import net.forthecrown.economy.market.MarketShop;
 import net.forthecrown.economy.market.ShopEntrance;
+import net.forthecrown.events.DayChangeEvent;
 import net.forthecrown.text.Text;
 import net.forthecrown.text.UnitFormat;
 import net.forthecrown.user.User;
@@ -24,9 +26,12 @@ import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataHolder;
 import org.bukkit.persistence.PersistentDataType;
+import org.slf4j.Logger;
 import org.spongepowered.math.vector.Vector3i;
 
 public class MarketListener implements Listener {
+
+  private static final Logger LOGGER = Loggers.getLogger();
 
   private final MarketManager manager;
 
@@ -40,6 +45,19 @@ public class MarketListener implements Listener {
       marketEviction.run();
     }
     manager.getAwaitingExecution().clear();
+  }
+
+  @EventHandler(ignoreCancelled = true)
+  public void onDayChange(DayChangeEvent event) {
+    if (!manager.getPlugin().getShopConfig().isAutoEvictEnabled()) {
+      return;
+    }
+
+    LOGGER.debug("Running market ownership validation");
+
+    for (var market : manager.getOwnedShops()) {
+      market.validateOwnership();
+    }
   }
 
   @EventHandler(ignoreCancelled = true)

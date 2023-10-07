@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
-import org.bukkit.event.EventException;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -100,15 +99,12 @@ public class EventsExtension extends ScriptExtension {
     private final boolean ignoreCancelled;
 
     @Override
-    public void execute(@NotNull Listener listener, @NotNull Event event) throws EventException {
+    public void execute(@NotNull Listener listener, @NotNull Event event) {
       if (!type.isInstance(event)) {
         return;
       }
 
-      if (event instanceof Cancellable c
-          && c.isCancelled()
-          && ignoreCancelled
-      ) {
+      if (event instanceof Cancellable c && c.isCancelled() && ignoreCancelled) {
         return;
       }
 

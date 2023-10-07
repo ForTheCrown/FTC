@@ -158,6 +158,16 @@ public class Result<V> {
     return error != null ? value : this.value;
   }
 
+  public void applyError(Consumer<String> errorConsumer) {
+    Objects.requireNonNull(errorConsumer);
+
+    if (error == null) {
+      return;
+    }
+
+    errorConsumer.accept(error);
+  }
+
   /**
    * Either report's this result to the specified {@code errors} logger or calls
    * the specified {@code consumer}, depending on if this is an error result or
@@ -167,6 +177,9 @@ public class Result<V> {
    * @param consumer Value consumer
    */
   public void apply(Consumer<String> errorConsumer, Consumer<V> consumer) {
+    Objects.requireNonNull(errorConsumer, "Null error consumer");
+    Objects.requireNonNull(consumer, "Null consumer");
+
     if (error != null) {
       errorConsumer.accept(error);
       return;

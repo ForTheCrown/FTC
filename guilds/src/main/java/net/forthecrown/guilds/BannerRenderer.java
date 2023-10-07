@@ -16,7 +16,7 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 import lombok.Getter;
 import net.forthecrown.Loggers;
-import net.forthecrown.utils.MinecraftAssetDownloader;
+import net.forthecrown.guilds.util.MinecraftAssetDownloader;
 import net.forthecrown.utils.VanillaAccess;
 import net.forthecrown.utils.io.PathUtil;
 import org.apache.commons.lang3.Validate;
@@ -63,7 +63,9 @@ public class BannerRenderer {
     assetsPath = Path.of("mc_assets");
 
     // Get the banner directory
-    this.bannerTextureDirectory = assetsPath.resolve("minecraft")
+    this.bannerTextureDirectory = assetsPath
+        .resolve("assets")
+        .resolve("minecraft")
         .resolve("textures")
         .resolve("entity")
         .resolve("banner");
@@ -73,7 +75,7 @@ public class BannerRenderer {
     if (shouldDownloadAssets()) {
       PathUtil.safeDelete(assetsPath);
 
-      MinecraftAssetDownloader.download(assetsPath, "latest");
+      MinecraftAssetDownloader.download(assetsPath, "latest.release");
 
       Files.writeString(
           assetsPath.resolve("version.txt"),

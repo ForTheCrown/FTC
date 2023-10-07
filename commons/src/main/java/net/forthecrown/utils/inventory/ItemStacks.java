@@ -1,9 +1,5 @@
 package net.forthecrown.utils.inventory;
 
-import com.google.common.base.Strings;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
 import it.unimi.dsi.fastutil.Hash;
 import it.unimi.dsi.fastutil.Hash.Strategy;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
@@ -15,19 +11,13 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.nbt.BinaryTag;
-import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.nbt.CompoundTag;
-import net.forthecrown.nbt.ListTag;
-import net.forthecrown.nbt.TagTypes;
 import net.forthecrown.nbt.paper.ItemNbtProvider;
 import net.forthecrown.nbt.paper.PaperNbt;
 import net.forthecrown.nbt.string.Snbt;
 import net.forthecrown.nbt.string.TagParseException;
-import net.forthecrown.text.Text;
 import net.forthecrown.utils.AbstractListIterator;
 import net.forthecrown.utils.VanillaAccess;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.minecraft.util.datafix.DataFixers;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -187,58 +177,7 @@ public final class ItemStacks {
       tag.putInt(DATA_VERSION_TAG, VanillaAccess.getDataVersion());
     }
 
-    if (tag.contains("tag")) {
-      var display = tag.getCompound("tag").get("display");
-
-      if (display != null && display.isCompound()) {
-        fixDisplayTags(display.asCompound());
-      }
-    }
-
     return PaperNbt.loadItem(tag);
-  }
-
-  private static void fixDisplayTags(CompoundTag display) {
-    String name = display.getString("Name");
-
-    if (!Strings.isNullOrEmpty(name)) {
-      display.putString("Name", fixJsonString(name));
-    }
-
-    ListTag list = display.getList("Lore", TagTypes.stringType());
-
-    if (list.isEmpty()) {
-      return;
-    }
-
-    for (int i = 0; i < list.size(); i++) {
-      var n = list.get(i);
-
-      if (!n.isString()) {
-        continue;
-      }
-
-      String s = n.asString().value();
-      s = fixJsonString(s);
-
-      list.set(i, BinaryTags.stringTag(s));
-    }
-
-    display.put("Lore", list);
-  }
-
-  private static String fixJsonString(String json) {
-    Component text = GsonComponentSerializer.gson().deserialize(json);
-    String plain = Text.plain(text);
-
-    try {
-      JsonElement element = JsonParser.parseString(plain);
-      Objects.requireNonNull(element);
-
-      return plain;
-    } catch (JsonSyntaxException exc) {
-      return json;
-    }
   }
 
   /**

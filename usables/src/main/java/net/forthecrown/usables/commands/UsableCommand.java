@@ -5,6 +5,7 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
 import java.util.List;
 import java.util.function.Predicate;
 import lombok.Getter;
@@ -96,7 +97,14 @@ public abstract class UsableCommand<H extends UsableObject> extends FtcCommand {
     if (argumentType == null) {
       edit = builder;
     } else {
-      edit = argument(argName, argumentType);
+      var req = argument(argName, argumentType);
+      var suggester = getSuggestions();
+
+      if (suggester != null) {
+        req.suggests(suggester);
+      }
+
+      edit = req;
     }
 
     createEditArguments((ArgumentBuilder) edit, provider);
@@ -104,6 +112,10 @@ public abstract class UsableCommand<H extends UsableObject> extends FtcCommand {
     if (builder != edit) {
       builder.then(edit);
     }
+  }
+
+  protected SuggestionProvider<CommandSource> getSuggestions() {
+    return null;
   }
 
   protected void addPrefixedArguments(LiteralArgumentBuilder<CommandSource> builder) {

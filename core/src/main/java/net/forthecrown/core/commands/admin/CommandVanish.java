@@ -89,7 +89,7 @@ public class CommandVanish {
   }
 
   void joinLeaveMessage(User user, boolean vanished) {
-    if (user.isOnline()) {
+    if (!user.isOnline()) {
       return;
     }
 

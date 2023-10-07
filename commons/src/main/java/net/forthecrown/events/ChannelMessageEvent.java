@@ -4,12 +4,14 @@ import java.util.Objects;
 import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
+import net.forthecrown.text.ViewerAwareMessage;
+import net.forthecrown.text.channel.ChannelMessageState;
 import net.forthecrown.text.channel.ChannelledMessage;
 import net.forthecrown.text.channel.MessageRenderer;
-import net.forthecrown.text.ViewerAwareMessage;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.Audiences;
 import net.kyori.adventure.audience.Audience;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -43,9 +45,6 @@ public class ChannelMessageEvent extends Event implements Cancellable {
    */
   private final Audience source;
 
-  @Getter @Setter
-  private boolean cancelled;
-
   /**
    * A set of audiences that will view the message.
    * <p>
@@ -70,7 +69,12 @@ public class ChannelMessageEvent extends Event implements Cancellable {
 
   private final MessageRenderer renderer;
 
+  @Getter @Setter
+  private ChannelMessageState state;
+
   public ChannelMessageEvent(ChannelledMessage message) {
+    super(!Bukkit.isPrimaryThread());
+
     this.initialMessage = message.getMessage();
     this.message        = message.getMessage();
     this.source         = message.getSource();
@@ -79,6 +83,18 @@ public class ChannelMessageEvent extends Event implements Cancellable {
     this.shownToSender  = message.isShownToSender();
     this.announcement   = message.isAnnouncement();
     this.renderer       = message.getRenderer();
+
+    this.state = ChannelMessageState.FINE;
+  }
+
+  @Override
+  public boolean isCancelled() {
+    return state != ChannelMessageState.FINE;
+  }
+
+  @Override
+  public void setCancelled(boolean cancel) {
+    this.state = cancel ? ChannelMessageState.CANCELLED : ChannelMessageState.FINE;
   }
 
   /**

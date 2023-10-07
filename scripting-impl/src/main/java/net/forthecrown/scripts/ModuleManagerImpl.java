@@ -11,12 +11,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import net.forthecrown.Loggers;
 import net.forthecrown.scripts.module.ImportInfo;
 import net.forthecrown.scripts.module.ImportInfo.BindingImport;
 import net.forthecrown.scripts.module.JsModule;
 import net.forthecrown.scripts.module.ModuleManager;
 import net.forthecrown.scripts.module.ScriptModule;
 import net.forthecrown.scripts.module.ScriptableModule;
+import net.forthecrown.scripts.modules.ScoreboardModule;
 import net.forthecrown.utils.Result;
 import net.forthecrown.utils.io.source.Source;
 import net.forthecrown.utils.io.source.Sources;
@@ -24,8 +26,11 @@ import org.mozilla.javascript.NativeJavaClass;
 import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
+import org.slf4j.Logger;
 
 class ModuleManagerImpl implements ModuleManager {
+
+  private static final Logger LOGGER = Loggers.getLogger();
 
   private final Map<String, JsModule> moduleMap = new Object2ObjectOpenHashMap<>();
   private final ScriptManager service;
@@ -35,7 +40,7 @@ class ModuleManagerImpl implements ModuleManager {
   }
 
   public void addBuiltIns() {
-    //addModule("scoreboard", ScoreboardModule.MODULE);
+    addModule("scoreboard", ScoreboardModule.MODULE);
   }
 
   @Override
@@ -57,6 +62,11 @@ class ModuleManagerImpl implements ModuleManager {
   @Override
   public Optional<JsModule> getModule(String name) {
     return Optional.ofNullable(moduleMap.get(name));
+  }
+
+  @Override
+  public void remove(String moduleName) {
+    moduleMap.remove(moduleName);
   }
 
   @Override
@@ -103,7 +113,7 @@ class ModuleManagerImpl implements ModuleManager {
       return classImport.mapError(err -> "Failed to import '" + path + "' as class: " + err);
     }
 
-    return Result.error("Couldn't find any class/script file/module matching the name '%s'", path);
+    return Result.error("Couldn't find any class/script-file/module matching the name '%s'", path);
   }
 
   Result<JsModule> tryImportClass(Script script, String path) {
@@ -166,16 +176,18 @@ class ModuleManagerImpl implements ModuleManager {
 
   Result<JsModule> findScriptModule(Script script, String path) {
     String fName = path + (path.endsWith(".js") ? "" : ".js");
+
+    Path dir = script.getWorkingDirectory();
     Path relative = script.getWorkingDirectory().resolve(fName);
 
     if (Files.exists(relative)) {
-      Source source = Sources.fromPath(relative, service.getScriptsDirectory());
+      Source source = Sources.fromPath(relative, dir);
       return loadModule(source, script);
     }
 
     Path scriptFile = service.getScriptsDirectory().resolve(fName);
     if (Files.exists(scriptFile)) {
-      Source source = Sources.fromPath(scriptFile, service.getScriptsDirectory());
+      Source source = Sources.fromPath(scriptFile, dir);
       return loadModule(source, script);
     }
 
@@ -183,13 +195,14 @@ class ModuleManagerImpl implements ModuleManager {
   }
 
   Result<JsModule> loadModule(Source source, Script script) {
-    Script importedScript = service.newScript(source);
+    ScriptLoader loader = script.getLoader();
+    Script importedScript = loader.loadScript(source);
 
     try {
       importedScript.compile();
     } catch (Throwable t) {
       importedScript.getLogger().error("Failed to compile", t);
-      return Result.error("Script compilation failed");
+      return Result.error("Script loading failed");
     }
 
     var evalResult = importedScript.evaluate();
@@ -229,6 +242,8 @@ class ModuleManagerImpl implements ModuleManager {
           ScriptableObject.putConstProperty(scope, id.toString(), value);
         }
       }
+
+      return Result.success(Unit.INSTANCE);
     }
 
     Scriptable dest;
@@ -277,5 +292,12 @@ class ModuleManagerImpl implements ModuleManager {
     }
 
     return Result.success(value);
+  }
+
+  public void close() {
+    moduleMap.forEach((string, jsModule) -> {
+      jsModule.close();
+    });
+    moduleMap.clear();
   }
 }

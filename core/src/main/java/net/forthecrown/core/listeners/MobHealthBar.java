@@ -1,5 +1,6 @@
 package net.forthecrown.core.listeners;
 
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.function.Consumer;
 import net.forthecrown.Worlds;
 import net.forthecrown.core.CorePlugin;
 import net.forthecrown.text.Text;
+import net.forthecrown.utils.PluginUtil;
 import net.forthecrown.utils.Tasks;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -151,22 +153,27 @@ public class MobHealthBar implements Listener {
 
     HIT_MARKERS.add(entity);
 
-    Tasks.runTimer(new Consumer<>() {
-      int ticks = 12;
+    entity.getScheduler().runAtFixedRate(
+        PluginUtil.getPlugin(),
+        new Consumer<>() {
+          int ticks = 12;
 
-      @Override
-      public void accept(BukkitTask task) {
-        if (--ticks < 0) {
-          Tasks.cancel(task);
-          entity.remove();
-          HIT_MARKERS.remove(entity);
+          @Override
+          public void accept(ScheduledTask task) {
+            if (--ticks < 0) {
+              task.cancel();
+              entity.remove();
+              HIT_MARKERS.remove(entity);
 
-          return;
-        }
+              return;
+            }
 
-        entity.teleport(entity.getLocation().add(0, 0.05D, 0));
-      }
-    }, 1, 1);
+            entity.teleport(entity.getLocation().add(0, 0.05D, 0));
+          }
+        },
+        entity::remove,
+        1, 1
+    );
   }
 
   private static TextColor damageColor(double dmg) {

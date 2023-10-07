@@ -55,18 +55,6 @@ public class MarketManager {
 
   /* ----------------------------- METHODS ------------------------------ */
 
-  void onDayChange() {
-    if (!plugin.getShopConfig().isAutoEvictEnabled()) {
-      return;
-    }
-
-    LOGGER.debug("Running market ownership validation");
-
-    for (var market : byOwner.values()) {
-      market.validateOwnership();
-    }
-  }
-
   /**
    * Gets a shop by the shop owner's UUID
    *
@@ -214,6 +202,10 @@ public class MarketManager {
    */
   public Collection<MarketShop> getAllShops() {
     return byName.values();
+  }
+
+  public Collection<MarketShop> getOwnedShops() {
+    return byOwner.values();
   }
 
   public boolean isEmpty() {

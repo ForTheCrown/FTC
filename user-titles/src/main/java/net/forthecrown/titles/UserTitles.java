@@ -40,10 +40,9 @@ import org.slf4j.Logger;
 public class UserTitles implements UserComponent {
   private static final Logger LOGGER = Loggers.getLogger();
 
-  public static final String
-      KEY_TITLE = "title",
-      KEY_AVAILABLE = "titles",
-      KEY_TIER = "tier";
+  public static final String KEY_TITLE = "title";
+  public static final String KEY_AVAILABLE = "titles";
+  public static final String KEY_TIER = "tier";
 
   /* ----------------------------- INSTANCE FIELDS ------------------------------ */
 
@@ -277,21 +276,6 @@ public class UserTitles implements UserComponent {
    */
   public void ensureSynced() throws UserOfflineException {
     user.ensureOnline();
-/*
-    user.getDiscordMember().ifPresent(member -> {
-      OffsetDateTime boostStart = member.getTimeBoosted();
-      Optional<UserRank> boostTitle = REGISTRY.get("booster");
-
-      if (boostTitle.isEmpty()) {
-        return;
-      }
-
-      if (boostStart == null) {
-        removeTitle(boostTitle.get());
-      } else {
-        addTitle(boostTitle.get());
-      }
-    });*/
 
     var values = RankTier.values();
     ArrayUtils.reverse(values);

@@ -86,14 +86,14 @@ public class BlockPalette {
       ++blocks;
     }
 
-    for (var e : area.getEntities()) {
+    area.entities().forEachRemaining(e -> {
       if (!config.includeEntity(e)) {
-        continue;
+        return;
       }
 
       EntityInfo info = EntityInfo.of(origin, e);
       this.entities.add(info);
-    }
+    });
 
     Loggers.getLogger().info("Scanned {} blocks and {} entities",
         blocks, entities.size()

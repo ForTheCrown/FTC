@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.forthecrown.Loggers;
 import net.forthecrown.economy.EconMessages;
+import net.forthecrown.economy.signshops.event.ShopPostUseEvent;
 import net.forthecrown.text.Text;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
@@ -88,6 +89,8 @@ public class SignShopSession {
     customer.sendMessage(EconMessages.sessionInteraction(this));
     growAmount(getExampleItem().getAmount());
     shop.setLastInteraction(System.currentTimeMillis());
+
+    new ShopPostUseEvent(customer, shop).callEvent();
   }
 
   /**

@@ -6,13 +6,13 @@ import net.forthecrown.usables.BuiltType;
 import net.forthecrown.usables.Condition;
 import net.forthecrown.usables.Interaction;
 import net.forthecrown.usables.UsableComponent;
-import net.forthecrown.usables.UsageType;
+import net.forthecrown.usables.ObjectType;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
 public class TestNeverUsed implements Condition {
 
-  public static final UsageType<TestNeverUsed> TYPE = BuiltType.<TestNeverUsed>builder()
+  public static final ObjectType<TestNeverUsed> TYPE = BuiltType.<TestNeverUsed>builder()
       .emptyFactory(() -> new TestNeverUsed(false))
       .loader(dynamic -> {
         boolean b = dynamic.asBoolean(false);
@@ -40,7 +40,7 @@ public class TestNeverUsed implements Condition {
   }
 
   @Override
-  public UsageType<? extends UsableComponent> getType() {
+  public ObjectType<? extends UsableComponent> getType() {
     return TYPE;
   }
 

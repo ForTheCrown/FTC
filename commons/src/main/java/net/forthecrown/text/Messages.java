@@ -96,11 +96,6 @@ public interface Messages {
   TextComponent CLICK_ME = text("Click me!");
 
   /**
-   * Uncategorized text which says that special items cannot be dropped
-   */
-  TextComponent CANNOT_DROP_SPECIAL = text("Cannot drop special item!", NamedTextColor.RED);
-
-  /**
    * Uncategorized message which states that all-caps messages cannot be sent
    */
   TextComponent ALL_CAPS = text("Please do not send all caps messages.", NamedTextColor.GRAY);
@@ -329,8 +324,8 @@ public interface Messages {
    * @param target The Target that accepted the request
    * @return The formatted message
    */
-  static Component requestAccepted(User target) {
-    return format("&e{0, user}&r accepted your request.",
+  static Component requestAccepted(Component target) {
+    return format("&e{0}&r accepted your request.",
         NamedTextColor.GOLD, target
     );
   }
@@ -342,8 +337,8 @@ public interface Messages {
    * @param target The user that denied the request
    * @return The formatted message
    */
-  static Component requestDenied(User target) {
-    return format("&6{0, user}&r denied your request.",
+  static Component requestDenied(Component target) {
+    return format("&6{0}&r denied your request.",
         NamedTextColor.GRAY, target
     );
   }

@@ -9,7 +9,7 @@ import net.forthecrown.usables.BuiltType;
 import net.forthecrown.usables.Condition;
 import net.forthecrown.usables.Interaction;
 import net.forthecrown.usables.UsableComponent;
-import net.forthecrown.usables.UsageType;
+import net.forthecrown.usables.ObjectType;
 import net.forthecrown.utils.io.FtcCodecs;
 import net.forthecrown.utils.io.Results;
 import net.kyori.adventure.text.Component;
@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class TestWorld implements Condition {
 
-  public static final UsageType<TestWorld> TYPE = BuiltType.<TestWorld>builder()
+  public static final ObjectType<TestWorld> TYPE = BuiltType.<TestWorld>builder()
       .parser((reader, source) -> new TestWorld(ArgumentTypes.world().parse(reader)))
       .suggester((context, builder) -> ArgumentTypes.world().listSuggestions(context,builder))
 
@@ -84,7 +84,7 @@ public class TestWorld implements Condition {
   }
 
   @Override
-  public UsageType<? extends UsableComponent> getType() {
+  public ObjectType<? extends UsableComponent> getType() {
     return TYPE;
   }
 

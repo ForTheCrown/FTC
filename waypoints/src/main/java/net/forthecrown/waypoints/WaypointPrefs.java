@@ -10,20 +10,14 @@ import net.forthecrown.user.UserProperty;
 
 public class WaypointPrefs {
 
-  public static final UserProperty<Boolean> INVITES_ALLOWED = Properties.booleanProperty()
-      .key("regionInvites")
-      .defaultValue(true)
-      .build();
+  public static final UserProperty<Boolean> INVITES_ALLOWED
+      = Properties.booleanProperty("regionInvites", true);
 
-  public static final UserProperty<Boolean> HULK_SMASH_ENABLED = Properties.booleanProperty()
-      .key("hulkSmash")
-      .defaultValue(true)
-      .build();
+  public static final UserProperty<Boolean> HULK_SMASH_ENABLED
+      = Properties.booleanProperty("hulkSmash", true);
 
-  public static final UserProperty<Boolean> HULK_SMASHING = Properties.booleanProperty()
-      .key("hulkSmashing")
-      .defaultValue(false)
-      .build();
+  public static final UserProperty<Boolean> HULK_SMASHING
+      = Properties.booleanProperty("hulkSmashing", false);
 
   public static final UserProperty<UUID> HOME_PROPERTY = Properties.uuidProperty()
       .key("homeWaypoint")

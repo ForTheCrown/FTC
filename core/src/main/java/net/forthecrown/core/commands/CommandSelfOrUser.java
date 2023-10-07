@@ -15,7 +15,6 @@ import net.forthecrown.utils.inventory.ItemStacks;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
@@ -122,7 +121,7 @@ public class CommandSelfOrUser extends FtcCommand {
         "Opens a menu to dispose of items for %s",
         CorePermissions.DISPOSAL,
         (user, source, self) -> {
-          Inventory inv = Bukkit.createInventory(null, InventoryType.DISPENSER, CoreMessages.DISPOSAL);
+          Inventory inv = Bukkit.createInventory(null, 54, CoreMessages.DISPOSAL);
           user.getPlayer().openInventory(inv);
 
           return 0;

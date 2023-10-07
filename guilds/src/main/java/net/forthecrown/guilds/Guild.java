@@ -34,6 +34,7 @@ import net.forthecrown.text.TextWriter;
 import net.forthecrown.text.TextWriters;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
+import net.forthecrown.user.name.DisplayIntent;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
@@ -216,9 +217,10 @@ public class Guild implements InventoryHolder, HoverEventSource<Component> {
   public void sendMessage(ComponentLike like) {
     ChannelledMessage.create(viewer -> Text.valueOf(like, viewer))
         .setChannelName("guild_forwarding/" + id)
+        .setAnnouncement(true)
         .addTargets(getOnlineMembers())
         .setRenderer((viewer, baseMessage) -> {
-          return Component.textOfChildren(displayName(), space(), baseMessage);
+          return Component.textOfChildren(getPrefix(), baseMessage);
         })
         .send();
   }
@@ -258,7 +260,7 @@ public class Guild implements InventoryHolder, HoverEventSource<Component> {
   public void writeHover(TextWriter writer) {
     User leader = getLeader().getUser();
 
-    writer.field("Leader", leader.displayName(writer.viewer()));
+    writer.field("Leader", leader.displayName(writer.viewer(), DisplayIntent.HOVER_TEXT));
     writer.field("Total Exp", Text.formatNumber(getTotalExp()));
     writer.field("Created", Text.formatDate(getCreationTimeStamp()));
     writer.field("Members", Text.formatNumber(getMemberSize()));

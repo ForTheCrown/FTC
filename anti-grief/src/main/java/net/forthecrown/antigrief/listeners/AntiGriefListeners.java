@@ -2,6 +2,7 @@ package net.forthecrown.antigrief.listeners;
 
 import static net.forthecrown.events.Events.register;
 
+import github.scarsz.discordsrv.DiscordSRV;
 import net.forthecrown.antigrief.AntiGriefPlugin;
 
 public final class AntiGriefListeners {
@@ -16,5 +17,7 @@ public final class AntiGriefListeners {
     register(new LoginListener());
     register(new ServerLoadListener());
     register(new VeinListener(plugin));
+
+    DiscordSRV.api.subscribe(new StaffChatDiscordListener());
   }
 }

@@ -3,10 +3,13 @@ package net.forthecrown.core;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.util.Map;
 import java.util.UUID;
 import net.forthecrown.datafix.DataUpdater;
 import net.forthecrown.datafix.DataUpdaters;
@@ -198,22 +201,65 @@ class MailUpdate extends DataUpdater {
 class UserUpdate extends DataUpdater {
 
   @Override
-  protected boolean update() {
+  protected boolean update() throws IOException {
     Path userdata = PathUtil.pluginPath("userdata");
 
-    return iterateDirectory(userdata, true, true, path -> {
+    Map<UUID, JsonWrapper> profileData = new Object2ObjectOpenHashMap<>();
+    loadProfiles(profileData);
+
+    boolean iterResult = iterateDirectory(userdata, true, true, path -> {
       logger.info("Transforming userdata: {}", path);
 
       JsonObject object = JsonUtils.readFileObject(path);
+      var idResult = PathUtil.getFilenameUUID(path);
+
+      if (idResult.result().isEmpty()) {
+        logger.error("Found non-user file in userdata directory: {}", path);
+        return;
+      }
+
       JsonWrapper json = JsonWrapper.wrap(object);
-      transformData(json);
+      transformData(json, idResult.result().get(), profileData);
       JsonUtils.writeFile(object, path);
 
       logger.info("Completed transformation of {}'s data", path);
     });
+
+    saveProfiles(profileData);
+
+    return iterResult;
   }
 
-  private void transformData(JsonWrapper json) {
+  void saveProfiles(Map<UUID, JsonWrapper> map) throws IOException {
+    JsonArray array = new JsonArray();
+    for (JsonWrapper value : map.values()) {
+      array.add(value.getSource());
+    }
+
+    JsonUtils.writeFile(array, PathUtil.pluginPath("profiles.json"));
+  }
+
+  void loadProfiles(Map<UUID, JsonWrapper> map) throws IOException {
+    JsonArray element = JsonUtils.readFile(PathUtil.pluginPath("profiles.json")).getAsJsonArray();
+
+    int i = 0;
+
+    for (JsonElement jsonElement : element) {
+      if (!jsonElement.isJsonObject()) {
+        logger.error("Found non-object profile entry at index {}", i);
+        continue;
+      }
+
+      i++;
+
+      JsonWrapper json = JsonWrapper.wrap(jsonElement.getAsJsonObject());
+      UUID id = json.getUUID("uuid");
+
+      map.put(id, json);
+    }
+  }
+
+  private void transformData(JsonWrapper json, UUID id, Map<UUID, JsonWrapper> profileData) {
     JsonWrapper properties = json.getWrappedNonNull("properties");
     JsonWrapper blockList = json.getWrappedNonNull("blockList");
 
@@ -229,6 +275,16 @@ class UserUpdate extends DataUpdater {
 
       if (inter.has("separated")) {
         blockList.add("separated", inter.get("separated"));
+      }
+    }
+
+    JsonElement ipElement = json.remove("ip");
+    if (ipElement != null && !ipElement.isJsonNull()) {
+      var data = profileData.get(id);
+
+      if (data != null) {
+        data.add("ip", ipElement);
+        data.add("lastIpUpdate", json.getObject("timeStamps").get("lastJoin").deepCopy());
       }
     }
 
@@ -282,7 +338,6 @@ class DirectoryMover extends DataUpdater {
     Path shops        = pluginDir.resolve("FTC-Shops");
     Path kingship     = pluginDir.resolve("FTC-Kingship");
 
-    copyFromOld("serverlist.toml",        serverlist.resolve("serverlist.toml"));
     copyFromOld("icons",                  serverlist.resolve("icons"));
 
     copyFromOld("punishments.json",       antiGrief.resolve("punishments.json"));
@@ -305,10 +360,6 @@ class DirectoryMover extends DataUpdater {
     copyFromOld("economy/mining.shop",    sellshop.resolve("mining.shop"));
     copyFromOld("economy/shops.json",     sellshop.resolve("shops.json"));
     copyFromOld("economy/markets",        shops.resolve("markets"));
-
-    var challengesDir = challenges.resolve("challenges");
-    copySafe(challengesDir, challenges);
-    PathUtil.safeDelete(challengesDir);
 
     copyFromOld("cooldowns.json",         core.resolve("cooldowns.json"));
     copyFromOld("stored_inventories.dat", core.resolve("stored_inventories.dat"));

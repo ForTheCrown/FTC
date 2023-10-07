@@ -94,7 +94,10 @@ public class CommandRoyalSword extends FtcCommand {
     var ability = factory.withPrefix("ability");
     ability.usage("", "Shows the active ability of your held sword");
 
-    ability.usage("<ability> [<level: number(1..)>]")
+    ability.usage("unset")
+        .addInfo("Removes your sword's active ability");
+
+    ability.usage("set <ability> [<level: number(1..)>]")
         .addInfo("Sets the active ability of your held sword")
         .addInfo("If <level> is not set, defaults to %s", START_LEVEL);
 
@@ -191,17 +194,23 @@ public class CommandRoyalSword extends FtcCommand {
               return 0;
             })
 
-            .then(argument("type", ABILITY_ARGUMENT)
-                .executes(c -> {
-                  return setAbility(c, START_LEVEL);
-                })
-
-                .then(argument("level", IntegerArgumentType.integer(START_LEVEL))
+            .then(literal("set")
+                .then(argument("type", ABILITY_ARGUMENT)
                     .executes(c -> {
-                      int level = c.getArgument("level", Integer.class);
-                      return setAbility(c, level);
+                      return setAbility(c, START_LEVEL);
                     })
+
+                    .then(argument("level", IntegerArgumentType.integer(START_LEVEL))
+                        .executes(c -> {
+                          int level = c.getArgument("level", Integer.class);
+                          return setAbility(c, level);
+                        })
+                    )
                 )
+            )
+
+            .then(literal("unset")
+                .executes(this::abilityRemove)
             )
 
             .then(literal("cooldown")
@@ -251,6 +260,26 @@ public class CommandRoyalSword extends FtcCommand {
         Text.format(
             "Created a royal sword for {0, user}, rank: {1, number, -roman}",
             user, level + 1
+        )
+    );
+    return 0;
+  }
+
+  private int abilityRemove(CommandContext<CommandSource> c) throws CommandSyntaxException {
+    var user = getUserSender(c);
+    var pair = getSword(user);
+    var item = pair.first();
+    var sword = pair.second();
+
+    validateAbility(sword);
+
+    var removed = sword.getAbility();
+    sword.setAbility(null);
+
+    c.getSource().sendSuccess(
+        Text.format("Removed ability &e{0}&r from sword",
+            NamedTextColor.GRAY,
+            removed.displayName()
         )
     );
     return 0;

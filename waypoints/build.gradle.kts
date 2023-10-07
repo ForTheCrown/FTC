@@ -12,8 +12,6 @@ dependencies {
   compileOnly(project(":cosmetics"))
   compileOnly(project(":structures"))
   compileOnly(project(":anti-grief"))
-
-  compileOnly("us.dynmap:DynmapCoreAPI:3.4")
 }
 
 pluginYml {

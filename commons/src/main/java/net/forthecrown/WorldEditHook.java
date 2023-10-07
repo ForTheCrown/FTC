@@ -1,5 +1,7 @@
 package net.forthecrown;
 
+import javax.annotation.Nullable;
+import net.forthecrown.utils.math.AreaSelection;
 import net.forthecrown.utils.math.WorldBounds3i;
 import org.bukkit.entity.Player;
 
@@ -13,5 +15,9 @@ public interface WorldEditHook {
     return BukkitServices.loadOrThrow(WorldEditHook.class);
   }
 
+  @Nullable
+  AreaSelection getSelectedBlocks(Player player);
+
+  @Nullable
   WorldBounds3i getPlayerSelection(Player player);
 }

@@ -12,7 +12,7 @@ import net.forthecrown.text.Text;
 import net.forthecrown.usables.Action;
 import net.forthecrown.usables.Interaction;
 import net.forthecrown.usables.UsableComponent;
-import net.forthecrown.usables.UsageType;
+import net.forthecrown.usables.ObjectType;
 import net.forthecrown.user.currency.Currency;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 public class CurrencyActions {
 
   public static void registerAll(
-      Registry<UsageType<? extends Action>> registry,
+      Registry<ObjectType<? extends Action>> registry,
       String currencyName,
       Currency currency
   ) {
@@ -40,7 +40,7 @@ public class CurrencyActions {
   }
 }
 
-class CurrencyActionType implements UsageType<CurrencyAction> {
+class CurrencyActionType implements ObjectType<CurrencyAction> {
 
   private final Modification modification;
   private final Currency currency;
@@ -72,7 +72,7 @@ class CurrencyActionType implements UsageType<CurrencyAction> {
 }
 
 record CurrencyAction(
-    UsageType<CurrencyAction> type,
+    ObjectType<CurrencyAction> type,
     int value,
     Modification action,
     Currency currency
@@ -84,7 +84,7 @@ record CurrencyAction(
   }
 
   @Override
-  public UsageType<? extends UsableComponent> getType() {
+  public ObjectType<? extends UsableComponent> getType() {
     return type;
   }
 

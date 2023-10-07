@@ -3,6 +3,8 @@ package net.forthecrown.utils.math;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.TypeAdapter;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import net.forthecrown.nbt.BinaryTag;
@@ -124,6 +126,36 @@ public final class Vectors {
   public static final long CHUNK_COORDINATE_MASK = 0xFFFFFFFFL;
 
   public static final long CHUNK_COORDINATE_SIZE = 32;
+
+  public static final Codec<Vector3i> V3I_CODEC = RecordCodecBuilder.create(instance -> {
+    return instance
+        .group(
+            Codec.INT.fieldOf("x").forGetter(Vector3i::x),
+            Codec.INT.fieldOf("y").forGetter(Vector3i::y),
+            Codec.INT.fieldOf("z").forGetter(Vector3i::z)
+        )
+        .apply(instance, Vector3i::from);
+  });
+
+  public static final Codec<Vector3d> V3D_CODEC = RecordCodecBuilder.create(instance -> {
+    return instance
+        .group(
+            Codec.DOUBLE.fieldOf("x").forGetter(Vector3d::x),
+            Codec.DOUBLE.fieldOf("y").forGetter(Vector3d::y),
+            Codec.DOUBLE.fieldOf("z").forGetter(Vector3d::z)
+        )
+        .apply(instance, Vector3d::from);
+  });
+
+  public static final Codec<Vector3f> V3F_CODEC = RecordCodecBuilder.create(instance -> {
+    return instance
+        .group(
+            Codec.FLOAT.fieldOf("x").forGetter(Vector3f::x),
+            Codec.FLOAT.fieldOf("y").forGetter(Vector3f::y),
+            Codec.FLOAT.fieldOf("z").forGetter(Vector3f::z)
+        )
+        .apply(instance, Vector3f::from);
+  });
 
   /* --------------------------- TYPE ADAPTERS ---------------------------- */
 

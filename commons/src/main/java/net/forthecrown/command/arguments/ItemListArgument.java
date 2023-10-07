@@ -4,10 +4,10 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import java.util.concurrent.CompletableFuture;
-import net.forthecrown.command.FtcSuggestions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Completions;
 import net.forthecrown.grenadier.Readers;
@@ -147,12 +147,14 @@ public class ItemListArgument implements ArgumentType<ItemListResult> {
     }
 
     private Suggester<CommandSource> createInitial() {
-      return FtcSuggestions.combined(
+      SuggestionProvider<CommandSource> combined = Completions.combine(
           (context, builder) -> {
             return Completions.suggest(builder, "1", "2", "4", "8", "16", "32", "64");
           },
           itemArgument::listSuggestions
       );
+
+      return Suggester.wrap(combined);
     }
 
     @Override

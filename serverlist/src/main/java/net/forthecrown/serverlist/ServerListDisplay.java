@@ -3,7 +3,6 @@ package net.forthecrown.serverlist;
 import static net.forthecrown.utils.MonthDayPeriod.ALL;
 
 import com.google.gson.JsonElement;
-import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,7 +13,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import lombok.Getter;
-import lombok.Setter;
 import net.forthecrown.Loggers;
 import net.forthecrown.registry.Holder;
 import net.forthecrown.registry.Registries;
@@ -38,11 +36,7 @@ import org.slf4j.Logger;
 public class ServerListDisplay {
   private static final Logger LOGGER = Loggers.getLogger();
 
-  public static final Comparator<Holder<DisplayEntry>> ENTRY_COMPARATOR
-      = Holder.comparingByValue();
-
-  public static final Pair<CachedServerIcon, Component> NULL_PAIR
-      = Pair.of(null, null);
+  public static final Comparator<Holder<DisplayEntry>> ENTRY_COMPARATOR = Holder.comparingByValue();
 
   /** Key of the default display entry */
   public static final String DEFAULT = "default";
@@ -57,12 +51,6 @@ public class ServerListDisplay {
   private final Path loaderFile;
 
   private final Random random;
-
-  @Setter
-  private boolean allowMaxPlayerRandomization;
-
-  @Setter
-  private Component baseMotd;
 
   ServerListDisplay() {
     this.directory = PathUtil.pluginPath("icons");
@@ -105,15 +93,13 @@ public class ServerListDisplay {
     dateCache.sort(ENTRY_COMPARATOR);
   }
 
-  public Pair<CachedServerIcon, Component> getCurrent() {
+  ListDisplayData getCurrent() {
     if (registry.isEmpty()) {
-      return NULL_PAIR;
+      return new ListDisplayData();
     }
 
     var date = LocalDate.now();
-
-    CachedServerIcon icon = null;
-    Component motdPart = null;
+    ListDisplayData displayData = new ListDisplayData();
 
     for (Holder<DisplayEntry> i : dateCache) {
       var val = i.getValue();
@@ -123,33 +109,19 @@ public class ServerListDisplay {
         continue;
       }
 
-      if (icon == null) {
-        icon = val.get(random);
-      }
-
-      if (motdPart == null) {
-        motdPart = val.getMotdPart();
-      }
-
-      // Both icon and MOTD have been found, stop here
-      if (icon != null && motdPart != null) {
-        return Pair.of(icon, motdPart);
-      }
+      displayData.fillValues(val, random);
     }
 
     // Either MOTD, icon or both are missing, get the default entry
     // and fill any missing data with it
     Optional<Holder<DisplayEntry>> def = registry.getHolder(DEFAULT);
 
-    if (def.isEmpty()) {
-      return Pair.of(icon, motdPart);
-    } else {
+    if (def.isPresent()) {
       var defaultValue = def.get().getValue();
-      return Pair.of(
-          icon == null ? defaultValue.get(random) : icon,
-          motdPart == null ? defaultValue.getMotdPart() : motdPart
-      );
+      displayData.fillValues(defaultValue, random);
     }
+
+    return displayData;
   }
 
   public void load() {
@@ -166,7 +138,7 @@ public class ServerListDisplay {
         JsonElement element = e.getValue();
 
         if (element.isJsonPrimitive() || element.isJsonArray()) {
-          icon = new DisplayEntry(null, readIconList(element), null, null, 0);
+          icon = new DisplayEntry(null, readIconList(element), null, null, 0, -1,null);
         } else {
           var json = JsonWrapper.wrap(element.getAsJsonObject());
 
@@ -178,6 +150,8 @@ public class ServerListDisplay {
           Script condition = null;
           Component motdPart = null;
           int prio = json.getInt("priority", 0);
+          int protocol = json.getInt("protocol_override", -1);
+          String versionText = json.getString("version_text", null);
 
           if (json.has("condition")) {
             condition = Scripts.loadScript(json.get("condition"), true);
@@ -200,7 +174,7 @@ public class ServerListDisplay {
             continue;
           }
 
-          icon = new DisplayEntry(period, icons, condition, motdPart, prio);
+          icon = new DisplayEntry(period, icons, condition, motdPart, prio, protocol, versionText);
         }
 
         if (icon.getIcons().isEmpty()) {

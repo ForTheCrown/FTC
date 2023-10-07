@@ -14,4 +14,8 @@ dependencies {
 pluginYml {
   name = "FTC-Usables"
   main = "net.forthecrown.usables.UsablesPlugin"
+
+  loadAfter {
+    regular("project:guilds")
+  }
 }

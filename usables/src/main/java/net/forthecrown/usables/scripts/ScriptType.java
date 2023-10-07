@@ -13,13 +13,13 @@ import java.util.concurrent.CompletableFuture;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.scripts.Scripts;
 import net.forthecrown.scripts.commands.ScriptArgument;
-import net.forthecrown.usables.UsageType;
+import net.forthecrown.usables.ObjectType;
 import net.forthecrown.utils.io.source.Source;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ScriptType implements UsageType<ScriptInstance> {
+public class ScriptType implements ObjectType<ScriptInstance> {
 
   @Override
   public ScriptInstance parse(StringReader reader, CommandSource cmdSource)

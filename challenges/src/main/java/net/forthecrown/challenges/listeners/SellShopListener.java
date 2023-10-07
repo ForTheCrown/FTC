@@ -8,7 +8,7 @@ import net.forthecrown.sellshop.event.SellShopCreateEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-public class SellShopListener implements Listener {
+class SellShopListener implements Listener {
 
   private final ChallengeManager manager;
 
@@ -23,7 +23,7 @@ public class SellShopListener implements Listener {
     builder.add(
         Slot.of(4, 2),
         Menus.createOpenNode(
-            manager.getItemChallengeMenu(),
+            manager::getItemChallengeMenu,
             Challenges.createMenuHeader()
         )
     );

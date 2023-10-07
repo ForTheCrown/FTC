@@ -38,8 +38,12 @@ public class SellShop {
   @Getter
   private final ItemPriceMap priceMap = new ItemPriceMap();
 
-  public SellShop(Path directory) {
+  private final SellShopPlugin plugin;
+
+  public SellShop(SellShopPlugin plugin, Path directory) {
+    this.plugin = plugin;
     this.directory = directory;
+
     SellProperties.registerAll();
   }
 
@@ -62,7 +66,7 @@ public class SellShop {
       var menuJson = JsonWrapper.wrap(element.getAsJsonObject());
 
       var reader = new MenuReader(directory, menuJson);
-      var menu = reader.read(this);
+      var menu = reader.read(this, plugin.getShopConfig().defaultMaxEarnings());
 
       priceMap.addAll(menu.getPriceMap());
       builder.add(reader.getSlot(), Menus.createOpenNode(menu.getInventory(), menu.getButton()));

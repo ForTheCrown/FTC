@@ -16,4 +16,11 @@ dependencies {
 pluginYml {
   name = "FTC-Challenges"
   main = "net.forthecrown.challenges.ChallengesPlugin"
+
+  openClassLoader = true
+
+  depends {
+    optional("VotingPlugin")
+    optional("project:shops")
+  }
 }

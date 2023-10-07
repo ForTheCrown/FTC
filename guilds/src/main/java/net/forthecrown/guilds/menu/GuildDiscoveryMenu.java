@@ -85,6 +85,10 @@ public class GuildDiscoveryMenu extends ListPage<Guild> {
 
   @Override
   protected List<Guild> getList(User user, Context context) {
+    return getGuildList(user);
+  }
+
+  public static List<Guild> getGuildList(User user) {
     List<Guild> list = Guilds.getManager().getGuilds();
 
     boolean invert = user.get(GUserProperties.DISCOVERY_SORT_INVERTED);
@@ -95,7 +99,6 @@ public class GuildDiscoveryMenu extends ListPage<Guild> {
     }
 
     list.sort(invert ? sort.reversed() : sort);
-
     return list;
   }
 

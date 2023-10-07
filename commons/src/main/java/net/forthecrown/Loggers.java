@@ -8,6 +8,10 @@ import org.slf4j.LoggerFactory;
 public final class Loggers {
   private Loggers() {}
 
+  public static boolean isDebugEnabled() {
+    return getLogger().isDebugEnabled();
+  }
+
   public static Logger getLogger() {
     StackWalker walker = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE);
     Class<?> caller = walker.getCallerClass();

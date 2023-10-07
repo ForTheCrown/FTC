@@ -23,11 +23,11 @@ public class SellShopPlugin extends JavaPlugin {
   public void onEnable() {
     SellProperties.registerAll();
 
-    sellShop = new SellShop(PathUtil.pluginPath());
+    sellShop = new SellShop(this, PathUtil.pluginPath());
     reloadConfig();
 
     SellShopCommands.createCommands(sellShop);
-    SellShopListeners.registerAll();
+    SellShopListeners.registerAll(this);
 
     Users.getService().registerComponent(UserShopData.class);
   }

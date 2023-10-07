@@ -6,6 +6,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import java.time.Duration;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -192,8 +194,10 @@ public final class Waypoints {
    * Removes non-invulnerable waypoints from the given set
    */
   private static Set<Waypoint> removeVulnerable(Set<Waypoint> waypoints) {
-    waypoints.removeIf(waypoint -> !waypoint.get(WaypointProperties.INVULNERABLE));
-    return waypoints;
+    Set<Waypoint> result = new ObjectOpenHashSet<>(waypoints);
+    result.removeIf(Objects::isNull);
+    result.removeIf(waypoint -> !waypoint.get(WaypointProperties.INVULNERABLE));
+    return result;
   }
 
   /**
@@ -508,9 +512,6 @@ public final class Waypoints {
   /**
    * Tests if the user can move their home waypoint.
    * <p>
-   * If {@link WaypointConfig#moveInHasCooldown} is false, then this method will not throw an
-   * exception.
-   * <p>
    * The cooldown length is determined by {@link WaypointConfig#moveInCooldown}
    *
    * @param user The user to test
@@ -526,12 +527,13 @@ public final class Waypoints {
     // If movein cooldown disabled or the
     // cooldown length is less than 1
     var config = WaypointManager.getInstance().config();
+    Duration duration = config.moveInCooldown;
 
-    if (lastMoveIn == -1 || !config.moveInHasCooldown || config.moveInCooldown.toMillis() < 1) {
+    if (lastMoveIn == -1 || duration == null || duration.toMillis() < 1) {
       return;
     }
 
-    long remainingCooldown = Time.timeUntil(lastMoveIn + config.moveInCooldown.toMillis());
+    long remainingCooldown = Time.timeUntil(lastMoveIn + duration.toMillis());
 
     if (remainingCooldown > 0) {
       throw Exceptions.cooldownEndsIn(remainingCooldown);
@@ -580,14 +582,14 @@ public final class Waypoints {
    * Updates the given waypoint's dynmap marker, if and only if, the dynmap plugin is installed.
    *
    * @param waypoint The waypoint to update the marker of
-   * @see WaypointDynmap#updateMarker(Waypoint)
+   * @see WaypointWebmaps#updateMarker(Waypoint)
    */
   public static void updateDynmap(Waypoint waypoint) {
     if (!PluginUtil.isEnabled("Dynmap")) {
       return;
     }
 
-    WaypointDynmap.updateMarker(waypoint);
+    WaypointWebmaps.updateMarker(waypoint);
   }
 
   public static Waypoint getHomeWaypoint(User user) {

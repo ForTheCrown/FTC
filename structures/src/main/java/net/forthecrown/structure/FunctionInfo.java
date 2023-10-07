@@ -44,17 +44,17 @@ public class FunctionInfo {
 
   private static final ArgumentOption<String> FUNC_ARG
       = Options.argument(Arguments.FTC_KEY)
-      .addLabel(FUNCTION_CMD_PREFIX)
+      .setLabel(FUNCTION_CMD_PREFIX)
       .build();
 
   private static final ArgumentOption<CompoundTag> TAG_ARG
       = Options.argument(ArgumentTypes.compoundTag())
-      .addLabel("data")
+      .setLabel("data")
       .build();
 
   private static final ArgumentOption<BlockArgument.Result> TURNS_INTO_ARG
       = Options.argument(ArgumentTypes.block())
-      .addLabel("turns_into")
+      .setLabel("turns_into")
       .build();
 
   public static final OptionsArgument PARSER = OptionsArgument.builder()

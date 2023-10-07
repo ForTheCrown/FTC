@@ -48,6 +48,8 @@ class ScriptPlaceholders {
     script.put("viewer", ctx.viewer());
     script.put("renderer", ctx.renderer());
 
+    ctx.context().forEach(script::put);
+
     ExecResult<Object> obj = script.evaluate().logError();
 
     if (!obj.isSuccess()) {

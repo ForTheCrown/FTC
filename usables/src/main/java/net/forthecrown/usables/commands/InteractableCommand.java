@@ -74,44 +74,54 @@ public abstract class InteractableCommand<H extends Usable> extends UsableComman
 
     argument.then(UsablesCommands.actions.create(context -> {
       H holder = provider.get(context);
-
-      return new ListHolder<>() {
-        @Override
-        public ComponentList<Action> getList() {
-          return holder.getActions();
-        }
-
-        @Override
-        public void postEdit() {
-          provider.postEdit(holder);
-        }
-
-        @Override
-        public UsableObject object() {
-          return holder;
-        }
-      };
+      return new ActionListAccess<>(holder, provider);
     }).requires(hasAdminPermission()));
 
     argument.then(UsablesCommands.conditions.create(context -> {
       H holder = provider.get(context);
-
-      return new ListHolder<>() {
-        @Override
-        public ComponentList<Condition> getList() {
-          return holder.getConditions();
-        }
-
-        @Override
-        public void postEdit() {
-          provider.postEdit(holder);
-        }
-
-        @Override
-        public UsableObject object() {
-          return holder;
-        }
-      };
+      return new ConditionListAccess<>(holder, provider);
     }).requires(hasAdminPermission()));
+  }
+
+  record ActionListAccess<T extends Usable>(
+      T usable,
+      UsableProvider<T> provider
+  ) implements ListHolder<Action> {
+
+    @Override
+    public ComponentList<Action> getList() {
+      return usable.getActions();
+    }
+
+    @Override
+    public void postEdit() {
+      provider.postEdit(usable);
+    }
+
+    @Override
+    public UsableObject object() {
+      return usable;
+    }
+  }
+
+  record ConditionListAccess<T extends Usable>(
+      T usable,
+      UsableProvider<T> provider
+  ) implements ListHolder<Condition> {
+
+    @Override
+    public ComponentList<Condition> getList() {
+      return usable.getConditions();
+    }
+
+    @Override
+    public void postEdit() {
+      provider.postEdit(usable);
+    }
+
+    @Override
+    public UsableObject object() {
+      return usable;
+    }
   }
 }

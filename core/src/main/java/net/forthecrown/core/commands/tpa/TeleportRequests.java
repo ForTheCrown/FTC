@@ -8,6 +8,7 @@ import net.forthecrown.command.request.RequestValidator;
 import net.forthecrown.events.WorldAccessTestEvent;
 import net.forthecrown.user.Properties;
 import net.forthecrown.user.User;
+import net.forthecrown.utils.Audiences;
 import net.kyori.adventure.audience.Audience;
 import org.bukkit.World;
 
@@ -34,7 +35,7 @@ public class TeleportRequests {
   }
 
   public static TeleportRequest getIncoming(User target, User sender) {
-    return table.getIncoming(sender, target);
+    return table.getIncoming(target, sender);
   }
 
   public static boolean clearIncoming(User target) {
@@ -57,6 +58,8 @@ public class TeleportRequests {
       var sender = request.getSender();
       var target = request.getTarget();
 
+      boolean isSender = Audiences.equals(viewer, sender);
+
       boolean tpaHere = request.isTpaHere();
 
       if (sender.equals(target)) {
@@ -71,13 +74,16 @@ public class TeleportRequests {
         throw TpExceptions.tpaDisabled(target);
       }
 
-      TeleportRequest outgoing = table.getOutgoing(sender, target);
-      TeleportRequest incoming = table.getIncoming(target, sender);
+      if (!request.accepted) {
+        TeleportRequest outgoing = table.getOutgoing(sender, target);
+        TeleportRequest incoming = table.getIncoming(target, sender);
 
-      if (outgoing != null || incoming != null) {
-        throw Exceptions.requestAlreadySent(target);
+        if (outgoing != null || incoming != null) {
+          throw Exceptions.requestAlreadySent(target);
+        }
+
+
       }
-
       World world = tpaHere ? sender.getWorld() : target.getWorld();
 
       CommandSyntaxException noMessage = tpaHere

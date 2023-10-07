@@ -1,20 +1,23 @@
 package net.forthecrown.utils.io;
 
 import com.google.gson.JsonElement;
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.Decoder;
-import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.Encoder;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.PrimitiveCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 import lombok.experimental.UtilityClass;
@@ -26,6 +29,7 @@ import net.forthecrown.utils.TomlConfigs;
 import net.forthecrown.utils.inventory.ItemList;
 import net.forthecrown.utils.inventory.ItemLists;
 import net.forthecrown.utils.inventory.ItemStacks;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.NbtOps;
@@ -39,6 +43,23 @@ public @UtilityClass class FtcCodecs {
 
   /* ----------------------------------------------------------- */
 
+  public final Codec<World> WORLD_CODEC = Codec.STRING.comapFlatMap(s -> {
+    NamespacedKey key = NamespacedKey.fromString(s);
+    World world;
+
+    if (key != null) {
+      world = Bukkit.getWorld(key);
+    } else {
+      world = Bukkit.getWorld(s);
+    }
+
+    if (world == null) {
+      return Results.error("Unknown world '%s'", s);
+    }
+
+    return Results.success(world);
+  }, world -> world.key().asString());
+
   public final Codec<String> KEY_CODEC = Codec.STRING.comapFlatMap(s -> {
     if (!Registries.isValidKey(s)) {
       return Results.error("Invalid key '%s'", s);
@@ -46,6 +67,16 @@ public @UtilityClass class FtcCodecs {
 
     return DataResult.success(s);
   }, Function.identity());
+
+  public static final Codec<Key> KYORI_KEY = Codec.STRING.comapFlatMap(s -> {
+    NamespacedKey key = NamespacedKey.fromString(s);
+
+    if (key == null) {
+      return Results.error("Invalid key '%s'", s);
+    }
+
+    return Results.success(key);
+  }, Key::asString);
 
   public static final Codec<NamespacedKey> NAMESPACED_KEY = Codec.STRING.comapFlatMap(string -> {
     NamespacedKey key = NamespacedKey.fromString(string);
@@ -104,12 +135,7 @@ public @UtilityClass class FtcCodecs {
       var strResult = ops.getStringValue(input);
 
       if (strResult.result().isPresent()) {
-        try {
-          var duration = TomlConfigs.parseDuration(strResult.result().get());
-          return DataResult.success(duration);
-        } catch (CommandSyntaxException exc) {
-          return Results.error(exc.getMessage());
-        }
+        return safeParse(strResult.result().get(), TomlConfigs::parseDuration);
       }
 
       return ops.getNumberValue(input)
@@ -160,92 +186,29 @@ public @UtilityClass class FtcCodecs {
 
   /* ----------------------------------------------------------- */
 
-  public final Codec<Location> LOCATION_CODEC = Codec.of(
-      new Encoder<>() {
-        @Override
-        public <T> DataResult<T> encode(Location input,
-                                        DynamicOps<T> ops,
-                                        T prefix
-        ) {
-          var builder = ops.mapBuilder();
+  public final Codec<Location> LOCATION_CODEC = RecordCodecBuilder.create(instance -> {
+    return instance
+        .group(
+            WORLD_CODEC.optionalFieldOf("world").forGetter(o -> Optional.ofNullable(o.getWorld())),
 
-          if (input.isWorldLoaded()) {
-            builder.add(
-                "world",
-                ops.createString(input.getWorld().getName())
-            );
-          }
+            Codec.DOUBLE.fieldOf("x").forGetter(Location::getX),
+            Codec.DOUBLE.fieldOf("y").forGetter(Location::getZ),
+            Codec.DOUBLE.fieldOf("z").forGetter(Location::getY),
 
-          builder.add("x", ops.createDouble(input.getX()));
-          builder.add("y", ops.createDouble(input.getY()));
-          builder.add("z", ops.createDouble(input.getZ()));
+            Codec.FLOAT.optionalFieldOf("yaw").forGetter(o -> {
+              float yaw = o.getYaw();
+              return yaw == 0 ? Optional.empty() : Optional.of(yaw);
+            }),
 
-          if (input.getYaw() != 0F) {
-            builder.add("yaw", ops.createFloat(input.getYaw()));
-          }
-
-          if (input.getPitch() != 0F) {
-            builder.add("pitch", ops.createFloat(input.getPitch()));
-          }
-
-          return builder.build(prefix);
-        }
-      },
-
-      new Decoder<>() {
-        @Override
-        public <T> DataResult<Pair<Location, T>> decode(DynamicOps<T> ops,
-                                                        T input
-        ) {
-          Dynamic<T> dynamic = new Dynamic<>(ops, input);
-          return dynamic.get("world")
-              .asString()
-              .flatMap(s -> {
-                World w = Bukkit.getWorld(s);
-
-                if (w == null) {
-                  return Results.error(
-                      "Unknown world: '%s'", s
-                  );
-                }
-
-                return DataResult.success(w);
-              })
-
-              .map(world -> {
-                double x = dynamic.get("x")
-                    .asNumber()
-                    .map(Number::doubleValue)
-                    .getOrThrow(false, s -> {
-                    });
-
-                double y = dynamic.get("y")
-                    .asNumber()
-                    .map(Number::doubleValue)
-                    .getOrThrow(false, s -> {
-                    });
-
-                double z = dynamic.get("z")
-                    .asNumber()
-                    .map(Number::doubleValue)
-                    .getOrThrow(false, s -> {
-                    });
-
-                float yaw = dynamic.get("yaw")
-                    .asNumber(0F)
-                    .floatValue();
-
-                float pitch = dynamic.get("pitch")
-                    .asNumber(0F)
-                    .floatValue();
-
-                return new Location(world, x, y, z, yaw, pitch);
-              })
-
-              .map(location -> Pair.of(location, input));
-        }
-      }
-  );
+            Codec.FLOAT.optionalFieldOf("pitch").forGetter(o -> {
+              float pitch = o.getPitch();
+              return pitch == 0 ? Optional.empty() : Optional.of(pitch);
+            })
+        )
+        .apply(instance, (world, x, y, z, yaw, pitch) -> {
+          return new Location(world.orElse(null), x, y, z, yaw.orElse(0f), pitch.orElse(0f));
+        });
+  });
 
   public static final Codec<Component> COMPONENT = ofJson(JsonUtils::writeText, JsonUtils::readText);
 
@@ -254,16 +217,26 @@ public @UtilityClass class FtcCodecs {
 
   /* ----------------------------------------------------------- */
 
-  public static <V> Codec<V> ofJson(Function<V, JsonElement> serializer,
-                                    Function<JsonElement, V> deserializer
+  public static <T> DataResult<T> safeParse(String str, ArgumentType<T> parser) {
+    try {
+      StringReader reader = new StringReader(str);
+      return DataResult.success(parser.parse(reader));
+    } catch (CommandSyntaxException exc) {
+      return DataResult.error(exc::getMessage);
+    }
+  }
+
+  public static <V> Codec<V> ofJson(
+      Function<V, JsonElement> serializer,
+      Function<JsonElement, V> deserializer
   ) {
     return Codec.of(
-        new Encoder<V>() {
+        new Encoder<>() {
           @Override
           public <T> DataResult<T> encode(V input, DynamicOps<T> ops, T prefix) {
             JsonElement json = serializer.apply(input);
             if (ops instanceof JsonOps js) {
-              return DataResult.success((T) js);
+              return DataResult.success((T) json);
             }
 
             T val = JsonOps.INSTANCE.convertTo(ops, json);
@@ -271,7 +244,7 @@ public @UtilityClass class FtcCodecs {
           }
         },
 
-        new Decoder<V>() {
+        new Decoder<>() {
           @Override
           public <T> DataResult<Pair<V, T>> decode(DynamicOps<T> ops, T input) {
             JsonElement element;
@@ -301,7 +274,7 @@ public @UtilityClass class FtcCodecs {
     if (constants.length > 16) {
       Map<String, E> map = new HashMap<>();
       for (var e : constants) {
-        map.put(e.name(), e);
+        map.put(e.name().toUpperCase(), e);
       }
 
       return Codec.STRING.comapFlatMap(s -> {
@@ -322,7 +295,7 @@ public @UtilityClass class FtcCodecs {
       s = s.toUpperCase();
 
       for (var e : constants) {
-        if (e.name().equals(s)) {
+        if (e.name().toUpperCase().equals(s)) {
           return DataResult.success(e);
         }
       }

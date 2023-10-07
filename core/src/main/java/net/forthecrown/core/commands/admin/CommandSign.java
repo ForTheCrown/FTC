@@ -1,6 +1,7 @@
 package net.forthecrown.core.commands.admin;
 
 import static net.forthecrown.grenadier.Grenadier.toMessage;
+import static net.kyori.adventure.text.Component.newline;
 import static net.kyori.adventure.text.Component.text;
 
 import com.mojang.brigadier.arguments.BoolArgumentType;
@@ -26,7 +27,11 @@ import net.forthecrown.text.Messages;
 import net.forthecrown.text.Text;
 import net.forthecrown.user.User;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Sign;
@@ -37,7 +42,7 @@ import org.bukkit.block.sign.SignSide;
 
 public class CommandSign extends FtcCommand {
 
-  private final Map<UUID, SignLines> copies = new Object2ObjectOpenHashMap<>();
+  private final Map<UUID, SignCopy> copies = new Object2ObjectOpenHashMap<>();
 
   private final Map<String, SignType> types = Map.ofEntries(
       entry("oak"),
@@ -100,10 +105,13 @@ public class CommandSign extends FtcCommand {
                 .executes(c -> {
                   SignInfo sign = get(c);
 
-                  SignLines.EMPTY.apply(sign.side);
+                  SignCopy.EMPTY.apply(sign.side);
                   sign.update();
 
-                  c.getSource().sendSuccess(text("Cleared sign"));
+                  c.getSource().sendSuccess(
+                      text("Cleared")
+                          .append(sign.displayName().color(NamedTextColor.YELLOW))
+                  );
                   return 0;
                 })
             )
@@ -116,11 +124,11 @@ public class CommandSign extends FtcCommand {
                       boolean glowing
                           = c.getArgument("glow_state", Boolean.class);
 
-                      sign.sign.setGlowingText(glowing);
+                      sign.side.setGlowingText(glowing);
                       sign.update();
 
                       c.getSource().sendSuccess(
-                          Text.format("Set sign glowing: {0}", glowing)
+                          Text.format("Set &e{0}&r glowing: &e{1}&r", sign.displayName(), glowing)
                       );
                       return 0;
                     })
@@ -137,7 +145,7 @@ public class CommandSign extends FtcCommand {
                       sign.update();
 
                       c.getSource().sendSuccess(
-                          Text.format("Set sign waxed {0}", waxed)
+                          Text.format("Set &e{0}&r waxed &e{1}&r.", sign.displayName(), waxed)
                       );
                       return 0;
                     })
@@ -153,7 +161,30 @@ public class CommandSign extends FtcCommand {
                       type.apply(sign.sign());
 
                       c.getSource().sendSuccess(
-                          text("Set sign's type to: " + type.name())
+                          Text.format("Set &e{0}&r type to &e{1}&r.",
+                              sign.displayName(),
+                              type.name()
+                          )
+                      );
+                      return 0;
+                    })
+                )
+            )
+
+            .then(literal("color")
+                .then(argument("color", ArgumentTypes.enumType(DyeColor.class))
+                    .executes(c -> {
+                      SignInfo info = get(c);
+                      DyeColor color = c.getArgument("color", DyeColor.class);
+
+                      info.side.setColor(color);
+                      info.update();
+
+                      c.getSource().sendSuccess(
+                          Text.format("Changed &e{0}&r color to &e{1}&r.",
+                              info.displayName(),
+                              color.name().toLowerCase()
+                          )
                       );
                       return 0;
                     })
@@ -165,11 +196,13 @@ public class CommandSign extends FtcCommand {
                   User user = getUserSender(c);
                   SignInfo sign = get(c);
 
-                  SignLines lines = new SignLines(sign.side());
+                  SignCopy lines = new SignCopy(sign.side());
                   copies.put(user.getUniqueId(), lines);
 
                   user.sendMessage(
-                      text("Copied sign")
+                      text("Copied ")
+                          .color(NamedTextColor.GRAY)
+                          .append(sign.displayName().color(NamedTextColor.YELLOW))
                   );
 
                   return 0;
@@ -181,7 +214,7 @@ public class CommandSign extends FtcCommand {
                   User user = getUserSender(c);
                   SignInfo sign = get(c);
 
-                  SignLines lines = copies.get(user.getUniqueId());
+                  SignCopy lines = copies.get(user.getUniqueId());
                   if (lines == null) {
                     throw Exceptions.create("You have no sign copied");
                   }
@@ -189,10 +222,7 @@ public class CommandSign extends FtcCommand {
                   lines.apply(sign.side());
                   sign.update();
 
-                  user.sendMessage(
-                      text("Pasted sign")
-                  );
-
+                  user.sendMessage(text("Pasted sign"));
                   return 0;
                 })
             )
@@ -245,13 +275,13 @@ public class CommandSign extends FtcCommand {
       sign.line(index - 1, Component.empty());
 
       c.getSource().sendSuccess(
-          Text.format("Cleared line {0, number}", index)
+          Text.format("Cleared &e{0}&r line &e{1, number}&r.", info.displayName(), index)
       );
     } else {
       sign.line(index - 1, text);
 
       c.getSource().sendSuccess(
-          Text.format("Set line {0, number} to {1}", index, text)
+          Text.format("Set &e{0}&r line {1, number} to '&e{2}&r'", info.displayName(), index, text)
       );
     }
 
@@ -285,42 +315,92 @@ public class CommandSign extends FtcCommand {
     }
 
     SignSide signSide = sign.getSide(side);
-    return new SignInfo(sign, signSide);
+    return new SignInfo(sign, signSide, side);
   }
 
-  record SignInfo(Sign sign, SignSide side) {
+  record SignInfo(Sign sign, SignSide side, Side sideEnum) {
 
     public void update() {
       sign.update(false, false);
+    }
+
+    private TextColor dyeColor() {
+      return TextColor.color(side.getColor().getColor().asRGB());
+    }
+
+    public Component displayName() {
+      var dyeColor = dyeColor();
+
+      return text()
+          .append(text("["))
+          .append(Component.translatable(sign.getType()))
+          .append(text("'s " + Text.prettyEnumName(sideEnum) + " Side"))
+          .append(text("]"))
+
+          .hoverEvent(
+              text()
+                  .append(Text.prettyLocation(sign.getLocation(), true))
+
+                  .append(newline())
+                  .append(text(Text.prettyEnumName(sideEnum) + " Side"))
+
+                  .append(newline(), side.line(0).colorIfAbsent(dyeColor))
+                  .append(newline(), side.line(1).colorIfAbsent(dyeColor))
+                  .append(newline(), side.line(2).colorIfAbsent(dyeColor))
+                  .append(newline(), side.line(3).colorIfAbsent(dyeColor))
+
+                  .build()
+          )
+          .clickEvent(
+              ClickEvent.suggestCommand(
+                  String.format("/sign %s %s %s ", sign.getX(), sign.getY(), sign.getZ())
+              )
+          )
+
+          .build();
     }
   }
 
   /**
    * A small data class to store the data written on a sign or data which can be applied to a sign
    */
-  record SignLines(Component line0, Component line1, Component line2, Component line3) {
+  record SignCopy(
+      Component line0,
+      Component line1,
+      Component line2,
+      Component line3,
+      DyeColor dyeColor,
+      boolean glowing
+  ) {
 
-    public static final SignLines EMPTY = new SignLines(
+    public static final SignCopy EMPTY = new SignCopy(
         Component.empty(),
         Component.empty(),
         Component.empty(),
-        Component.empty()
+        Component.empty(),
+        null,
+        false
     );
 
-    public SignLines(SignSide sign) {
-      this(sign.line(0), sign.line(1), sign.line(2), sign.line(3));
+    public SignCopy(SignSide side) {
+      this(
+          side.line(0),
+          side.line(1),
+          side.line(2),
+          side.line(3),
+          side.getColor(),
+          side.isGlowingText()
+      );
     }
 
-    /**
-     * Sets the given sign's lines this instance's lines
-     *
-     * @param sign The sign to edit
-     */
-    public void apply(SignSide sign) {
-      sign.line(0, emptyIfNull(line0));
-      sign.line(1, emptyIfNull(line1));
-      sign.line(2, emptyIfNull(line2));
-      sign.line(3, emptyIfNull(line3));
+    public void apply(SignSide side) {
+      side.line(0, emptyIfNull(line0));
+      side.line(1, emptyIfNull(line1));
+      side.line(2, emptyIfNull(line2));
+      side.line(3, emptyIfNull(line3));
+
+      side.setGlowingText(glowing);
+      side.setColor(Objects.requireNonNullElse(dyeColor, DyeColor.BLACK));
     }
 
     private static Component emptyIfNull(Component component) {

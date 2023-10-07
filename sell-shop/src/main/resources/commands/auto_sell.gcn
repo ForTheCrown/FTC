@@ -1,5 +1,6 @@
 name = "autosell"
 aliases = "autoselling" | "auto_sell" | "auto_selling"
+description = "Admin command for managing players' auto sell"
 
 literal("list").argument("player", user) {
   map_result = @result_to_user

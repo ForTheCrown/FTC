@@ -35,32 +35,32 @@ public class ItemAttributeNode extends ItemModifierNode {
 
   private static final ArgumentOption<Attribute> ATTR_ARG
       = Options.argument(ARGUMENT_ATTRIBUTE)
-      .addLabel("attribute")
+      .setLabel("attribute")
       .build();
 
   private static final ArgumentOption<UUID> UUID_ARG
       = Options.argument(ArgumentTypes.uuid())
-      .addLabel("uuid")
+      .setLabel("uuid")
       .build();
 
   private static final ArgumentOption<String> NAME_ARG
       = Options.argument(StringArgumentType.string())
-      .addLabel("name")
+      .setLabel("name")
       .build();
 
   private static final ArgumentOption<AttributeModifier.Operation> OPERATION_ARG
       = Options.argument(ArgumentTypes.enumType(AttributeModifier.Operation.class))
-      .addLabel("operation")
+      .setLabel("operation")
       .build();
 
   private static final ArgumentOption<Double> VALUE_ARG
       = Options.argument(DoubleArgumentType.doubleArg())
-      .addLabel("value")
+      .setLabel("value")
       .build();
 
   private static final ArgumentOption<EquipmentSlot> SLOT_ARG
       = Options.argument(SLOT_ARGUMENT)
-      .addLabel("slot")
+      .setLabel("slot")
       .build();
 
   private static final OptionsArgument ATTR_ARGS = OptionsArgument.builder()

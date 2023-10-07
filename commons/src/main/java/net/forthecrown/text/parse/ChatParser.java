@@ -90,7 +90,7 @@ public class ChatParser {
           .match(pattern)
 
           .condition((result1, matchCount, replaced) -> {
-            return func.filter(result1)
+            return func.filter(result1, context)
                 ? PatternReplacementResult.REPLACE
                 : PatternReplacementResult.CONTINUE;
           })

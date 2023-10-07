@@ -13,6 +13,7 @@ import java.util.function.Function;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.Loggers;
+import net.forthecrown.challenges.event.ChallengeCompleteEvent;
 import net.forthecrown.registry.Holder;
 import net.forthecrown.scripts.Script;
 import net.forthecrown.scripts.Scripts;
@@ -33,6 +34,7 @@ public class ChallengeEntry {
 
   @Getter
   private final UUID id;
+  private final ChallengeManager manager;
 
   private final Object2FloatMap<String> progress = new Object2FloatOpenHashMap<>();
   private final EnumMap<StreakCategory, Streak> streaks = new EnumMap<>(StreakCategory.class);
@@ -85,8 +87,7 @@ public class ChallengeEntry {
   }
 
   public boolean hasCompleted(Challenge challenge) {
-    return Challenges.getManager()
-        .getChallengeRegistry()
+    return manager.getChallengeRegistry()
         .getHolderByValue(challenge)
         .map(this::hasCompleted)
         .orElse(false);
@@ -105,17 +106,19 @@ public class ChallengeEntry {
 
     if (hasCompleted(holder)
         || !Challenges.isActive(challenge)
-        || Challenges.getManager().areChallengesLocked()
+        || manager.areChallengesLocked()
     ) {
       return;
     }
 
-    float current = progress.getFloat(holder);
+    float current = getProgress(holder);
     User user = getUser();
 
-    float newVal = Math.min(
-        value + current,
-        challenge.getGoal(user)
+    float goal = challenge.getGoal(user);
+    float newVal = Math.min(value + current, goal);
+
+    LOGGER.debug("Added {} (now at {}) points to {}'s goal towards {} (goal={})",
+        value, newVal, user, holder.getKey(), goal
     );
 
     if (newVal >= challenge.getGoal(user)) {
@@ -125,7 +128,13 @@ public class ChallengeEntry {
           holder.getKey()
       );
 
-      if (!challenge.canComplete(user)) {
+      boolean canComplete = challenge.canComplete(user);
+
+      ChallengeCompleteEvent event = new ChallengeCompleteEvent(user, holder);
+      event.setCancelled(!canComplete);
+      event.callEvent();
+
+      if (event.isCancelled()) {
         return;
       }
 
@@ -138,11 +147,10 @@ public class ChallengeEntry {
     }
 
     progress.put(holder.getKey(), newVal);
+    LOGGER.debug("put() called");
   }
 
   private void potentiallyAddStreak(StreakCategory category) {
-    var manager = Challenges.getManager();
-
     for (var c : manager.getActiveChallenges()) {
       if (c.getValue().getStreakCategory() != category) {
         continue;
@@ -184,6 +192,8 @@ public class ChallengeEntry {
   }
 
   public void clear() {
+    LOGGER.debug("clear() called");
+
     progress.clear();
     completedKeys.clear();
     streaks.clear();
@@ -226,9 +236,7 @@ public class ChallengeEntry {
       return;
     }
 
-    var manager = Challenges.getManager();
     var registry = manager.getChallengeRegistry();
-
 
     json.getMap(KEY_PROGRESS, Function.identity(), JsonElement::getAsFloat)
         .forEach((s, aFloat) -> {
@@ -254,6 +262,6 @@ public class ChallengeEntry {
   }
 
   public float getProgress(Holder<Challenge> e) {
-    return progress.getFloat(e);
+    return progress.getFloat(e.getKey());
   }
 }

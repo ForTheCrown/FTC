@@ -18,10 +18,4 @@ public class CommandResourceWorld {
     plugin.reload();
     source.sendSuccess(Component.text("Reloaded ResourceWorld plugin"));
   }
-
-  void resetWorld(CommandSource source) {
-    var rw = plugin.getResourceWorld();
-    rw.resetAndLoad();
-    source.sendSuccess(Component.text("Starting ResourceWorld reset"));
-  }
 }

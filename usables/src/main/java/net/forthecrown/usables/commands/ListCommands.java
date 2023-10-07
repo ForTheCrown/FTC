@@ -13,6 +13,7 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.context.StringRange;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import net.forthecrown.command.Commands;
 import net.forthecrown.command.Exceptions;
@@ -21,6 +22,7 @@ import net.forthecrown.command.help.UsageFactory;
 import net.forthecrown.grenadier.CommandContexts;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Completions;
+import net.forthecrown.grenadier.Grenadier;
 import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.grenadier.types.IntRangeArgument.IntRange;
 import net.forthecrown.registry.Holder;
@@ -29,15 +31,19 @@ import net.forthecrown.text.Text;
 import net.forthecrown.text.TextWriters;
 import net.forthecrown.usables.ComponentList;
 import net.forthecrown.usables.UsableComponent;
-import net.forthecrown.usables.UsageType;
+import net.forthecrown.usables.ObjectType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 
 public class ListCommands<T extends UsableComponent> {
 
-  private final Registry<UsageType<T>> registry;
-  private final RegistryArguments<UsageType<T>> argument;
+  static final int POS_FIRST  = 0;
+  static final int POS_LAST   = -1;
+  static final int POS_AT     = 1;
+
+  private final Registry<ObjectType<T>> registry;
+  private final RegistryArguments<ObjectType<T>> argument;
 
   private final String displayName;
   private final String argumentName;
@@ -45,7 +51,7 @@ public class ListCommands<T extends UsableComponent> {
   public ListCommands(
       String argumentName,
       String displayName,
-      Registry<UsageType<? extends T>> registry
+      Registry<ObjectType<? extends T>> registry
   ) {
     this.argumentName = argumentName;
     this.displayName = displayName;
@@ -63,7 +69,7 @@ public class ListCommands<T extends UsableComponent> {
     factory.usage("clear").addInfo("Clears the %s list", displayName);
 
     factory.usage("remove <indices>")
-        .addInfo("Removes a %s from the %s list", displayName, displayName)
+        .addInfo("Removes a %s", displayName)
         .addInfo("Examples:")
         .addInfo("- remove 1: Removes an element at index 1")
         .addInfo("- remove 1..3: Removes all elements between indices 1 through 3");
@@ -71,8 +77,14 @@ public class ListCommands<T extends UsableComponent> {
     factory.usage("add <type> [<input>]")
         .addInfo("Adds a %s", displayName);
 
+    factory.usage("add -at <index> <type> [<input>]")
+        .addInfo("Adds an %s before the element at <index>", displayName);
+
     factory.usage("add -first <type> [<input>]")
         .addInfo("Adds a %s to the front of the %ss list", displayName, displayName);
+
+    factory.usage("set <index> <type> [<input>]")
+        .addInfo("Sets the %s at <index> to <type>", displayName);
   }
 
   public LiteralArgumentBuilder<CommandSource> create(ListAccess<T> access) {
@@ -106,25 +118,19 @@ public class ListCommands<T extends UsableComponent> {
     });
 
     builder.then(literal("add")
-        .then(literal("-first").then(addArgument(access, true)))
-        .then(addArgument(access, false))
+        .then(literal("-at")
+            .then(argument("index", IntegerArgumentType.integer(1))
+                .suggests(suggestIndices(access))
+                .then(addArgument(access, POS_AT))
+            )
+        )
+
+        .then(literal("-first").then(addArgument(access, POS_FIRST)))
+        .then(addArgument(access, POS_LAST))
     );
 
     builder.then(literal("remove").then(argument("range", ArgumentTypes.intRange())
-        .suggests((context, sBuilder) -> {
-          var holder = access.getHolder(context);
-          var list = holder.getList();
-
-          if (list.isEmpty()) {
-            return Suggestions.empty();
-          }
-
-          for (int i = 1; i <= list.size(); i++) {
-            sBuilder.suggest(i);
-          }
-
-          return sBuilder.buildFuture();
-        })
+        .suggests(suggestIndices(access))
 
         .executes(c -> {
           var holder = access.getHolder(c);
@@ -171,6 +177,8 @@ public class ListCommands<T extends UsableComponent> {
     ));
 
     builder.then(literal("set").then(argument("index", IntegerArgumentType.integer(1))
+        .suggests(suggestIndices(access))
+
         .then(argument("type", argument)
             .executes(c -> {
               StringReader reader = new StringReader(c.getInput());
@@ -182,7 +190,7 @@ public class ListCommands<T extends UsableComponent> {
 
             .then(argument("input", StringArgumentType.greedyString())
                 .suggests((context, builder1) -> {
-                  Holder<UsageType<T>> holder = context.getArgument("type", Holder.class);
+                  Holder<ObjectType<T>> holder = context.getArgument("type", Holder.class);
                   return holder.getValue().getSuggestions(context, builder1);
                 })
 
@@ -220,9 +228,35 @@ public class ListCommands<T extends UsableComponent> {
     }));
   }
 
+  private SuggestionProvider<CommandSource> suggestIndices(ListAccess<T> access) {
+    return (context, builder) -> {
+      var holder = access.getHolder(context);
+      var list = holder.getList();
+
+      if (list.isEmpty()) {
+        return Suggestions.empty();
+      }
+
+      var input = builder.getRemainingLowerCase();
+
+      for (int i = 0; i < list.size(); i++) {
+        String suggestion = String.valueOf(i + 1);
+
+        if (!Completions.matches(input, suggestion)) {
+          continue;
+        }
+
+        Component hover = list.displayEntry(i);
+        builder.suggest(suggestion, Grenadier.toMessage(hover));
+      }
+
+      return builder.buildFuture();
+    };
+  }
+
   private RequiredArgumentBuilder<CommandSource, ?> addArgument(
       ListAccess<T> access,
-      boolean first
+      int positioned
   ) {
     return argument("type", argument)
 
@@ -243,14 +277,13 @@ public class ListCommands<T extends UsableComponent> {
         .executes(c -> {
           StringReader reader = new StringReader(c.getInput());
           reader.setCursor(reader.getTotalLength());
-
-          doAdd(c, access, first, reader);
+          doAdd(c, access, positioned, reader);
           return 0;
         })
 
         .then(argument("input", StringArgumentType.greedyString())
             .suggests((context, builder1) -> {
-              Holder<UsageType<T>> holder = context.getArgument("type", Holder.class);
+              Holder<ObjectType<T>> holder = context.getArgument("type", Holder.class);
               return holder.getValue().getSuggestions(context, builder1);
             })
 
@@ -259,7 +292,7 @@ public class ListCommands<T extends UsableComponent> {
               StringReader reader = new StringReader(c.getInput());
               reader.setCursor(range.getStart());
 
-              doAdd(c, access, first, reader);
+              doAdd(c, access, positioned, reader);
               return 0;
             })
         );
@@ -273,8 +306,8 @@ public class ListCommands<T extends UsableComponent> {
     ListHolder<T> listHolder = access.getHolder(c);
     ComponentList<T> list = listHolder.getList();
 
-    Holder<UsageType<T>> holder = c.getArgument("type", Holder.class);
-    UsageType<T> type = holder.getValue();
+    Holder<ObjectType<T>> holder = c.getArgument("type", Holder.class);
+    ObjectType<T> type = holder.getValue();
 
     validateApplicable(holder, listHolder);
 
@@ -296,7 +329,7 @@ public class ListCommands<T extends UsableComponent> {
     ));
   }
 
-  private void validateApplicable(Holder<UsageType<T>> holder, ListHolder<T> listHolder)
+  private void validateApplicable(Holder<ObjectType<T>> holder, ListHolder<T> listHolder)
       throws CommandSyntaxException
   {
     if (!holder.getValue().canApplyTo(listHolder.object())) {
@@ -310,14 +343,14 @@ public class ListCommands<T extends UsableComponent> {
   private void doAdd(
       CommandContext<CommandSource> c,
       ListAccess<T> access,
-      boolean first,
+      int positioned,
       StringReader reader
   ) throws CommandSyntaxException {
     ListHolder<T> listHolder = access.getHolder(c);
     ComponentList<T> list = listHolder.getList();
 
-    Holder<UsageType<T>> holder = c.getArgument("type", Holder.class);
-    UsageType<T> type = holder.getValue();
+    Holder<ObjectType<T>> holder = c.getArgument("type", Holder.class);
+    ObjectType<T> type = holder.getValue();
 
     validateApplicable(holder, listHolder);
 
@@ -327,12 +360,19 @@ public class ListCommands<T extends UsableComponent> {
       Commands.ensureCannotRead(reader);
     }
 
-    if (first) {
-      list.addFirst(instance);
-    } else {
-      list.addLast(instance);
-    }
+    int index = switch (positioned) {
+      case POS_LAST -> list.size();
+      case POS_FIRST -> 0;
+      case POS_AT -> {
+        int i = c.getArgument("index", Integer.class);
+        Commands.ensureIndexValid(i, list.size() + 1);
+        yield i - 1;
+      }
 
+      default -> positioned;
+    };
+
+    list.add(instance, index);
     listHolder.postEdit();
 
     c.getSource().sendSuccess(Text.format("Added {0}: {1}", displayName, holder.getKey()));

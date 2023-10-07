@@ -12,9 +12,11 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.forthecrown.Loggers;
 import net.forthecrown.scripts.ExecResults;
+import net.forthecrown.scripts.Scripts;
+import net.forthecrown.text.UserClickCallback;
 import net.forthecrown.user.User;
-import net.forthecrown.utils.PluginUtil;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -43,6 +45,8 @@ public class ScriptedChallenge implements Challenge {
 
   private final Reward reward;
 
+  private final ClickEvent triggerClickEvent;
+
   ScriptEventListener listener;
   boolean listenerRegistered = false;
 
@@ -59,6 +63,8 @@ public class ScriptedChallenge implements Challenge {
 
     this.resetInterval = requireNonNull(builder.resetInterval, "Reset interval null");
     this.reward = requireNonNull(builder.reward, "Reward null");
+
+    this.triggerClickEvent = ClickEvent.callback((UserClickCallback) this::trigger);
   }
 
   /* ------------------------------ METHODS ------------------------------- */
@@ -72,7 +78,8 @@ public class ScriptedChallenge implements Challenge {
         return;
       }
 
-      s.invoke(METHOD_ON_ACTIVATE, getListener().getHandle()).logError();
+      s.invoke(METHOD_ON_ACTIVATE, getListener().getHandle())
+          .logError();
     });
 
     return CompletableFuture.completedFuture("");
@@ -87,7 +94,8 @@ public class ScriptedChallenge implements Challenge {
         return;
       }
 
-      s.invoke(METHOD_ON_RESET, listener.getHandle()).logError();
+      s.invoke(METHOD_ON_RESET, listener.getHandle())
+          .logError();
     });
     listener.closeScript();
   }
@@ -95,6 +103,10 @@ public class ScriptedChallenge implements Challenge {
   public void registerListener() {
     if (listenerRegistered) {
       return;
+    }
+
+    if (listener.script == null) {
+      listener.script = Scripts.fromScriptFile(script);
     }
 
     listener.reloadScript();
@@ -105,7 +117,7 @@ public class ScriptedChallenge implements Challenge {
           listener,
           EventPriority.MONITOR,
           listener,
-          PluginUtil.currentContextPlugin(),
+          Challenges.getPlugin(),
           true
       );
     }
@@ -149,7 +161,8 @@ public class ScriptedChallenge implements Challenge {
         return;
       }
 
-      s.invoke(METHOD_ON_COMPLETE, user).logError();
+      s.invoke(METHOD_ON_COMPLETE, user)
+          .logError();
     });
 
     Challenge.super.onComplete(user);
@@ -157,9 +170,7 @@ public class ScriptedChallenge implements Challenge {
 
   @Override
   public void trigger(Object input) {
-    if (eventClass == null
-        && Strings.isNullOrEmpty(script)
-    ) {
+    if (eventClass == null && Strings.isNullOrEmpty(script)) {
       listener.getHandle().givePoint(input);
       return;
     }
@@ -180,8 +191,7 @@ public class ScriptedChallenge implements Challenge {
       }
 
       Loggers.getLogger().error(
-          "Cannot manually invoke script {}! Event class has "
-              + "been specified!",
+          "Cannot manually invoke script {}! Event class has been specified!",
           getListener().getScript()
       );
 
@@ -202,11 +212,8 @@ public class ScriptedChallenge implements Challenge {
       return;
     }
 
-    getListener().getScript().invoke(
-        METHOD_ON_EVENT,
-        input,
-        getListener().getHandle()
-    );
+    getListener().getScript().invoke(METHOD_ON_EVENT, input, getListener().getHandle())
+        .logError();
   }
 
   /* -------------------------- OBJECT OVERRIDES -------------------------- */

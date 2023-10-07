@@ -2,6 +2,7 @@ package net.forthecrown.user;
 
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
@@ -88,5 +89,24 @@ public interface UserLookup {
      *         the past 2 weeks
      */
     @Nullable String getLastName();
+
+    /**
+     * Gets the entry's last used IP
+     * <p>
+     * This IP may not be up-to-date with the player's actual IP. This is become most IP addresses
+     * are dynamic instead of static.
+     *
+     * @return Entry's IP address
+     */
+    @Nullable String getIp();
+
+    /**
+     * Gets the last time this entry's IP address was updated.
+     * <p>
+     * If this instant was more than a week or two ago, use the IP address with caution
+     *
+     * @return Last IP update timestamp
+     */
+    @Nullable Instant getLastIpUpdate();
   }
 }

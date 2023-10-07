@@ -13,4 +13,5 @@ public interface ModuleManager {
 
   Result<Unit> importInto(Script script, ImportInfo info);
 
+  void remove(String moduleName);
 }

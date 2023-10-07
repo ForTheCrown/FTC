@@ -39,6 +39,8 @@ public class CoreConfig {
 
   private boolean rightClickDeposits = true;
 
+  private int hoppersInOneChunk = 128;
+
   public enum AltJoinPrevention {
     ALWAYS {
       @Override

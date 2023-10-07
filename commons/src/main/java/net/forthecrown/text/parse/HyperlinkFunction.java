@@ -2,13 +2,24 @@ package net.forthecrown.text.parse;
 
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
-import net.forthecrown.Loggers;
+import net.forthecrown.text.Text;
 import net.kyori.adventure.text.Component;
 
 public class HyperlinkFunction extends TextFunction {
 
+  static final int GROUP_NAME = 1;
+  static final int GROUP_URL = 2;
+
   public HyperlinkFunction() {
-    super(Pattern.compile("\\[[^\\]]+\\]\\((?:(https?):\\/\\/)?([-\\w_.]+\\.\\w{2,})(\\/\\S*)?\\)"));
+    super(createPattern());
+  }
+
+  private static Pattern createPattern() {
+    String urlPattern = LinkFunction.URL_PATTERN.pattern();
+    String prefix = "\\[([\\w\\s]+)\\]\\((";
+    String suffix = ")\\)";
+
+    return Pattern.compile(prefix + urlPattern + suffix);
   }
 
   @Override
@@ -18,23 +29,12 @@ public class HyperlinkFunction extends TextFunction {
 
   @Override
   public Component format(MatchResult result, TextContext context) {
-    String input = result.group();
-    Loggers.getLogger().debug("input={}", input);
-
-    input = input.substring(1, input.length() - 1);
-
-    int textCloseIndex = input.indexOf(']');
-
-    if (textCloseIndex == -1) {
-      return null;
-    }
-
-    String text = input.substring(0, textCloseIndex);
-    String url = input.substring(textCloseIndex + 2);
+    String text = result.group(GROUP_NAME);
+    String url  = result.group(GROUP_URL);
 
     return Component.text(text)
         .style(LinkFunction.UNDERLINED_STYLE)
         .hoverEvent(Component.text("Link: " + url))
-        .clickEvent(LinkFunction.url(url));
+        .clickEvent(Text.openUrl(url));
   }
 }

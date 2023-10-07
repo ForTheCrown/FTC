@@ -35,6 +35,7 @@ public class PlaceholderServiceImpl implements PlaceholderService {
 
     defaultSources.add(defaults);
     defaultSources.add(new PlayerPlaceholders("viewer", null));
+    defaultSources.add(new TranslatedPlaceholders());
 
     defaults.add("text", new ComponentPlaceholder());
   }

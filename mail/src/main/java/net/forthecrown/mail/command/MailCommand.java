@@ -30,6 +30,7 @@ import net.forthecrown.grenadier.types.options.ArgumentOption;
 import net.forthecrown.grenadier.types.options.FlagOption;
 import net.forthecrown.grenadier.types.options.Options;
 import net.forthecrown.grenadier.types.options.OptionsArgument;
+import net.forthecrown.grenadier.types.options.OptionsArgumentBuilder;
 import net.forthecrown.grenadier.types.options.ParsedOptions;
 import net.forthecrown.mail.Attachment;
 import net.forthecrown.mail.Mail;
@@ -79,7 +80,7 @@ class MailCommand {
   public MailCommand(MailService service) {
     this.service = service;
 
-    OptionsArgument.Builder optionsBuilder = OptionsArgument.builder();
+    OptionsArgumentBuilder optionsBuilder = OptionsArgument.builder();
     optionsBuilder.addRequired(MESSAGE);
     optionsBuilder.addOptional(ITEMS);
     optionsBuilder.addOptional(TAGS);

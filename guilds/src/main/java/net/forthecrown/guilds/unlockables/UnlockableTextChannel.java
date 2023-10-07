@@ -5,6 +5,7 @@ import static net.forthecrown.guilds.GuildSettings.GUILD_CHANNEL;
 import static net.forthecrown.guilds.menu.GuildMenus.GUILD;
 
 import java.time.Instant;
+import net.forthecrown.Loggers;
 import net.forthecrown.command.Exceptions;
 import net.forthecrown.guilds.Guild;
 import net.forthecrown.guilds.GuildDiscord;
@@ -54,8 +55,7 @@ public class UnlockableTextChannel implements Unlockable {
 
   @Override
   public boolean isUnlocked(Guild guild) {
-    return guild.getSettings()
-        .hasFlags(GUILD_CHANNEL);
+    return guild.getSettings().hasFlags(GUILD_CHANNEL);
   }
 
   @Override
@@ -78,8 +78,14 @@ public class UnlockableTextChannel implements Unlockable {
             );
           }
 
+
+          if (Loggers.isDebugEnabled()) {
+            builder.addLore("channelId: " + guild.getDiscord().getChannelId());
+          }
+
           if (isUnlocked(guild)) {
             guild.getDiscord().getChannel().ifPresentOrElse(channel -> {
+
               if (isArchived(channel)) {
                 builder
                     .addLore("&cArchived!")
@@ -123,7 +129,7 @@ public class UnlockableTextChannel implements Unlockable {
 
           if (!isUnlocked(guild)) {
             throw Exceptions.format(
-                "Requires any Guild member to buy the Guild Chat"
+                "Requires any Guild member to buy the Guild Chat upgrade from the webstore"
             );
           }
 
@@ -131,7 +137,7 @@ public class UnlockableTextChannel implements Unlockable {
 
           var now = Instant.now();
           var lastUpdate = guild.getDiscord().getLastChannelUpdate();
-          var interval = Guilds.getConfig().roleUpdateInterval;
+          var interval = Guilds.getConfig().roleUpdateInterval();
 
           var nextChange = lastUpdate.plus(interval);
 
@@ -152,7 +158,7 @@ public class UnlockableTextChannel implements Unlockable {
           // Since any method involving Discord can fail, every method call
           // here is async and can have a different output to the user
           // depending on if the method call failed or succeeded. If it
-          // succeeded, A normal message is shown and GuildMenus.open() is
+          // succeeded, A normal message is shown and click.reloadMenu(); is
           // called to reload the page, else an error message is shown and
           // nothing more
           //   -- Jules
@@ -177,7 +183,7 @@ public class UnlockableTextChannel implements Unlockable {
                   )
               );
 
-              GuildMenus.open(page, user, guild);
+              click.reloadMenu();
             });
 
             return;
@@ -202,7 +208,7 @@ public class UnlockableTextChannel implements Unlockable {
                       user
                   )
               );
-              GuildMenus.open(page, user, guild);
+              click.reloadMenu();
             });
 
             return;
@@ -230,7 +236,7 @@ public class UnlockableTextChannel implements Unlockable {
                     user
                 )
             );
-            GuildMenus.open(page, user, guild);
+            click.reloadMenu();
           });
         })
 

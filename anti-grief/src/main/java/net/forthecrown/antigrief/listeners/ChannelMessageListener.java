@@ -4,6 +4,7 @@ import net.forthecrown.antigrief.BannedWords;
 import net.forthecrown.antigrief.Mute;
 import net.forthecrown.antigrief.Punishments;
 import net.forthecrown.events.ChannelMessageEvent;
+import net.forthecrown.text.channel.ChannelMessageState;
 import net.kyori.adventure.audience.Audience;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
@@ -23,18 +24,18 @@ class ChannelMessageListener implements Listener {
     Mute mute = Punishments.checkMute(source);
 
     if (mute == Mute.HARD) {
-      event.setCancelled(true);
+      event.setState(ChannelMessageState.CANCELLED);
       return;
     }
 
     if (mute == Mute.SOFT) {
-      event.getTargets().clear();
+      event.setState(ChannelMessageState.SOFT_CANCELLED);
     }
 
     if (source instanceof CommandSender cmdSource
         && BannedWords.checkAndWarn(cmdSource, event.getMessage())
     ) {
-      event.setCancelled(true);
+      event.setState(ChannelMessageState.CANCELLED);
     }
   }
 }

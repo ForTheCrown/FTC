@@ -36,7 +36,10 @@ public class CommandWild extends FtcCommand {
       var location = wild.getWildLocation(player);
       player.teleport(location);
 
-      player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 400, 1));
+      if (wild.fallingWild()) {
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 600, 0));
+      }
+
       player.playSound(SOUND);
 
       return 0;

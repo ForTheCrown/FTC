@@ -36,7 +36,9 @@ class PunishmentListPage extends ListPage<Punishment> {
     this.current = current;
 
     initMenu(
-        Menus.builder(Component.text((current ? "Current" : "Past") + " punishments")),
+        Menus.builder(Component.text((current ? "Current" : "Past") + " punishments"))
+            .setSize(Menus.sizeFromRows(4)),
+
         true
     );
   }

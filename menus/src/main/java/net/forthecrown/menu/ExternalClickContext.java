@@ -7,6 +7,7 @@ import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
@@ -26,6 +27,7 @@ public class ExternalClickContext {
   private final InventoryView view;
 
   private final ClickType type;
+  private final InventoryAction action;
 
   @Setter
   @Accessors(fluent = true)
@@ -35,15 +37,13 @@ public class ExternalClickContext {
     this.player = (Player) event.getWhoClicked();
     this.user = Users.get(player);
     this.view = event.getView();
-
     this.clicked = view.getBottomInventory();
     this.menuInventory = view.getTopInventory();
-    this.holder = (MenuHolder) menuInventory.getHolder();
-
+    this.holder = Menus.getHolder(menuInventory);
     this.slot = event.getSlot();
     this.rawSlot = event.getRawSlot();
-
     this.type = event.getClick();
+    this.action = event.getAction();
     this.cancelEvent = event.isCancelled();
   }
 }

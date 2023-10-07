@@ -39,7 +39,7 @@ public class GuildInvite {
     Guild guild = getGuild();
 
     receiver.sendMessage(Messages.REQUEST_DENIED);
-    guild.sendMessage(Messages.requestDenied(receiver));
+    guild.sendMessage(Messages.requestDenied(receiver.displayName()));
 
     delete();
   }

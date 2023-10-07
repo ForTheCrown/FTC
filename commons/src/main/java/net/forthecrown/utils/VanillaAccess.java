@@ -4,17 +4,20 @@ import com.mojang.datafixers.DataFixer;
 import io.papermc.paper.util.StacktraceDeobfuscator;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.lang.reflect.Field;
+import java.util.Locale;
 import java.util.Map;
 import net.forthecrown.Loggers;
 import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.nbt.paper.TagTranslators;
 import net.forthecrown.utils.math.Vectors;
+import net.kyori.adventure.translation.GlobalTranslator;
 import net.minecraft.SharedConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.locale.Language;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -289,5 +292,13 @@ public final class VanillaAccess {
         .map(CraftNamespacedKey::fromMinecraft)
         .findFirst()
         .orElse(null);
+  }
+
+  public static boolean isValidTranslationKey(String key, Locale locale) {
+    if (Language.getInstance().has(key)) {
+      return true;
+    }
+
+    return GlobalTranslator.translator().translate(key, locale) != null;
   }
 }

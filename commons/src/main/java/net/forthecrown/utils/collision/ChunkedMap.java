@@ -7,9 +7,11 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectDoublePair;
 import it.unimi.dsi.fastutil.objects.ObjectLists;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ObjectSet;
 import it.unimi.dsi.fastutil.objects.ObjectSets;
 import java.util.AbstractCollection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -46,6 +48,8 @@ public class ChunkedMap<T> {
   public static final ObjectDoublePair NO_NEAREST
       = ObjectDoublePair.of(null, -1.0D);
 
+  public static final int MAX_BOUNDS_SIZE = 50_000;
+
   /* -------------------------- INSTANCE FIELDS --------------------------- */
 
   /**
@@ -66,6 +70,8 @@ public class ChunkedMap<T> {
    * wouldn't know in which chunks an entry was stored.
    */
   private final Map<T, Entry<T>> entries = new Object2ObjectOpenHashMap<>();
+
+  private final Set<Entry<T>> tooLarge = new HashSet<>();
 
   /**
    * The total area this map encompasses, may be null.
@@ -147,6 +153,16 @@ public class ChunkedMap<T> {
 
     Set<T> result = new ObjectOpenHashSet<>();
 
+    if (!tooLarge.isEmpty()) {
+      for (Entry<T> e : tooLarge) {
+        if (!e.bounds3i.overlaps(bounds3i)) {
+          continue;
+        }
+
+        result.add(e.value);
+      }
+    }
+
     // Go through chunks and find all overlapping entries
     // Since set is being used, entries shouldn't
     // occur more than once
@@ -154,9 +170,11 @@ public class ChunkedMap<T> {
       List<Entry<T>> list = getChunk(value);
 
       for (Entry<T> p : list) {
-        if (p.bounds3i.overlaps(bounds3i)) {
-          result.add(p.value);
+        if (!p.bounds3i.overlaps(bounds3i)) {
+          continue;
         }
+
+        result.add(p.value);
       }
     });
 
@@ -168,6 +186,17 @@ public class ChunkedMap<T> {
 
     if (isEmpty() || !totalArea.overlaps(bounds3i)) {
       return;
+    }
+
+    if (!tooLarge.isEmpty()) {
+      for (Entry<T> e : tooLarge) {
+        if (!e.bounds3i.overlaps(bounds3i)) {
+          continue;
+        }
+
+        Collision<T> coll = new Collision<>(e.value, world, e.bounds3i);
+        out.add(coll);
+      }
     }
 
     forEachChunk(bounds3i, value -> {
@@ -193,15 +222,29 @@ public class ChunkedMap<T> {
   public @NotNull Set<T> get(@NotNull Vector3i pos) {
     Objects.requireNonNull(pos, "pos");
 
-    if (isEmpty() || !totalArea.contains(pos)) {
+    if (isEmpty() || totalArea.contains(pos)) {
       return ObjectSets.emptySet();
     }
 
-    return getChunk(toChunkLong(pos))
+    ObjectSet<T> result = new ObjectOpenHashSet<>(16);
+
+    if (!tooLarge.isEmpty()) {
+      for (Entry<T> tEntry : tooLarge) {
+        if (!tEntry.bounds3i.contains(pos)) {
+          continue;
+        }
+
+        result.add(tEntry.value);
+      }
+    }
+
+    getChunk(toChunkLong(pos))
         .stream()
         .filter(pair -> pair.bounds3i().contains(pos))
         .map(Entry::value)
-        .collect(ObjectOpenHashSet.toSet());
+        .forEach(result::add);
+
+    return ObjectSets.unmodifiable(result);
   }
 
   /**
@@ -261,13 +304,25 @@ public class ChunkedMap<T> {
       totalArea = totalArea.combine(bounds);
     }
 
-    // Add to each chunk's list
-    forEachChunk(bounds, cPos -> {
-      var list = chunkMap.computeIfAbsent(cPos, pos -> new ChunkList<>());
-      list.add(entry);
-    });
+    int longestSide = longestSide(bounds);
+    if (longestSide >= MAX_BOUNDS_SIZE) {
+      tooLarge.add(entry);
+    } else {
+      // Add to each chunk's list
+      forEachChunk(bounds, cPos -> {
+        var list = chunkMap.computeIfAbsent(cPos, pos -> new ChunkList<>());
+        list.add(entry);
+      });
+    }
 
     return true;
+  }
+
+  int longestSide(Bounds3i bounds3i) {
+    int sizeX = bounds3i.sizeX();
+    int sizeY = bounds3i.sizeY();
+    int sizeZ = bounds3i.sizeZ();
+    return Math.max(sizeX, Math.max(sizeZ, sizeY));
   }
 
   /**
@@ -339,16 +394,22 @@ public class ChunkedMap<T> {
   }
 
   private void _remove(Entry<T> entry) {
-    // Loop through all the entries chunks
-    forEachChunk(entry.bounds3i(), cPos -> {
-      List<Entry<T>> chunk = getChunk(cPos);
+    int longestSide = longestSide(entry.bounds3i);
 
-      if (chunk.isEmpty()) {
-        return;
-      }
+    if (longestSide >= MAX_BOUNDS_SIZE) {
+      tooLarge.remove(entry);
+    } else {
+      // Loop through all the entries chunks
+      forEachChunk(entry.bounds3i(), cPos -> {
+        List<Entry<T>> chunk = getChunk(cPos);
 
-      chunk.remove(entry);
-    });
+        if (chunk.isEmpty()) {
+          return;
+        }
+
+        chunk.remove(entry);
+      });
+    }
 
     if (entries.isEmpty()) {
       clear();
@@ -364,6 +425,7 @@ public class ChunkedMap<T> {
     chunkMap.clear();
     totalArea = null;
     entries.clear();
+    tooLarge.clear();
   }
 
   /**

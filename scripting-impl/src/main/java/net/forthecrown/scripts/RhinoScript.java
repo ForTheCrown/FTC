@@ -28,10 +28,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Function;
+import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeJavaClass;
 import org.mozilla.javascript.NativeJavaMethod;
 import org.mozilla.javascript.NativeObject;
+import org.mozilla.javascript.ScriptRuntime;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
@@ -55,7 +56,9 @@ public class RhinoScript implements Script {
   @Getter
   private String[] arguments = EMPTY_STRING_ARRAY;
 
-  NativeObject scriptObject;
+  NativeObject bindingScope;
+  NativeObject evaluationScope;
+
   private org.mozilla.javascript.Script compiled;
 
   @Getter @Setter
@@ -71,9 +74,13 @@ public class RhinoScript implements Script {
 
   private final List<Class> imported = new ArrayList<>();
 
-  public RhinoScript(ScriptManager service, Source source) {
-    this.source = Objects.requireNonNull(source, "Null source");
+  @Getter
+  private final ScriptLoader loader;
+
+  public RhinoScript(ScriptLoader loader, ScriptManager service, Source source) {
+    this.source  = Objects.requireNonNull(source, "Null source");
     this.service = Objects.requireNonNull(service, "Null service");
+    this.loader  = Objects.requireNonNull(loader, "Null loader");
 
     this.logger = Loggers.getLogger(getName());
   }
@@ -115,14 +122,14 @@ public class RhinoScript implements Script {
   @Override
   public Object get(@NotNull String bindingName) throws IllegalStateException {
     ensureCompiled();
-    Object value = scriptObject.get(bindingName, scriptObject);
+    Object value = ScriptableObject.getProperty(evaluationScope, bindingName);
 
     if (value == Context.getUndefinedValue() || value == null) {
       return null;
     }
 
     if (value == Scriptable.NOT_FOUND) {
-      return NOT_FOUND;
+      return value;
     }
 
     return toJava(value);
@@ -130,7 +137,7 @@ public class RhinoScript implements Script {
 
   @Override
   public boolean hasMethod(String methodName) throws IllegalStateException {
-    return get(methodName) instanceof Function;
+    return get(methodName) instanceof Callable;
   }
 
   @Override
@@ -139,9 +146,9 @@ public class RhinoScript implements Script {
   {
     ensureCompiled();
     Object wrapped = toScriptObject(bindingName, binding);
-    scriptObject.put(bindingName, scriptObject, wrapped);
+    ScriptableObject.putProperty(bindingScope, bindingName, wrapped);
 
-    if (binding instanceof RhinoScript script) {
+    if (binding instanceof RhinoScript script && !script.equals(this)) {
       addChild(script);
     }
 
@@ -154,7 +161,7 @@ public class RhinoScript implements Script {
   {
     ensureCompiled();
     Object wrapped = toScriptObject(bindingName, binding);
-    scriptObject.putConst(bindingName, scriptObject, wrapped);
+    bindingScope.putConst(bindingName, bindingScope, wrapped);
 
     if (binding instanceof RhinoScript script) {
       addChild(script);
@@ -170,13 +177,13 @@ public class RhinoScript implements Script {
       Consumer<Object> setter
   ) throws IllegalStateException {
     ensureCompiled();
-    scriptObject.defineProperty(bindingName, getter, setter, 0);
+    bindingScope.defineProperty(bindingName, getter, setter, 0);
     return this;
   }
 
   Object toScriptObject(String label, Object o) {
     if (o instanceof Class<?> clazz) {
-      return new NativeJavaClass(scriptObject, clazz);
+      return new NativeJavaClass(bindingScope, clazz);
     }
 
     if (o instanceof Method method) {
@@ -185,7 +192,7 @@ public class RhinoScript implements Script {
 
     if (o instanceof RhinoScript other) {
       other.ensureCompiled();
-      return other.scriptObject;
+      return new ScriptObject(other);
     }
 
     return o;
@@ -195,7 +202,7 @@ public class RhinoScript implements Script {
   public Object remove(@NotNull String bindingName) throws IllegalStateException {
     ensureCompiled();
     Object existing = get(bindingName);
-    scriptObject.delete(bindingName);
+    bindingScope.delete(bindingName);
 
     if (existing instanceof Script script) {
       removeChild(script);
@@ -207,13 +214,12 @@ public class RhinoScript implements Script {
   @Override
   public Set<Entry<Object, Object>> bindingEntries() throws IllegalStateException {
     ensureCompiled();
-    return scriptObject.entrySet();
+    return bindingScope.entrySet();
   }
 
-  @Override
-  public NativeObject getScriptObject() {
+  public NativeObject getBindingScope() {
     ensureCompiled();
-    return scriptObject;
+    return bindingScope;
   }
 
   @Override
@@ -232,8 +238,8 @@ public class RhinoScript implements Script {
   }
 
   void runtimeImport(String name, Class<?> importedClass) {
-    NativeJavaClass njc = new NativeJavaClass(scriptObject, importedClass);
-    scriptObject.put(name, scriptObject, njc);
+    NativeJavaClass njc = new NativeJavaClass(bindingScope, importedClass);
+    bindingScope.put(name, bindingScope, njc);
   }
 
   private Context enterContext() {
@@ -263,10 +269,14 @@ public class RhinoScript implements Script {
 
     try (Context ctx = enterContext()) {
       compiled = ctx.compileString(str, getName(), 1, null);
-      scriptObject = new NativeObject();
-      ctx.initStandardObjects(scriptObject);
+      bindingScope = new NativeObject();
+      evaluationScope = new NativeObject();
 
-      put("args", arguments);
+      NativeObject topLevelScope = service.getTopLevelScope(ctx);
+      bindingScope.setParentScope(topLevelScope);
+      evaluationScope.setParentScope(bindingScope);
+
+      put("args", createArgsArray());
       put("logger", logger);
       put("_script", this);
 
@@ -281,13 +291,40 @@ public class RhinoScript implements Script {
         imported.forEach(this::runtimeImport);
       }
 
-      processor.runCallbacks(this);
+      var callbackResult = processor.runCallbacks(this);
+
+      if (callbackResult.isError()) {
+        throw new ScriptLoadException(
+            "Error(s) during script loading:\n" + callbackResult.getError()
+        );
+      }
+
     } catch (Throwable t) {
       var message = getMessage(t);
       throw new ScriptLoadException(message, t);
     }
 
     return this;
+  }
+
+  private NativeArray createArgsArray() {
+    NativeArray array = new NativeArray(arguments.length);
+    for (int i = 0; i < arguments.length; i++) {
+      String arg = arguments[i];
+      ScriptableObject.putProperty(array, i, arg);
+    }
+    return array;
+  }
+
+  private NativeObject evalScope() {
+    if (evaluationScope != null) {
+      return evaluationScope;
+    }
+
+    evaluationScope = new NativeObject();
+    evaluationScope.setParentScope(bindingScope);
+
+    return evaluationScope;
   }
 
   @Override
@@ -298,12 +335,24 @@ public class RhinoScript implements Script {
 
     try (Context ctx = enterContext()) {
       try {
-        Object o = compiled.exec(ctx, scriptObject);
+        Object o = compiled.exec(ctx, evalScope());
         return ExecResultImpl.success(transformResult(o), this);
       } catch (Throwable t) {
         return ExecResultImpl.wrap(t, this);
       }
     }
+  }
+
+  @Override
+  public Script clearEvaluationBindings() {
+    if (evaluationScope == null) {
+      return this;
+    }
+
+    evaluationScope = new NativeObject();
+    evaluationScope.setParentScope(bindingScope);
+
+    return this;
   }
 
   @Override
@@ -314,14 +363,10 @@ public class RhinoScript implements Script {
       return ExecResultImpl.error("Script not compiled", this);
     }
 
-    Object value = ScriptableObject.getProperty(scriptObject, methodName);
-
-    if (value == Scriptable.NOT_FOUND) {
-      return ExecResultImpl.error("No such method found", methodName, this);
-    }
+    Object value = get(methodName);
 
     if (!(value instanceof Callable callable)) {
-      return ExecResultImpl.error("Value is not a callable", methodName, this);
+      return ExecResultImpl.error("No such method found", methodName, this);
     }
 
     try (Context ctx = enterContext()) {
@@ -330,14 +375,14 @@ public class RhinoScript implements Script {
       if (arguments.length > 0) {
         args = new Object[arguments.length];
         for (int i = 0; i < arguments.length; i++) {
-          args[i] = Context.javaToJS(arguments[i], scriptObject, ctx);
+          args[i] = Context.javaToJS(arguments[i], evaluationScope, ctx);
         }
       } else {
-        args = EMPTY_OBJECT_ARRAY;
+        args = ScriptRuntime.emptyArgs;
       }
 
       try {
-        Object returnValue = callable.call(ctx, scriptObject, scriptObject, args);
+        Object returnValue = callable.call(ctx, evaluationScope, evaluationScope, args);
         return ExecResultImpl.success(transformResult(returnValue), methodName, this);
       } catch (Throwable exc) {
         return ExecResultImpl.wrap(exc, methodName, this);
@@ -375,6 +420,9 @@ public class RhinoScript implements Script {
 
   @Override
   public Script addChild(Script child) {
+    Objects.requireNonNull(child, "Null child");
+    Preconditions.checkArgument(!child.equals(this), "addChild called with self");
+
     if (children.add(child)) {
       ((RhinoScript) child).setParent(this);
     }
@@ -384,6 +432,8 @@ public class RhinoScript implements Script {
 
   @Override
   public Script removeChild(Script child) {
+    Objects.requireNonNull(child, "Null child");
+
     if (children.remove(child)) {
       ((RhinoScript) child).setParent(null);
     }
@@ -444,10 +494,24 @@ public class RhinoScript implements Script {
   }
 
   @Override
+  public NativeObject getScriptObject() throws IllegalStateException {
+    return evaluationScope;
+  }
+
+  @Override
   public void close() {
     if (compiled == null) {
       return;
     }
+
+    var onCloseResult = invoke("__onClose");
+    onCloseResult.error().ifPresent(string -> {
+      if (string.contains("No such method found")) {
+        return;
+      }
+
+      onCloseResult.logError();
+    });
 
     if (extensions != null) {
       extensions.values().forEach(ext -> ext.onScriptClose(this));
@@ -458,9 +522,11 @@ public class RhinoScript implements Script {
     }
 
     children.forEach(Script::close);
+    children.clear();
 
     compiled = null;
-    scriptObject = null;
+    bindingScope = null;
+    evaluationScope = null;
   }
 
   static Object toJava(Object jsObject) {

@@ -13,16 +13,13 @@ import com.sk89q.worldguard.protection.managers.RemovalStrategy;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import java.time.Duration;
-import java.time.ZonedDateTime;
 import net.forthecrown.Loggers;
 import net.forthecrown.McConstants;
-import net.forthecrown.discord.DiscordBotAnnouncer;
 import net.forthecrown.resourceworld.RwPlugin;
 import net.forthecrown.structure.BlockStructure;
 import net.forthecrown.structure.StructurePlaceConfig;
 import net.forthecrown.structure.Structures;
 import net.forthecrown.text.channel.ChannelledMessage;
-import net.forthecrown.text.Text;
 import net.forthecrown.usables.CmdUsables;
 import net.forthecrown.usables.UsablesPlugin;
 import net.forthecrown.usables.conditions.TestCooldown;
@@ -229,17 +226,5 @@ public class WorldResetListener implements Listener {
 
     rw.lastReset = System.currentTimeMillis();
     LOGGER.info("Resource World reset finished");
-
-    rw.schedule();
-
-    if (PluginUtil.isEnabled("FTC-Discord")) {
-      ZonedDateTime nextReset = ZonedDateTime.now()
-          .plus(config.resetInterval);
-
-      DiscordBotAnnouncer.announce(
-          "Resource world has been reset! Next reset date: %s",
-          Text.DATE_TIME_FORMATTER.format(nextReset)
-      );
-    }
   }
 }

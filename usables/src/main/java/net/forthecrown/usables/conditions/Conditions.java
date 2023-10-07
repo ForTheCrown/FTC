@@ -1,8 +1,9 @@
 package net.forthecrown.usables.conditions;
 
+import net.forthecrown.registry.Holder;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.usables.Condition;
-import net.forthecrown.usables.UsageType;
+import net.forthecrown.usables.ObjectType;
 import net.forthecrown.usables.scripts.ScriptInstance;
 import net.forthecrown.user.currency.Currency;
 import net.forthecrown.user.UserService;
@@ -10,7 +11,7 @@ import net.forthecrown.user.Users;
 
 public class Conditions {
 
-  public static void registerAll(Registry<UsageType<? extends Condition>> r) {
+  public static void registerAll(Registry<ObjectType<? extends Condition>> r) {
     r.register("cooldown", TestCooldown.TYPE);
     r.register("in_world", TestWorld.TYPE);
     r.register("one_use",  TestOneUse.TYPE);
@@ -28,12 +29,8 @@ public class Conditions {
     UserService service = Users.getService();
     Registry<Currency> currencies = service.getCurrencies();
 
-    currencies.get("rhines").ifPresent(currency -> {
-      r.register("rhines", new CurrencyConditionType(currency, "Rhines"));
-    });
-
-    currencies.get("gems").ifPresent(currency -> {
-      r.register("gems", new CurrencyConditionType(currency, "Gems"));
-    });
+    for (Holder<Currency> entry : currencies.entries()) {
+      r.register(entry.getKey(), new CurrencyConditionType(entry.getValue()));
+    }
   }
 }

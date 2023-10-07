@@ -11,7 +11,7 @@ class SimpleImportProcessor extends RegexProcessor {
   static final int GROUP_STAR = 1;
 
   public SimpleImportProcessor() {
-    super(Pattern.compile("import( +\\* +from)? +['\"]([^'\"]+)['\"];?"));
+    super(Pattern.compile("import(\s+\\*\s+from)?\s+['\"]([^'\"]+)['\"];?"));
   }
 
   @Override

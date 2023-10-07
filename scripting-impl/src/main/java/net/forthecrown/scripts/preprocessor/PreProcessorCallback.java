@@ -1,8 +1,10 @@
 package net.forthecrown.scripts.preprocessor;
 
+import com.mojang.datafixers.util.Unit;
 import net.forthecrown.scripts.Script;
+import net.forthecrown.utils.Result;
 
 interface PreProcessorCallback {
 
-  void postProcess(Script script);
+  Result<Unit> postProcess(Script script);
 }

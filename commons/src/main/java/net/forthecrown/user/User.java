@@ -4,6 +4,7 @@ import com.destroystokyo.paper.profile.PlayerProfile;
 import java.time.Duration;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -485,4 +486,6 @@ public interface User extends ForwardingAudience.Single {
   boolean canTeleport();
 
   UserTeleport getCurrentTeleport();
+
+  Locale getLocale();
 }

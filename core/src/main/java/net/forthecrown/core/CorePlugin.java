@@ -51,7 +51,7 @@ public class CorePlugin extends JavaPlugin {
 
     helpList = new HelpListImpl();
     userService = new UserServiceImpl(this);
-    ftcServer = new FtcServerImpl();
+    ftcServer = new FtcServerImpl(this);
     dayChange = new DayChange();
     announcer = new AutoAnnouncer();
     placeholderService = new PlaceholderServiceImpl(this);

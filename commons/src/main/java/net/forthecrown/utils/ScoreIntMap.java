@@ -59,6 +59,7 @@ public class ScoreIntMap<K> implements Iterable<Entry<K>> {
   @Getter
   private boolean unsaved = true;
 
+  @Getter @Setter
   private boolean fatalErrors = true;
 
   @Setter
@@ -96,6 +97,7 @@ public class ScoreIntMap<K> implements Iterable<Entry<K>> {
           throw new IllegalArgumentException(reason);
         } else {
           Loggers.getLogger().error(reason);
+          remove(key);
           return;
         }
       }

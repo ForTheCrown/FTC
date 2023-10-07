@@ -25,6 +25,7 @@ import net.forthecrown.core.commands.admin.CommandSudo;
 import net.forthecrown.core.commands.admin.CommandTab;
 import net.forthecrown.core.commands.admin.CommandTeleport;
 import net.forthecrown.core.commands.admin.CommandTeleportExact;
+import net.forthecrown.core.commands.admin.CommandTellRawF;
 import net.forthecrown.core.commands.admin.CommandTime;
 import net.forthecrown.core.commands.admin.CommandTimeFields;
 import net.forthecrown.core.commands.admin.CommandTop;
@@ -87,6 +88,7 @@ public final class CoreCommands {
     new CommandCooldown();
     new CommandBroadcast();
     new CommandDocGen();
+    new CommandTellRawF();
 
     new CommandSay();
     new CommandNickname();

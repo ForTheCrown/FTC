@@ -37,7 +37,8 @@ public class MarketArgument implements ArgumentType<MarketShop>, SimpleVanillaMa
   }
 
   @Override
-  public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
+  public <S> CompletableFuture<Suggestions> listSuggestions(
+      CommandContext<S> context,
       SuggestionsBuilder builder
   ) {
     return Completions.suggest(builder, manager.getNames());

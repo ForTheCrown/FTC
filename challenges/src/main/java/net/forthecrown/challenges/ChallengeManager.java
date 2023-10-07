@@ -5,7 +5,6 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Collection;
 import java.util.Collections;
@@ -17,6 +16,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletionStage;
 import lombok.Getter;
+import lombok.Setter;
 import net.forthecrown.Loggers;
 import net.forthecrown.menu.Menu;
 import net.forthecrown.registry.Holder;
@@ -38,7 +38,7 @@ public class ChallengeManager {
   @Getter
   private final ChallengesPlugin plugin;
 
-  @Getter
+  @Getter @Setter
   private LocalDate date;
 
   @Getter
@@ -65,7 +65,7 @@ public class ChallengeManager {
   }
 
   public ChallengeEntry getEntry(UUID uuid) {
-    return entries.computeIfAbsent(uuid, ChallengeEntry::new);
+    return entries.computeIfAbsent(uuid, uuid1 -> new ChallengeEntry(uuid1, this));
   }
 
   public List<Holder<Challenge>> getActiveChallenges() {
@@ -92,33 +92,6 @@ public class ChallengeManager {
     return now.compareTo(date) != 0;
   }
 
-  void onDayChange(ZonedDateTime time) {
-    date = time.toLocalDate();
-
-    if (time.getDayOfWeek() == DayOfWeek.MONDAY) {
-      // Clear all item challenge's used items
-      // list, so they can be selected again
-      for (var h : challengeRegistry.entries()) {
-        if (!(h.getValue() instanceof ItemChallenge)) {
-          continue;
-        }
-
-        var container = storage.loadContainer(h);
-
-        if (container.getUsed().isEmpty()) {
-          continue;
-        }
-
-        container.getUsed().clear();
-        storage.saveContainer(container);
-      }
-
-      reset(ResetInterval.WEEKLY);
-    }
-
-    reset(ResetInterval.DAILY);
-  }
-
   public void reset(ResetInterval interval) {
     Set<Challenge> current = new ObjectOpenHashSet<>();
 
@@ -129,7 +102,7 @@ public class ChallengeManager {
         return false;
       }
 
-      challenge.deactivate();
+      deactivate(holder);
       current.add(challenge);
 
       return true;
@@ -166,9 +139,10 @@ public class ChallengeManager {
     Set<Holder<Challenge>> picked = pickUniqueEntries(challenges, required);
 
     resetTimes.put(interval, System.currentTimeMillis());
+    activeChallenges.addAll(picked);
 
     picked.forEach(holder -> {
-      activate(holder, true);
+      activate(holder, true, false);
     });
 
     LOGGER.info("Reset all {} challenges, added {} new ones",
@@ -212,7 +186,7 @@ public class ChallengeManager {
       var c = holder.getValue();
 
       if (c instanceof ItemChallenge) {
-        activate(holder, true);
+        activate(holder, true, true);
         return true;
       }
 
@@ -222,10 +196,31 @@ public class ChallengeManager {
     return challenges;
   }
 
-  public void activate(Holder<Challenge> holder, boolean resetting) {
-    activeChallenges.add(holder);
+  public void deactivate(Holder<Challenge> challenge) {
+    try {
+      challenge.getValue().deactivate();
+    } catch (Throwable t) {
+      LOGGER.error("Failed to deactivate challenge '{}'", challenge.getKey(), t);
+    }
+  }
 
-    CompletionStage<String> extra = holder.getValue().activate(resetting);
+  public void activate(Holder<Challenge> holder, boolean resetting, boolean addToList) {
+    if (addToList) {
+      activeChallenges.add(holder);
+    }
+
+    CompletionStage<String> extra;
+
+    try {
+      extra = holder.getValue().activate(resetting);
+    } catch (Throwable t) {
+      LOGGER.error("Failed to activate challenge '{}'", holder.getKey(), t);
+
+      activeChallenges.remove(holder);
+      deactivate(holder);
+
+      return;
+    }
 
     if (resetting) {
       extra.whenComplete((s, throwable) -> {
@@ -274,7 +269,7 @@ public class ChallengeManager {
     clear();
     loadChallenges();
 
-    storage.loadEntries()
+    storage.loadEntries(this)
         .resultOrPartial(LOGGER::error)
         .ifPresent(entries1 -> {
           for (var e : entries1) {
@@ -293,9 +288,7 @@ public class ChallengeManager {
     LocalDate now;
 
     if (interval == ResetInterval.WEEKLY) {
-      now = date.with(
-          TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)
-      );
+      now = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
     } else {
       now = date;
     }

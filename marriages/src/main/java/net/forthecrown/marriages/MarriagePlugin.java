@@ -7,6 +7,7 @@ import net.forthecrown.marriages.commands.CommandMarriageAccept;
 import net.forthecrown.marriages.commands.CommandMarriageChat;
 import net.forthecrown.marriages.commands.CommandMarriageDeny;
 import net.forthecrown.marriages.commands.CommandMarry;
+import net.forthecrown.marriages.listeners.ChatListener;
 import net.forthecrown.marriages.listeners.MarriageListener;
 import net.forthecrown.user.Users;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -23,6 +24,7 @@ public class MarriagePlugin extends JavaPlugin {
     new CommandMarry();
 
     Events.register(new MarriageListener());
+    Events.register(new ChatListener());
 
     var ftcServer = FtcServer.server();
     Marriages.defineSettings(ftcServer.getGlobalSettingsBook());

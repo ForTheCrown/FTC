@@ -6,14 +6,12 @@ import com.mojang.brigadier.Message;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Completions;
 import net.forthecrown.grenadier.Grenadier;
-import net.forthecrown.grenadier.Suggester;
 import net.forthecrown.user.Users;
 
 /**
@@ -68,22 +66,5 @@ public interface FtcSuggestions {
         });
 
     return builder.buildFuture();
-  }
-
-  @SafeVarargs
-  static Suggester<CommandSource> combined(Suggester<CommandSource>... arr) {
-    return (context, builder) -> {
-      CompletableFuture<Suggestions> result = new CompletableFuture<>();
-
-      for (Suggester<CommandSource> provider : arr) {
-        CompletableFuture<Suggestions> suggestions = provider.getSuggestions(context, builder);
-
-        result = result.thenCombine(suggestions, (s1, s2) -> {
-          return Suggestions.merge(context.getInput(), List.of(s1, s2));
-        });
-      }
-
-      return result;
-    };
   }
 }

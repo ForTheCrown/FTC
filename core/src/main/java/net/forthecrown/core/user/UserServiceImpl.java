@@ -19,12 +19,11 @@ import net.forthecrown.Loggers;
 import net.forthecrown.core.CoreConfig;
 import net.forthecrown.core.CorePlugin;
 import net.forthecrown.core.user.PropertyImpl.BuilderImpl;
-import net.forthecrown.packet.PacketListeners;
 import net.forthecrown.registry.Holder;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.registry.RegistryListener;
-import net.forthecrown.user.currency.Currency;
+import net.forthecrown.text.UnitFormat;
 import net.forthecrown.user.Properties;
 import net.forthecrown.user.TimeField;
 import net.forthecrown.user.User;
@@ -33,6 +32,7 @@ import net.forthecrown.user.UserLookup;
 import net.forthecrown.user.UserProperty;
 import net.forthecrown.user.UserProperty.Builder;
 import net.forthecrown.user.UserService;
+import net.forthecrown.user.currency.Currency;
 import net.forthecrown.user.event.UserLeaveEvent;
 import net.forthecrown.user.event.UserLogEvent;
 import net.forthecrown.utils.Result;
@@ -97,6 +97,11 @@ public class UserServiceImpl implements UserService {
     this.playtime.setValidator(KeyValidator.IS_PLAYER);
     this.votes.setValidator(KeyValidator.IS_PLAYER);
 
+    this.balances.setFatalErrors(false);
+    this.gems.setFatalErrors(false);
+    this.playtime.setFatalErrors(false);
+    this.votes.setFatalErrors(false);
+
     this.currencies = Registries.newFreezable();
 
     this.propertyRegistry = Registries.newFreezable();
@@ -136,8 +141,8 @@ public class UserServiceImpl implements UserService {
     registerComponent(UserTimestamps.class);
     registerComponent(UserHomes.class);
 
-    currencies.register("rhines", Currency.wrap("Rhine", balances));
-    currencies.register("gems", Currency.wrap("Gem", gems));
+    currencies.register("rhines", Currency.wrap(UnitFormat.UNIT_RHINE, balances));
+    currencies.register("gems", Currency.wrap(UnitFormat.UNIT_GEM, gems));
   }
 
   public void shutdown() {
@@ -198,9 +203,14 @@ public class UserServiceImpl implements UserService {
     }
 
     if (player != null) {
-      PacketListeners.listeners().uninject(player);
       user.setEntityLocation(player.getLocation());
       user.setLastOnlineName(player.getName());
+
+      var addr = player.getAddress();
+      if (addr != null) {
+        var entry = user.lookupEntry();
+        lookup.changeIp(entry, addr.getAddress().getHostAddress());
+      }
     }
 
     if (user.vanishTicker != null) {

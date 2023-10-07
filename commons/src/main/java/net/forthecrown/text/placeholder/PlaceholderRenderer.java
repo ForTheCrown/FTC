@@ -3,7 +3,6 @@ package net.forthecrown.text.placeholder;
 import java.util.Map;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
-import net.forthecrown.utils.context.Context;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
@@ -55,7 +54,7 @@ public interface PlaceholderRenderer extends PlaceholderList {
    * @return The rendered component
    */
   default Component render(Component base, @Nullable Audience viewer) {
-    return render(base, viewer, Context.EMPTY);
+    return render(base, viewer, Map.of());
   }
 
   /**
@@ -67,7 +66,7 @@ public interface PlaceholderRenderer extends PlaceholderList {
    *
    * @return Rendered component
    */
-  Component render(Component base, @Nullable Audience viewer, Context ctx);
+  Component render(Component base, @Nullable Audience viewer, Map<String, Object> context);
 
   /**
    * Tells this list to use the default global placeholders

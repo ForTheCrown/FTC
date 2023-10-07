@@ -1,6 +1,8 @@
 package net.forthecrown.challenges;
 
 import com.google.common.collect.ImmutableList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletionStage;
 import net.forthecrown.Loggers;
 import net.forthecrown.text.Text;
@@ -56,6 +58,7 @@ public interface Challenge {
 
       writer.setFieldStyle(Style.style(NamedTextColor.GRAY));
       writer.setFieldValueStyle(Style.style(NamedTextColor.GRAY));
+      writer.setFieldSeparator(Component.text(": ", NamedTextColor.GRAY));
 
       reward.write(writer, streak, viewer == null ? null : viewer.getUniqueId());
     }
@@ -71,12 +74,16 @@ public interface Challenge {
     int streak = getStreak(user);
     float goal = getGoal().getValue(streak);
 
+    Map<String, Object> ctx = new HashMap<>();
+    ctx.put("goal", goal);
+    ctx.put("challenge", this);
+
     PlaceholderRenderer list = Placeholders.newRenderer()
         .useDefaults()
         .add("goal", Text.formatNumber(goal))
         .add("streak", Text.formatNumber(streak));
 
-    return list.render(component);
+    return list.render(component, user, ctx);
   }
 
   /**

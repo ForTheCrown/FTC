@@ -22,7 +22,7 @@ public class ScriptedChallengeLoader {
   static final String KEY_ARGS = "inputs";
   static final String EVENT_CUSTOM = "custom";
 
-  public static Result<ScriptedChallenge> parse(JsonObject object) {
+  public static Result<ScriptedChallenge> load(JsonObject object) {
     JsonWrapper json = JsonWrapper.wrap(object);
 
     if (!json.has(KEY_NAME)) {

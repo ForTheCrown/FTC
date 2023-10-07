@@ -35,19 +35,19 @@ public class CommandShopHistory extends FtcCommand {
 
   public static final ArgumentOption<Integer> PAGE
       = Options.argument(IntegerArgumentType.integer(1))
-      .addLabel("page")
+      .setLabel("page")
       .setDefaultValue(1)
       .build();
 
   public static final ArgumentOption<Integer> PAGE_SIZE
       = Options.argument(IntegerArgumentType.integer(5, 25))
       .setDefaultValue(10)
-      .addLabel("page-size")
+      .setLabel("page-size")
       .build();
 
   public static final ArgumentOption<LocationFileName> SHOP_NAME
       = Options.argument(LocationFileName::parse)
-      .addLabel("shop-name")
+      .setLabel("shop-name")
       .build();
 
   public static final OptionsArgument ARGS = OptionsArgument.builder()

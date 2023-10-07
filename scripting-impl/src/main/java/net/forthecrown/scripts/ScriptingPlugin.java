@@ -3,11 +3,13 @@ package net.forthecrown.scripts;
 import com.google.gson.JsonElement;
 import java.nio.file.Path;
 import java.util.Map;
+import lombok.Getter;
 import net.forthecrown.BukkitServices;
 import net.forthecrown.command.Commands;
 import net.forthecrown.grenadier.annotations.AnnotatedCommandContext;
 import net.forthecrown.scripts.commands.CommandJs;
 import net.forthecrown.scripts.commands.ScriptingCommand;
+import net.forthecrown.scripts.listeners.ScriptListeners;
 import net.forthecrown.scripts.pack.PackManager;
 import net.forthecrown.scripts.preprocessor.PreProcessor;
 import net.forthecrown.utils.io.JsonWrapper;
@@ -15,6 +17,7 @@ import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.utils.io.SerializationHelper;
 import org.bukkit.plugin.java.JavaPlugin;
 
+@Getter
 public class ScriptingPlugin extends JavaPlugin {
 
   private ScriptManager service;
@@ -34,10 +37,13 @@ public class ScriptingPlugin extends JavaPlugin {
 
     ScriptPlaceholders.registerAll();
 
+    // Commands
     AnnotatedCommandContext ctx = Commands.createAnnotationContext();
-    ctx.registerCommand(new ScriptingCommand());
-
+    ctx.registerCommand(new ScriptingCommand(this));
     new CommandJs();
+
+    // Events
+    ScriptListeners.registerAll(this);
 
     reload();
   }

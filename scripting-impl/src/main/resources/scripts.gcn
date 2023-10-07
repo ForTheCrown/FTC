@@ -1,7 +1,34 @@
 name        = "scripts"
 aliases     = 'script'
 permission  = 'ftc.commands.scripts'
-description = "Command that provides access to FTC's embedded scripting engine"
+description = "Command that provides access to FTC's scripting engine"
+
+literal("reload-config") {
+  executes = configReload()
+  description = "Reloads the scripting plugin config"
+}
+
+literal("reload-scripts") {
+  executes = scriptsReload()
+  description = "Reloads all currently active scripts"
+}
+
+literal("loaded") {
+  literal("list") {
+    executes = listActive()
+    description = "Lists all loaded scripts"
+  }
+
+  literal("reload").argument("active", @active_script) {
+    executes = reloadActive()
+    description = "Reloads a specific script"
+  }
+
+  literal("close").argument("active", @active_script) {
+    executes = closeActive()
+    description = "Closes a loaded script"
+  }
+}
 
 literal("run").argument("script_name", @script_argument) {
   executes = runScript()

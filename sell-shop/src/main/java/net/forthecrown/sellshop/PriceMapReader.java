@@ -62,13 +62,11 @@ public class PriceMapReader {
    */
   static final char EMPTY_VAL = '-';
 
-  static final int DEF_MAX_EARNINGS = 500_000;
-
-  static ItemPriceMap readFile(Path path) {
+  static ItemPriceMap readFile(Path path, int defaultMaxEarnings) {
     var map = new ItemPriceMap();
 
     try (var reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
-      read(map, reader);
+      read(map, reader, defaultMaxEarnings);
     } catch (IOException e) {
       throw new IllegalStateException(e);
     }
@@ -76,7 +74,9 @@ public class PriceMapReader {
     return map;
   }
 
-  private static void read(ItemPriceMap map, BufferedReader reader) throws IOException {
+  private static void read(ItemPriceMap map, BufferedReader reader, int defaultMax)
+      throws IOException
+  {
     var lines = reader.lines().toList();
     int line = 0;
 
@@ -94,7 +94,7 @@ public class PriceMapReader {
       }
 
       try {
-        map.add(parseLine(new StringReader(trimmed)));
+        map.add(parseLine(new StringReader(trimmed), defaultMax));
       } catch (CommandSyntaxException e) {
         throw new IOException(
             String.format("Error on line %s: '%s'", line, e.getMessage()),
@@ -104,7 +104,7 @@ public class PriceMapReader {
     }
   }
 
-  private static ItemSellData parseLine(StringReader reader)
+  private static ItemSellData parseLine(StringReader reader, int defaultMaxEarnings)
       throws CommandSyntaxException, IOException {
     var builder = ItemSellData.builder();
 
@@ -119,7 +119,7 @@ public class PriceMapReader {
     // --- Max earnings ---
 
     skipSeparator(reader);
-    builder.maxEarnings(parseInt(reader, DEF_MAX_EARNINGS));
+    builder.maxEarnings(parseInt(reader, defaultMaxEarnings));
 
     // --- Compact data parsing ---
 

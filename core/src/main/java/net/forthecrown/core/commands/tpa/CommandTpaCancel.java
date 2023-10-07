@@ -41,7 +41,7 @@ public class CommandTpaCancel extends FtcCommand {
           TeleportRequest r = TeleportRequests.latestOutgoing(user);
 
           if (r == null) {
-            throw TpExceptions.NO_TP_REQUESTS;
+            throw TpExceptions.NO_TP_REQUESTS_OUT;
           }
 
           r.cancel();

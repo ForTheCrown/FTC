@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -87,9 +88,6 @@ public final class UserImpl implements User {
 
   @Getter @Setter
   private String lastOnlineName;
-
-  @Getter @Setter
-  private String ip;
 
   @Getter
   private final List<String> previousNames = new ArrayList<>();
@@ -387,6 +385,11 @@ public final class UserImpl implements User {
   }
 
   @Override
+  public @Nullable String getIp() {
+    return lookupEntry().getIp();
+  }
+
+  @Override
   public void setNickname(String nickname) {
     ensureValid();
 
@@ -446,6 +449,8 @@ public final class UserImpl implements User {
     ensureOnline();
     Preconditions.checkState(!isAfk(), "User is already AFK");
     ensureValid();
+
+    setAfk(true , reason);
 
     ViewerAwareMessage nonNullReason = reason == null
         ? ViewerAwareMessage.wrap(Component.empty())
@@ -828,6 +833,11 @@ public final class UserImpl implements User {
     }
 
     return Time.isPast(getTime(TimeField.NEXT_TELEPORT));
+  }
+
+  @Override
+  public Locale getLocale() {
+    return isOnline() ? getPlayer().locale() : Locale.ENGLISH;
   }
 
   @Override

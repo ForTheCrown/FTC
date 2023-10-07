@@ -29,9 +29,7 @@ public class ScriptEventListener implements Listener, EventExecutor {
 
   @Override
   public void execute(@NotNull Listener listener, @NotNull Event event) {
-    if (event instanceof Cancellable cancellable
-        && cancellable.isCancelled()
-    ) {
+    if (event instanceof Cancellable cancellable && cancellable.isCancelled()) {
       return;
     }
 
@@ -43,11 +41,7 @@ public class ScriptEventListener implements Listener, EventExecutor {
     // Execute script if there's an onEvent method
     if (script != null && script.hasMethod(ScriptedChallenge.METHOD_ON_EVENT)) {
       var res = script.invoke(ScriptedChallenge.METHOD_ON_EVENT, event, handle);
-
-      res.error().ifPresent(throwable -> {
-        LOGGER.error("Failed on event {}", event.getClass().getName());
-      });
-
+      res.logError();
       return;
     }
 
@@ -61,13 +55,12 @@ public class ScriptEventListener implements Listener, EventExecutor {
   }
 
   private Player findPlayer(Event event) {
-    if (script == null
-        || !script.hasMethod(ScriptedChallenge.METHOD_GET_PLAYER)
-    ) {
+    if (script == null || !script.hasMethod(ScriptedChallenge.METHOD_GET_PLAYER)) {
       return getFromEvent(event);
     }
 
-    var runResult = script.invoke(ScriptedChallenge.METHOD_GET_PLAYER, event);
+    var runResult = script.invoke(ScriptedChallenge.METHOD_GET_PLAYER, event)
+        .logError();
 
     if (runResult.result().isEmpty()) {
       LOGGER.error(
@@ -86,9 +79,7 @@ public class ScriptEventListener implements Listener, EventExecutor {
       return event1.getPlayer();
     }
 
-    if (event instanceof EntityEvent entityEvent
-        && entityEvent.getEntity() instanceof Player player
-    ) {
+    if (event instanceof EntityEvent e && e.getEntity() instanceof Player player) {
       return player;
     }
 
@@ -116,14 +107,14 @@ public class ScriptEventListener implements Listener, EventExecutor {
       script.close();
     }
 
-    script.compile();
-
     if (args != null && args.length > 0) {
-      script.put("inputs", args);
+      script.setArguments(args);
     }
 
-    script.put("_challengeHandle", handle);
-    script.put("_challenge", handle.getChallenge());
+    script.compile();
+
+    script.put("handle", handle);
+    script.put("challenge", handle.getChallenge());
 
     script.evaluate().throwIfError();
   }

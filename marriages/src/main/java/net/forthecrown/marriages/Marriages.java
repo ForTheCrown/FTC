@@ -12,13 +12,14 @@ import net.forthecrown.command.Exceptions;
 import net.forthecrown.command.settings.Setting;
 import net.forthecrown.command.settings.SettingsBook;
 import net.forthecrown.mail.Mail;
-import net.forthecrown.text.channel.ChannelledMessage;
 import net.forthecrown.text.PlayerMessage;
-import net.forthecrown.text.format.FormatBuilder;
+import net.forthecrown.text.Text;
+import net.forthecrown.text.channel.ChannelledMessage;
 import net.forthecrown.user.Properties;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserProperty;
 import net.forthecrown.user.Users;
+import net.forthecrown.utils.Audiences;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -122,7 +123,7 @@ public final class Marriages {
     spouse.set(MCHAT_TOGGLED, false);
 
     user.sendMessage(MMessages.senderDivorced(spouse));
-    Mail.sendOrMail(spouse, MMessages.targetDivorced(user));
+    Mail.sendOrMail(spouse, MMessages.targetDivorced(user).create(spouse));
   }
 
   public static void testCanMarry(User user, User target) throws CommandSyntaxException {
@@ -160,23 +161,19 @@ public final class Marriages {
     user.sendMessage(MMessages.nowMarried(target).create(user));
 
     ChannelledMessage.announce(
-        FormatBuilder.builder()
-            .setFormat("&e{0, user}&r is now married to &e{1, user}&r{2}")
-            .setArguments(
-                user, target,
+        Text.vformat("&e{0, user}&r is now married to &e{1, user}&r{2}",
+            user, target,
 
-                MESSAGE_RANDOM.nextInt(0, 1000) != 1
-                    ? text("!")
-                    : text("... I give it a week", NamedTextColor.GRAY)
-            )
-            .asViewerAware()
+            MESSAGE_RANDOM.nextInt(0, 1000) != 1
+                ? text("!")
+                : text("... I give it a week", NamedTextColor.GRAY)
+        )
     );
   }
 
   public static void mchat(User user, PlayerMessage message) {
     var spouse = getSpouse(user);
-
-    assert spouse != null : "No spouse";
+    Objects.requireNonNull(spouse, "User " + user + " has no spouse");
 
     var chn = ChannelledMessage.create(message);
     chn.setChannelName("marriage_chat");
@@ -184,7 +181,20 @@ public final class Marriages {
     chn.addTarget(spouse);
 
     chn.setRenderer((viewer, baseMessage) -> {
-      Component displayName = user.displayName(viewer);
+      Component displayName;
+
+      // If the condition fails, it means the channel is being viewed by
+      // a user not invloved in the marriage, which can only happen with
+      // EavesDropper
+      if (Audiences.equals(viewer, user) || Audiences.equals(viewer, spouse)) {
+        displayName = user.displayName(viewer);
+      } else {
+        displayName = Component.textOfChildren(
+            user.displayName(viewer),
+            text(" -> "),
+            spouse.displayName(viewer)
+        );
+      }
 
       return text()
           .append(MMessages.MARRIAGE_PREFIX)

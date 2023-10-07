@@ -20,7 +20,7 @@ public abstract class InWorldUsableCommand<H extends InWorldUsable> extends Inte
   ) {
     super.createEditArguments(argument, provider);
 
-    argument.then(literal("cancel_vanilla")
+    argument.then(literal("cancel-interaction")
         .executes(c -> {
           H holder = provider.get(c);
 

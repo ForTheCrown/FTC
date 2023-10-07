@@ -7,18 +7,28 @@ import net.forthecrown.utils.io.source.Source;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
-public interface ScriptService {
+public interface ScriptService extends ScriptLoader {
 
   Path getScriptsDirectory();
 
+  CachingScriptLoader newLoader();
+
+  CachingScriptLoader newLoader(Path workingDirectory);
+
+  CachingScriptLoader getGlobalLoader();
+
   @NotNull
-  Script newScript(@NotNull Source source);
+  Script newScript(ScriptLoader loader, @NotNull Source source);
+
+  default Script newScript(@NotNull Source source) {
+    return newScript(this, source);
+  }
 
   Plugin getScriptPlugin();
 
   List<Class<?>> getAutoImportedClasses();
 
-  void addActiveScript(Script script);
+  void addAutoImportedClass(Class<?> clazz);
 
   ModuleManager getModules();
 }

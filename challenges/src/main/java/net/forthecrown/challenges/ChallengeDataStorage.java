@@ -92,11 +92,11 @@ public class ChallengeDataStorage {
   }
 
   public void loadChallenges(Registry<Challenge> target) {
-    loadChallenges(target, getChallengesFile(), ScriptedChallengeLoader::parse);
+    loadChallenges(target, getChallengesFile(), ScriptedChallengeLoader::load);
   }
 
   public void loadItemChallenges(Registry<Challenge> registry) {
-    loadChallenges(registry, getItemChallengesFile(), ItemChallengeLoader::parse);
+    loadChallenges(registry, getItemChallengesFile(), ItemChallengeLoader::load);
   }
 
   private void loadChallenges(
@@ -131,6 +131,8 @@ public class ChallengeDataStorage {
 
         ++loaded;
         registry.register(e.getKey(), result.getValue());
+
+        LOGGER.debug("Loaded challenge {}", e.getKey());
       }
 
       LOGGER.debug("Loaded {} challenges from {}", loaded, path);
@@ -139,7 +141,7 @@ public class ChallengeDataStorage {
 
   /* ----------------------------- USER DATA ------------------------------ */
 
-  public DataResult<List<ChallengeEntry>> loadEntries() {
+  public DataResult<List<ChallengeEntry>> loadEntries(ChallengeManager manager) {
     return SerializationHelper.readJson(getUserDataFile())
         .map(object -> {
           List<ChallengeEntry> entries = new ObjectArrayList<>();
@@ -155,7 +157,7 @@ public class ChallengeDataStorage {
             }
 
             UUID uuid = UUID.fromString(e.getKey());
-            ChallengeEntry entry = new ChallengeEntry(uuid);
+            ChallengeEntry entry = new ChallengeEntry(uuid, manager);
 
             var eObj = JsonWrapper.wrap(e.getValue().getAsJsonObject());
             entry.deserialize(eObj);
@@ -248,9 +250,10 @@ public class ChallengeDataStorage {
     });
   }
 
-  public void loadActive(Collection<Holder<Challenge>> holders,
-                         Map<ResetInterval, Long> lastResets,
-                         Registry<Challenge> registry
+  public void loadActive(
+      Collection<Holder<Challenge>> holders,
+      Map<ResetInterval, Long> lastResets,
+      Registry<Challenge> registry
   ) {
     holders.clear();
     lastResets.clear();

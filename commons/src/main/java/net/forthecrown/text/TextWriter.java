@@ -32,18 +32,16 @@ public interface TextWriter extends ComponentLike {
   default void fieldSameLine(Object field, Object value) {
     write(Text.valueOf(field, viewer()).applyFallbackStyle(getFieldStyle()));
     write(getFieldSeparator());
-
-    Component valueText = Text.valueOf(value, viewer());
-
-    if (Text.isEmpty(valueText)) {
-      write(valueText.applyFallbackStyle(getFieldValueStyle()));
-    }
+    fieldValue(value);
   }
 
   default void field(Object field, Object value) {
     field(field);
+    fieldValue(value);
+  }
 
-    Component valueText = Text.valueOf(value, viewer());
+  default void fieldValue(Object value) {
+    Component valueText = value == null ? null : Text.valueOf(value, viewer());
 
     if (!Text.isEmpty(valueText)) {
       write(valueText.applyFallbackStyle(getFieldValueStyle()));

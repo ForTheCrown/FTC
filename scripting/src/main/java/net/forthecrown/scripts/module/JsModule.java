@@ -10,4 +10,8 @@ public interface JsModule {
   default void onImportFail(Script script) {
 
   }
+
+  default void close() {
+
+  }
 }

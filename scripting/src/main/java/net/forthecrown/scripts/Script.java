@@ -10,22 +10,13 @@ import java.util.function.Supplier;
 import net.forthecrown.utils.io.source.Source;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
 import org.slf4j.Logger;
 
 public interface Script extends AutoCloseable {
 
-  Object NOT_FOUND = new Object() {
-    @Override
-    public int hashCode() {
-      return 0;
-    }
-
-    @Override
-    public String toString() {
-      return "NOT_FOUND";
-    }
-  };
+  Object NOT_FOUND = Scriptable.NOT_FOUND;
 
   /**
    * Gets the script source
@@ -41,6 +32,8 @@ public interface Script extends AutoCloseable {
   default String getName() {
     return getSource().name();
   }
+
+  ScriptLoader getLoader();
 
   /**
    * Gets the script service
@@ -228,7 +221,7 @@ public interface Script extends AutoCloseable {
    * @return Script's bindings object
    * @throws IllegalStateException If the script is not compiled
    */
-  Scriptable getScriptObject() throws IllegalStateException;
+  NativeObject getScriptObject() throws IllegalStateException;
 
   /**
    * Imports a class, making it accessible to the script. Imported classes will persist between
@@ -261,6 +254,17 @@ public interface Script extends AutoCloseable {
    * @return Evaluation result
    */
   ExecResult<Object> evaluate();
+
+  /**
+   * Clears the script-level binding values. Any values placed into the script with
+   * {@link #put(String, Object)} will not be removed.
+   * <p>
+   * This method will only clear the scope of the script that is filled with values that have been
+   * created by the script itself, this includes local variables, local functions and such.
+   *
+   * @return {@code this}
+   */
+  Script clearEvaluationBindings();
 
   /**
    * Invokes a function in the script's main scope

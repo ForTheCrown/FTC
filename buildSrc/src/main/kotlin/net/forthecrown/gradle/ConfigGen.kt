@@ -7,6 +7,8 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.util.*
 
+const val NEW_DEPENDENCY_FORMAT = false
+
 internal fun createPluginYml(it: Task) {
   val configYml = it.project.extensions.findByType(FtcPaperYml::class.java) ?: return
   validateConfig(configYml, it)
@@ -57,13 +59,31 @@ internal fun createPluginYml(it: Task) {
   if (dependsMap.isNotEmpty()) {
     builder.append("dependencies:\n")
 
-    dependsMap.forEach { (key, value) ->
-      val depName = resolveDependency(key, it.project) ?: return@forEach;
+    if (NEW_DEPENDENCY_FORMAT) {
+      val serverDepends = ArrayList<Pair<String, PluginDependency>>();
+      val bootstrapDepends = ArrayList<Pair<String, PluginDependency>>()
 
-      builder
-        .append("  - name: '${depName}'\n")
-        .append("    required: ${!value.optional}\n")
-        .append("    bootstrap: ${value.bootstrap}\n")
+      dependsMap.forEach { (name, dependency) ->
+        val resolvedName = resolveDependency(name, it.project) ?: return@forEach
+
+        if (dependency.bootstrap) {
+          bootstrapDepends.add(Pair(resolvedName, dependency))
+        } else {
+          serverDepends.add(Pair(resolvedName, dependency))
+        }
+      }
+
+      printDependencyList(serverDepends, builder, "server")
+      printDependencyList(bootstrapDepends, builder, "bootstrap")
+    } else {
+      dependsMap.forEach { (key, value) ->
+        val depName = resolveDependency(key, it.project) ?: return@forEach;
+
+        builder
+            .append("  - name: '${depName}'\n")
+            .append("    required: ${!value.optional}\n")
+            .append("    bootstrap: ${value.bootstrap}\n")
+      }
     }
   }
 
@@ -83,6 +103,25 @@ internal fun createPluginYml(it: Task) {
   }
 
   Files.writeString(path, builder.toString(), StandardCharsets.UTF_8)
+}
+
+fun printDependencyList(
+    list: List<Pair<String, PluginDependency>>,
+    builder: StringBuilder,
+    title: String
+) {
+  if (list.isEmpty()) {
+    return
+  }
+
+  builder.append("  $title:")
+
+  for (pair in list) {
+    builder.append("    ${pair.first}:")
+    builder.append("      load: ${pair.second.load}")
+    builder.append("      required: ${!pair.second.optional}")
+    builder.append("      join-classpath: ${!pair.second.joinClasspath}")
+  }
 }
 
 fun resolveDependency(name: String, project: Project): String? {

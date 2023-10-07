@@ -1,6 +1,7 @@
 package net.forthecrown.antigrief;
 
 
+import com.google.common.base.Strings;
 import com.google.gson.JsonElement;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectImmutableList;
@@ -161,11 +162,23 @@ public class PunishEntry {
     UserService service = Users.getService();
 
     if (service.userLoadingAllowed()) {
-      type.onPunishmentEnd(getUser(), this, punishment);
+      onPunishEnd(punishment, type, pardonSource);
     } else {
       PunishmentManager manager = Punishments.get();
-      manager.getPostStartup().add(() -> type.onPunishmentEnd(getUser(), this, punishment));
+      manager.getPostStartup().add(() -> onPunishEnd(punishment, type, pardonSource));
     }
+  }
+
+  private void onPunishEnd(Punishment punishment, PunishType type, String pardoner) {
+    var user = getUser();
+
+    type.onPunishmentEnd(user, this, punishment);
+
+    if (!Strings.isNullOrEmpty(pardoner)) {
+      return;
+    }
+
+    Punishments.announceExpiry(user, type, punishment);
   }
 
   void clearCurrent() {

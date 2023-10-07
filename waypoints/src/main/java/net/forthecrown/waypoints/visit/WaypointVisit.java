@@ -280,7 +280,7 @@ public class WaypointVisit implements Runnable {
       );
     } else {
       // Execute travel effect, if they have one
-      if (activeEffect != null) {
+      if (shouldPlayEffect()) {
         Tasks.runLater(() -> {
           activeEffect.onPoleTeleport(
               user,
@@ -302,6 +302,10 @@ public class WaypointVisit implements Runnable {
 
       runTpHandlers();
     }
+  }
+
+  boolean shouldPlayEffect() {
+    return activeEffect != null && user.getGameMode() != GameMode.SPECTATOR;
   }
 
   void runHandlers(Consumer<VisitHandler> consumer) {

@@ -5,7 +5,6 @@ import static net.kyori.adventure.text.Component.text;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.BoolArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.command.Exceptions;
 import net.forthecrown.grenadier.types.options.ArgumentOption;
@@ -27,20 +26,16 @@ class ComponentPlaceholder extends OptionedPlaceholder {
   private static final ArgumentOption<String> TEXT = quotedString("content").build();
 
   private static final ArgumentOption<String> TRANS = quotedString("translation")
-      .mutuallyExclusiveWith(TEXT)
       .build();
 
   private static final ArgumentOption<String> SELECTOR = quotedString("selector")
       .build();
 
   private static final ArgumentOption<String> OBJ_NAME = quotedString("objective")
-      .mutuallyExclusiveWith(TEXT)
-      .mutuallyExclusiveWith(TRANS)
-      .requires(SELECTOR)
       .build();
 
   private static final ArgumentOption<TextColor> COLOR = Options.argument(new ColorParser())
-      .addLabel("color")
+      .setLabel("color")
       .build();
 
   private static final ArgumentOption<String> HOVER = quotedString("hover").build();
@@ -54,36 +49,30 @@ class ComponentPlaceholder extends OptionedPlaceholder {
   private static final ArgumentOption<String> RUN_COMMAND = quotedString("run_command").build();
 
   private static final ArgumentOption<String> SUGGEST_CMD = quotedString("suggest_command")
-      .mutuallyExclusiveWith(RUN_COMMAND)
       .build();
 
   private static final ArgumentOption<String> OPEN_URL = quotedString("open_url")
-      .mutuallyExclusiveWith(SUGGEST_CMD)
-      .mutuallyExclusiveWith(RUN_COMMAND)
       .build();
 
   private static final ArgumentOption<String> COPY_TEXT = quotedString("copy")
-      .mutuallyExclusiveWith(SUGGEST_CMD)
-      .mutuallyExclusiveWith(RUN_COMMAND)
-      .mutuallyExclusiveWith(OPEN_URL)
       .build();
 
   private static final OptionsArgument ARGUMENT = OptionsArgument.builder()
-      .addOptional(TEXT)
-      .addOptional(TRANS)
-      .addOptional(SELECTOR)
-      .addOptional(OBJ_NAME)
+      .requireOneOf(TEXT, TRANS)
+      .addRequired(OBJ_NAME, b -> b.exclusiveWith(TEXT, TRANS).requires(SELECTOR))
+      .addOptional(SELECTOR, b -> b.requires(OBJ_NAME))
+
+      .oneOf(COPY_TEXT, OPEN_URL, RUN_COMMAND, SUGGEST_CMD)
+
       .addOptional(HOVER)
+
       .addOptional(COLOR)
       .addOptional(ITALIC)
       .addOptional(BOLD)
       .addOptional(UNDERLINED)
       .addOptional(STRIKETHROUGH)
       .addOptional(OBFUSCATED)
-      .addOptional(OPEN_URL)
-      .addOptional(SUGGEST_CMD)
-      .addOptional(RUN_COMMAND)
-      .addOptional(COPY_TEXT)
+
       .build();
 
   public ComponentPlaceholder() {
@@ -91,7 +80,7 @@ class ComponentPlaceholder extends OptionedPlaceholder {
   }
 
   private static ArgumentOption.Builder<String> quotedString(String name) {
-    return Options.argument(StringArgumentType.string()).addLabel(name);
+    return Options.argument(new StringParser()).setLabel(name);
   }
 
   private static ArgumentOption<Boolean> boolOpt(String name) {
@@ -163,6 +152,19 @@ class ComponentPlaceholder extends OptionedPlaceholder {
     });
 
     return builder.build();
+  }
+
+  static class StringParser implements ArgumentType<String> {
+
+    @Override
+    public String parse(StringReader reader) throws CommandSyntaxException {
+      if (!reader.canRead()) {
+        throw Exceptions.create("End-of-input");
+      }
+
+      String str = reader.readString();
+      return str.replace("\\n", "\n");
+    }
   }
 
   private static class ColorParser implements ArgumentType<TextColor> {

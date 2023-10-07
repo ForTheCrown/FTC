@@ -119,6 +119,10 @@ public final class TomlConfigs {
 
   public static Duration parseDuration(String strValue) throws CommandSyntaxException {
     StringReader reader = new StringReader(strValue);
+    return parseDuration(reader);
+  }
+
+  public static Duration parseDuration(StringReader reader) throws CommandSyntaxException {
     TimeArgument parser = ArgumentTypes.time();
     Duration result = parser.parse(reader);
 

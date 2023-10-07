@@ -1,11 +1,13 @@
 package net.forthecrown.scripts.preprocessor;
 
+import com.mojang.datafixers.util.Unit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import net.forthecrown.scripts.Script;
+import net.forthecrown.utils.Result;
 import org.jetbrains.annotations.ApiStatus.Internal;
 
 @Internal
@@ -21,6 +23,8 @@ public class PreProcessor {
   static Map<String, String> importPlaceholders;
 
   private final StringBuffer source;
+
+  @Getter
   private final List<PreProcessorCallback> callbacks = new ArrayList<>();
 
   public PreProcessor(StringBuffer source) {
@@ -48,11 +52,21 @@ public class PreProcessor {
     return source.toString();
   }
 
-  public void runCallbacks(Script script) {
+  public Result<Unit> runCallbacks(Script script) {
+    Result<Unit> result = Result.success(Unit.INSTANCE);
+
     for (int i = 0; i < callbacks.size(); i++) {
       PreProcessorCallback callback = callbacks.get(i);
-      callback.postProcess(script);
+      var callbackResult = callback.postProcess(script);
+
+      result = result.combine(
+          callbackResult,
+          (string, string2) -> string + "\n" + string2,
+          (unit, unit2) -> unit
+      );
     }
+
+    return result;
   }
 }
 

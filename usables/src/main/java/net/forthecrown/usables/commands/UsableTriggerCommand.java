@@ -18,15 +18,15 @@ import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.text.Text;
 import net.forthecrown.usables.UPermissions;
 import net.forthecrown.usables.UsablesPlugin;
-import net.forthecrown.usables.trigger.Trigger;
-import net.forthecrown.usables.trigger.Trigger.Type;
+import net.forthecrown.usables.trigger.AreaTrigger;
+import net.forthecrown.usables.trigger.AreaTrigger.Type;
 import net.forthecrown.usables.trigger.TriggerManager;
 import net.forthecrown.utils.math.WorldBounds3i;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.permissions.Permission;
 
-public class UsableTriggerCommand extends InteractableCommand<Trigger> {
+public class UsableTriggerCommand extends InteractableCommand<AreaTrigger> {
 
   private final TriggerManager manager;
 
@@ -57,6 +57,8 @@ public class UsableTriggerCommand extends InteractableCommand<Trigger> {
         .addInfo("Redefines a trigger to your current world edit selection");
 
     factory.usage("remove").addInfo("Removes a trigger");
+
+    super.createUsages(factory);
   }
 
   @Override
@@ -92,7 +94,7 @@ public class UsableTriggerCommand extends InteractableCommand<Trigger> {
       throws CommandSyntaxException
   {
     String name = c.getArgument("name", String.class);
-    Trigger existing = manager.get(name);
+    AreaTrigger existing = manager.get(name);
 
     if (existing != null) {
       throw Exceptions.alreadyExists("Trigger", existing.displayName());
@@ -112,7 +114,7 @@ public class UsableTriggerCommand extends InteractableCommand<Trigger> {
       }
     }
 
-    Trigger trigger = new Trigger();
+    AreaTrigger trigger = new AreaTrigger();
     trigger.setName(name);
     trigger.setArea(area);
 
@@ -126,12 +128,12 @@ public class UsableTriggerCommand extends InteractableCommand<Trigger> {
   @Override
   protected <B extends ArgumentBuilder<CommandSource, B>> void createEditArguments(
       B argument,
-      UsableProvider<Trigger> provider
+      UsableProvider<AreaTrigger> provider
   ) {
     super.createEditArguments(argument, provider);
 
     argument.then(literal("remove").executes(c -> {
-      Trigger trigger = c.getArgument("trigger", Trigger.class);
+      AreaTrigger trigger = c.getArgument("trigger", AreaTrigger.class);
       manager.remove(trigger);
 
       c.getSource().sendSuccess(
@@ -142,7 +144,7 @@ public class UsableTriggerCommand extends InteractableCommand<Trigger> {
 
     argument.then(literal("redefine")
         .executes(c -> {
-          Trigger trigger = provider.get(c);
+          AreaTrigger trigger = provider.get(c);
           var newArea = WorldBounds3i.ofPlayerSelection(c.getSource().asPlayer());
 
           if (newArea == null) {
@@ -164,20 +166,18 @@ public class UsableTriggerCommand extends InteractableCommand<Trigger> {
     argument.then(literal("rename")
         .then(argument("newName", Arguments.FTC_KEY)
             .suggests((context, builder) -> {
-              Trigger trigger = provider.get(context);
+              AreaTrigger trigger = provider.get(context);
               return Completions.suggest(builder, trigger.getName());
             })
             .executes(c -> {
-              Trigger trigger = provider.get(c);
+              AreaTrigger trigger = provider.get(c);
 
               var oldName = trigger.getName();
               String name = c.getArgument("newName", String.class);
 
               var existing = manager.get(name);
               if (existing != null) {
-                throw Exceptions.format("Trigger with name {0} already exists",
-                    existing.displayName()
-                );
+                throw Exceptions.alreadyExists("Trigger", trigger.displayName());
               }
 
               trigger.setName(name);
@@ -228,24 +228,30 @@ public class UsableTriggerCommand extends InteractableCommand<Trigger> {
 
   @Override
   protected ArgumentType<?> getArgumentType() {
-    return new TriggerArgumentType();
+    return new TriggerArgumentType(manager);
   }
 
   @Override
-  protected UsableProvider<Trigger> getProvider(String argument) {
-    return context -> context.getArgument(argument, Trigger.class);
+  protected UsableProvider<AreaTrigger> getProvider(String argument) {
+    return context -> context.getArgument(argument, AreaTrigger.class);
   }
 
-  class TriggerArgumentType implements ArgumentType<Trigger> {
+  public static class TriggerArgumentType implements ArgumentType<AreaTrigger> {
+
+    private final TriggerManager manager;
+
+    public TriggerArgumentType(TriggerManager manager) {
+      this.manager = manager;
+    }
 
     @Override
-    public Trigger parse(StringReader reader) throws CommandSyntaxException {
+    public AreaTrigger parse(StringReader reader) throws CommandSyntaxException {
       final int start = reader.getCursor();
 
       String ftcKey = Arguments.FTC_KEY.parse(reader);
 
       var triggers = UsablesPlugin.get().getTriggers();
-      Trigger trigger = triggers.get(ftcKey);
+      AreaTrigger trigger = triggers.get(ftcKey);
 
       if (trigger == null) {
         reader.setCursor(start);

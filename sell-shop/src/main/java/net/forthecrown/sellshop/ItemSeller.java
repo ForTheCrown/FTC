@@ -78,7 +78,7 @@ public final class ItemSeller {
     SellResult result = sell.sell();
 
     ItemSellEvent event = new ItemSellEvent(
-        result.getSold(), result.getEarned(), material, result.getFailure()
+        player, result.getSold(), result.getEarned(), material, result.getFailure()
     );
 
     event.callEvent();
@@ -106,10 +106,11 @@ public final class ItemSeller {
     player.getComponent(UserShopData.class)
         .add(sell.getItemData().getMaterial(), result.getEarned());
 
-    Loggers.getLogger().info(
-        "Selling complete! seller={} material={} quantity={} earned={}",
-        player, material, result.getSold(), result.getEarned()
-    );
+    var config = SellShopPlugin.getPlugin().getShopConfig();
+
+    if (!isAutoSell() || !config.logAutoSellOnlyWhenEnds()) {
+      log(player, material, result.getSold(), result.getEarned());
+    }
 
     if (send) {
       player.sendMessage(SellMessages.soldItems(result, material));
@@ -122,6 +123,19 @@ public final class ItemSeller {
     }
 
     return result;
+  }
+
+  public static void log(User player, Material material, int sold, int earned) {
+    var config = SellShopPlugin.getPlugin().getShopConfig();
+
+    if (!config.logSelling()) {
+      return;
+    }
+
+    Loggers.getLogger().info(
+        "Selling complete! seller={} material={} quantity={} earned={}",
+        player, material, sold, earned
+    );
   }
 
   void removeItems(SellResult result) {

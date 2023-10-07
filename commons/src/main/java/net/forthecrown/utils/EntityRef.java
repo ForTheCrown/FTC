@@ -3,6 +3,8 @@ package net.forthecrown.utils;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import java.util.UUID;
 import lombok.Data;
 import net.forthecrown.grenadier.types.ArgumentTypes;
@@ -33,6 +35,14 @@ public class EntityRef {
 
   public static final char FIELD_SEPARATOR = ' ';
 
+  public static final Codec<EntityRef> CODEC = Codec.STRING.comapFlatMap(s -> {
+    try {
+      return DataResult.success(EntityRef.parse(s));
+    } catch (IllegalArgumentException exc) {
+      return DataResult.error(exc::getMessage);
+    }
+  }, EntityRef::toString);
+
   private final UUID uniqueId;
   private final String worldName;
   private final Vector2i chunk;
@@ -50,7 +60,19 @@ public class EntityRef {
     Chunk c = w.getChunkAt(chunk.x(), chunk.y());
     var result = w.getEntity(getUniqueId());
 
-    return result;
+    if (result != null) {
+      return result;
+    }
+
+    Entity[] e = c.getEntities();
+
+    for (Entity entity : e) {
+      if (entity.getUniqueId().equals(uniqueId)) {
+        return entity;
+      }
+    }
+
+    return null;
   }
 
   public static EntityRef of(Entity e) {

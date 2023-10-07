@@ -18,9 +18,12 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent.Reason;
 import org.bukkit.inventory.Inventory;
+import org.slf4j.Logger;
 
 @Getter
 public class Menu implements MenuCloseConsumer {
+
+  private static final Logger LOGGER = Loggers.getLogger();
 
   /**
    * The cooldown category menus use
@@ -119,7 +122,11 @@ public class Menu implements MenuCloseConsumer {
   public Inventory createInventory(User user, Context context) {
     MenuHolder holder = createMenuHolder(context);
     Inventory inv = holder.getInventory();
+    fillInventory(user, context, inv);
+    return inv;
+  }
 
+  public void fillInventory(User user, Context context, Inventory inv) {
     if (border != null) {
       var item = border.createItem(user, context);
 
@@ -145,20 +152,16 @@ public class Menu implements MenuCloseConsumer {
 
       var item = node.createItem(user, context);
 
-      if (ItemStacks.isEmpty(item)) {
+      if (item == null) {
         continue;
       }
 
-      assert item != null;
-
-      if (hasFlag(MenuFlag.PREVENT_ITEM_STACKING)) {
+      if (ItemStacks.notEmpty(item) && hasFlag(MenuFlag.PREVENT_ITEM_STACKING)) {
         Menus.makeUnstackable(item);
       }
 
       inv.setItem(i, item);
     }
-
-    return inv;
   }
 
   public void onExternalClick(InventoryClickEvent event) {
@@ -191,6 +194,8 @@ public class Menu implements MenuCloseConsumer {
     event.setCancelled(cancel);
     click.cancelEvent(cancel);
 
+    LOGGER.debug("onMenuClick: cancelled={}, flags={}", cancel, flags);
+
     Cooldowns cd = Cooldowns.cooldowns();
 
     if (cd.onCooldown(user.getUniqueId(), COOLDOWN_CATEGORY)) {
@@ -198,6 +203,7 @@ public class Menu implements MenuCloseConsumer {
       // flat out disable it here
       event.setCancelled(true);
 
+      LOGGER.debug("onCooldown");
       return;
     }
 
@@ -207,19 +213,24 @@ public class Menu implements MenuCloseConsumer {
       if (node == null) {
         if (border != null && Menus.isBorderSlot(Slot.of(click.getSlot()), size)) {
           node = border;
+          LOGGER.debug("node = border");
         } else {
           return;
         }
+        LOGGER.debug("node = nodes[slot]");
       }
 
       click.node = node;
-
       node.onClick(user, context, click);
+
+      LOGGER.debug("postClick: cancelled={}", click.cancelEvent());
     } catch (CommandSyntaxException exc) {
       Exceptions.handleSyntaxException(user, exc);
     } catch (Throwable t) {
       Loggers.getLogger().error("Error running menu click!", t);
     } finally {
+      LOGGER.debug("Finally block");
+
       if (click.cancelEvent()) {
         event.setCancelled(true);
       }
@@ -231,13 +242,16 @@ public class Menu implements MenuCloseConsumer {
       if (click.shouldClose()) {
         click.getPlayer().closeInventory();
       } else if (click.shouldReloadMenu()) {
-        open(user, context);
+        var inventory = click.getInventory();
+        fillInventory(user, context, inventory);
       }
     }
   }
 
   public void onMenuClose(InventoryCloseEvent event) {
     MenuHolder holder = (MenuHolder) event.getInventory().getHolder();
+    assert holder != null : "Null holder";
+
     User user = Users.get((Player) event.getPlayer());
 
     onClose(event.getInventory(), holder.getContext(), user, event.getReason());

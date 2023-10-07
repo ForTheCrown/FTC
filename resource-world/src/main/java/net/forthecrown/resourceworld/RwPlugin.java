@@ -1,6 +1,7 @@
 package net.forthecrown.resourceworld;
 
 import lombok.Getter;
+import net.forthecrown.BukkitServices;
 import net.forthecrown.command.Commands;
 import net.forthecrown.events.Events;
 import net.forthecrown.grenadier.annotations.AnnotatedCommandContext;
@@ -9,6 +10,7 @@ import net.forthecrown.resourceworld.listeners.BlockListener;
 import net.forthecrown.resourceworld.listeners.WorldResetListener;
 import net.forthecrown.utils.PeriodicalSaver;
 import net.forthecrown.utils.TomlConfigs;
+import net.forthecrown.worldloader.SeedGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @Getter
@@ -30,6 +32,8 @@ public class RwPlugin extends JavaPlugin {
     this.resourceWorld = new ResourceWorld(this);
 
     reload();
+
+    BukkitServices.register(SeedGenerator.class, new RwSeedGenerator(this));
 
     Events.register(new WorldResetListener(this));
     Events.register(new BlockListener(this));

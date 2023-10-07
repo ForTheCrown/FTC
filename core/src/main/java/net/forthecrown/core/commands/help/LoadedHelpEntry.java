@@ -37,7 +37,7 @@ public class LoadedHelpEntry implements HelpEntry {
 
   @Override
   public void writeShort(TextWriter writer, CommandSource source) {
-    writer.fieldSameLine(mainLabel, shortText);
+    writer.fieldSameLine("/" + mainLabel, shortText);
   }
 
   @Override

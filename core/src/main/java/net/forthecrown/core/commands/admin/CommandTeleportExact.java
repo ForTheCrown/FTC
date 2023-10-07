@@ -32,22 +32,20 @@ public class CommandTeleportExact extends FtcCommand {
   public static final ArgumentOption<Float> YAW
       = Options.argument(FloatArgumentType.floatArg(-180, 180))
       .setDefaultValue(0F)
-      .addLabel("yaw")
+      .setLabel("yaw")
       .build();
 
 
   public static final ArgumentOption<Float> PITCH
       = Options.argument(FloatArgumentType.floatArg(-90, 90))
       .setDefaultValue(0F)
-      .addLabel("pitch")
+      .setLabel("pitch")
       .build();
 
   public static final OptionsArgument ARGS = OptionsArgument.builder()
       .addRequired(WORLD)
 
-      .addRequired(CORD_X)
-      .addRequired(CORD_Y)
-      .addRequired(CORD_Z)
+      .requireAllOf(CORD_X, CORD_Y, CORD_Z)
 
       .addOptional(YAW)
       .addOptional(PITCH)

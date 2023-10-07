@@ -4,13 +4,13 @@ import net.forthecrown.usables.Condition;
 import net.forthecrown.usables.Interaction;
 import net.forthecrown.usables.SimpleType;
 import net.forthecrown.usables.UsableComponent;
-import net.forthecrown.usables.UsageType;
+import net.forthecrown.usables.ObjectType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 public class TestEmptyInventory implements Condition {
 
-  public static final UsageType<TestEmptyInventory> TYPE
+  public static final ObjectType<TestEmptyInventory> TYPE
       = new SimpleType<>(TestEmptyInventory::new);
 
   @Override
@@ -24,7 +24,7 @@ public class TestEmptyInventory implements Condition {
   }
 
   @Override
-  public UsageType<? extends UsableComponent> getType() {
+  public ObjectType<? extends UsableComponent> getType() {
     return TYPE;
   }
 }

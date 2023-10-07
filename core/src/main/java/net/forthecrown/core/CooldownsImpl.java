@@ -32,8 +32,7 @@ public class CooldownsImpl implements Cooldowns {
   @Getter
   private final Path path;
 
-  private final Map<String, CategoryMap> cooldownMap
-      = new Object2ObjectOpenHashMap<>();
+  private final Map<String, CategoryMap> cooldownMap = new Object2ObjectOpenHashMap<>();
 
   private CooldownsImpl() {
     this.path = PathUtil.pluginPath("cooldowns.json");

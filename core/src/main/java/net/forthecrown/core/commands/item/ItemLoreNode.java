@@ -135,7 +135,7 @@ public class ItemLoreNode extends ItemModifierNode {
 
                       Commands.ensureIndexValid(index, lore.size());
 
-                      lore.set(index-1, text);
+                      lore.set(index-1, optionallyWrap(text, c, "text"));
                       held.lore(lore);
 
                       c.getSource().sendSuccess(

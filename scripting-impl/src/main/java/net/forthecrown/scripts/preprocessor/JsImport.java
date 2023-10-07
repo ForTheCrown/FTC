@@ -6,7 +6,6 @@ import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.scripts.Script;
-import net.forthecrown.scripts.ScriptLoadException;
 import net.forthecrown.scripts.module.ImportInfo;
 import net.forthecrown.scripts.module.ImportInfo.BindingImport;
 import net.forthecrown.scripts.module.ModuleManager;
@@ -49,15 +48,11 @@ class JsImport implements PreProcessorCallback {
   }
 
   @Override
-  public void postProcess(Script script) {
+  public Result<Unit> postProcess(Script script) {
     ImportInfo info = new ImportInfo(aliased, path, getBindingName(), importedValues);
     ModuleManager manager = script.getService().getModules();
 
-    Result<Unit> result = manager.importInto(script, info)
+    return manager.importInto(script, info)
         .mapError(string -> "Import failure on script " + script.getName() + ": " + string);
-
-    if (result.isError()) {
-      throw new ScriptLoadException(result.getError());
-    }
   }
 }

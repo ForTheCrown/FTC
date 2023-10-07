@@ -4,6 +4,7 @@ import static net.kyori.adventure.text.Component.text;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.MatchResult;
 import net.forthecrown.Loggers;
 import net.forthecrown.text.placeholder.PlaceholderContext;
@@ -11,7 +12,6 @@ import net.forthecrown.text.placeholder.PlaceholderList;
 import net.forthecrown.text.placeholder.PlaceholderRenderer;
 import net.forthecrown.text.placeholder.PlaceholderSource;
 import net.forthecrown.text.placeholder.TextPlaceholder;
-import net.forthecrown.utils.context.Context;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
@@ -35,7 +35,7 @@ public class PlaceholderRendererImpl implements PlaceholderRenderer {
   }
 
   @Override
-  public Component render(Component base, @Nullable Audience viewer, Context ctx) {
+  public Component render(Component base, @Nullable Audience viewer, Map<String, Object> ctx) {
     if (service.getPlugin().getFtcConfig().placeholdersDisabled()) {
       return base;
     }
@@ -51,6 +51,10 @@ public class PlaceholderRendererImpl implements PlaceholderRenderer {
   }
 
   private Component renderPlaceholder(MatchResult result, PlaceholderContext render) {
+    if (result.group().startsWith("\\")) {
+      return text(result.group().substring(1));
+    }
+
     String placeholderName = result.group(1);
 
     String input = result.group(2);

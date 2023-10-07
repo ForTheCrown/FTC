@@ -20,10 +20,12 @@ public interface UsableObject {
     return interact(createInteraction(player));
   }
 
+  default Interaction createInteraction(Player player, boolean adminInteraction) {
+    return Interaction.create(player, this, adminInteraction);
+  }
+
   default Interaction createInteraction(Player player) {
-    Interaction interaction = Interaction.create(player, this);
-    fillContext(interaction.context());
-    return interaction;
+    return Interaction.create(player, this);
   }
 
   boolean interact(Interaction interaction);

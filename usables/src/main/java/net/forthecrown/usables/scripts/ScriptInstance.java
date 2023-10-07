@@ -13,7 +13,7 @@ import net.forthecrown.usables.Action;
 import net.forthecrown.usables.Condition;
 import net.forthecrown.usables.Interaction;
 import net.forthecrown.usables.UsableComponent;
-import net.forthecrown.usables.UsageType;
+import net.forthecrown.usables.ObjectType;
 import net.forthecrown.utils.io.source.Source;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +29,7 @@ import org.mozilla.javascript.json.JsonParser.ParseException;
 @Getter
 public class ScriptInstance implements Condition, Action {
 
-  public static final UsageType<ScriptInstance> TYPE = new ScriptType();
+  public static final ObjectType<ScriptInstance> TYPE = new ScriptType();
 
   private final Source source;
   private final String[] args;
@@ -145,7 +145,7 @@ public class ScriptInstance implements Condition, Action {
   }
 
   @Override
-  public UsageType<? extends UsableComponent> getType() {
+  public ObjectType<? extends UsableComponent> getType() {
     return TYPE;
   }
 

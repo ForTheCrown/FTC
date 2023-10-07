@@ -43,7 +43,6 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.format.TextDecoration.State;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import net.kyori.adventure.translation.GlobalTranslator;
 import net.kyori.adventure.translation.Translatable;
 import net.kyori.adventure.util.HSVLike;
 import org.bukkit.Location;
@@ -100,38 +99,24 @@ public final class Text {
       .hexColors()
       .build();
 
-  public static final ComponentFlattener FLATTENER = ComponentFlattener.basic()
-      .toBuilder()
-      .complexMapper(TranslatableComponent.class, (component, consumer) -> {
-        var translator = GlobalTranslator.translator();
-        var format = translator.translate(component.key(), Locale.ENGLISH);
-
-        // This is a weird bug, the keys exist but not on the server's side??
-        // IDK, this is to stop an infinite recursion error from happening
-        if (format == null) {
-          consumer.accept(text(component.key()));
-
-          for (Component child : component.children()) {
-            consumer.accept(child);
-          }
-
-          return;
-        }
-
-        consumer.accept(GlobalTranslator.render(component, Locale.ENGLISH));
-      })
-      .unknownMapper(component -> {
-        throw new IllegalArgumentException(
-            String.format("Don't know how to flatten: %s", component)
-        );
-      })
-      .build();
+  public static final ComponentFlattener FLATTENER = PaperAdventure.FLATTENER;
 
   public static final PlainTextComponentSerializer PLAIN = PlainTextComponentSerializer.builder()
       .flattener(FLATTENER)
       .build();
 
+  static final Pattern URL_SCHEME_PATTERN
+      = Pattern.compile("^[a-z][a-z0-9+\\-.]*:");
+
   /* ----------------------------- UTILITY METHODS ------------------------------ */
+
+  public static ClickEvent openUrl(String url) {
+    if (!URL_SCHEME_PATTERN.matcher(url).find()) {
+      url = "http://" + url;
+    }
+
+    return ClickEvent.openUrl(url);
+  }
 
   /**
    * Renders the given text to a string with section symbols to denote color

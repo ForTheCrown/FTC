@@ -16,8 +16,6 @@ dependencies {
   compileOnly(project(":discord"))
   compileOnly(project(":waypoints"))
   compileOnly(project(":anti-grief"))
-
-  compileOnly("us.dynmap:DynmapCoreAPI:3.5-beta-3")
 }
 
 pluginYml {

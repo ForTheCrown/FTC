@@ -1,6 +1,7 @@
 package net.forthecrown.serverlist;
 
 import net.forthecrown.command.FtcCommand;
+import net.forthecrown.command.help.UsageFactory;
 import net.forthecrown.grenadier.GrenadierCommand;
 import net.kyori.adventure.text.Component;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -11,6 +12,11 @@ public class CommandServerList extends FtcCommand {
     super("serverlist");
     setDescription("Allows interacting with the serverlist plugin");
     register();
+  }
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.usage("reload", "Reloads the serverlist plugin");
   }
 
   @Override

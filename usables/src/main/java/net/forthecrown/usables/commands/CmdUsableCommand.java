@@ -4,6 +4,7 @@ import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.List;
 import lombok.Getter;
 import net.forthecrown.command.Exceptions;
 import net.forthecrown.command.arguments.Arguments;
@@ -15,6 +16,7 @@ import net.forthecrown.usables.CmdUsables;
 import net.forthecrown.usables.Condition;
 import net.forthecrown.usables.conditions.TestPermission;
 import net.forthecrown.usables.objects.CommandUsable;
+import net.forthecrown.user.User;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 public abstract class CmdUsableCommand<T extends CommandUsable> extends InteractableCommand<T> {
@@ -67,6 +69,48 @@ public abstract class CmdUsableCommand<T extends CommandUsable> extends Interact
 
       return 0;
     });
+
+    argument.then(argument("selector", Arguments.ONLINE_USERS)
+        .requires(hasAdminPermission())
+
+        .executes(c -> {
+          T value = provider.get(c);
+          List<User> users = Arguments.getUsers(c, "selector");
+
+          int successes = 0;
+
+          for (User user : users) {
+            var interaction = value.createInteraction(user.getPlayer(), true);
+
+            if (value.interact(interaction)) {
+              successes++;
+            }
+          }
+
+          if (successes < 1) {
+            throw Exceptions.format("Failed to make any players interact with {0}",
+                value.displayName()
+            );
+          }
+
+          if (users.size() == 1) {
+            c.getSource().sendSuccess(
+                Text.format("Made &e{0, user}&r interact with &6{1}&r.", NamedTextColor.GRAY,
+                    users.get(0), value.displayName()
+                )
+            );
+          } else {
+            c.getSource().sendSuccess(
+                Text.format("Made &e{0, number} players&r interact with &6{1}&r.",
+                    NamedTextColor.GRAY,
+                    users.size(), value.displayName()
+                )
+            );
+          }
+
+          return 0;
+        })
+    );
 
     argument.then(literal("remove")
         .requires(hasAdminPermission())

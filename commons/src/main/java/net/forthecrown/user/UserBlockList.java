@@ -206,6 +206,9 @@ public interface UserBlockList extends UserComponent {
     }
 
     users.removeIf(user -> {
+      if (selfRemovedMessage != null && user.equals(sender)) {
+        return true;
+      }
       return areBlocked(sender, user) || (filterTest != null && !user.get(filterTest));
     });
 

@@ -27,7 +27,7 @@ public class AdminBroadcastListener implements Listener {
         displayName = user.displayName(viewer);
       }
 
-      return Text.format("{0} &8&l»&r {1}", NamedTextColor.GRAY, displayName, message);
+      return Text.format("&8{0} &l»&r {1}", NamedTextColor.GRAY, displayName, message);
     });
   }
 }

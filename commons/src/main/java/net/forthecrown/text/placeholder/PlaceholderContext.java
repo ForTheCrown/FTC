@@ -1,6 +1,6 @@
 package net.forthecrown.text.placeholder;
 
-import net.forthecrown.utils.context.Context;
+import java.util.Map;
 import net.kyori.adventure.audience.Audience;
 
 /**
@@ -12,7 +12,7 @@ import net.kyori.adventure.audience.Audience;
 public record PlaceholderContext(
     Audience viewer,
     PlaceholderRenderer renderer,
-    Context context
+    Map<String, Object> context
 ) {
 
 }

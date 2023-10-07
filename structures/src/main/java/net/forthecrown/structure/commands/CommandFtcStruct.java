@@ -17,13 +17,14 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 import net.forthecrown.Permissions;
+import net.forthecrown.WorldEditHook;
 import net.forthecrown.command.DataCommands;
 import net.forthecrown.command.DataCommands.DataAccessor;
 import net.forthecrown.command.Exceptions;
 import net.forthecrown.command.FtcCommand;
-import net.forthecrown.command.help.UsageFactory;
 import net.forthecrown.command.arguments.Arguments;
 import net.forthecrown.command.arguments.FtcKeyArgument;
+import net.forthecrown.command.help.UsageFactory;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Completions;
 import net.forthecrown.grenadier.GrenadierCommand;
@@ -43,10 +44,10 @@ import net.forthecrown.structure.StructureFillConfig;
 import net.forthecrown.structure.StructurePlaceConfig;
 import net.forthecrown.structure.Structures;
 import net.forthecrown.text.Text;
+import net.forthecrown.utils.math.AreaSelection;
 import net.forthecrown.utils.math.Rotation;
 import net.forthecrown.utils.math.Transform;
 import net.forthecrown.utils.math.Vectors;
-import net.forthecrown.utils.math.WorldBounds3i;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -63,13 +64,13 @@ public class CommandFtcStruct extends FtcCommand {
 
   private static final ArgumentOption<List<EntityType>> IGNORE_ENT_ARG
       = Options.argument(ArgumentTypes.array(ArgumentTypes.enumType(EntityType.class)))
-      .addLabel("ignore_entities")
+      .setLabel("ignore_entities")
       .setDefaultValue(Collections.emptyList())
       .build();
 
   private static final ArgumentOption<List<BlockFilterArgument.Result>> BLOCK_FILTER
       = Options.argument(ArgumentTypes.array(ArgumentTypes.blockFilter()))
-      .addLabel("ignore_blocks")
+      .setLabel("ignore_blocks")
       .setDefaultValue(Collections.emptyList())
       .build();
 
@@ -86,31 +87,31 @@ public class CommandFtcStruct extends FtcCommand {
 
   static final ArgumentOption<Rotation> ROT_ARG
       = Options.argument(ArgumentTypes.enumType(Rotation.class))
-      .addLabel("rotation")
+      .setLabel("rotation")
       .setDefaultValue(Rotation.NONE)
       .build();
 
   private static final ArgumentOption<Vector3d> OFFSET_ARG
       = Options.argument(new VectorParser())
-      .addLabel("offset")
+      .setLabel("offset")
       .setDefaultValue(Vector3d.ZERO)
       .build();
 
   private static final ArgumentOption<Vector3d> PIVOT_ARG
       = Options.argument(new VectorParser())
-      .addLabel("pivot")
+      .setLabel("pivot")
       .setDefaultValue(Vector3d.ZERO)
       .build();
 
   private static final ArgumentOption<ParsedPosition> POS_ARG
       = Options.argument(ArgumentTypes.blockPosition())
-      .addLabel("pos")
+      .setLabel("pos")
       .setDefaultValue(ParsedPosition.IDENTITY)
       .build();
 
   private static final ArgumentOption<String> PALETTE_ARG
       = Options.argument(new PaletteParser())
-      .addLabel("palette")
+      .setLabel("palette")
       .setDefaultValue(BlockStructure.DEFAULT_PALETTE_NAME)
       .build();
 
@@ -440,9 +441,9 @@ public class CommandFtcStruct extends FtcCommand {
                     ParsedOptions args
   ) throws CommandSyntaxException {
     Player player = c.getSource().asPlayer();
-    WorldBounds3i bounds3i = WorldBounds3i.ofPlayerSelection(player);
+    AreaSelection selection = WorldEditHook.hook().getSelectedBlocks(player);
 
-    if (bounds3i == null) {
+    if (selection == null) {
       throw Exceptions.NO_REGION_SELECTION;
     }
 
@@ -450,13 +451,13 @@ public class CommandFtcStruct extends FtcCommand {
     if (palette != null
         && !palette.equals(BlockStructure.DEFAULT_PALETTE_NAME)
         && !structure.getDefaultSize().equals(Vector3i.ZERO)
-        && !bounds3i.size().equals(structure.getDefaultSize())
+        && !selection.size().equals(structure.getDefaultSize())
     ) {
       throw Exceptions.format(
           "Invalid size: {} for palette!" +
               "\nSelection must have same size as existing structure {}",
 
-          bounds3i.save(),
+          selection.size(),
           structure.getDefaultSize()
       );
     }
@@ -488,7 +489,7 @@ public class CommandFtcStruct extends FtcCommand {
     }
 
     var config = StructureFillConfig.builder()
-        .area(bounds3i)
+        .area(selection)
         .blockPredicate(blockFilter)
         .entityPredicate(entityFilter)
         .includeFunctionBlocks(args.has(INCLUDE_FUNCTIONS))

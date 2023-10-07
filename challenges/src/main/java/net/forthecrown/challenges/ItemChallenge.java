@@ -149,12 +149,6 @@ public class ItemChallenge implements Challenge {
   }
 
   @Override
-  public void onComplete(User user) {
-    Challenges.trigger("daily/shop_challenge", user);
-    Challenge.super.onComplete(user);
-  }
-
-  @Override
   public void trigger(Object input) {
     var player = ChallengeHandle.getPlayer(input);
     var item = getTargetItem().orElseThrow();

@@ -1,6 +1,6 @@
 
 # Link to webstore
-webstoreLink = ""
+webstoreLink = "https://forthecrown.buycraft.net/"
 
 # Note: 'earnings' here is just an internal number which represents
 # how many rhines a user has earned from selling a certain item type.
@@ -16,3 +16,9 @@ earningLossInterval = "1d"
 
 # The amount of earnings lost everytime shop earnings are reduced
 earningLoss = 5000
+
+# Log when people are selling items
+logSelling = true
+
+# Log auto-sold items only when the selling 'session' has ended
+logAutoSellOnlyWhenEnds = true

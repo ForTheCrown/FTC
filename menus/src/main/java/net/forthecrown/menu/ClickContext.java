@@ -5,8 +5,10 @@ import static net.forthecrown.Cooldowns.NO_END_COOLDOWN;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import net.forthecrown.user.Users;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
@@ -61,6 +63,11 @@ public class ClickContext {
   private final ClickType clickType;
 
   /**
+   * Action type
+   */
+  private final InventoryAction action;
+
+  /**
    * Determines if the inventory should be reloaded after the click code is executed
    */
   @Accessors(fluent = true)
@@ -97,13 +104,14 @@ public class ClickContext {
 
   public ClickContext(Inventory inventory, InventoryClickEvent event) {
     this.inventory = inventory;
-    this.holder = (MenuHolder) inventory.getHolder();
+    this.holder = Menus.getHolder(inventory);
     this.player = (Player) event.getWhoClicked();
     this.slot = event.getSlot();
     this.rawSlot = event.getRawSlot();
     this.cursorItem = event.getCursor();
     this.clickType = event.getClick();
     this.view = event.getView();
+    this.action = event.getAction();
 
     this.cancelEvent = true;
     this.cooldownTime = DEFAULT_COOLDOWN;
@@ -116,5 +124,10 @@ public class ClickContext {
    */
   public boolean shouldCooldown() {
     return cooldownTime > 0 || cooldownTime == NO_END_COOLDOWN;
+  }
+
+  public void reloadMenu() {
+    var menu = holder.getMenu();
+    menu.fillInventory(Users.get(player), holder.getContext(), inventory);
   }
 }

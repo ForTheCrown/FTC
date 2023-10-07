@@ -8,11 +8,9 @@ import com.mojang.serialization.DynamicOps;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.stream.Stream;
 import net.forthecrown.utils.io.IOConsumer;
 import net.forthecrown.utils.io.PathUtil;
-import org.bukkit.plugin.Plugin;
 
 public abstract class DataUpdater {
 
@@ -177,6 +175,16 @@ public abstract class DataUpdater {
       logger.error("Error copying file '{}' to '{}'", source, dest, exc);
       return false;
     }
+  }
+
+  public final boolean safeDelete(Path path) {
+    logger.info("Deleting '{}'", path);
+
+    return PathUtil.safeDelete(path)
+        .resultOrPartial(string -> {
+          logger.error("Error deleting '{}': {}", path, string);
+        })
+        .isPresent();
   }
 
   /**

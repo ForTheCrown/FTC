@@ -2,15 +2,14 @@ package net.forthecrown.serverlist;
 
 import lombok.Getter;
 import net.forthecrown.events.Events;
-import net.forthecrown.utils.io.PathUtil;
-import net.forthecrown.utils.io.SerializationHelper;
-import net.kyori.adventure.text.Component;
+import net.forthecrown.utils.TomlConfigs;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @Getter
 public class ServerlistPlugin extends JavaPlugin {
 
   private ServerListDisplay display;
+  private ServerListConfig listConfig;
 
   @Override
   public void onEnable() {
@@ -18,7 +17,7 @@ public class ServerlistPlugin extends JavaPlugin {
     reload();
 
     new CommandServerList();
-    Events.register(new ServerlistListener());
+    Events.register(new ServerlistListener(this));
   }
 
   public void reload() {
@@ -28,16 +27,6 @@ public class ServerlistPlugin extends JavaPlugin {
 
   @Override
   public void reloadConfig() {
-    saveResource("config.toml", false);
-    SerializationHelper.readAsJson(
-        PathUtil.pluginPath("config.toml"),
-        json -> {
-          boolean allowRandom = json.getBool("allowMaxPlayerRandomization", true);
-          display.setAllowMaxPlayerRandomization(allowRandom);
-
-          Component baseMotd = json.getComponent("baseMotd");
-          display.setBaseMotd(baseMotd);
-        }
-    );
+    listConfig = TomlConfigs.loadPluginConfig(this, ServerListConfig.class);
   }
 }

@@ -16,13 +16,10 @@ hulkSmashPoles = true
 waypointDeletionDelay = "3d"
 
 # Cooldown between users being able to do moveins
-moveInCooldown = "1h"
+moveInCooldown = 0
 
 # Duration for which a waypoint invite is valid
 validCooldownTime = "10m"
-
-# Whether the move-in cooldown is enabled
-moveInHasCooldown = false
 
 # Plugin data auto save interval
 autoSaveInterval = "30m"

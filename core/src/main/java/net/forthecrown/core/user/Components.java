@@ -1,13 +1,16 @@
 package net.forthecrown.core.user;
 
 import com.google.common.base.Strings;
+import io.papermc.paper.plugin.provider.classloader.ConfiguredPluginClassLoader;
 import it.unimi.dsi.fastutil.objects.ObjectBooleanPair;
+import java.util.Objects;
 import net.forthecrown.registry.Holder;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.registry.RegistryListener;
 import net.forthecrown.user.ComponentName;
 import net.forthecrown.user.UserComponent;
+import org.bukkit.plugin.Plugin;
 
 public final class Components {
   private Components() {}
@@ -106,5 +109,15 @@ public final class Components {
     ComponentFactory factory = new ComponentFactory(UnknownComponent.class);
     REGISTRY.register(id, factory);
     return factory;
+  }
+
+  public static void unregisterAll(Plugin plugin) {
+    REGISTRY.removeIf(holder -> {
+      Class<?> typeClass = holder.getValue().getType();
+      ClassLoader loader = typeClass.getClassLoader();
+
+      return loader instanceof ConfiguredPluginClassLoader pluginLoader
+          && Objects.equals(pluginLoader.getPlugin(), plugin);
+    });
   }
 }

@@ -4,14 +4,18 @@ import com.google.common.base.Strings;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.forthecrown.command.FtcSuggestions;
+import net.forthecrown.core.CorePermissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Completions;
 import net.forthecrown.user.User;
@@ -34,6 +38,9 @@ public class UserLookupImpl implements UserLookup {
       = new Object2ObjectOpenHashMap<>(EXPECTED_SIZE);
 
   private final Map<String, UserLookupEntry> named
+      = new Object2ObjectOpenHashMap<>(EXPECTED_SIZE);
+
+  private final Map<String, UserLookupEntry> byIp
       = new Object2ObjectOpenHashMap<>(EXPECTED_SIZE);
 
   // Secondary lookup maps
@@ -77,6 +84,12 @@ public class UserLookupImpl implements UserLookup {
       return entry;
     }
 
+    entry = byIp.get(string);
+
+    if (entry != null && entry.isIpTrustable()) {
+      return entry;
+    }
+
     return oldNamed.get(string);
   }
 
@@ -112,6 +125,10 @@ public class UserLookupImpl implements UserLookup {
     // If user has a lastname, add to lastname lookup map
     if (entry.getLastName() != null) {
       oldNamed.put(entry.getLastName().toLowerCase(), entry);
+    }
+
+    if (entry.getIp() != null) {
+      byIp.put(entry.getIp(), entry);
     }
 
     unsaved = true;
@@ -161,6 +178,24 @@ public class UserLookupImpl implements UserLookup {
     unsaved = true;
   }
 
+  public synchronized void changeIp(UserLookupEntry entry, String ip) {
+    var existing = entry.getIp();
+
+    if (existing != null) {
+      byIp.remove(existing);
+    }
+
+    entry.setIp(ip);
+
+    if (ip == null) {
+      entry.setLastIpUpdate(null);
+      return;
+    }
+
+    entry.setLastIpUpdate(Instant.now());
+    byIp.put(ip, entry);
+  }
+
   /**
    * Removes the given entry from the cache
    *
@@ -176,6 +211,10 @@ public class UserLookupImpl implements UserLookup {
 
     if (cache.getLastName() != null) {
       oldNamed.remove(cache.getLastName());
+    }
+
+    if (cache.getIp() != null) {
+      byIp.remove(cache.getIp());
     }
 
     unsaved = true;
@@ -224,6 +263,15 @@ public class UserLookupImpl implements UserLookup {
 
       if (tokenMatches(e.getLastName(), token)) {
         builder.suggest(e.getLastName(), hover);
+        continue;
+      }
+
+      if (tokenMatches(e.getIp(), token)
+          && source.hasPermission(CorePermissions.IP_QUERY)
+          && e.isIpTrustable()
+      ) {
+        builder.suggest(e.getIp(), hover);
+        continue;
       }
     }
 
@@ -250,9 +298,9 @@ public class UserLookupImpl implements UserLookup {
     return identified.values().parallelStream();
   }
 
-  @Getter @Setter
+  @Getter @Setter(AccessLevel.PACKAGE)
   @RequiredArgsConstructor
-  static class UserLookupEntry implements LookupEntry {
+  public static class UserLookupEntry implements LookupEntry {
 
     private final UUID uniqueId;
 
@@ -260,6 +308,20 @@ public class UserLookupImpl implements UserLookup {
     private String nickname;
     private String lastName;
 
+    private String ip;
+    private Instant lastIpUpdate;
+
     private long lastNameChange = NO_NAME_CHANGE;
+
+    boolean isIpTrustable() {
+      if (Strings.isNullOrEmpty(ip) || lastIpUpdate == null) {
+        return false;
+      }
+
+      Instant invalidationDate = lastIpUpdate.plus(Duration.ofDays(14));
+      Instant now = Instant.now();
+
+      return now.isBefore(invalidationDate);
+    }
   }
 }

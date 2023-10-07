@@ -145,8 +145,8 @@ public final class ChannelledMessage {
    * however if {@link #isShownToSender()} is set to {@code false}, then the source of the message
    * will not be included in the message
    *
-   * @return {@code -1} if the announcement event was cancelled, {@code 0} if the viewer set was
-   *         empty after the event call, or a non-zero number of viewers that saw the announcement
+   * @return {@code -1} if the announcement event was cancelled, {@code -2}, if the message was
+   *         'soft cancelled', or the number of viewers that saw the announcement
    */
   public int send() {
     if (source != null) {
@@ -156,11 +156,17 @@ public final class ChannelledMessage {
     ChannelMessageEvent event = new ChannelMessageEvent(this);
     event.callEvent();
 
-    if (event.isCancelled()) {
+    if (event.getState() == ChannelMessageState.CANCELLED) {
       return -1;
     }
 
-    return handler.handle(this, event);
+    int result = handler.handle(this, event);
+
+    if (event.getState() == ChannelMessageState.SOFT_CANCELLED) {
+      return -2;
+    } else {
+      return result;
+    }
   }
 
 }

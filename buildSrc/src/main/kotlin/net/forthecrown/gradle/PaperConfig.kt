@@ -91,9 +91,23 @@ class DependsList(private val loadAfter: LoadOrderList) {
   }
 }
 
+enum class DependencyLoad {
+  BEFORE, AFTER, OMIT
+}
+
 data class PluginDependency(val optional: Boolean) {
   var bootstrap: Boolean = false
-  var loadbefore: Boolean = true
+  var load: DependencyLoad = DependencyLoad.BEFORE
+  var joinClasspath: Boolean = true
+
+  var loadbefore: Boolean
+    get() {
+      return load == DependencyLoad.BEFORE
+    }
+
+    set(value) {
+      load = if (value) DependencyLoad.BEFORE else DependencyLoad.AFTER
+    }
 }
 
 class LoadOrderList {

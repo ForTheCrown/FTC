@@ -2,8 +2,9 @@ package net.forthecrown.scripts;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import lombok.Getter;
 import net.forthecrown.Worlds;
 import net.forthecrown.text.Messages;
@@ -29,6 +30,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.NativeJavaClass;
+import org.mozilla.javascript.NativeObject;
+import org.mozilla.javascript.ScriptableObject;
 import org.spongepowered.math.vector.Vector2d;
 import org.spongepowered.math.vector.Vector2i;
 import org.spongepowered.math.vector.Vector3d;
@@ -42,13 +47,15 @@ public class ScriptManager implements ScriptService {
   @Getter
   private final Plugin scriptPlugin;
 
-  @Getter
   private final List<Class<?>> autoImportedClasses = new ObjectArrayList<>();
 
-  private final List<RhinoScript> active = new ArrayList<>();
+  @Getter
+  private final CachingScriptLoader globalLoader;
 
   @Getter
   private final ModuleManagerImpl modules;
+
+  private NativeObject topLevelScope;
 
   public ScriptManager(Path scriptsDirectory, Plugin scriptPlugin) {
     this.scriptsDirectory = scriptsDirectory;
@@ -56,6 +63,8 @@ public class ScriptManager implements ScriptService {
 
     this.modules = new ModuleManagerImpl(this);
     this.modules.addBuiltIns();
+
+    this.globalLoader = newLoader();
 
     setupAutoImports();
   }
@@ -88,12 +97,64 @@ public class ScriptManager implements ScriptService {
     autoImportedClasses.add(Worlds.class);
   }
 
+  public NativeObject getTopLevelScope(Context ctx) {
+    if (topLevelScope != null) {
+      return topLevelScope;
+    }
+
+    topLevelScope = new NativeObject();
+    ctx.initStandardObjects(topLevelScope);
+
+    for (Class<?> autoImportedClass : autoImportedClasses) {
+      NativeJavaClass njc = new NativeJavaClass(topLevelScope, autoImportedClass);
+      ScriptableObject.putConstProperty(topLevelScope, autoImportedClass.getSimpleName(), njc);
+    }
+
+    return topLevelScope;
+  }
+
   @Override
-  public @NotNull Script newScript(@NotNull Source source) {
-    Script script = new RhinoScript(this, source);
+  public CachingScriptLoader newLoader() {
+    return new CachingLoaderImpl(this);
+  }
+
+  @Override
+  public CachingScriptLoader newLoader(Path workingDirectory) {
+    return new CachingLoaderImpl(this, workingDirectory);
+  }
+
+  @Override
+  public void addAutoImportedClass(Class<?> clazz) {
+    Objects.requireNonNull(clazz, "Class was null");
+
+    if (autoImportedClasses.contains(clazz)) {
+      return;
+    }
+
+    autoImportedClasses.add(clazz);
+
+    if (topLevelScope == null) {
+      return;
+    }
+
+    NativeJavaClass njc = new NativeJavaClass(topLevelScope, clazz);
+    ScriptableObject.putConstProperty(topLevelScope, clazz.getSimpleName(), njc);
+  }
+
+  public List<Class<?>> getAutoImportedClasses() {
+    return Collections.unmodifiableList(autoImportedClasses);
+  }
+
+  @Override
+  public Script loadScript(Source source) {
+    return newScript(source);
+  }
+
+  @Override
+  public @NotNull Script newScript(ScriptLoader loader, @NotNull Source source) {
+    Script script = new RhinoScript(loader, this, source);
 
     script.setWorkingDirectory(scriptsDirectory);
-    autoImportedClasses.forEach(script::importClass);
 
     script.addExtension("events", new EventsExtension(scriptPlugin));
     script.addExtension("scheduler", new SchedulerExtension());
@@ -101,16 +162,9 @@ public class ScriptManager implements ScriptService {
     return script;
   }
 
-  @Override
-  public void addActiveScript(Script script) {
-    active.add((RhinoScript) script);
-  }
-
   public void close() {
-    active.forEach(RhinoScript::close);
-    active.clear();
-
-
+    modules.close();
+    globalLoader.close();
   }
 }
 

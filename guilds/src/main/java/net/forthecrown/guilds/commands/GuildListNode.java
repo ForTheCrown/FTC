@@ -10,8 +10,9 @@ import java.util.List;
 import net.forthecrown.command.Commands;
 import net.forthecrown.command.help.UsageFactory;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.guilds.GUserProperties;
 import net.forthecrown.guilds.Guild;
-import net.forthecrown.guilds.Guilds;
+import net.forthecrown.guilds.menu.GuildDiscoveryMenu;
 import net.forthecrown.text.Text;
 import net.forthecrown.text.TextWriter;
 import net.forthecrown.text.TextWriters;
@@ -38,6 +39,12 @@ class GuildListNode extends GuildCommandNode {
     result.setHeader(text("Guilds", NamedTextColor.YELLOW));
 
     result.getHeader()
+        .title((it, writer, context) -> {
+          var viewer = context.getOrThrow(VIEWER);
+          if (viewer.get(GUserProperties.DISCOVERY_ONLY_PUBLIC)) {
+            writer.write(" (Public-only)");
+          }
+        })
         .append(Component.newline())
         .append(Component.text("[Discovery menu]", NamedTextColor.AQUA)
             .clickEvent(ClickEvent.runCommand("/g discover"))
@@ -113,9 +120,10 @@ class GuildListNode extends GuildCommandNode {
   private Component listGuilds(int page, int pageSize, User viewer)
       throws CommandSyntaxException
   {
-    List<Guild> guilds = Guilds.getManager().getGuilds();
+    List<Guild> guilds = GuildDiscoveryMenu.getGuildList(viewer);
 
     Commands.ensurePageValid(page, pageSize, guilds.size());
+
     PagedIterator<Guild> it = PagedIterator.of(guilds, page, pageSize);
     return FORMAT.format(it, SET.createContext().set(VIEWER, viewer));
   }

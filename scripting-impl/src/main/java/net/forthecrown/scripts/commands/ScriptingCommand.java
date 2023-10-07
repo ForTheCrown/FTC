@@ -6,6 +6,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Map;
 import java.util.Objects;
 import net.forthecrown.command.Exceptions;
+import net.forthecrown.command.arguments.RegistryArguments;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.annotations.Argument;
 import net.forthecrown.grenadier.annotations.CommandData;
@@ -15,13 +16,19 @@ import net.forthecrown.grenadier.types.options.FlagOption;
 import net.forthecrown.grenadier.types.options.Options;
 import net.forthecrown.grenadier.types.options.OptionsArgument;
 import net.forthecrown.grenadier.types.options.ParsedOptions;
+import net.forthecrown.registry.Holder;
+import net.forthecrown.scripts.CachingScriptLoader;
 import net.forthecrown.scripts.ExecResult;
 import net.forthecrown.scripts.Script;
 import net.forthecrown.scripts.ScriptLoadException;
 import net.forthecrown.scripts.ScriptService;
+import net.forthecrown.scripts.ScriptingPlugin;
 import net.forthecrown.scripts.Scripts;
+import net.forthecrown.scripts.pack.ScriptPack;
 import net.forthecrown.text.Text;
 import net.forthecrown.utils.io.source.Source;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 @CommandData("file = scripts.gcn")
 public class ScriptingCommand {
@@ -30,13 +37,13 @@ public class ScriptingCommand {
 
   public static final ArgumentOption<String[]> SCRIPT_ARGS
       = Options.argument(ScriptArgsArgument.SCRIPT_ARGS)
-      .setLabels("args")
+      .setLabel("args")
       .setDefaultValue(new String[0])
       .build();
 
   public static final ArgumentOption<String> METHOD
       = Options.argument(StringArgumentType.string())
-      .setLabels("method")
+      .setLabel("method")
       .build();
 
   public static final OptionsArgument OPTIONS = OptionsArgument.builder()
@@ -45,10 +52,46 @@ public class ScriptingCommand {
       .addOptional(METHOD)
       .build();
 
+  private final ScriptingPlugin plugin;
+
+  public ScriptingCommand(ScriptingPlugin plugin) {
+    this.plugin = plugin;
+  }
+
   @VariableInitializer
   void initVars(Map<String, Object> vars) {
     vars.put("script_argument", ScriptArgument.SCRIPT);
     vars.put("run_options", OPTIONS);
+
+    var packs = plugin.getPacks();
+    vars.put("active_script", new RegistryArguments<>(packs.getPacks(), "Loaded Script"));
+  }
+
+  void configReload(CommandSource source) {
+    plugin.reloadConfig();
+    source.sendSuccess(Component.text("Reloaded scripting config"));
+  }
+
+  void scriptsReload(CommandSource source) {
+    plugin.getPacks().reload();
+    source.sendSuccess(Component.text("Reloaded scripting config"));
+  }
+
+  void listActive(CommandSource source) {
+
+  }
+
+  void reloadActive(CommandSource source) {
+
+  }
+
+  void closeActive(CommandSource source, @Argument("active") Holder<ScriptPack> holder) {
+    holder.getRegistry().remove(holder.getKey());
+    holder.getValue().close();
+
+    source.sendSuccess(
+        Text.format("Removed script pack '&e{0}&r'", NamedTextColor.GRAY, holder.getKey())
+    );
   }
 
   void runScript(
@@ -74,7 +117,9 @@ public class ScriptingCommand {
       String... args
   ) throws CommandSyntaxException {
     ScriptService service = Scripts.getService();
-    Script script = service.newScript(scriptSource);
+    CachingScriptLoader loader = service.getGlobalLoader();
+
+    Script script = service.newScript(loader, scriptSource);
     script.setArguments(args);
 
     try {
@@ -83,7 +128,7 @@ public class ScriptingCommand {
       throw Exceptions.format("Couldn't compile script: {0}", exc.getMessage());
     }
 
-    script.put("_source", source);
+    script.put("source", source);
 
     ExecResult<Object> result = script.evaluate().logError();
 
@@ -106,15 +151,14 @@ public class ScriptingCommand {
     }
 
     result.result().ifPresentOrElse(o -> {
-      source.sendMessage(Text.format("Script execution finished, result={0}", o));
+      source.sendSuccess(Text.format("Script execution finished, result={0}", o));
     }, () -> {
-      source.sendMessage(Text.format("Script execution finished"));
+      source.sendSuccess(Text.format("Script execution finished"));
     });
 
     if (!keepOpen) {
       script.close();
-    } else {
-      service.addActiveScript(script);
+      loader.remove(scriptSource);
     }
   }
 }

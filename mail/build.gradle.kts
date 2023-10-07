@@ -14,4 +14,8 @@ dependencies {
 pluginYml {
   name = "FTC-Mail"
   main = "net.forthecrown.mail.MailPlugin"
+
+  loadAfter {
+    regular("project:guilds")
+  }
 }

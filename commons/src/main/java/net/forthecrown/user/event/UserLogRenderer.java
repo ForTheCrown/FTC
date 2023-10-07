@@ -1,13 +1,12 @@
 package net.forthecrown.user.event;
 
-import net.forthecrown.Permissions;
 import net.forthecrown.text.Messages;
+import net.forthecrown.text.Text;
 import net.forthecrown.user.NameRenderFlags;
-import net.forthecrown.user.Properties;
 import net.forthecrown.user.User;
-import net.forthecrown.utils.Audiences;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.event.player.PlayerQuitEvent.QuitReason;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,6 +32,13 @@ public interface UserLogRenderer {
   static UserLogRenderer newNameJoin(String newName) {
     return (user, viewer) -> {
       return Messages.newNameJoinMessage(user.displayName(viewer), newName);
+    };
+  }
+
+  static UserLogRenderer firstJoin() {
+    return (user, viewer) -> {
+      return Text.vformat("Welcome &6{0, user}&r to the server!", NamedTextColor.YELLOW, user)
+          .create(viewer);
     };
   }
 

@@ -8,6 +8,7 @@ import net.forthecrown.discord.commands.AppenderCommand;
 import net.forthecrown.discord.listener.AnnouncementForwardingListener;
 import net.forthecrown.discord.listener.ServerLoadListener;
 import net.forthecrown.events.Events;
+import net.forthecrown.user.Users;
 import net.forthecrown.utils.TomlConfigs;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.LoggerContext;
@@ -27,6 +28,9 @@ public class DiscordPlugin extends JavaPlugin {
 
     Events.register(new ServerLoadListener());
     DiscordSRV.api.subscribe(new AnnouncementForwardingListener(this));
+
+    var nameFactory = Users.getService().getNameFactory();
+    nameFactory.addProfileField("discord_id", new DiscordProfileField());
   }
 
   @Override
@@ -38,6 +42,7 @@ public class DiscordPlugin extends JavaPlugin {
   @Override
   public void onDisable() {
     updateLoggers(true);
+    Users.getService().getNameFactory().removeField("discord_id");
   }
 
   void updateLoggers(boolean remove) {

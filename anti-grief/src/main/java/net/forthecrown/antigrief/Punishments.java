@@ -5,11 +5,11 @@ import static net.kyori.adventure.text.Component.text;
 import com.google.common.base.Strings;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Objects;
 import javax.annotation.Nullable;
 import net.forthecrown.Loggers;
 import net.forthecrown.Permissions;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.Grenadier;
 import net.forthecrown.text.PeriodFormat;
 import net.forthecrown.text.ViewerAwareMessage;
 import net.forthecrown.text.channel.ChannelledMessage;
@@ -20,6 +20,7 @@ import net.forthecrown.utils.Audiences;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.slf4j.Logger;
 
@@ -82,9 +83,15 @@ public final class Punishments {
    * @param sender The sender to get the entry of
    * @return The sender's entry, null, if the sender is not a player or a user
    */
-  public static PunishEntry entry(Audience sender) {
+  public static @Nullable PunishEntry entry(Audience sender) {
+    LOGGER.debug("sender={}", sender);
+
     User player = Audiences.getUser(sender);
-    Objects.requireNonNull(player);
+
+    if (player == null) {
+      return null;
+    }
+
     return inst.getEntry(player.getUniqueId());
   }
 
@@ -127,8 +134,6 @@ public final class Punishments {
 
     announce(source, target, type, duration, reason);
 
-    entry.punish(punishment);
-
     var lengthString = duration == null
         ? "Eternal"
         : PeriodFormat.of(duration).toString();
@@ -139,6 +144,8 @@ public final class Punishments {
         reason,
         lengthString
     );
+
+    entry.punish(punishment);
   }
 
   /**
@@ -192,15 +199,34 @@ public final class Punishments {
           return FormatBuilder.builder()
               .setViewer(viewer)
               .setFormat("Un{0} {1, user}", NamedTextColor.YELLOW)
-              .setArguments(type.nameEndingED(), target)
+              .setArguments(type.nameEndingED().toLowerCase(), target)
               .asComponent();
         }
     );
+  }
 
-    LOGGER.info("{} Un{} {}",
-        source.textName(),
-        type.nameEndingED().toLowerCase(),
-        target.getNickOrName()
+  public static void announceExpiry(User user, PunishType type, Punishment punishment) {
+    _announce(
+        null,
+        viewer -> {
+          var builder = text();
+          builder.append(user.displayName(viewer).color(NamedTextColor.YELLOW))
+              .color(NamedTextColor.GRAY)
+              .append(text("'s "))
+              .append(text(type.nameEndingED(), NamedTextColor.GOLD))
+              .append(text(" has expired"));
+
+          if (punishment != null && !Strings.isNullOrEmpty(punishment.getReason())) {
+            builder
+                .append(text(", reason: '"))
+                .append(text(punishment.getReason(), NamedTextColor.YELLOW))
+                .append(text("'"));
+          } else {
+            builder.append(text("."));
+          }
+
+          return builder.build();
+        }
     );
   }
 
@@ -223,7 +249,15 @@ public final class Punishments {
     }
 
     // Tell staff chat
-    StaffChat.newMessage().setSource(source).setMessage(text).send();
+    var message = StaffChat.newMessage().setMessage(text).setLogged(true);
+
+    if (source != null) {
+      message.setSource(source);
+    } else {
+      message.setSource(Grenadier.createSource(Bukkit.getConsoleSender()));
+    }
+
+    message.send();
   }
 
   /**

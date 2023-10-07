@@ -3,8 +3,7 @@ package net.forthecrown.challenges;
 import java.time.Duration;
 import lombok.Getter;
 import net.forthecrown.challenges.commands.CommandChallenges;
-import net.forthecrown.challenges.listeners.SellShopListener;
-import net.forthecrown.events.Events;
+import net.forthecrown.challenges.listeners.ChallengeListeners;
 import net.forthecrown.utils.PeriodicalSaver;
 import net.forthecrown.utils.TomlConfigs;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -19,12 +18,14 @@ public class ChallengesPlugin extends JavaPlugin {
 
   @Override
   public void onEnable() {
+    DataFix.execute();
+
     challenges = new ChallengeManager(this);
 
     saver = PeriodicalSaver.create(challenges::save, () -> Duration.ofMinutes(30));
     saver.start();
 
-    Events.register(new SellShopListener(challenges));
+    ChallengeListeners.registerAll(this);
     new CommandChallenges(challenges);
   }
 

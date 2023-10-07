@@ -12,7 +12,7 @@ import net.forthecrown.usables.Action;
 import net.forthecrown.usables.BuiltType;
 import net.forthecrown.usables.Interaction;
 import net.forthecrown.usables.UsableComponent;
-import net.forthecrown.usables.UsageType;
+import net.forthecrown.usables.ObjectType;
 import net.forthecrown.usables.objects.ConditionHolder;
 import net.forthecrown.usables.objects.Warp;
 import net.forthecrown.user.User;
@@ -30,22 +30,22 @@ public class TeleportAction implements Action {
 
   private static final ArgumentOption<Float> YAW
       = Options.argument(FloatArgumentType.floatArg(-180, 180))
-      .addLabel("yaw")
+      .setLabel("yaw")
       .build();
 
   private static final ArgumentOption<Float> PITCH
       = Options.argument(FloatArgumentType.floatArg(-90, 90))
-      .addLabel("pitch")
+      .setLabel("pitch")
       .build();
 
   private static final ArgumentOption<World> WORLD
       = Options.argument(ArgumentTypes.world())
-      .addLabel("world")
+      .setLabel("world")
       .build();
 
   private static final ArgumentOption<ParsedPosition> POS_ARG
       = Options.argument(ArgumentTypes.position())
-      .addLabel("pos")
+      .setLabel("pos")
       .setDefaultValue(ParsedPosition.IDENTITY)
       .build();
 
@@ -56,7 +56,7 @@ public class TeleportAction implements Action {
       .addOptional(POS_ARG)
       .build();
 
-  public static final UsageType<TeleportAction> TYPE = BuiltType.<TeleportAction>builder()
+  public static final ObjectType<TeleportAction> TYPE = BuiltType.<TeleportAction>builder()
       .requiresInput(TriState.FALSE)
 
       .tagLoader(binaryTag -> new TeleportAction(TagUtil.readLocation(binaryTag)))
@@ -126,7 +126,7 @@ public class TeleportAction implements Action {
   }
 
   @Override
-  public UsageType<? extends UsableComponent> getType() {
+  public ObjectType<? extends UsableComponent> getType() {
     return TYPE;
   }
 

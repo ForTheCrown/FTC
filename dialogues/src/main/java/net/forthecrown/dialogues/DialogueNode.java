@@ -3,6 +3,7 @@ package net.forthecrown.dialogues;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import java.time.Duration;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -147,7 +148,11 @@ public class DialogueNode implements Predicate<User>, UserClickCallback {
       return clickEvent;
     }
 
-    clickEvent = ClickEvent.callback(this);
+    clickEvent = ClickEvent.callback(
+        this,
+        builder -> builder.uses(-1).lifetime(Duration.ofDays(365))
+    );
+
     return clickEvent;
   }
 

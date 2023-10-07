@@ -1,11 +1,17 @@
 package net.forthecrown.sellshop;
 
+import static net.forthecrown.text.Messages.CLICK_ME;
+import static net.kyori.adventure.text.Component.newline;
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.event.ClickEvent.openUrl;
+
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import net.forthecrown.menu.MenuNode;
 import net.forthecrown.menu.Slot;
 import net.forthecrown.user.UserProperty;
 import net.forthecrown.utils.inventory.ItemStacks;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -54,7 +60,17 @@ public final class SellShopNodes {
       )
 
       .setRunnable((user, context) -> {
-        user.sendMessage(SellMessages.SHOP_WEB_MESSAGE);
+        var link = SellShopPlugin.getPlugin().getShopConfig().webstoreLink();
+
+        user.sendMessage(
+            text("Our webstore", NamedTextColor.GRAY)
+                .append(newline())
+                .append(
+                    text(link, NamedTextColor.AQUA)
+                        .hoverEvent(CLICK_ME)
+                        .clickEvent(openUrl(link))
+                )
+        );
         context.shouldClose(true);
       })
 

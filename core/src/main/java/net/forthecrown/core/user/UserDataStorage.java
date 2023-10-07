@@ -27,7 +27,6 @@ public class UserDataStorage {
   public static final String KEY_LAST_NAME = "lastOnlineName";
   public static final String KEY_NAME = "name";
   public static final String KEY_PREVIOUS_NAMES = "previousNames";
-  public static final String KEY_IP = "ip";
   public static final String KEY_LAST_LOC = "lastLocation";
   public static final String KEY_LOCATION = "location";
 
@@ -128,6 +127,14 @@ public class UserDataStorage {
       json.add("lastNameChange", entry.getLastNameChange());
     }
 
+    if (!Strings.isNullOrEmpty(entry.getIp())) {
+      json.add("ip", entry.getIp());
+
+      if (entry.getLastIpUpdate() != null) {
+        json.addInstant("lastIpUpdate", entry.getLastIpUpdate());
+      }
+    }
+
     return json.getSource();
   }
 
@@ -146,6 +153,14 @@ public class UserDataStorage {
     if (json.has("lastName")) {
       entry.setLastName(json.getString("lastName"));
       entry.setLastNameChange(json.getLong("lastNameChange"));
+    }
+
+    if (json.has("ip")) {
+      entry.setIp(json.getString("ip"));
+
+      if (json.has("lastIpUpdate")) {
+        entry.setLastIpUpdate(json.getInstant("lastIpUpdate", null));
+      }
     }
 
     return entry;
@@ -190,10 +205,6 @@ public class UserDataStorage {
 
     user.getPreviousNames().addAll(json.getList(KEY_PREVIOUS_NAMES, JsonElement::getAsString));
 
-    if (json.has(KEY_IP)) {
-      user.setIp(json.getString(KEY_IP));
-    }
-
     if (json.has(KEY_LAST_LOC)) {
       user.setReturnLocation(json.getLocation(KEY_LAST_LOC));
     }
@@ -211,10 +222,6 @@ public class UserDataStorage {
 
     if (!user.getPreviousNames().isEmpty()) {
       json.addList(KEY_PREVIOUS_NAMES, user.getPreviousNames(), JsonPrimitive::new);
-    }
-
-    if (!Strings.isNullOrEmpty(user.getIp())) {
-      json.add(KEY_IP, user.getIp());
     }
 
     if (user.getReturnLocation() != null) {
@@ -260,7 +267,6 @@ public class UserDataStorage {
   }
 
   private void loadComponents(JsonWrapper json, UserImpl user) {
-    json.remove(KEY_IP);
     json.remove(KEY_LAST_NAME);
     json.remove(KEY_PREVIOUS_NAMES);
     json.remove(KEY_LOCATION);

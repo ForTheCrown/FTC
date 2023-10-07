@@ -60,7 +60,7 @@ public class WaypointTypes {
     });
   }
 
-  public static void init() {
+  public static void registerAll() {
     register("admin", ADMIN);
     register("player", PLAYER);
     register("region_pole", REGION_POLE);

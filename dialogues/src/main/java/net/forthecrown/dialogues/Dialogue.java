@@ -1,19 +1,15 @@
 package net.forthecrown.dialogues;
 
-import com.google.common.base.Strings;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import lombok.Getter;
 import net.forthecrown.Loggers;
 import net.forthecrown.registry.Registries;
-import net.forthecrown.user.User;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.event.ClickCallback;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 public class Dialogue implements ClickCallback<Audience> {
@@ -42,27 +38,6 @@ public class Dialogue implements ClickCallback<Audience> {
     }
 
     node.accept(audience);
-  }
-
-  public Optional<String> run(User user, @Nullable String nodeName) {
-    DialogueNode node;
-
-    if (Strings.isNullOrEmpty(nodeName)) {
-      node = getEntryPoint();
-
-      if (node == null) {
-        return Optional.of("No 'entry_node' set as entry point");
-      }
-    } else {
-      node = getNodeByName(nodeName);
-
-      if (node == null) {
-        return Optional.of("No node named: '" + nodeName + "'");
-      }
-    }
-
-    node.accept(user);
-    return Optional.empty();
   }
 
   public void addEntry(String name, DialogueNode node) {

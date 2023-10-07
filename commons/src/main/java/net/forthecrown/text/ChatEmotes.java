@@ -39,6 +39,8 @@ public final class ChatEmotes {
     register("reallysad", "(◉︵◉ )");
     register("heart", Component.text("❤", NamedTextColor.DARK_RED));
     register("skull", "☠");
+    register("thumbsup", "\uD83D\uDC4D");
+    register("thumbsdown", "\uD83D\uDC4E");
   }
 
   private static void register(String key, String emote) {

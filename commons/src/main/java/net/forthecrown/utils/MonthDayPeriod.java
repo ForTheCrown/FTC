@@ -3,6 +3,14 @@ package net.forthecrown.utils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
+import com.mojang.datafixers.util.Either;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.codecs.EitherCodec;
+import com.mojang.serialization.codecs.ListCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.MonthDay;
@@ -11,17 +19,42 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.format.SignStyle;
 import java.time.temporal.ChronoField;
+import java.util.List;
 import java.util.Objects;
 import lombok.Data;
 import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.nbt.CompoundTag;
+import net.forthecrown.utils.io.Results;
 
 /**
  * Represents the period of time in which a holiday is active, or just the date its active
  */
 @Data
 public class MonthDayPeriod {
+
+  public static final Codec<MonthDay> MONTH_DAY_CODEC = new Codec<>() {
+    @Override
+    public <T> DataResult<Pair<MonthDay, T>> decode(DynamicOps<T> ops, T input) {
+      return ops.getStringValue(input)
+          .flatMap(s -> {
+            try {
+              MonthDay day = MonthDay.parse(s, PARSER);
+              return Results.success(day);
+            } catch (DateTimeParseException exc) {
+              return Results.error(exc.getMessage());
+            }
+          })
+          .map(monthDay -> Pair.of(monthDay, input));
+    }
+
+    @Override
+    public <T> DataResult<T> encode(MonthDay input, DynamicOps<T> ops, T prefix) {
+      return Results.success(ops.createString(PARSER.format(input)));
+    }
+  };
+
+  public static final Codec<MonthDayPeriod> CODEC;
 
   /**
    * Date time formatter used to parse values and to format them for serialization into NBT
@@ -291,5 +324,65 @@ public class MonthDayPeriod {
     }
 
     return start.format(PARSER) + " - " + end.format(PARSER);
+  }
+
+  /* --------------------------- CODEC STATIC CONSTRUCTOR ---------------------------- */
+
+  static {
+    Codec<MonthDayPeriod> recordCodec = RecordCodecBuilder.create(instance -> {
+      return instance
+          .group(
+              MONTH_DAY_CODEC.fieldOf("start").forGetter(MonthDayPeriod::getStart),
+              MONTH_DAY_CODEC.fieldOf("end").forGetter(MonthDayPeriod::getEnd)
+          )
+          .apply(instance, MonthDayPeriod::between);
+    });
+
+    Codec<MonthDayPeriod> arrayCodec = new ListCodec<>(MONTH_DAY_CODEC)
+        .comapFlatMap(list -> {
+          if (list.isEmpty()) {
+            return Results.success(ALL);
+          }
+
+          if (list.size() == 1) {
+            return Results.success(exact(list.get(0)));
+          }
+
+          if (list.size() == 2) {
+            return Results.success(between(list.get(0), list.get(1)));
+          }
+
+          return Results.error("More than 2 date elements: %s", list);
+        }, monthDayPeriod -> {
+          if (monthDayPeriod.isExact()) {
+            return List.of(monthDayPeriod.getStart());
+          } else {
+            return List.of(monthDayPeriod.getStart(), monthDayPeriod.getEnd());
+          }
+        });
+
+    Codec<MonthDayPeriod> stringCodec = MONTH_DAY_CODEC
+        .flatXmap(
+            monthDay -> Results.success(exact(monthDay)),
+
+            period -> {
+              if (period.isExact()) {
+                return Results.success(period.getStart());
+              }
+
+              return Results.error("Cannot save a non-exact period as a string");
+            }
+        );
+
+    CODEC = new EitherCodec<>(recordCodec, new EitherCodec<>(stringCodec, arrayCodec))
+        .xmap(
+            either -> either.map(o -> o, e2 -> e2.map(o -> o, o -> o)),
+            period -> {
+              if (period.isExact()) {
+                return Either.right(Either.left(period));
+              }
+              return Either.right(Either.right(period));
+            }
+        );
   }
 }

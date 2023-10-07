@@ -33,19 +33,19 @@ public class MailCommands {
 
   public static final ArgumentOption<Integer> PAGE
       = Options.argument(IntegerArgumentType.integer(1))
-      .addLabel("page")
+      .setLabel("page")
       .setDefaultValue(1)
       .build();
 
   public static final ArgumentOption<Integer> PAGE_SIZE
       = Options.argument(IntegerArgumentType.integer(5, 20))
-      .addLabel("page_size")
+      .setLabel("page_size")
       .setDefaultValue(10)
       .build();
 
   public static final ArgumentOption<Long> MESSAGE_ID
       = Options.argument(LongArgumentType.longArg())
-      .addLabel("message_id")
+      .setLabel("message_id")
       .build();
 
   public static final ArgumentOption<UserParseResult> PLAYER

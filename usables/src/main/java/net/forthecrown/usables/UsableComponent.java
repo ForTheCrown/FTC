@@ -9,5 +9,5 @@ public interface UsableComponent {
     return null;
   }
 
-  UsageType<? extends UsableComponent> getType();
+  ObjectType<? extends UsableComponent> getType();
 }

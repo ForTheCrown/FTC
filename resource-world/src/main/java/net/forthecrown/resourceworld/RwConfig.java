@@ -20,8 +20,6 @@ public class RwConfig {
 
   public String portalWarp = "portal";
 
-  public Duration resetInterval = Duration.ofDays(60);
-
   public Duration sectionRetentionTime = Duration.ofMinutes(5);
 
   public Duration autosaveInterval;

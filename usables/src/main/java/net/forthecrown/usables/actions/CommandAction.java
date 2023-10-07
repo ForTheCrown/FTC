@@ -15,7 +15,7 @@ import net.forthecrown.grenadier.Grenadier;
 import net.forthecrown.usables.Action;
 import net.forthecrown.usables.Interaction;
 import net.forthecrown.usables.UsableComponent;
-import net.forthecrown.usables.UsageType;
+import net.forthecrown.usables.ObjectType;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -26,8 +26,8 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 public class CommandAction implements Action {
 
-  public static final UsageType<CommandAction> AS_PLAYER = new CommandActionType(true);
-  public static final UsageType<CommandAction> AS_SELF = new CommandActionType(false);
+  public static final ObjectType<CommandAction> AS_PLAYER = new CommandActionType(true);
+  public static final ObjectType<CommandAction> AS_SELF = new CommandActionType(false);
 
   private final String command;
   private final boolean asPlayer;
@@ -71,7 +71,7 @@ public class CommandAction implements Action {
   }
 
   @Override
-  public UsageType<? extends UsableComponent> getType() {
+  public ObjectType<? extends UsableComponent> getType() {
     return asPlayer ? AS_PLAYER : AS_SELF;
   }
 
@@ -81,7 +81,7 @@ public class CommandAction implements Action {
   }
 }
 
-class CommandActionType implements UsageType<CommandAction> {
+class CommandActionType implements ObjectType<CommandAction> {
 
   private final boolean asPlayer;
 

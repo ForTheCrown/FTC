@@ -23,6 +23,7 @@ import github.scarsz.discordsrv.dependencies.jda.api.entities.Webhook;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.WebhookClient;
 import github.scarsz.discordsrv.dependencies.jda.api.requests.restaction.ChannelAction;
 import github.scarsz.discordsrv.dependencies.jda.api.utils.MarkdownSanitizer;
+import github.scarsz.discordsrv.util.DiscordUtil;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -115,8 +116,8 @@ public class GuildDiscord {
     roleId = NULL_ID;
   }
 
-  public static JDA getJDA() {
-    return DiscordSRV.getPlugin().getJda();
+  public static JDA getJda() {
+    return DiscordUtil.getJda();
   }
 
   public static github.scarsz.discordsrv.dependencies.jda.api.entities.Guild
@@ -170,8 +171,12 @@ public class GuildDiscord {
   }
 
   public void forwardGuildChat(User sender, Component message) {
+    LOGGER.debug("forwardGuildChat: sender={}, message={}", sender, Text.plain(message));
+
     // Only forward to non archived channels
     channelIfNotArchived().ifPresent(channel -> {
+
+      LOGGER.debug("Inside");
 
       String text = MarkdownSanitizer.escape(Text.toDiscord(message));
       String name = MarkdownSanitizer.escape(Text.toDiscord(sender.displayName()));
@@ -224,15 +229,16 @@ public class GuildDiscord {
       channel = getChannel().orElseThrow();
     }
 
-    getOrCreateWebhook(channel)
-        .thenAccept(webhook -> {
-          WebhookClient<Void> client = (WebhookClient<Void>) webhook;
-          client.sendMessage(message)
-              .submit()
-              .exceptionally(throwable -> {
-                return null;
-              });
-        });
+    var config = Guilds.getConfig();
+
+    if (config.useWebhooks()) {
+      getOrCreateWebhook(channel).thenAccept(webhook -> {
+        WebhookClient<Void> client = (WebhookClient<Void>) webhook;
+        client.sendMessage(message).submit();
+      });
+    } else {
+      channel.sendMessage(message).submit();
+    }
   }
 
   /* ----------------------------- WEBHOOKS ------------------------------- */
@@ -242,7 +248,7 @@ public class GuildDiscord {
   }
 
   private CompletableFuture<Webhook> createWebhook(TextChannel channel) {
-    var path = PluginJar.resourcePath(Guilds.getConfig().webhookAvatarPath);
+    var path = PluginJar.resourcePath(Guilds.getConfig().webhookAvatarPath());
 
     Icon icon = null;
     try {
@@ -278,7 +284,7 @@ public class GuildDiscord {
     }
 
     return Optional.of(
-        getJDA().retrieveWebhookById(webhookId)
+        getJda().retrieveWebhookById(webhookId)
             .submit()
     );
   }
@@ -290,7 +296,8 @@ public class GuildDiscord {
       return Optional.empty();
     }
 
-    return Optional.ofNullable(getJDA().getRoleById(roleId));
+    var role = getJda().getRoleById(roleId);
+    return Optional.ofNullable(role);
   }
 
   public CompletableFuture<Void> deleteRole() {
@@ -392,7 +399,8 @@ public class GuildDiscord {
       return Optional.empty();
     }
 
-    return Optional.ofNullable(getJDA().getTextChannelById(channelId));
+    TextChannel channel = getJda().getTextChannelById(channelId);
+    return Optional.ofNullable(channel);
   }
 
   public Optional<TextChannel> channelIfNotArchived() {
@@ -401,30 +409,6 @@ public class GuildDiscord {
 
   public static boolean isArchived(TextChannel channel) {
     return channel.getMemberPermissionOverrides().isEmpty();
-  }
-
-  public static Category guildsTextCategory() {
-    return getGuildCategory().orElseGet(() -> {
-      var action = DiscordSRV.getPlugin().getMainGuild()
-          .createCategory("Guilds");
-
-      // Disable public viewing of text channel
-      action = action.addPermissionOverride(
-          action.getGuild().getPublicRole(),
-          null,
-
-          // Set the perms given to users
-          // per-channel here to be denied
-          memberOverridePerms()
-      );
-
-      addStaffAccess(action);
-
-      var cat = action.reason("FTC: Create guild category").complete();
-      Guilds.getConfig().guildsChannelCategory = cat.getIdLong();
-
-      return cat;
-    });
   }
 
   private static Optional<Role> getStaffRole() {
@@ -479,13 +463,13 @@ public class GuildDiscord {
   }
 
   private static Optional<Category> getGuildCategory() {
-    long id = Guilds.getConfig().guildsChannelCategory;
+    long id = Guilds.getConfig().guildsChannelCategory();
 
     if (id == 0) {
       return Optional.empty();
     }
 
-    var cat = getJDA().getCategoryById(id);
+    var cat = getJda().getCategoryById(id);
 
     if (cat == null) {
       return Optional.empty();
@@ -558,7 +542,21 @@ public class GuildDiscord {
       return CompletableFuture.completedFuture(opt.get());
     }
 
-    var action = guildsTextCategory().createTextChannel(guild.getName());
+    Optional<ChannelAction<TextChannel>> actionOpt = getGuildCategory()
+        .map(category -> category.createTextChannel(guild.getName()));
+
+    if (actionOpt.isEmpty()) {
+      LOGGER.error("No guild channel category set in FTC-Guilds/config.toml, cannot make channel");
+      LOGGER.error("If a channel is set but this error persists, the ID is invalid");
+
+      return CompletableFuture.failedFuture(
+          new RuntimeException("No guild channel category found, cannot create channel")
+      );
+    }
+
+    var action = actionOpt.get();
+
+    LOGGER.debug("Creating channel for guild {}", guild);
 
     forEachDiscordMember(member -> {
       action.addPermissionOverride(
@@ -580,9 +578,18 @@ public class GuildDiscord {
           }
 
           channelId = channel.getIdLong();
+
+          LOGGER.debug("Created channel, channelId={}, channelId.string={}",
+              channelId, channel.getId()
+          );
+
           lastChannelUpdate = Instant.now();
 
+          LOGGER.debug("Post create");
+
           webHookMessage(channel, CHANNEL_OPENING_MESSAGE, false);
+
+          LOGGER.debug("Post webhook message");
         });
   }
 

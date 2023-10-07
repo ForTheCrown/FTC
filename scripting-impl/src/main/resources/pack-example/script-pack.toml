@@ -3,15 +3,8 @@ main-script = "main.js"
 
 required-plugins = [ "FTC-ExtendedItems" ]
 
-# List of script packs this pack imports
-# Importing means this pack can use the specified pack's scripts
-#
-# If the pack exports a package, for example 'scoreboard', then you can use
-# 'import "scoreboard"' anywhere, no need to import
-imported-packs = [ "other_pack" ]
-
 # A list of export name to implementation script
 # - 'script' Is a file path inside this pack's directory
 [exports]
-json = { script = "exports/json", methods = ["parse", "stringify"]}
+json = { script = "exports/json", values = ["o_parse as parse", "stringify"]}
 example = "exports/example"

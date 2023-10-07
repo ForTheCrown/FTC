@@ -102,7 +102,10 @@ class FtcGradlePlugin: Plugin<Project> {
         return@doFirst
       }
 
-      scanForProjectDependencies(it.project, yml)
+      if (ftcExtension.autoAddDependencies) {
+        scanForProjectDependencies(it.project, yml)
+      }
+
       setArchiveName(it.project, yml)
       createPluginYml(it)
     }

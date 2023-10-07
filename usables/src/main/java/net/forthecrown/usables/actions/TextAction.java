@@ -13,7 +13,7 @@ import net.forthecrown.usables.Action;
 import net.forthecrown.usables.BuiltType;
 import net.forthecrown.usables.Interaction;
 import net.forthecrown.usables.UsableComponent;
-import net.forthecrown.usables.UsageType;
+import net.forthecrown.usables.ObjectType;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 @RequiredArgsConstructor
 public class TextAction implements Action {
 
-  public static final UsageType<TextAction> TYPE = BuiltType.<TextAction>builder()
+  public static final ObjectType<TextAction> TYPE = BuiltType.<TextAction>builder()
       .parser((reader, source) -> {
         var remain = reader.getRemaining();
         reader.setCursor(reader.getTotalLength());
@@ -50,18 +50,18 @@ public class TextAction implements Action {
     PlaceholderRenderer list = Placeholders.newRenderer().useDefaults();
 
     Component base = getBaseText(player);
-    Component rendered = list.render(base, player);
+    Component rendered = list.render(base, player, interaction.context());
 
     player.sendMessage(rendered);
   }
 
   @Override
-  public UsageType<? extends UsableComponent> getType() {
+  public ObjectType<? extends UsableComponent> getType() {
     return TYPE;
   }
 
   @Override
   public @Nullable Component displayInfo() {
-    return Component.text("'" + text + "'");
+    return getBaseText(null);
   }
 }

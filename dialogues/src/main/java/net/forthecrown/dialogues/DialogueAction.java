@@ -11,7 +11,7 @@ import net.forthecrown.usables.Action;
 import net.forthecrown.usables.BuiltType;
 import net.forthecrown.usables.Interaction;
 import net.forthecrown.usables.UsableComponent;
-import net.forthecrown.usables.UsageType;
+import net.forthecrown.usables.ObjectType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.slf4j.Logger;
 
@@ -19,7 +19,7 @@ public class DialogueAction implements Action {
 
   public static final Logger LOGGER = Loggers.getLogger();
 
-  public static final UsageType<DialogueAction> TYPE = BuiltType.<DialogueAction>builder()
+  public static final ObjectType<DialogueAction> TYPE = BuiltType.<DialogueAction>builder()
       .parser((reader, source) -> {
         Result result = DialogueArgument.dialogue().parse(reader);
         return new DialogueAction(result.dialogue(), result.nodeName());
@@ -92,7 +92,7 @@ public class DialogueAction implements Action {
   }
 
   @Override
-  public UsageType<? extends UsableComponent> getType() {
+  public ObjectType<? extends UsableComponent> getType() {
     return TYPE;
   }
 }

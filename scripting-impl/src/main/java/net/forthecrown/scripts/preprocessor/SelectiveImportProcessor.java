@@ -15,7 +15,7 @@ class SelectiveImportProcessor extends RegexProcessor {
 
   public SelectiveImportProcessor() {
     super(Pattern.compile(
-        "import +\\{([a-zA-Z0-9_$, ]+)}(?: +as +([a-zA-Z0-9_$]+))? +from +\"([^\"]+)\";?"
+        "import\s+\\{([a-zA-Z0-9_$, \\s]+)}(?:\s+as\s+([a-zA-Z0-9_$]+))?\s+from\s+\"([^\"]+)\";?"
     ));
   }
 

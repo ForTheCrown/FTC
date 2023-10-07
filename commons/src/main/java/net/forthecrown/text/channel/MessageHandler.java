@@ -19,7 +19,10 @@ public interface MessageHandler {
     Set<Audience> viewers = event.getTargets();
 
     int seenMessage = viewers.size();
-    viewers.forEach(viewer -> sendMessage(viewer, message, renderer));
+
+    if (event.getState() != ChannelMessageState.SOFT_CANCELLED) {
+      viewers.forEach(viewer -> sendMessage(viewer, message, renderer));
+    }
 
     if (event.isShownToSender() && source != null) {
       sendMessage(source, message, renderer);
@@ -30,7 +33,11 @@ public interface MessageHandler {
   };
 
   MessageHandler EMPTY_IF_VIEWER_WAS_REMOVED = (ch, event) -> {
-    Set<Audience> viewers = new HashSet<>(ch.getTargets());
+    Set<Audience> viewers = new HashSet<>();
+
+    if (event.getState() != ChannelMessageState.SOFT_CANCELLED) {
+      viewers.addAll(ch.getTargets());
+    }
 
     if (event.isShownToSender() && event.getSource() != null) {
       viewers.add(event.getSource());

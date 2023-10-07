@@ -24,7 +24,7 @@ import net.kyori.adventure.util.TriState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class BuiltType<T> implements UsageType<T> {
+public class BuiltType<T> implements ObjectType<T> {
 
   private final Supplier<T> emptyFactory;
   private final Parser<T> parser;
@@ -119,7 +119,7 @@ public class BuiltType<T> implements UsageType<T> {
     if (emptyFactory != null) {
       return emptyFactory.get();
     }
-    return UsageType.super.createEmpty();
+    return ObjectType.super.createEmpty();
   }
 
   public interface Parser<T> {

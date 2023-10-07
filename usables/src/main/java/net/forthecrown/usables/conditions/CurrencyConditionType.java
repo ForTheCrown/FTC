@@ -16,7 +16,7 @@ import net.forthecrown.usables.Condition;
 import net.forthecrown.usables.Interaction;
 import net.forthecrown.usables.UsableCodecs;
 import net.forthecrown.usables.Usables;
-import net.forthecrown.usables.UsageType;
+import net.forthecrown.usables.ObjectType;
 import net.forthecrown.user.currency.Currency;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -24,17 +24,15 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @Getter
-public class CurrencyConditionType implements UsageType<CurrencyCondition> {
+public class CurrencyConditionType implements ObjectType<CurrencyCondition> {
 
   private final Currency currency;
   private final String currencyName;
 
-  public CurrencyConditionType(Currency currency, String currencyName) {
+  public CurrencyConditionType(Currency currency) {
     Objects.requireNonNull(currency);
-    Objects.requireNonNull(currencyName);
-
     this.currency = currency;
-    this.currencyName = currencyName;
+    this.currencyName = currency.name();
   }
 
   @Override

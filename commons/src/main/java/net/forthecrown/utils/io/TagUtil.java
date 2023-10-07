@@ -9,16 +9,21 @@ import static net.forthecrown.nbt.BinaryTags.stringTag;
 import com.mojang.datafixers.DSL;
 import com.mojang.serialization.Dynamic;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 import net.forthecrown.nbt.BinaryTag;
 import net.forthecrown.nbt.BinaryTags;
+import net.forthecrown.nbt.ByteArrayTag;
 import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.nbt.IntArrayTag;
 import net.forthecrown.nbt.ListTag;
+import net.forthecrown.nbt.LongArrayTag;
 import net.forthecrown.nbt.StringTag;
 import net.forthecrown.nbt.TagTypes;
 import net.forthecrown.nbt.TypeIds;
@@ -199,5 +204,44 @@ public final class TagUtil {
         .getValue();
 
     return (T) fixed;
+  }
+
+  public static Object toJavaTree(BinaryTag tag) {
+    return switch (tag.getId()) {
+      case TypeIds.END -> null;
+      case TypeIds.BYTE -> tag.asNumber().byteValue();
+      case TypeIds.SHORT -> tag.asNumber().shortValue();
+      case TypeIds.INT -> tag.asNumber().intValue();
+      case TypeIds.LONG -> tag.asNumber().longValue();
+      case TypeIds.FLOAT -> tag.asNumber().floatValue();
+      case TypeIds.DOUBLE -> tag.asNumber().doubleValue();
+
+      case TypeIds.BYTE_ARRAY -> ((ByteArrayTag) tag).toByteArray();
+
+      case TypeIds.STRING -> tag.asString().value();
+
+      case TypeIds.LIST -> {
+        List<Object> list = new ArrayList<>();
+        ListTag listTag = tag.asList();
+
+        for (BinaryTag binaryTag : listTag) {
+          list.add(toJavaTree(binaryTag));
+        }
+
+        yield list;
+      }
+
+      case TypeIds.COMPOUND -> {
+        Map<String, Object> map = new HashMap<>();
+        CompoundTag compound = tag.asCompound();
+        compound.forEach((s, t) -> map.put(s, toJavaTree(t)));
+        yield map;
+      }
+
+      case TypeIds.INT_ARRAY -> ((IntArrayTag) tag).toIntArray();
+      case TypeIds.LONG_ARRAY -> ((LongArrayTag) tag).toLongArray();
+
+      default -> throw new IllegalStateException("Unknown Tag: " + tag);
+    };
   }
 }

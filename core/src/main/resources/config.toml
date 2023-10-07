@@ -12,6 +12,9 @@ tpaExpireTime = "3m"
 # Maximum length a player's nickname can have
 maxNickLength = 16
 
+# Maximum amount of hoppers in a chunk
+hoppersInOneChunk = 128
+
 # Worlds people cannot set their homes to or TPA into
 illegalWorlds = [ "world_void", "world_test", "world_event", "void" ]
 

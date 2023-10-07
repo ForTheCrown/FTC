@@ -53,12 +53,12 @@ public class RequestTable<R extends PlayerRequest> {
     request.table = null;
   }
 
-  private TableEntry getOrCreateEntry(UUID user) {
-    return entryMap.computeIfAbsent(user, uuid -> new TableEntry());
+  private TableEntry getOrCreateEntry(UUID id) {
+    return entryMap.computeIfAbsent(id, uuid -> new TableEntry());
   }
 
-  private void removeRequest(UUID user, boolean incoming, R request) {
-    TableEntry entry = entryMap.get(user);
+  private void removeRequest(UUID uuid, boolean incoming, R request) {
+    TableEntry entry = entryMap.get(uuid);
 
     if (entry == null) {
       return;
@@ -71,7 +71,7 @@ public class RequestTable<R extends PlayerRequest> {
     }
 
     if (entry.isEmpty()) {
-      entryMap.remove(user);
+      entryMap.remove(uuid);
     }
   }
 
@@ -139,7 +139,7 @@ public class RequestTable<R extends PlayerRequest> {
     }
 
     public R getOutgoing(User target) {
-      for (var i: incoming) {
+      for (var i: outgoing) {
         if (i.getTargetId().equals(target.getUniqueId())) {
           return i;
         }

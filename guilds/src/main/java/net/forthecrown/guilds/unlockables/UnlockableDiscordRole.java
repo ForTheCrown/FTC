@@ -6,6 +6,7 @@ import static net.kyori.adventure.text.Component.text;
 
 import java.time.Duration;
 import java.time.Instant;
+import net.forthecrown.Loggers;
 import net.forthecrown.command.Exceptions;
 import net.forthecrown.guilds.GuildPermission;
 import net.forthecrown.guilds.Guilds;
@@ -69,6 +70,10 @@ public class UnlockableDiscordRole implements Unlockable {
 
           builder.setName("&eDiscord role");
 
+          if (Loggers.isDebugEnabled()) {
+            builder.addLore("roleId: " + guild.getDiscord().getRoleId());
+          }
+
           if (isUnlocked(guild)) {
             guild.getDiscord().getRole().ifPresentOrElse(role -> {
               builder
@@ -99,7 +104,7 @@ public class UnlockableDiscordRole implements Unlockable {
             Instant lastUpdate = guild.getDiscord().getLastRoleUpdate();
             Instant now = Instant.now();
 
-            Duration interval = Guilds.getConfig().roleUpdateInterval;
+            Duration interval = Guilds.getConfig().roleUpdateInterval();
             Instant nextPossible = lastUpdate.plus(interval);
 
             if (now.isBefore(nextPossible)) {
@@ -130,7 +135,7 @@ public class UnlockableDiscordRole implements Unlockable {
                     user
                 ));
 
-                GuildMenus.open(page, user, guild);
+                click.reloadMenu();
               });
               return;
             }
@@ -158,7 +163,7 @@ public class UnlockableDiscordRole implements Unlockable {
                   )
               );
 
-              GuildMenus.open(page, user, guild);
+              click.reloadMenu();
             });
           });
         })

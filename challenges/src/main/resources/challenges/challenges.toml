@@ -83,7 +83,7 @@ reward = { guildExp = 5 }
 
 ["daily/vote"]
 displayName = "Vote"
-eventClass = "custom"
+eventClass = "com.bencodez.votingplugin.events.PlayerPostVoteEvent"
 script = "challenges/on_vote.js"
 goal = 2
 description = [ "Vote for the server" ]
@@ -92,7 +92,7 @@ reward = { guildExp = 5 }
 ["daily/bank_run"]
 displayName = "Bank Run"
 eventClass = "custom"
-script = "challenges/on_bank_run.js"
+script = "challenges/generic.js"
 description = [ "Complete a bank run" ]
 reward = { guildExp = 10 }
 
@@ -122,7 +122,7 @@ reward = { guildExp = 15 }
 ["daily/sell"]
 displayName = "Selling"
 goal = 10_000
-eventClass = "custom"
+eventClass = "net.forthecrown.sellshop.event.ItemSellEvent"
 script = "challenges/on_sell.js"
 description = [ "Sell items in /shop worth ${goal} Rhines" ]
 reward = { guildExp = 15 }
@@ -130,7 +130,7 @@ reward = { guildExp = 15 }
 ["daily/buy"]
 displayName = "Buying"
 goal = 3
-eventClass = "custom"
+eventClass = "net.forthecrown.economy.signshops.event.ShopPostUseEvent"
 script = "challenges/on_buy.js"
 description = [ "Buy items from ${goal} different shop buildings in Hazelguard" ]
 reward = { guildExp = 15 }
@@ -155,7 +155,7 @@ description = [ "Kill a warden" ]
 reward = { guildExp = 20 }
 
 ["daily/pay"]
-displayName = "Pay${script: challenges/pay.js}"
+displayName = "Pay${script: challenges/pay_display.js}"
 eventClass = "custom"
 script = "challenges/on_pay.js"
 description = [ "Complete by paying 10,000 Rhines" ]
@@ -172,7 +172,7 @@ reward = { guildExp = 40 }
 ["weekly/elite_bank_run"]
 displayName = "Elite Bank Run"
 eventClass = "custom"
-script = "challenges/on_bank_run.js"
+script = "challenges/generic.js"
 type = "weekly"
 goal = 2
 description = [ "Complete ${goal} elite bank runs" ]
@@ -342,8 +342,9 @@ reward = { guildExp = 10 }
 
 ["daily/shop_challenge"]
 displayName = "Item Challenge"
-eventClass = "custom"
+eventClass = "net.forthecrown.challenges.event.ChallengeCompleteEvent"
 goal = 2
+script = "challenges/on_shop_complete.js"
 description = [ "Complete ${goal} of the daily challenges in /shop." ]
 reward = { guildExp = 40 }
 

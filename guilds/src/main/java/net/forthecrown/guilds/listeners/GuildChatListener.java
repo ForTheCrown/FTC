@@ -34,6 +34,8 @@ public class GuildChatListener implements Listener {
         user.getName(), event.signedMessage().message()
     );
 
+    event.setCancelled(true);
+
     Tasks.runSync(() -> {
       guild.chat(user, PlayerMessage.of(event.signedMessage().message(), user));
     });

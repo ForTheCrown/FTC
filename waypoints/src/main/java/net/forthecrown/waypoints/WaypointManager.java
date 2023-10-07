@@ -30,6 +30,8 @@ public class WaypointManager {
   static WaypointManager instance;
 
   private final Path path;
+
+  @Getter
   private final WaypointsPlugin plugin;
 
   private final Map<String, Waypoint> byName = new Object2ObjectOpenHashMap<>();
@@ -146,7 +148,7 @@ public class WaypointManager {
     }
 
     // If dynmap installed, remove marker
-    WaypointDynmap.removeMarker(waypoint);
+    WaypointWebmaps.removeMarker(waypoint);
 
     // If waypoint has residents, loop through them and
     // remove them from the waypoint

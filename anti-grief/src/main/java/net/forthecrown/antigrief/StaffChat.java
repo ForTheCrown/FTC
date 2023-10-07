@@ -38,7 +38,7 @@ import org.bukkit.Bukkit;
 public final class StaffChat {
   private StaffChat() {}
 
-  private static final String COOL_CLUB = "cool-club";
+  public static final String COOL_CLUB = "cool-club";
 
   public static final Set<UUID> toggledPlayers = new HashSet<>();
 
@@ -143,7 +143,7 @@ public final class StaffChat {
         msg.addTarget(player);
       });
 
-      if (isLogged()) {
+      if (logged) {
         msg.addTarget(Bukkit.getConsoleSender());
       }
 

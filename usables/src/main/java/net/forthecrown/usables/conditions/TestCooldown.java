@@ -1,21 +1,33 @@
 package net.forthecrown.usables.conditions;
 
+import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import com.mojang.serialization.OptionalDynamic;
+import com.mojang.serialization.Decoder;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.Keyable;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.EitherMapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
+import it.unimi.dsi.fastutil.objects.Object2LongMaps;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import java.time.Duration;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.stream.Stream;
 import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.text.Text;
 import net.forthecrown.usables.BuiltType;
 import net.forthecrown.usables.Condition;
 import net.forthecrown.usables.Interaction;
+import net.forthecrown.usables.ObjectType;
 import net.forthecrown.usables.UsableComponent;
-import net.forthecrown.usables.UsageType;
 import net.forthecrown.utils.Time;
+import net.forthecrown.utils.TomlConfigs;
 import net.forthecrown.utils.io.FtcCodecs;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -23,69 +35,74 @@ import org.jetbrains.annotations.Nullable;
 
 public class TestCooldown implements Condition {
 
-  public static final UsageType<TestCooldown> TYPE = BuiltType.<TestCooldown>builder()
+  public static final MapCodec<Object2LongMap<UUID>> CD_MAP_CODEC = Codec.simpleMap(
+      FtcCodecs.UUID_CODEC,
+      Codec.LONG,
+
+      new Keyable() {
+        @Override
+        public <T> Stream<T> keys(DynamicOps<T> ops) {
+          return Stream.empty();
+        }
+      }
+  ).xmap(Object2LongOpenHashMap::new, Function.identity());
+
+  private static final MapCodec<Duration> DURATION_EITHER_CODEC
+      = new EitherMapCodec<>(
+          FtcCodecs.DURATION.fieldOf("millisDuration"),
+          FtcCodecs.DURATION.fieldOf("duration")
+      )
+      .xmap(e -> e.map(d1 -> d1, d2 -> d2), Either::right);
+
+  public static final Codec<TestCooldown> RECORD_CODEC = RecordCodecBuilder.create(instance -> {
+    return instance
+        .group(
+            DURATION_EITHER_CODEC.forGetter(o -> o.duration),
+            CD_MAP_CODEC.codec().optionalFieldOf("entries").forGetter(o -> Optional.of(o.cooldowns))
+        )
+        .apply(instance, (duration, entries) -> {
+          var cd = new TestCooldown(duration);
+          cd.cooldowns.putAll(entries.orElseGet(Object2LongMaps::emptyMap));
+          return cd;
+        });
+  });
+
+  public static final Codec<TestCooldown> CODEC = Codec.of(
+      RECORD_CODEC,
+
+      new Decoder<>() {
+        @Override
+        public <T> DataResult<Pair<TestCooldown, T>> decode(DynamicOps<T> ops, T input) {
+          var strResult = ops.getStringValue(input);
+          var numResult = ops.getNumberValue(input);
+
+          if (numResult.result().isPresent()) {
+            return numResult
+                .map(number -> Duration.ofMillis(number.longValue()))
+                .map(TestCooldown::new)
+                .map(testCooldown -> new Pair<>(testCooldown, input));
+          }
+
+          if (strResult.result().isPresent()) {
+            return strResult
+                .flatMap(s -> FtcCodecs.safeParse(s, TomlConfigs::parseDuration))
+                .map(duration1 -> new Pair<>(new TestCooldown(duration1), input));
+          }
+
+          return RECORD_CODEC.decode(ops, input);
+        }
+      }
+  );
+
+  public static final ObjectType<TestCooldown> TYPE = BuiltType.<TestCooldown>builder()
       .parser((reader, source) -> new TestCooldown(ArgumentTypes.time().parse(reader)))
       .suggester(ArgumentTypes.time()::listSuggestions)
 
-      .loader(dynamic -> {
-        var stringResult = dynamic.asString();
-        var numberResult = dynamic.asNumber();
-
-        if (stringResult.result().isPresent()) {
-          return FtcCodecs.DURATION.decode(dynamic)
-              .map(Pair::getFirst)
-              .map(TestCooldown::new);
-        }
-
-        if (numberResult.result().isPresent()) {
-          return DataResult.success(
-              new TestCooldown(Duration.ofMillis(numberResult.result().get().longValue()))
-          );
-        }
-
-        OptionalDynamic<Object> dur = dynamic.get("duration");
-        OptionalDynamic<Object> durMillis = dynamic.get("millisDuration");
-
-        OptionalDynamic<Object> durationDyn = dur.get().result().isPresent() ? dur : durMillis;
-
-        return durationDyn
-            .flatMap(objectDynamic -> {
-              return FtcCodecs.DURATION
-                  .decode(objectDynamic.getOps(), objectDynamic.getValue())
-                  .map(Pair::getFirst);
-            })
-            .map(TestCooldown::new)
-
-            .map(cd -> {
-              var entries = dynamic.get("entries").asMap(
-                  objectDynamic -> UUID.fromString(objectDynamic.asString(null)),
-                  objectDynamic -> objectDynamic.asNumber(null).longValue()
-              );
-
-              cd.cooldowns.putAll(entries);
-              cd.clearExpired();
-
-              return cd;
-            });
-      })
+      .loader(CODEC::parse)
 
       .saver((value, ops) -> {
         value.clearExpired();
-
-        var builder = ops.mapBuilder();
-        builder.add("duration", FtcCodecs.DURATION.encodeStart(ops, value.duration));
-
-        if (!value.cooldowns.isEmpty()) {
-          var entries = ops.mapBuilder();
-
-          value.cooldowns.forEach((uuid, timestamp) -> {
-            entries.add(uuid.toString(), ops.createLong(timestamp));
-          });
-
-          builder.add("entries", entries.build(ops.empty()));
-        }
-
-        return builder.build(ops.empty());
+        return CODEC.encodeStart(ops, value);
       })
 
       .build();
@@ -128,7 +145,7 @@ public class TestCooldown implements Condition {
   }
 
   @Override
-  public UsageType<? extends UsableComponent> getType() {
+  public ObjectType<? extends UsableComponent> getType() {
     return TYPE;
   }
 

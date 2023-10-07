@@ -166,21 +166,35 @@ public class CommandKingMaker extends FtcCommand {
     MonarchGender gender = c.getArgument("gender", MonarchGender.class);
 
     User target = Arguments.getUser(c, "user");
+    var old = kingship.getMonarch();
 
     kingship.setMonarchId(target.getUniqueId());
     kingship.setGender(gender);
+
+    if (old != null && old.isOnline()) {
+      old.updateTabName();
+    }
 
     if (target.isOnline()) {
       target.updateTabName();
     }
 
-    c.getSource().sendSuccess(
-        Text.format("Made &e{0, user}&r a &e{1}&r!",
-            NamedTextColor.GRAY,
-            target,
-            kingship.getTitle()
-        )
-    );
+    if (old == null) {
+      c.getSource().sendSuccess(
+          Text.format("Made &e{0, user}&r a &e{1}&r!",
+              NamedTextColor.GRAY,
+              target,
+              kingship.getTitle()
+          )
+      );
+    } else {
+      c.getSource().sendSuccess(
+          Text.format("Replaced &e{0, user}&r with &6{1}&e {2, user}&r!",
+              NamedTextColor.GRAY,
+              old, kingship.getTitle(), target
+          )
+      );
+    }
     return 0;
   }
 }

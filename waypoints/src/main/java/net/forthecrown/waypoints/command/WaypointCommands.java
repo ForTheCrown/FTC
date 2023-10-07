@@ -17,6 +17,7 @@ public class WaypointCommands {
     new CommandInvite();
     new CommandListWaypoints();
     new CommandMoveIn();
+    new CommandSpawn();
     new CommandVisit();
     new CommandWaypoints();
   }

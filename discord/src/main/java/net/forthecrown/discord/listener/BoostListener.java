@@ -72,7 +72,7 @@ public class BoostListener implements EventListener {
     }
   }
 
-  private boolean isBoosting(GuildMemberUpdateBoostTimeEvent event) {
+  public static boolean isBoosting(GuildMemberUpdateBoostTimeEvent event) {
     if (event.getOldTimeBoosted() == null) {
       return true;
     }

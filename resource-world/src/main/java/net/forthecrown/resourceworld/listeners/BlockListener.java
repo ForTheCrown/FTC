@@ -33,6 +33,10 @@ public class BlockListener implements Listener {
   }
 
   private boolean testWorld(World world) {
+    if (!plugin.getRwConfig().doubleDrop.enabled) {
+      return false;
+    }
+
     return world.equals(Worlds.resource());
   }
 

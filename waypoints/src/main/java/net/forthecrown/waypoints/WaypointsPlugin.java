@@ -20,7 +20,7 @@ public class WaypointsPlugin extends JavaPlugin {
   public void onEnable() {
     reloadConfig();
 
-    WaypointTypes.init();
+    WaypointTypes.registerAll();
     WaypointManager.instance = new WaypointManager(this);
 
     SettingsBook<User> settingsBook = FtcServer.server().getGlobalSettingsBook();
@@ -42,7 +42,6 @@ public class WaypointsPlugin extends JavaPlugin {
     saver.stop();
 
     var m = WaypointManager.getInstance();
-    m.save();
     m.clear();
   }
 

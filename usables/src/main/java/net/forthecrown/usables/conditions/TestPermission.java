@@ -7,7 +7,7 @@ import net.forthecrown.usables.BuiltType;
 import net.forthecrown.usables.Condition;
 import net.forthecrown.usables.Interaction;
 import net.forthecrown.usables.UsableComponent;
-import net.forthecrown.usables.UsageType;
+import net.forthecrown.usables.ObjectType;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.permissions.Permission;
@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class TestPermission implements Condition {
 
-  static final UsageType<TestPermission> TYPE = BuiltType.<TestPermission>builder()
+  static final ObjectType<TestPermission> TYPE = BuiltType.<TestPermission>builder()
       .saver((value, ops) -> DataResult.success(ops.createString(value.permission)))
       .loader(dynamic -> dynamic.asString().map(TestPermission::new))
       .parser((reader, source) -> {
@@ -46,7 +46,7 @@ public class TestPermission implements Condition {
   }
 
   @Override
-  public UsageType<? extends UsableComponent> getType() {
+  public ObjectType<? extends UsableComponent> getType() {
     return TYPE;
   }
 

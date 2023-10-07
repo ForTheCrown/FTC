@@ -117,44 +117,45 @@ public final class PathUtil {
       return Results.error("Path '%s' is not a directory", dir);
     }
 
+    DataResult<Integer> result = DataResult.success(0);
+
     try (var stream = Files.newDirectoryStream(dir)) {
-      int deleted = 0;
-
       for (var p : stream) {
-        if (Files.isDirectory(p)) {
-          if (!deep) {
-            continue;
+        if (Files.isDirectory(p) && deep) {
+          var subResult = iterateDirectory(p, true, tolerateErrors, fileConsumer);
+          result = result.apply2(Integer::sum, subResult);
+
+          if (subResult.error().isPresent()) {
+            LOGGER.error(subResult.error().get().message());
+
+            if (!tolerateErrors) {
+              return result;
+            }
           }
 
-          var result = iterateDirectory(p, true, tolerateErrors, fileConsumer);
-          var either = result.get();
-
-          if (either.left().isPresent()) {
-            deleted += either.left().get();
-          } else if (!tolerateErrors) {
-            final int finalDeleted = deleted;
-            return result.map(integer -> integer + finalDeleted);
-          } else {
-            LOGGER.error(result.error().get().message());
-          }
+          continue;
         }
 
         try {
           fileConsumer.accept(p);
-          deleted++;
+          result = result.map(integer -> integer + 1);
         } catch (IOException exc) {
+          var err = Results.error(
+              "Couldn't perform operation on file '%s': '%s'",
+              p, exc.getMessage()
+          );
+
+          result = result.apply2((integer, o) -> integer, err);
+
           if (!tolerateErrors) {
-            return Results.partial(deleted,
-                "Couldn't perform operation on file '%s': '%s'",
-                p, exc.getMessage()
-            );
+            return result;
           } else {
             LOGGER.error("Error iterating over path {}", p, exc);
           }
         }
       }
 
-      return DataResult.success(deleted);
+      return result;
     } catch (IOException e) {
       return Results.error("Couldn't iterate through directory '%s': '%s'", e);
     }

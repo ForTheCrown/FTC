@@ -5,10 +5,10 @@ import static net.forthecrown.text.Messages.acceptButton;
 import static net.forthecrown.text.Messages.confirmButton;
 import static net.forthecrown.text.Messages.denyButton;
 import static net.forthecrown.text.Text.format;
+import static net.forthecrown.text.Text.vformat;
 import static net.kyori.adventure.text.Component.text;
 
 import net.forthecrown.text.ViewerAwareMessage;
-import net.forthecrown.text.format.FormatBuilder;
 import net.forthecrown.user.User;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -57,12 +57,12 @@ public interface MMessages {
       NamedTextColor.YELLOW
   );
 
-  static Component proposeSender(User target) {
-    return format("Proposed to &e{0, user}&r.", NamedTextColor.GOLD, target);
+  static ViewerAwareMessage proposeSender(User target) {
+    return vformat("Proposed to &e{0, user}&r.", NamedTextColor.GOLD, target);
   }
 
-  static Component proposeTarget(User sender) {
-    return format("&e{0, user}&r has proposed to you! {1} {2}",
+  static ViewerAwareMessage proposeTarget(User sender) {
+    return vformat("&e{0, user}&r has proposed to you! {1} {2}",
         NamedTextColor.GOLD,
         sender,
         acceptButton("/marryaccept " + sender.getName()),
@@ -70,22 +70,22 @@ public interface MMessages {
     );
   }
 
-  static Component confirmDivorce(User spouse) {
-    return format("Are you sure you wish to divorce &e{0, user}&r? {1}",
+  static ViewerAwareMessage confirmDivorce(User spouse) {
+    return vformat("Are you sure you wish to divorce &e{0, user}&r? {1}",
         NamedTextColor.GRAY,
         spouse,
         confirmButton("/divorce confirm")
     );
   }
 
-  static Component proposeDenySender(User target) {
-    return format("&e{0, user}&r denied your proposal :(",
+  static ViewerAwareMessage proposeDenySender(User target) {
+    return vformat("&e{0, user}&r denied your proposal :(",
         NamedTextColor.GRAY, target
     );
   }
 
-  static Component proposeDenyTarget(User sender) {
-    return format("Denied &e{0, user}&r's proposal.",
+  static ViewerAwareMessage proposeDenyTarget(User sender) {
+    return vformat("Denied &e{0, user}&r's proposal.",
         NamedTextColor.GRAY, sender
     );
   }
@@ -96,15 +96,15 @@ public interface MMessages {
     );
   }
 
-  static Component proposeAcceptTarget(User sender) {
-    return format(
+  static ViewerAwareMessage proposeAcceptTarget(User sender) {
+    return vformat(
         "&e{0, user}&r accepted your marriage proposal! Hurry to {1} to complete the ritual!",
         NamedTextColor.GRAY, sender, HAZELGUARD_CHAPEL
     );
   }
 
-  static Component priestTextConfirm(User sender, User target) {
-    return format("Do you, &6{0, user}&r, take &6{1, user}&r to be your lawfully wed spouse?",
+  static ViewerAwareMessage priestTextConfirm(User sender, User target) {
+    return vformat("Do you, &6{0, user}&r, take &6{1, user}&r to be your lawfully wed spouse?",
         NamedTextColor.YELLOW,
         sender, target
     );
@@ -117,10 +117,7 @@ public interface MMessages {
    * @return The formatted message
    */
   static ViewerAwareMessage nowMarried(User to) {
-    return FormatBuilder.builder()
-        .setFormat("You are now married to &6{0, user}&r!", NamedTextColor.GOLD)
-        .setArguments(to)
-        .asViewerAware();
+    return vformat("You are now married to &6{0, user}&r!", NamedTextColor.GOLD, to);
   }
 
   /**
@@ -130,10 +127,7 @@ public interface MMessages {
    * @return The formatted message
    */
   static ViewerAwareMessage senderDivorced(User spouse) {
-    return FormatBuilder.builder()
-        .setFormat("Divorced &e{0, user}&r.", NamedTextColor.GOLD)
-        .setArguments(spouse)
-        .asViewerAware();
+    return vformat("Divorced &e{0, user}&r.", NamedTextColor.GOLD, spouse);
   }
 
   /**
@@ -142,7 +136,7 @@ public interface MMessages {
    * @param user The user that divorced the viewer
    * @return The formatted message
    */
-  static Component targetDivorced(User user) {
-    return format("&6{0, user}&e divorced you.", user);
+  static ViewerAwareMessage targetDivorced(User user) {
+    return vformat("&6{0, user}&e divorced you.", user);
   }
 }

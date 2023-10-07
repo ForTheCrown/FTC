@@ -17,7 +17,7 @@ public interface Condition extends UsableComponent {
   interface TransientCondition extends Condition {
 
     @Override
-    default UsageType<? extends UsableComponent> getType() {
+    default ObjectType<? extends UsableComponent> getType() {
       return null;
     }
   }

@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.Set;
 import net.forthecrown.Permissions;
 import net.forthecrown.text.BufferedTextWriter;
+import net.forthecrown.text.Messages;
 import net.forthecrown.text.Text;
 import net.forthecrown.text.TextWriter;
 import net.forthecrown.text.TextWriters;
@@ -81,6 +82,10 @@ public class NameFactoryImpl implements UserNameFactory {
     Component suffix = formatSuffix(user, ctx);
     if (suffix != null) {
       builder.append(suffix);
+    }
+
+    if (user.isAfk() && ctx.intentMatches(DisplayIntent.TABLIST)) {
+      builder.append(Messages.AFK_SUFFIX);
     }
 
     if (ctx.intent().isHoverTextAllowed()) {

@@ -61,6 +61,8 @@ public interface CorePermissions {
 
   Permission PAY                     = registerCmd("pay");
 
+  Permission IP_QUERY                = register("ftc.users.iplookup");
+
   Permission HOME                    = registerCmd("home");
   Permission HOME_OTHERS             = register(HOME, "others");
 

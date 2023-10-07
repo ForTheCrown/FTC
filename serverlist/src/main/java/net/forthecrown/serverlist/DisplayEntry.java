@@ -24,6 +24,9 @@ class DisplayEntry implements Comparable<DisplayEntry> {
   private final Component motdPart;
   private final int priority;
 
+  private final int protocolOverride;
+  private final String versionText;
+
   public CachedServerIcon get(Random random) {
     if (icons.isEmpty()) {
       return null;
@@ -44,7 +47,8 @@ class DisplayEntry implements Comparable<DisplayEntry> {
     condition.put("random", random);
     condition.put("date", date);
 
-    ExecResult<Object> evalResult = condition.evaluate().logError();
+    ExecResult<Object> evalResult = condition.clearEvaluationBindings().evaluate().logError();
+
     return ExecResults.toBoolean(evalResult).result().orElse(false);
   }
 

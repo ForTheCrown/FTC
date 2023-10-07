@@ -8,7 +8,7 @@ import net.forthecrown.usables.BuiltType;
 import net.forthecrown.usables.Condition;
 import net.forthecrown.usables.Interaction;
 import net.forthecrown.usables.UsableComponent;
-import net.forthecrown.usables.UsageType;
+import net.forthecrown.usables.ObjectType;
 import net.forthecrown.utils.io.FtcCodecs;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class TestOneUse implements Condition {
 
-  public static final UsageType<TestOneUse> TYPE = BuiltType.<TestOneUse>builder()
+  public static final ObjectType<TestOneUse> TYPE = BuiltType.<TestOneUse>builder()
       .emptyFactory(TestOneUse::new)
       .loader(dynamic -> {
         return dynamic.readList(FtcCodecs.UUID_CODEC).map(uuids -> {
@@ -52,7 +52,7 @@ public class TestOneUse implements Condition {
   }
 
   @Override
-  public UsageType<? extends UsableComponent> getType() {
+  public ObjectType<? extends UsableComponent> getType() {
     return TYPE;
   }
 
@@ -62,6 +62,6 @@ public class TestOneUse implements Condition {
       return null;
     }
 
-    return Text.format("usedCount={1, number}", used.size());
+    return Text.format("usedCount={0, number}", used.size());
   }
 }

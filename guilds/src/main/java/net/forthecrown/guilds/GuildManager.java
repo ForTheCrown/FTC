@@ -139,7 +139,7 @@ public class  GuildManager {
           }
 
           var pos = Guilds.chunkFromPacked(next.getLongKey());
-          GuildDynmap.unrenderChunk(pos);
+          GuildWebmaps.unrenderChunk(pos);
 
           return true;
         });
@@ -249,9 +249,9 @@ public class  GuildManager {
 
     if (DynmapUtil.isInstalled()) {
       if (guild == null) {
-        GuildDynmap.unrenderChunk(pos);
+        GuildWebmaps.unrenderChunk(pos);
       } else {
-        GuildDynmap.renderChunk(pos, guild);
+        GuildWebmaps.renderChunk(pos, guild);
       }
     }
   }
@@ -268,7 +268,7 @@ public class  GuildManager {
     chunkMap.remove(pos);
 
     if (DynmapUtil.isInstalled()) {
-      GuildDynmap.unrenderChunk(Guilds.chunkFromPacked(pos));
+      GuildWebmaps.unrenderChunk(Guilds.chunkFromPacked(pos));
     }
   }
 

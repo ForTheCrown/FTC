@@ -8,6 +8,7 @@ import net.forthecrown.sellshop.ItemSeller;
 import net.forthecrown.sellshop.SellMessages;
 import net.forthecrown.sellshop.SellResult;
 import net.forthecrown.sellshop.UserShopData;
+import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.Tasks;
 import net.kyori.adventure.sound.Sound;
@@ -18,7 +19,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.scheduler.BukkitTask;
 
-public class AutoSellListener implements Listener {
+class AutoSellListener implements Listener {
 
   // Session map to update messages with correct cumulative amounts instead of displaying a
   // static 'You sold X for Y' message that doesn't change
@@ -57,12 +58,13 @@ public class AutoSellListener implements Listener {
     // If existing player session has different type of item
     // then cancel that session
     if (session != null && session.material != mat) {
+      session.expire();
       Tasks.cancel(session.task);
       session = null;
     }
 
     if (session == null) {
-      session = new AutoSellSession(mat);
+      session = new AutoSellSession(mat, user);
       SESSIONS.put(player.getUniqueId(), session);
     }
 
@@ -72,7 +74,12 @@ public class AutoSellListener implements Listener {
 
     // Delay timeout task
     Tasks.cancel(session.task);
-    session.task = Tasks.runLater(() -> SESSIONS.remove(player.getUniqueId()), SESSION_TIMEOUT);
+
+    AutoSellSession finalSession = session;
+    session.task = Tasks.runLater(() -> {
+      SESSIONS.remove(player.getUniqueId());
+      finalSession.expire();
+    }, SESSION_TIMEOUT);
 
     player.sendActionBar(SellMessages.soldItems(session.amount, session.earned, mat));
 
@@ -97,9 +104,16 @@ public class AutoSellListener implements Listener {
   static class AutoSellSession {
 
     private final Material material;
+    private final User user;
+
     private int amount;
     private int earned;
 
     private BukkitTask task;
+
+    public void expire() {
+      ItemSeller.log(user, material, amount, earned);
+      user.sendMessage(SellMessages.soldItemsTotal(amount, earned, material));
+    }
   }
 }

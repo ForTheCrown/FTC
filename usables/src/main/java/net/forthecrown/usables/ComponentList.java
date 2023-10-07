@@ -2,6 +2,7 @@ package net.forthecrown.usables;
 
 
 import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.Component.textOfChildren;
 
 import com.google.common.base.Strings;
 import com.mojang.serialization.DataResult;
@@ -30,13 +31,13 @@ public final class ComponentList<T extends UsableComponent> implements Iterable<
 
   public static final Logger LOGGER = Loggers.getLogger();
 
-  private final Registry<UsageType<T>> registry;
+  private final Registry<ObjectType<T>> registry;
 
   private T[] contents;
   private int size;
 
   @SuppressWarnings({"rawtypes", "unchecked"})
-  private ComponentList(Registry<UsageType<? extends T>> registry, Class<T> arrayType) {
+  private ComponentList(Registry<ObjectType<? extends T>> registry, Class<T> arrayType) {
     Objects.requireNonNull(registry, "Null registry");
 
     this.registry = (Registry) registry;
@@ -86,7 +87,7 @@ public final class ComponentList<T extends UsableComponent> implements Iterable<
     add(value, size);
   }
 
-  private void add(T value, int index) {
+  public void add(T value, int index) {
     Objects.requireNonNull(value, "Null value");
     Objects.checkIndex(index, size + 1);
 
@@ -128,7 +129,7 @@ public final class ComponentList<T extends UsableComponent> implements Iterable<
     }
   }
 
-  public void removeWithType(UsageType<? extends T> type) {
+  public void removeWithType(ObjectType<? extends T> type) {
     var it = iterator();
 
     while (it.hasNext()) {
@@ -151,7 +152,7 @@ public final class ComponentList<T extends UsableComponent> implements Iterable<
     ListBuilder<S> builder = ops.listBuilder();
 
     for (T t : this) {
-      UsageType<T> type = (UsageType<T>) t.getType();
+      ObjectType<T> type = (ObjectType<T>) t.getType();
 
       // Transient type
       if (type == null) {
@@ -268,24 +269,34 @@ public final class ComponentList<T extends UsableComponent> implements Iterable<
 
       prefixed.write(viewIndex + ") ", NamedTextColor.GRAY);
 
-      T component = contents[i];
-      UsageType<T> type = (UsageType<T>) component.getType();
-
-      registry.getKey(type).ifPresentOrElse(s -> {
-        prefixed.write(s, NamedTextColor.YELLOW);
-      }, () -> {
-        prefixed.write("UNKNOWN", NamedTextColor.YELLOW);
-      });
-
-      Component displayInfo = component.displayInfo();
-
-      if (displayInfo != null) {
-        writer.write(": ");
-        writer.write(displayInfo);
-      }
+      Component display = displayEntry(i);
+      prefixed.write(display);
     }
 
     writer.line("]");
+  }
+
+  public Component displayEntry(int index) {
+    T component = contents[index];
+    ObjectType<T> type = (ObjectType<T>) component.getType();
+
+    Component prefix;
+
+    if (type == null) {
+      prefix = text("TRANSIENT", NamedTextColor.YELLOW);
+    } else {
+      prefix = registry.getKey(type)
+          .map(s -> text(s, NamedTextColor.YELLOW))
+          .orElseGet(() -> text("UNKNOWN", NamedTextColor.YELLOW));
+    }
+
+    Component displayInfo = component.displayInfo();
+
+    if (displayInfo == null) {
+      return prefix;
+    } else {
+      return textOfChildren(prefix, text(": "), displayInfo);
+    }
   }
 
   private class Iter implements Iterator<T> {

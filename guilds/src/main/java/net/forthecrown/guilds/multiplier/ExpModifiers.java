@@ -165,9 +165,7 @@ public class ExpModifiers {
     updateTickingState();
   }
 
-  public List<DonatorMultiplier> getMultipliers(UUID uuid,
-                                                MultiplierType type
-  ) {
+  public List<DonatorMultiplier> getMultipliers(UUID uuid, MultiplierType type) {
     return multiplierList.stream()
         .filter(multiplier -> Objects.equals(uuid, multiplier.getDonator()))
         .filter(multiplier -> multiplier.getType() == type)
@@ -198,18 +196,21 @@ public class ExpModifiers {
   }
 
   public float getModifier(UUID uuid) {
-    float result = getManual();
-    var config = manager.getPlugin().getGuildConfig();
+    float result = 1;
+    result += getManual();
 
-    if (isWeekend() && config.weekendMultiplierEnabled) {
-      result += config.weekendModifier;
+    var config = manager.getPlugin().getGuildConfig();
+    float weekendMod = config.weekendModifier();
+
+    if (isWeekend() && weekendMod > 0) {
+      result += weekendMod;
     }
 
     for (var d: getActive(uuid)) {
       result += d.getModifier();
     }
 
-    return Math.min(result, config.maxExpMultiplier);
+    return Math.min(result, config.maxExpMultiplier());
   }
 
   public void clear() {
@@ -220,7 +221,7 @@ public class ExpModifiers {
 
   public JsonObject serialize() {
     JsonWrapper json = JsonWrapper.create();
-    json.add("manual", getManual());
+    json.add("manual", manual);
     json.add("donator_multipliers",
         JsonUtils.ofStream(
             multiplierList.stream()
@@ -240,7 +241,8 @@ public class ExpModifiers {
     }
 
     JsonWrapper json = JsonWrapper.wrap(element.getAsJsonObject());
-    setManual(json.getFloat("manual", 0.0F));
+
+    manual = json.getFloat("manual", 0.0F);
     loadDonators(json.getArray("donator_multipliers"));
   }
 

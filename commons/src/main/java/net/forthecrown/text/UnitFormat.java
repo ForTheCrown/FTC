@@ -106,15 +106,16 @@ public interface UnitFormat {
       return unit;
     }
 
-    if (unit.endsWith("exp")) {
+    var lowerCase = unit.toLowerCase();
+    if (lowerCase.endsWith("exp")) {
       return unit;
     }
 
-    if (unit.endsWith("s")
-        || unit.endsWith("x")
-        || unit.endsWith("sh")
-        || unit.endsWith("ch")
-        || unit.endsWith("y")
+    if (lowerCase.endsWith("s")
+        || lowerCase.endsWith("x")
+        || lowerCase.endsWith("sh")
+        || lowerCase.endsWith("ch")
+        || lowerCase.endsWith("y")
     ) {
       return unit + "es";
     }

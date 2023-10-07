@@ -10,7 +10,9 @@ public interface TpExceptions {
 
   CommandSyntaxException CANNOT_TP = create("Cannot currently teleport.");
 
-  CommandSyntaxException NO_TP_REQUESTS = create("You don't have any tp requests.");
+  CommandSyntaxException NO_TP_REQUESTS = create("You haven't received any tp requests.");
+
+  CommandSyntaxException NO_TP_REQUESTS_OUT = create("You haven't sent any tp requests.");
 
   CommandSyntaxException CANNOT_TP_SELF = create("You cannot teleport to yourself.");
 

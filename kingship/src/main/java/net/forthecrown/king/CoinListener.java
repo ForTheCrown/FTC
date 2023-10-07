@@ -23,6 +23,6 @@ public class CoinListener implements Listener {
     User monarch = kingship.getMonarch();
     String playerName = monarch.getName();
 
-    event.getBuilder().addLore("During the reign of " + title + " " + playerName);
+    event.getBuilder().addLore("&8During the reign of " + title + " " + playerName);
   }
 }

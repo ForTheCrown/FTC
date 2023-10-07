@@ -213,7 +213,7 @@ public class CommandMergeShop extends FtcCommand {
       var sender = getSender();
 
       target.sendMessage(Messages.REQUEST_DENIED);
-      sender.sendMessage(Messages.requestDenied(target));
+      sender.sendMessage(Messages.requestDenied(target.displayName()));
 
       stop();
     }

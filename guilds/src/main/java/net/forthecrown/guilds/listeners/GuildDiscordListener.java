@@ -114,9 +114,7 @@ public class GuildDiscordListener {
       g.sendMessage(
           text()
               .append(
-                  g.displayName(),
-
-                  text(" [Discord] ", NamedTextColor.GRAY),
+                  text("[Discord] ", NamedTextColor.GRAY),
 
                   Messages.chatMessage(
                       user.displayName(),

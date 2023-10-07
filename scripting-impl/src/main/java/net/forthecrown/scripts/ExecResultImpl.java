@@ -1,6 +1,7 @@
 package net.forthecrown.scripts;
 
 import com.google.common.base.Strings;
+import com.mojang.datafixers.util.Unit;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
@@ -114,6 +115,19 @@ class ExecResultImpl<T> implements ExecResult<T> {
     }
 
     return this;
+  }
+
+  @Override
+  public Result<T> toRegularResult() {
+    if (isSuccess()) {
+      if (value == null) {
+        return Result.success(Unit.INSTANCE).cast();
+      }
+
+      return Result.success(value);
+    }
+
+    return Result.error(formatError());
   }
 
   @Override

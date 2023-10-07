@@ -1,5 +1,6 @@
 name = "user_earnings"
 aliases = "userearnings" | "earnings"
+description = "Manage earnings with players"
 
 literal("get").argument("player", user) {
   map_result = @result_to_user

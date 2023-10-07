@@ -4,6 +4,9 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import net.forthecrown.Permissions;
 import net.forthecrown.command.FtcCommand;
 import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.text.Messages;
+import net.forthecrown.text.PlayerMessage;
+import net.forthecrown.text.channel.ChannelledMessage;
 import org.bukkit.entity.Player;
 
 public class CommandSay extends FtcCommand {
@@ -41,7 +44,13 @@ public class CommandSay extends FtcCommand {
                 Player player = c.getSource().asPlayer();
                 player.chat(msg);
               } else {
-
+                ChannelledMessage.create(PlayerMessage.allFlags(msg))
+                    .setBroadcast()
+                    .setSource(c.getSource())
+                    .setRenderer((viewer, baseMessage) -> {
+                      return Messages.chatMessage(c.getSource().displayName(), baseMessage);
+                    })
+                    .send();
               }
 
               return 0;

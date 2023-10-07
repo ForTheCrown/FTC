@@ -37,8 +37,11 @@ public class GuildMessage {
   private final long createTimeStamp;
   private final Component[] msgLines;
 
-  public GuildMessage(Material signType, UUID creatorName, long createTimeStamp,
-                      Component[] msgLines
+  public GuildMessage(
+      Material signType,
+      UUID creatorName,
+      long createTimeStamp,
+      Component[] msgLines
   ) {
     this.signType = signType;
     this.creatorName = creatorName;
@@ -59,8 +62,10 @@ public class GuildMessage {
                     )
                 )
 
-                .addLore(text("Created on: ", NamedTextColor.WHITE).append(
-                    Text.formatDate(this.createTimeStamp)))
+                .addLore(
+                    text("Created on: ", NamedTextColor.WHITE)
+                        .append(Text.formatDate(this.createTimeStamp))
+                )
 
                 .addLore(text(signBorder, NamedTextColor.GRAY))
                 .addLore(wrapSignLine(msgLines[0]))

@@ -5,6 +5,9 @@ import java.util.Objects;
 import net.forthecrown.FtcServer;
 import net.forthecrown.Worlds;
 import net.forthecrown.command.settings.SettingsBook;
+import net.forthecrown.text.ViewerAwareMessage;
+import net.forthecrown.text.channel.ChannelledMessage;
+import net.forthecrown.text.placeholder.Placeholders;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.PathUtil;
@@ -18,6 +21,11 @@ public class FtcServerImpl implements FtcServer {
   private Location serverSpawn;
 
   private final SettingsBook<User> globalSettings = new SettingsBook<>();
+  private final CorePlugin plugin;
+
+  public FtcServerImpl(CorePlugin plugin) {
+    this.plugin = plugin;
+  }
 
   private Path spawnJson() {
     return PathUtil.pluginPath("spawn.json");
@@ -56,5 +64,13 @@ public class FtcServerImpl implements FtcServer {
   @Override
   public @NotNull SettingsBook<User> getGlobalSettingsBook() {
     return globalSettings;
+  }
+
+  @Override
+  public void announce(ViewerAwareMessage message) {
+    ChannelledMessage.create(message)
+        .setBroadcast()
+        .setRenderer(plugin.getAnnouncer().renderer(Placeholders.newRenderer().useDefaults()))
+        .send();
   }
 }

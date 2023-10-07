@@ -3,6 +3,7 @@ package net.forthecrown.utils.math;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.lang.ref.WeakReference;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
 import net.forthecrown.WorldEditHook;
@@ -13,7 +14,6 @@ import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
 
-public class WorldBounds3i extends AbstractBounds3i<WorldBounds3i> implements Iterable<Block> {
+public class WorldBounds3i extends AbstractBounds3i<WorldBounds3i> implements AreaSelection {
 
   private final WeakReference<World> world;
 
@@ -144,6 +144,11 @@ public class WorldBounds3i extends AbstractBounds3i<WorldBounds3i> implements It
   @Override
   public BlockIterator iterator() {
     return new BlockIterator(getWorld(), min(), max(), volume());
+  }
+
+  @Override
+  public Iterator<Entity> entities() {
+    return getEntities().iterator();
   }
 
   public Collection<Entity> getEntities() {

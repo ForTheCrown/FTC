@@ -1,5 +1,6 @@
 package net.forthecrown.utils;
 
+import java.util.Collection;
 import java.util.Objects;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
@@ -80,6 +81,15 @@ public final class Audiences {
     } else {
       return audience;
     }
+  }
+
+  public static boolean contains(Audience audience, Collection<Audience> audiences) {
+    for (Audience t : audiences) {
+      if (equals(audience, t)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public static boolean equals(Audience first, Audience second) {
