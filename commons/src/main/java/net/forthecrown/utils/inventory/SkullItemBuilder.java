@@ -24,6 +24,10 @@ public class SkullItemBuilder extends ItemBuilder<SkullItemBuilder> {
   }
 
   public SkullItemBuilder setProfile(PlayerProfile profile) {
+    if (!profile.isComplete()) {
+      profile.complete(true);
+    }
+
     meta().setPlayerProfile(profile);
     return this;
   }
