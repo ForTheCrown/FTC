@@ -1,24 +1,19 @@
 package net.forthecrown.antigrief;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ObjectList;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import net.forthecrown.Loggers;
 import net.forthecrown.text.Text;
 import net.forthecrown.text.parse.ChatParseFlag;
 import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.utils.io.PluginJar;
+import net.forthecrown.utils.io.SerializationHelper;
 import net.kyori.adventure.text.ComponentLike;
-import org.apache.commons.lang3.StringUtils;
 import org.bukkit.command.CommandSender;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.slf4j.Logger;
 
 /**
  * Checks and manages banned words in user messages and inputs.
@@ -26,23 +21,25 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class BannedWords {
   private BannedWords() {}
 
-  private static final ObjectList<String> BANNED_WORDS = new ObjectArrayList<>();
+  private static final Logger LOGGER = Loggers.getLogger();
+
   private static final String COOLDOWN_CATEGORY = "banned_words";
   private static final int COOLDOWN_TIME = 3 * 60 * 20;
 
+  private static BannedWordsConfig config = BannedWordsConfig.EMPTY;
+
   public static void load() {
-    InputStream stream = getBannedWordsInputStream();
-    JsonElement element = JsonParser.parseReader(
-        new InputStreamReader(stream, StandardCharsets.UTF_8)
-    );
+    Path file = PathUtil.pluginPath("banned_words.toml");
+    PluginJar.saveResources("banned_words.toml", file);
 
-    JsonArray array = element.getAsJsonArray();
+    SerializationHelper.readAsJson(file, jsonWrapper -> {
+      JsonElement element = jsonWrapper.getSource();
 
-    BANNED_WORDS.clear();
-
-    for (JsonElement e : array) {
-      BANNED_WORDS.add(e.getAsString().toLowerCase());
-    }
+      BannedWordsConfig.loadConfig(element)
+          .mapError(s -> "Failed to load config: " + s)
+          .resultOrPartial(LOGGER::error)
+          .ifPresent(cfg -> config = cfg);
+    });
   }
 
   public static boolean contains(String unfiltered) {
@@ -54,12 +51,12 @@ public final class BannedWords {
   }
 
   private static boolean containsBannedWords(String input) {
-    String filteredInput = StringUtils.replaceChars(
-        input.toLowerCase(), "АВЕЅZІКМНОРСТХШѴУ", "ABESZIKMHOPCTXWVY"
-    );
+    String filtered = config.filter(input);
 
-    for (String s : BANNED_WORDS) {
-      if (filteredInput.contains(s)) {
+    for (Pattern bannedWord : config.bannedWords()) {
+      Matcher matcher = bannedWord.matcher(filtered);
+
+      if (matcher.find()) {
         return true;
       }
     }
@@ -76,36 +73,19 @@ public final class BannedWords {
   }
 
   private static boolean _checkAndWarn(CommandSender sender, String input) {
-    if (sender == null || sender.hasPermission(ChatParseFlag.IGNORE_SWEARS.getPermission())) {
+    boolean senderHasBypass
+        = sender == null || sender.hasPermission(ChatParseFlag.IGNORE_CASE.getPermission());
+
+    if (sender == null || (senderHasBypass && config.allowBypass())) {
       return false;
     }
 
     boolean result = containsBannedWords(input);
 
-    if (result
-        && !Cooldown.containsOrAdd(sender, COOLDOWN_CATEGORY, COOLDOWN_TIME)
-    ) {
+    if (result && !Cooldown.containsOrAdd(sender, COOLDOWN_CATEGORY, COOLDOWN_TIME)) {
       sender.sendMessage(GMessages.BAD_LANGUAGE);
     }
 
     return result;
-  }
-
-  private static InputStream getBannedWordsInputStream() {
-    final String stringPath = "banned_words.json";
-
-    PluginJar.saveResources(stringPath);
-    var file = PathUtil.pluginPath(stringPath);
-
-    if (Files.exists(file)) {
-      try {
-        return Files.newInputStream(file);
-      } catch (IOException e) {
-        throw new IllegalStateException(e);
-      }
-    }
-
-    var plugin = JavaPlugin.getPlugin(AntiGriefPlugin.class);
-    return plugin.getResource(stringPath);
   }
 }

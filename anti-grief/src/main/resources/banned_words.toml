@@ -1,0 +1,41 @@
+
+# Filters applied to the input
+#
+# Values:
+# - { regex = {"<regexp>" = "<replacement>"}}:
+#  Applies a regex filter to the input.
+#
+# - { chars = {"<sequence1>" = "<sequence2>"}}:
+#  Replaces each matching character from <sequence1> with the
+#  equivalent in <sequence2>, for example the chars {"AB" = "CD"}
+#  would turn the input "AAA BBBBB" into "CCC DDDDD".
+#
+# - { literal = { "<string>" = "<replacement>" }}
+#  Replaces the specified <string> in each input string with the
+#  specified <replacement>.
+#
+input_filters = [
+  { regex = {"[ _.,]+" = ""}},
+  { chars = {"АВЕЅZІКМНОРСТХШѴУ" = "ABESZIKMHOPCTXWVY"}}
+]
+
+# Sets whether the filter can be bypassed by players with the
+# 'ftc.chat.ignoreswears' permission
+bypassAllowed = true
+
+# List of banned words (List also supports RegExp values)
+# Words are checked in a case-insensitive context, so case
+# doesn't matter
+words = [
+  "nig+er",
+  "knee ?ge[ea]r",
+  "nigga",
+  "fag",
+  "fags",
+  "f[ae]gg[oi]t",
+  "cunt",
+  "whore",
+  "slut",
+  "kys",
+  "holohoax"
+]
