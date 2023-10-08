@@ -53,3 +53,13 @@ damageNumbersEnabled = true
 # Whether Right-Clicking with coins in your main hand will cause those coins
 # to be deposited, disabling this will not disable the /deposit command
 rightClickDeposits = true
+
+# Threshold at which durability warnings are thrown to players
+#
+# Uses the following equation to determine the durability at which
+# to start warnings:
+# minDurability = item.max_durability * durabilityWarningThreshold
+#
+# Set to 0 or less to disable
+#
+durabilityWarningThreshold = 0.1

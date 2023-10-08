@@ -18,6 +18,9 @@ public class PrefsBook {
   public static final UserProperty<Boolean> PAY
       = Properties.booleanProperty("paying", true);
 
+  public static final UserProperty<Boolean> DURABILITY_WARNINGS
+      = Properties.booleanProperty("durabilityAlerts", true);
+
   static void init(SettingsBook<User> settings) {
     Setting flying = Setting.create(Properties.FLYING)
         .setDisplayName("Flying")
@@ -99,6 +102,19 @@ public class PrefsBook {
             "togglepay", "payingtoggle"
         );
 
+    Setting durabilityAlerts = Setting.create(DURABILITY_WARNINGS)
+        .setDisplayName("Durability Warn")
+        .setDescription("Toggles seeing item breaking warnings")
+        .setToggle("N{1} showing item durability warnings.")
+        .setToggleDescription("{Enable} item durability warnings")
+
+        .createCommand(
+            "itembreakwarning",
+            Permissions.DEFAULT,
+            Permissions.ADMIN,
+            "itemdurability", "durabilitywarnings"
+        );
+
     List<BookSetting<User>> list = settings.getSettings();
     list.add(flying.toBookSettng());
     list.add(god.toBookSettng());
@@ -106,5 +122,6 @@ public class PrefsBook {
     list.add(profilePrivate.toBookSettng());
     list.add(ignoreac.toBookSettng());
     list.add(paying.toBookSettng());
+    list.add(durabilityAlerts.toBookSettng());
   }
 }

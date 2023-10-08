@@ -13,6 +13,7 @@ public final class CoreListeners {
     register(new AnvilListener(plugin));
     register(new ChatHandleListener());
     register(new DepositListener(plugin));
+    register(new DurabilityListener(plugin));
     register(new GamemodeListener());
     register(new HopperListener(plugin));
     register(new IgnoreListListener());

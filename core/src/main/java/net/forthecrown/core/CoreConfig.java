@@ -41,6 +41,8 @@ public class CoreConfig {
 
   private int hoppersInOneChunk = 128;
 
+  private double durabilityWarningThreshold = 0.1d;
+
   public enum AltJoinPrevention {
     ALWAYS {
       @Override
