@@ -54,8 +54,11 @@ import org.bukkit.inventory.ItemStack;
 public final class JsonUtils {
   private JsonUtils() {}
 
-  public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z", Locale.ROOT);
-  private static final DateFormat LEGACY_FORMAT = DateFormat.getDateInstance();
+  public static final SimpleDateFormat DATE_FORMAT
+      = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z", Locale.ROOT);
+
+  private static final DateFormat LEGACY_FORMAT
+      = DateFormat.getDateInstance();
 
   private static final BigInteger B = BigInteger.ONE.shiftLeft(64); // 2^64
   private static final BigInteger L = BigInteger.valueOf(Long.MAX_VALUE);
@@ -176,6 +179,16 @@ public final class JsonUtils {
   }
 
   public static Date readDate(JsonElement element) {
+    if (element == null || !element.isJsonPrimitive()) {
+      return null;
+    }
+
+    var prim = element.getAsJsonPrimitive();
+
+    if (prim.isNumber()) {
+      return new Date(prim.getAsLong());
+    }
+
     try {
       return DATE_FORMAT.parse(element.getAsString());
     } catch (ParseException e) {
@@ -184,7 +197,11 @@ public final class JsonUtils {
   }
 
   public static JsonElement writeDate(Date date) {
-    return new JsonPrimitive(DATE_FORMAT.format(date));
+    try {
+      return new JsonPrimitive(DATE_FORMAT.format(date));
+    } catch (Throwable t) {
+      return new JsonPrimitive(date.getTime());
+    }
   }
 
   public static long readTimestamp(JsonElement element) {
@@ -192,17 +209,8 @@ public final class JsonUtils {
   }
 
   public static long readTimestamp(JsonElement element, long def) {
-    if (element == null || !element.isJsonPrimitive()) {
-      return def;
-    }
-
-    JsonPrimitive primitive = element.getAsJsonPrimitive();
-
-    if (primitive.isString()) {
-      return readDate(element).getTime();
-    }
-
-    return primitive.getAsLong();
+    var date = readDate(element);
+    return date == null ? def : date.getTime();
   }
 
   public static JsonElement writeTimestamp(long time) {
@@ -348,7 +356,7 @@ public final class JsonUtils {
           String name = in.nextString().toUpperCase();
 
           for (Enum constant : eClass.getEnumConstants()) {
-            if (constant.name().equals(name)) {
+            if (constant.name().toUpperCase().equals(name)) {
               return (T) constant;
             }
           }

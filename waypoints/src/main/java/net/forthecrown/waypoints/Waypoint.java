@@ -421,6 +421,10 @@ public class Waypoint {
       return fromType;
     }
 
+    if (Objects.equals(id.toString(), effectiveName)) {
+      return null;
+    }
+
     return effectiveName;
   }
 

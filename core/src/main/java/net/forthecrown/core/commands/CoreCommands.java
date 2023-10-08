@@ -21,7 +21,6 @@ import net.forthecrown.core.commands.admin.CommandSign;
 import net.forthecrown.core.commands.admin.CommandSkull;
 import net.forthecrown.core.commands.admin.CommandSpecificGameMode;
 import net.forthecrown.core.commands.admin.CommandSpeed;
-import net.forthecrown.core.commands.admin.CommandSudo;
 import net.forthecrown.core.commands.admin.CommandTab;
 import net.forthecrown.core.commands.admin.CommandTeleport;
 import net.forthecrown.core.commands.admin.CommandTeleportExact;
@@ -72,7 +71,6 @@ public final class CoreCommands {
     new CommandTop();
     new CommandTime();
     new CommandTeleportExact();
-    new CommandSudo();
     new CommandSpeed();
     new CommandSkull();
     new CommandSign();

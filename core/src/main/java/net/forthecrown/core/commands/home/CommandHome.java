@@ -85,6 +85,10 @@ public class CommandHome extends FtcCommand {
         CoreExceptions.badWorldHome(home.name())
     );
 
+    if (!user.checkTeleporting()) {
+      return 0;
+    }
+
     var teleport = user.createTeleport(() -> l, UserTeleport.Type.HOME);
 
     if (result.isDefaultHome()) {

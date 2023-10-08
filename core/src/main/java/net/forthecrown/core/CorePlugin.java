@@ -75,7 +75,7 @@ public class CorePlugin extends JavaPlugin {
 
     saver = PeriodicalSaver.create(this::save, () -> ftcConfig.autosaveInterval());
 
-    reload();
+    reloadAll();
   }
 
   @Override
@@ -114,10 +114,17 @@ public class CorePlugin extends JavaPlugin {
     CooldownsImpl.getCooldowns().save();
   }
 
+  public void reloadAll() {
+    userService.load();
+    InventoryStorageImpl.getStorage().load();
+    CooldownsImpl.getCooldowns().load();
+
+    reload();
+  }
+
   public void reload() {
     reloadConfig();
 
-    userService.load();
     announcer.load();
 
     announcer.start();
@@ -129,8 +136,5 @@ public class CorePlugin extends JavaPlugin {
     ftcServer.load();
     helpList.load();
     wild.load();
-
-    InventoryStorageImpl.getStorage().load();
-    CooldownsImpl.getCooldowns().load();
   }
 }

@@ -96,9 +96,7 @@ public class ScoreIntMap<K> implements Iterable<Entry<K>> {
         if (fatalErrors) {
           throw new IllegalArgumentException(reason);
         } else {
-          Loggers.getLogger().error(reason);
-          remove(key);
-          return;
+          Loggers.getLogger().warn(reason);
         }
       }
     }
@@ -280,7 +278,7 @@ public class ScoreIntMap<K> implements Iterable<Entry<K>> {
       var entry = lookup.getEntry(key);
 
       if (entry == null) {
-        return "No played named '%s' exists".formatted(key);
+        return "No player with UUID %s exists".formatted(key);
       }
 
       return null;

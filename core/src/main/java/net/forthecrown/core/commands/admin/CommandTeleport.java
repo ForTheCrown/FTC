@@ -17,8 +17,6 @@ import net.forthecrown.grenadier.annotations.CommandFile;
 import net.forthecrown.grenadier.annotations.VariableInitializer;
 import net.forthecrown.grenadier.types.EntitySelector;
 import net.forthecrown.text.Text;
-import net.forthecrown.user.User;
-import net.forthecrown.user.UserTeleport.Type;
 import net.forthecrown.user.Users;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -93,22 +91,12 @@ public class CommandTeleport {
     int failed = 0;
 
     for (Entity e: entities) {
-      if (e instanceof Player player) {
-        User user = Users.get(player);
+      boolean success = teleportTo(e, dest);
 
-        user.createTeleport(dest::clone, Type.TELEPORT)
-            .setDelay(null)
-            .start();
-
+      if (success) {
         successes++;
       } else {
-        boolean success = teleportTo(e, dest);
-
-        if (success) {
-          successes++;
-        } else {
-          failed++;
-        }
+        failed++;
       }
     }
 
@@ -186,26 +174,19 @@ public class CommandTeleport {
   private void teleportSource(CommandSource source, Location location)
       throws CommandSyntaxException
   {
-    if (source.isPlayer()) {
-      var user = Users.get(source.asPlayer());
+    var entity = source.asEntity();
+    boolean success = teleportTo(entity, location);
 
-      user.createTeleport(location::clone, Type.TELEPORT)
-          .setDelay(null)
-          .start();
-    } else {
-      var entity = source.asEntity();
-      boolean success = teleportTo(entity, location);
-
-      if (!success) {
-        throw Exceptions.create("Failed to teleport");
-      }
+    if (!success) {
+      throw Exceptions.create("Failed to teleport");
     }
   }
 
   private boolean teleportTo(Entity e, Location l) {
     return e.teleport(l.clone(),
         TeleportCause.COMMAND,
-        EntityState.RETAIN_PASSENGERS
+        EntityState.RETAIN_PASSENGERS,
+        EntityState.RETAIN_VEHICLE
     );
   }
 

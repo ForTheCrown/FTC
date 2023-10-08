@@ -76,7 +76,11 @@ public class UserDataStorage {
         UUID uuid = UUID.fromString(e.getKey());
         int value = e.getValue().getAsInt();
 
-        map.set(uuid, value);
+        try {
+          map.set(uuid, value);
+        } catch (IllegalArgumentException exc) {
+          LOGGER.error("Error setting value {} to {} in map", uuid, value, exc);
+        }
       }
     });
   }
@@ -88,8 +92,12 @@ public class UserDataStorage {
 
         array -> {
           for (var e: array) {
-            UserLookupEntry entry = loadEntry(e);
-            lookup.addEntry(entry);
+            try {
+              UserLookupEntry entry = loadEntry(e);
+              lookup.addEntry(entry);
+            } catch (Throwable t) {
+              LOGGER.error("Failed to load profile entry {}", e, t);
+            }
           }
 
           lookup.setUnsaved(false);
@@ -104,8 +112,12 @@ public class UserDataStorage {
 
     JsonArray arr = new JsonArray();
     lookup.stream().forEach(entry -> {
-      JsonElement element = saveEntry(entry);
-      arr.add(element);
+      try {
+        JsonElement element = saveEntry(entry);
+        arr.add(element);
+      } catch (Throwable t) {
+        LOGGER.error("Failed to save entry {}", entry.getUniqueId(), t);
+      }
     });
 
     if (SerializationHelper.writeJson(userLookup, arr)) {

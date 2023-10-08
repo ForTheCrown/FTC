@@ -2,6 +2,7 @@ package net.forthecrown.core.commands.help;
 
 import java.util.HashSet;
 import java.util.Set;
+import net.forthecrown.Permissions;
 import net.forthecrown.command.FtcCommand;
 import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.text.TextWriters;
@@ -22,6 +23,7 @@ public class LoadedEntryCommand extends FtcCommand {
 
     setAliases(labels);
     getCommand().withDescription(entry.getShortText().asComponent());
+    setPermission(Permissions.HELP);
   }
 
   @Override

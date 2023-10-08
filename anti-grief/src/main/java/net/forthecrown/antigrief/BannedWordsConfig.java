@@ -70,7 +70,7 @@ record BannedWordsConfig(List<InputFilter> filters, boolean allowBypass, Set<Pat
         .map(Collections::unmodifiableSet);
 
     DataResult<List<InputFilter>> filtersResult = json.has("input_filters")
-        ? loadFilterSet(json.get("filters"))
+        ? loadFilterSet(json.get("input_filters"))
         : Results.success(List.of());
 
     return wordsResult.apply2(

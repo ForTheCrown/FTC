@@ -15,6 +15,11 @@ public class ServerPingListener implements Listener {
   public void onPaperServerListPing(PaperServerListPingEvent event) {
     var it = event.iterator();
 
+    var service = Users.getService();
+    if (!service.userLoadingAllowed()) {
+      return;
+    }
+
     while (it.hasNext()) {
       Player player = it.next();
       User user = Users.get(player);

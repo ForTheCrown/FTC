@@ -22,6 +22,7 @@ class CoreDataFix {
   static void execute() {
     DataUpdaters updaters = DataUpdaters.create();
     updaters.addUpdater(new DirectoryMover());
+    updaters.addUpdater(new UserDataMover());
     updaters.addUpdater(new UserUpdate());
     updaters.addUpdater(new MailUpdate());
     updaters.addUpdater(new ScriptRewriter());
@@ -310,6 +311,35 @@ class UserUpdate extends DataUpdater {
   }
 }
 
+class UserDataMover extends DataUpdater {
+
+  final Path pluginDir = Path.of("plugins");
+  final Path oldPluginDir = pluginDir.resolve("ForTheCrown");
+
+  @Override
+  protected boolean update() throws Throwable {
+    Path core = pluginDir.resolve("FTC-Core");
+
+    copyFromOld("user/alts.json",         core.resolve("alts.json"));
+    copyFromOld("user/balances.json",     core.resolve("balances.json"));
+    copyFromOld("user/gems.json",         core.resolve("gems.json"));
+    copyFromOld("user/playtime.json",     core.resolve("playtime.json"));
+    copyFromOld("user/profiles.json",     core.resolve("profiles.json"));
+    copyFromOld("user/votes.json",        core.resolve("votes.json"));
+    copyFromOld("user/data",              core.resolve("userdata"));
+
+    return true;
+  }
+
+  private void copyFromOld(String oldName, Path dest) {
+    if (!copySafe(oldPluginDir.resolve(oldName), dest)) {
+      return;
+    }
+
+    logger.info("Copied old FTC file '{}' to '{}'", oldName, dest);
+  }
+}
+
 class DirectoryMover extends DataUpdater {
 
   final Path pluginDir = Path.of("plugins");
@@ -363,13 +393,6 @@ class DirectoryMover extends DataUpdater {
 
     copyFromOld("cooldowns.json",         core.resolve("cooldowns.json"));
     copyFromOld("stored_inventories.dat", core.resolve("stored_inventories.dat"));
-    copyFromOld("user/alts.json",         core.resolve("alts.json"));
-    copyFromOld("user/balances.json",     core.resolve("balances.json"));
-    copyFromOld("user/gems.json",         core.resolve("gems.json"));
-    copyFromOld("user/playtime.json",     core.resolve("playtime.json"));
-    copyFromOld("user/profiles.json",     core.resolve("profiles.json"));
-    copyFromOld("user/votes.json",        core.resolve("votes.json"));
-    copyFromOld("user/data",              core.resolve("userdata"));
     copyFromOld("user/king.json",         kingship.resolve("data.json"));
 
     return true;

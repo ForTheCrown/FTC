@@ -14,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import net.forthecrown.Loggers;
 import net.forthecrown.command.FtcSuggestions;
 import net.forthecrown.core.CorePermissions;
 import net.forthecrown.grenadier.CommandSource;
@@ -21,10 +22,15 @@ import net.forthecrown.grenadier.Completions;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserLookup;
 import net.forthecrown.user.Users;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.ApiStatus.Internal;
+import org.slf4j.Logger;
 
 @Internal
 public class UserLookupImpl implements UserLookup {
+
+  private static final Logger LOGGER = Loggers.getLogger();
 
   /**
    * Expected size of the 2 primary maps for tracking names and UUIDs
@@ -58,7 +64,29 @@ public class UserLookupImpl implements UserLookup {
 
   @Override
   public UserLookupEntry getEntry(UUID playerId) {
-    return identified.get(playerId);
+    var foundEntry = identified.get(playerId);
+
+    if (foundEntry != null) {
+      return foundEntry;
+    }
+
+    OfflinePlayer player = Bukkit.getOfflinePlayer(playerId);
+    String name = player.getName();
+
+    if (Strings.isNullOrEmpty(name)) {
+      return null;
+    }
+
+    UserLookupEntry entry = new UserLookupEntry(playerId);
+    entry.name = name;
+
+    addEntry(entry);
+
+    LOGGER.warn("Data of player {} or '{}' may have been dropped, attempted recovery",
+        playerId, name
+    );
+
+    return entry;
   }
 
   @Override

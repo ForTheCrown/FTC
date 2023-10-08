@@ -33,12 +33,13 @@ public class WorldAccessTestEvent extends Event implements Cancellable {
   public WorldAccessTestEvent(CommandSender accessor, World world) {
     this.accessor = accessor;
     this.world = world;
+    this.accessible = true;
   }
 
-  public static void testOrThrow(CommandSender user, World world, CommandSyntaxException noMessage)
+  public static void testOrThrow(CommandSender sender, World world, CommandSyntaxException noMessage)
       throws CommandSyntaxException
   {
-    AccessResult result = testWorldAccess(user, world);
+    AccessResult result = testWorldAccess(sender, world);
 
     if (result.accessible()) {
       return;
@@ -51,12 +52,12 @@ public class WorldAccessTestEvent extends Event implements Cancellable {
     throw Exceptions.create(result.denyReason());
   }
 
-  public static AccessResult testWorldAccess(CommandSender user, World world) {
-    if (user.hasPermission(Permissions.WORLD_BYPASS)) {
+  public static AccessResult testWorldAccess(CommandSender sender, World world) {
+    if (sender.hasPermission(Permissions.WORLD_BYPASS)) {
       return AccessResult.ACCESSIBLE;
     }
 
-    WorldAccessTestEvent event = new WorldAccessTestEvent(user, world);
+    WorldAccessTestEvent event = new WorldAccessTestEvent(sender, world);
     event.callEvent();
 
     if (event.accessible) {
