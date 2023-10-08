@@ -61,7 +61,7 @@ public class ServerlistListener implements Listener {
 
     User user;
 
-    if (entry != null && config.inferPlayerBasedOffIp()) {
+    if (entry != null && config.inferPlayerBasedOffIp() && service.userLoadingAllowed()) {
       user = service.getUser(entry);
     } else {
       user = null;
