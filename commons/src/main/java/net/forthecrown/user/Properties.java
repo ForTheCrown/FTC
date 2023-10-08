@@ -1,6 +1,8 @@
 package net.forthecrown.user;
 
 import java.util.UUID;
+import net.forthecrown.utils.Audiences;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 
 public final class Properties {
@@ -79,5 +81,13 @@ public final class Properties {
 
   public static UserProperty.Builder<UUID> uuidProperty() {
     return Users.getService().createUuidProperty();
+  }
+
+  public static <T> T getValue(Audience audience, UserProperty<T> property) {
+    User user = Audiences.getUser(audience);
+    if (user == null) {
+      return property.getDefaultValue();
+    }
+    return user.get(property);
   }
 }

@@ -25,6 +25,9 @@ public class GUserProperties {
   public static final UserProperty<Boolean> G_CHAT_TOGGLE
       = Properties.booleanProperty("guildChatToggled", false);
 
+  public static final UserProperty<Boolean> GUILD_RANKED_TAGS
+      = Properties.booleanProperty("guildRankedNameTags", false);
+
   public static final UserProperty<UUID> GUILD = Properties.uuidProperty()
       .key("guild")
       .defaultValue(Identity.nil().uuid())
@@ -44,6 +47,20 @@ public class GUserProperties {
             "gct", "gchattoggle", "gctoggle"
         );
 
+    Setting rankedNameTags = Setting.create(GUILD_RANKED_TAGS)
+        .setDisplayName("Ranks in GC")
+        .setDescription("Toggles player names being prefixed with their guild rank in Guild Chat")
+        .setToggle("N{1} seeing ranks in guild chat")
+        .setToggleDescription("{Enable} Rank tags in Guild Chat")
+
+        .createCommand(
+            "guildrankchat",
+            GuildPermissions.GUILD,
+            GuildPermissions.GUILD_ADMIN,
+            "gcranks", "gchatranks"
+        );
+
+    settingsBook.getSettings().add(rankedNameTags.toBookSettng());
     settingsBook.getSettings().add(chatToggle.toBookSettng());
   }
 }
