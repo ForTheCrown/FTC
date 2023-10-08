@@ -417,7 +417,7 @@ public class Waypoint {
     }
 
     String fromType = type.getEffectiveName(this);
-    if (Strings.isNullOrEmpty(fromType)) {
+    if (!Strings.isNullOrEmpty(fromType)) {
       return fromType;
     }
 
