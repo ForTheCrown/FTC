@@ -37,6 +37,7 @@ public class CorePlugin extends JavaPlugin {
   private AutoAnnouncer announcer;
   private JoinInfo joinInfo;
   private Wild wild;
+  private EmojiLoader emojiLoader;
 
   public static CorePlugin plugin() {
     return getPlugin(CorePlugin.class);
@@ -57,6 +58,7 @@ public class CorePlugin extends JavaPlugin {
     placeholderService = new PlaceholderServiceImpl(this);
     joinInfo = new JoinInfo();
     wild = new Wild();
+    emojiLoader = new EmojiLoader();
 
     BukkitServices.register(FtcServer.class, ftcServer);
     BukkitServices.register(FtcHelpList.class, helpList);
@@ -126,15 +128,13 @@ public class CorePlugin extends JavaPlugin {
     reloadConfig();
 
     announcer.load();
-
     announcer.start();
-    saver.start();
 
     joinInfo.load();
-
     placeholderService.load();
     ftcServer.load();
     helpList.load();
     wild.load();
+    emojiLoader.load();
   }
 }

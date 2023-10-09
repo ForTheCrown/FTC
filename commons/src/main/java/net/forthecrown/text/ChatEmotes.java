@@ -4,6 +4,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import net.forthecrown.grenadier.Completions;
 import net.forthecrown.grenadier.Grenadier;
@@ -47,7 +48,7 @@ public final class ChatEmotes {
     register(key, Text.LEGACY.deserialize(emote));
   }
 
-  private static void register(String key, Component emote) {
+  public static void register(String key, Component emote) {
     var formattedKey = EMOTE_CHAR + key + EMOTE_CHAR;
     TOKEN_2_EMOTE.put(formattedKey, emote);
   }
@@ -81,5 +82,11 @@ public final class ChatEmotes {
     }
 
     return builder.buildFuture();
+  }
+
+  public static void unregisterAll(Set<String> names) {
+    for (String name : names) {
+      TOKEN_2_EMOTE.remove(name);
+    }
   }
 }
