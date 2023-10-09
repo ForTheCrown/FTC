@@ -660,8 +660,7 @@ public class MarketShop {
    */
   public void stopEviction() throws IllegalArgumentException {
     Validate.isTrue(hasOwner(), "Shop has no owner");
-    Validate.isTrue(markedForEviction(), "Shop '%s' is not marked for eviction",
-        getName());
+    Validate.isTrue(markedForEviction(), "Shop '%s' is not marked for eviction", getName());
 
     setEviction(null);
 
@@ -712,11 +711,13 @@ public class MarketShop {
 
     // If owner has been offline for a long time
     if (lastOnline != -1 && Time.isPast(lastOnline + config.getInactiveKickTime().toMillis())) {
-      beginEviction(
-          config.getEvictionDelay(),
-          EconMessages.MARKET_EVICT_INACTIVE,
-          SOURCE_AUTOMATIC
-      );
+      if (!markedForEviction()) {
+        beginEviction(
+            config.getEvictionDelay(),
+            EconMessages.MARKET_EVICT_INACTIVE,
+            SOURCE_AUTOMATIC
+        );
+      }
 
       return;
     }
@@ -792,7 +793,9 @@ public class MarketShop {
         ? EconMessages.MARKET_EVICT_STOCK
         : EconMessages.tooLittleShops();
 
-    beginEviction(config.getEvictionDelay(), reason, SOURCE_AUTOMATIC);
+    if (!markedForEviction()) {
+      beginEviction(config.getEvictionDelay(), reason, SOURCE_AUTOMATIC);
+    }
   }
 
   /**
