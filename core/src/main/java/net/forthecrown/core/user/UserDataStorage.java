@@ -91,6 +91,8 @@ public class UserDataStorage {
         file -> JsonUtils.readFile(file).getAsJsonArray(),
 
         array -> {
+          lookup.clear();
+
           for (var e: array) {
             try {
               UserLookupEntry entry = loadEntry(e);

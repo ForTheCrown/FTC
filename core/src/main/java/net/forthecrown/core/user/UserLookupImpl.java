@@ -77,10 +77,7 @@ public class UserLookupImpl implements UserLookup {
       return null;
     }
 
-    UserLookupEntry entry = new UserLookupEntry(playerId);
-    entry.name = name;
-
-    addEntry(entry);
+    UserLookupEntry entry = createEntry(playerId, name);
 
     LOGGER.warn("Data of player {} or '{}' may have been dropped, attempted recovery",
         playerId, name
@@ -142,6 +139,12 @@ public class UserLookupImpl implements UserLookup {
    * @param entry The entry to add.
    */
   public synchronized void addEntry(UserLookupEntry entry) {
+    var existing = identified.get(entry.getUniqueId());
+
+    if (existing != null) {
+      remove(existing);
+    }
+
     identified.put(entry.getUniqueId(), entry);
     named.put(entry.getName().toLowerCase(), entry);
 
@@ -207,6 +210,8 @@ public class UserLookupImpl implements UserLookup {
   }
 
   public synchronized void changeIp(UserLookupEntry entry, String ip) {
+    unsaved = true;
+
     var existing = entry.getIp();
 
     if (existing != null) {
@@ -323,7 +328,7 @@ public class UserLookupImpl implements UserLookup {
 
   @Override
   public Stream<UserLookupEntry> stream() {
-    return identified.values().parallelStream();
+    return identified.values().stream();
   }
 
   @Getter @Setter(AccessLevel.PACKAGE)
