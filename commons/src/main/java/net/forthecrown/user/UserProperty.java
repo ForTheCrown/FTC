@@ -1,6 +1,6 @@
 package net.forthecrown.user;
 
-import com.google.gson.JsonElement;
+import com.mojang.serialization.Codec;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,18 +29,13 @@ public interface UserProperty<T> {
   PropertyEditCallback<T> getCallback();
 
   /**
-   * Serializes this property's value to JSON
-   * @param value value to serialize
-   * @return Serialized value
+   * Gets the property's value codec.
+   * <p>
+   * This codec will be used to save and load values for this property
+   *
+   * @return Value codec
    */
-  @NotNull JsonElement serialize(@NotNull T value);
-
-  /**
-   * Deserializes the property's value from JSON
-   * @param element JSON to deserialize from
-   * @return Deserialized value
-   */
-  @NotNull T deserialize(@NotNull JsonElement element);
+  Codec<T> getCodec();
 
   /**
    * Property's ID number

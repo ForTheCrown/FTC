@@ -3,6 +3,7 @@ package net.forthecrown.core.user;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.JsonOps;
 import it.unimi.dsi.fastutil.objects.ObjectArrays;
 import net.forthecrown.Loggers;
 import net.forthecrown.registry.Holder;
@@ -207,8 +208,13 @@ public class PropertyMap implements UserComponent {
         continue;
       }
 
-      // Deserialize the value and set it
-      _set(property, property.deserialize(e.getValue()), false);
+      property.getCodec().parse(JsonOps.INSTANCE, e.getValue())
+          .mapError(s -> "Failed to load user property '" + property.getKey() + "': "+ s)
+          .resultOrPartial(LOGGER::error)
+          .ifPresentOrElse(
+              o -> _set(property, o, false),
+              () -> unknown.add(e.getKey(), e.getValue())
+          );
     }
 
     if (unknown.size() < 1) {
@@ -250,11 +256,12 @@ public class PropertyMap implements UserComponent {
       // Serialize and add to JSON
       var val = values[i];
 
-      try {
-        json.add(holder.getKey(), holder.getValue().serialize(val));
-      } catch (Throwable t) {
-        LOGGER.error("Error serializing property {}", holder.getKey(), t);
-      }
+      holder.getValue().getCodec().encodeStart(JsonOps.INSTANCE, val)
+          .mapError(s -> "Failed to save property '" + holder.getKey() + "': " + s)
+          .resultOrPartial(LOGGER::error)
+          .ifPresent(element -> {
+            json.add(holder.getKey(), element);
+          });
     }
 
     if (unknownProperties != null && unknownProperties.size() > 0) {

@@ -1,8 +1,6 @@
 package net.forthecrown.core.user;
 
-import com.google.gson.JsonElement;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.JsonOps;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,18 +30,6 @@ public class PropertyImpl<T> implements UserProperty<T> {
     this.defaultValue = defaultValue;
     this.callback = callback;
     this.codec = codec;
-  }
-
-  @Override
-  public @NotNull JsonElement serialize(@NotNull T value) {
-    var result = codec.encodeStart(JsonOps.INSTANCE, value);
-    return result.getOrThrow(false, s -> {});
-  }
-
-  @Override
-  public @NotNull T deserialize(@NotNull JsonElement element) {
-    var result = codec.parse(JsonOps.INSTANCE, element);
-    return result.getOrThrow(false, s -> {});
   }
 
   @Setter @Accessors(chain = true, fluent = true)
