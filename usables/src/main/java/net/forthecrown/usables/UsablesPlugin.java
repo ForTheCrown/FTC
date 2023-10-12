@@ -66,6 +66,8 @@ public class UsablesPlugin extends JavaPlugin {
   public void onDisable() {
     actions = null;
     conditions = null;
+
+    save();
   }
 
   public void reload() {
