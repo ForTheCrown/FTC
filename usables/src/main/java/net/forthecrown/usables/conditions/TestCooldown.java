@@ -6,7 +6,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.Decoder;
 import com.mojang.serialization.DynamicOps;
-import com.mojang.serialization.Keyable;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.EitherMapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -18,7 +17,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
-import java.util.stream.Stream;
 import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.text.Text;
 import net.forthecrown.usables.BuiltType;
@@ -35,17 +33,9 @@ import org.jetbrains.annotations.Nullable;
 
 public class TestCooldown implements Condition {
 
-  public static final MapCodec<Object2LongMap<UUID>> CD_MAP_CODEC = Codec.simpleMap(
-      FtcCodecs.UUID_CODEC,
-      Codec.LONG,
-
-      new Keyable() {
-        @Override
-        public <T> Stream<T> keys(DynamicOps<T> ops) {
-          return Stream.empty();
-        }
-      }
-  ).xmap(Object2LongOpenHashMap::new, Function.identity());
+  public static final Codec<Object2LongMap<UUID>> CD_MAP_CODEC
+      = Codec.unboundedMap(FtcCodecs.STRING_UUID, Codec.LONG)
+      .xmap(Object2LongOpenHashMap::new, Function.identity());
 
   private static final MapCodec<Duration> DURATION_EITHER_CODEC
       = new EitherMapCodec<>(
@@ -58,7 +48,7 @@ public class TestCooldown implements Condition {
     return instance
         .group(
             DURATION_EITHER_CODEC.forGetter(o -> o.duration),
-            CD_MAP_CODEC.codec().optionalFieldOf("entries").forGetter(o -> Optional.of(o.cooldowns))
+            CD_MAP_CODEC.optionalFieldOf("entries").forGetter(o -> Optional.of(o.cooldowns))
         )
         .apply(instance, (duration, entries) -> {
           var cd = new TestCooldown(duration);
