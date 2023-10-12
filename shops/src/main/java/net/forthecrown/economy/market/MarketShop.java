@@ -721,11 +721,10 @@ public class MarketShop {
 
       return;
     }
+
     // Cancel eviction if there is one, and if it was
     // started due to inactivity
-    else if (eviction != null
-        && eviction.getReason().equals(EconMessages.MARKET_EVICT_INACTIVE)
-    ) {
+    if (eviction != null && eviction.getReason().equals(EconMessages.MARKET_EVICT_INACTIVE)) {
       stopEviction();
     }
 
