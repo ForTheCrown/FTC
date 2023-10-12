@@ -11,11 +11,13 @@ import net.forthecrown.command.FtcCommand;
 import net.forthecrown.command.arguments.Arguments;
 import net.forthecrown.command.help.UsageFactory;
 import net.forthecrown.core.CorePermissions;
+import net.forthecrown.core.InventoryStorageImpl;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Completions;
 import net.forthecrown.grenadier.GrenadierCommand;
 import net.forthecrown.text.Text;
 import net.forthecrown.user.User;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 public class CommandInvStore extends FtcCommand {
@@ -31,6 +33,16 @@ public class CommandInvStore extends FtcCommand {
 
   @Override
   public void populateUsages(UsageFactory factory) {
+    factory.usage(
+        "reload",
+        "Reloads stored inventories"
+    );
+
+    factory.usage(
+        "save",
+        "Saves all currently stored inventories to disk"
+    );
+
     factory.usage(
         "save <player> <category: quoted string> [-doNotClear]",
 
@@ -88,7 +100,21 @@ public class CommandInvStore extends FtcCommand {
   @Override
   public void createCommand(GrenadierCommand command) {
     command
+        .then(literal("reload")
+            .executes(c -> {
+              InventoryStorageImpl.getStorage().load();
+              c.getSource().sendSuccess(Component.text("Reloaded SavedInventories from disk"));
+              return 0;
+            })
+        )
+
         .then(literal("save")
+            .executes(c -> {
+              InventoryStorageImpl.getStorage().save();
+              c.getSource().sendSuccess(Component.text("Saved SavedInventories to disk"));
+              return 0;
+            })
+
             .then(argument("user", Arguments.ONLINE_USER)
                 .then(argument("category", StringArgumentType.string())
                     .suggests(SUGGEST_CATEGORIES)
