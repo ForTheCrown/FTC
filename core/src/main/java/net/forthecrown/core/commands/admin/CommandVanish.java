@@ -5,6 +5,7 @@ import static net.forthecrown.command.Commands.getUserSender;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Map;
 import net.forthecrown.Permissions;
+import net.forthecrown.core.TabList;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.annotations.Argument;
 import net.forthecrown.grenadier.annotations.CommandFile;
@@ -98,6 +99,8 @@ public class CommandVanish {
     } else {
       joinMessage(user);
     }
+
+    TabList.update();
   }
 
   void leaveMessage(User user) {
