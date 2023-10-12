@@ -164,6 +164,7 @@ public final class ComponentList<T extends UsableComponent> implements Iterable<
         mapBuilder.add("type", ops.createString(key));
 
         type.save(t, ops)
+            .mapError(s -> "Failed to save '" + key + "': " + s)
             .resultOrPartial(LOGGER::error)
             .filter(s -> !Objects.equals(s, ops.empty()))
             .ifPresent(s -> mapBuilder.add("value", s));
