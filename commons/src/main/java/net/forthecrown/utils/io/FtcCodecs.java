@@ -34,8 +34,10 @@ import net.kyori.adventure.text.Component;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.NbtOps;
 import org.bukkit.Bukkit;
+import org.bukkit.Keyed;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 
@@ -184,6 +186,18 @@ public @UtilityClass class FtcCodecs {
     }
   };
 
+  public static final Codec<Character> CHAR = Codec.STRING.comapFlatMap(s -> {
+    if (s.length() > 1) {
+      return Results.error("String '%s' is not a single character!", s);
+    }
+
+    if (s.isEmpty()) {
+      return Results.error("Empty string");
+    }
+
+    return Results.success(s.charAt(0));
+  }, Object::toString);
+
   /* ----------------------------------------------------------- */
 
   public final Codec<Location> LOCATION_CODEC = RecordCodecBuilder.create(instance -> {
@@ -216,6 +230,18 @@ public @UtilityClass class FtcCodecs {
   public static final Codec<UUID> STRING_UUID = UUIDUtil.STRING_CODEC;
 
   /* ----------------------------------------------------------- */
+
+  public static <T extends Keyed> Codec<T> registryCodec(Registry<T> registry) {
+    return NAMESPACED_KEY.comapFlatMap(key -> {
+      var value = registry.get(key);
+
+      if (value == null) {
+        return Results.error("No value named '%s' found", key);
+      }
+
+      return Results.success(value);
+    }, t -> t.getKey());
+  }
 
   public static <T> DataResult<T> safeParse(String str, ArgumentType<T> parser) {
     try {
