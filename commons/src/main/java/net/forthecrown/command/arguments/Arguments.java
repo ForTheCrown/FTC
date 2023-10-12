@@ -33,6 +33,8 @@ public interface Arguments {
 
   ItemListArgument ITEM_LIST = new ItemListArgument();
 
+  ItemArgumentType ITEMSTACK = new ItemArgumentType();
+
   SuffixedNumberArgument<Integer> RHINES = createRhineArgument();
 
   SuffixedNumberArgument<Integer> GAMETIME = createGametimeArgument();
