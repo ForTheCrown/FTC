@@ -24,7 +24,7 @@ public final class UsablesListeners {
     register(new ItemListener());
     register(new EntityListener());
     register(new JoinListener(plugin));
-    register(new ServerLoadListener());
+    register(new ServerListener());
   }
 
   static void execute(InWorldUsable usable, Interaction interaction, Cancellable cancellable) {
