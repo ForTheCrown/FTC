@@ -127,6 +127,8 @@ public class Menu implements MenuCloseConsumer {
   }
 
   public void fillInventory(User user, Context context, Inventory inv) {
+    inv.clear();
+
     if (border != null) {
       var item = border.createItem(user, context);
 
