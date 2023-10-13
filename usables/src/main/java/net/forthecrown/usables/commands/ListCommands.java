@@ -323,10 +323,20 @@ public class ListCommands<T extends UsableComponent> {
     list.set(index - 1, instance);
     listHolder.postEdit();
 
-    c.getSource().sendSuccess(Text.format("Set {0} at index &e{1, number}&r: &6{2}&r.",
-        NamedTextColor.GRAY,
-        displayName, index, holder.getKey()
-    ));
+    CommandSource source = c.getSource();
+    Component displayInfo = instance.displayInfo();
+
+    if (displayInfo == null) {
+      source.sendSuccess(Text.format("Set {0} at index &e{1, number}&r to &6{2}&r.",
+          NamedTextColor.GRAY,
+          displayName, index, holder.getKey()
+      ));
+    } else {
+      c.getSource().sendSuccess(Text.format("Set {0} at index &e{1, number}&r to &6{2}&r: &f",
+          NamedTextColor.GRAY,
+          displayName, index, holder.getKey(), displayInfo
+      ));
+    }
   }
 
   private void validateApplicable(Holder<ObjectType<T>> holder, ListHolder<T> listHolder)
@@ -375,6 +385,19 @@ public class ListCommands<T extends UsableComponent> {
     list.add(instance, index);
     listHolder.postEdit();
 
-    c.getSource().sendSuccess(Text.format("Added {0}: {1}", displayName, holder.getKey()));
+    Component displayInfo = instance.displayInfo();
+    CommandSource source = c.getSource();
+
+    if (displayInfo == null) {
+      source.sendSuccess(Text.format("Added {0} &e{1}&r.",
+          NamedTextColor.GRAY,
+          displayName, holder.getKey()
+      ));
+    } else {
+      source.sendSuccess(Text.format("Added {0} &e{1}&r: &f{2}",
+          NamedTextColor.GRAY,
+          displayName, holder.getKey(), displayInfo
+      ));
+    }
   }
 }
