@@ -160,6 +160,30 @@ public interface TextWriter extends ComponentLike {
     line(FormatBuilder.builder().setViewer(viewer()).setFormat(like).setArguments(args).asComponent());
   }
 
+  default void formattedField(Object field, String valueFormat, Style style, Object... args) {
+    field(
+        Text.valueOf(field),
+
+        FormatBuilder.builder()
+            .setArguments(args)
+            .setFormat(valueFormat, style)
+            .setViewer(viewer())
+            .asComponent()
+    );
+  }
+
+  default void formattedField(Object field, String valueFormat, TextColor color, Object... args) {
+    field(
+        Text.valueOf(field),
+
+        FormatBuilder.builder()
+            .setArguments(args)
+            .setFormat(valueFormat, color)
+            .setViewer(viewer())
+            .asComponent()
+    );
+  }
+
   default void formattedField(Object field, String valueFormat, Object... args) {
     field(
         Text.valueOf(field, viewer()),

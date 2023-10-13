@@ -1,6 +1,7 @@
 package net.forthecrown.utils.inventory;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
+import java.util.concurrent.CompletableFuture;
 import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -24,8 +25,10 @@ public class SkullItemBuilder extends ItemBuilder<SkullItemBuilder> {
   }
 
   public SkullItemBuilder setProfile(PlayerProfile profile) {
-    if (!profile.isComplete()) {
-      profile.complete(true);
+    if (!profile.hasTextures()) {
+      CompletableFuture.runAsync(() -> {
+        profile.complete(true);
+      });
     }
 
     meta().setPlayerProfile(profile);
@@ -33,7 +36,7 @@ public class SkullItemBuilder extends ItemBuilder<SkullItemBuilder> {
   }
 
   public SkullItemBuilder setProfile(OfflinePlayer profile) {
-    return setProfile((PlayerProfile) profile.getPlayerProfile());
+    return setProfile(profile.getPlayerProfile());
   }
 
   @Override

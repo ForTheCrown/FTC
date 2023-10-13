@@ -10,6 +10,7 @@ import net.forthecrown.command.Exceptions;
 import net.forthecrown.text.Text;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
+import net.forthecrown.utils.PluginUtil;
 import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.kyori.adventure.text.Component;
@@ -242,7 +243,16 @@ public class Menu implements MenuCloseConsumer {
       }
 
       if (click.shouldClose()) {
-        click.getPlayer().closeInventory();
+        var player = click.getPlayer();
+        var scheduler = click.getPlayer().getScheduler();
+
+        scheduler.runDelayed(
+            PluginUtil.getPlugin(),
+            scheduledTask -> player.closeInventory(),
+            null,
+            1
+        );
+
       } else if (click.shouldReloadMenu()) {
         var inventory = click.getInventory();
         fillInventory(user, context, inventory);
