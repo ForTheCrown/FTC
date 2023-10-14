@@ -3,6 +3,8 @@ package net.forthecrown.guilds.waypoints;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import com.mojang.datafixers.util.Unit;
+import com.mojang.serialization.DataResult;
 import net.forthecrown.command.arguments.ParseResult;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Completions;
@@ -10,6 +12,7 @@ import net.forthecrown.guilds.Guild;
 import net.forthecrown.guilds.GuildExceptions;
 import net.forthecrown.guilds.GuildManager;
 import net.forthecrown.guilds.GuildPermissions;
+import net.forthecrown.utils.io.Results;
 import net.forthecrown.waypoints.WPermissions;
 import net.forthecrown.waypoints.Waypoint;
 import net.forthecrown.waypoints.WaypointExtension;
@@ -36,8 +39,12 @@ public class GuildWaypointExtension implements WaypointExtension {
   }
 
   @Override
-  public boolean isValidName(String name) {
-    return manager.getGuild(name) == null;
+  public DataResult<Unit> isValidName(String name) {
+    if (manager.getGuild(name) == null) {
+      return DataResult.success(Unit.INSTANCE);
+    }
+
+    return Results.error("Name belongs to a guild");
   }
 
   @Override

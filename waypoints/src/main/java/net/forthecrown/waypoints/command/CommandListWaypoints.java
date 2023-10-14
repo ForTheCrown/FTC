@@ -1,5 +1,7 @@
 package net.forthecrown.waypoints.command;
 
+import static net.kyori.adventure.text.Component.text;
+
 import com.google.common.base.Strings;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -10,15 +12,19 @@ import net.forthecrown.command.FtcCommand;
 import net.forthecrown.command.help.UsageFactory;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.GrenadierCommand;
+import net.forthecrown.text.Messages;
 import net.forthecrown.text.page.Footer;
 import net.forthecrown.text.page.PageEntry;
-import net.forthecrown.text.page.PagedIterator;
 import net.forthecrown.text.page.PageFormat;
+import net.forthecrown.text.page.PagedIterator;
+import net.forthecrown.user.User;
 import net.forthecrown.waypoints.WPermissions;
 import net.forthecrown.waypoints.Waypoint;
 import net.forthecrown.waypoints.WaypointManager;
 import net.forthecrown.waypoints.WaypointProperties;
+import net.forthecrown.waypoints.menu.WaypointListPage;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 public class CommandListWaypoints extends FtcCommand {
@@ -41,7 +47,16 @@ public class CommandListWaypoints extends FtcCommand {
 
   private PageFormat<Waypoint> createPageFormat() {
     PageFormat<Waypoint> format = PageFormat.create();
-    format.setHeader(Component.text("Named waypoints"));
+    format.setHeader(text("Named waypoints"));
+
+    format.getHeader().append((it, writer, context) -> {
+      writer.newLine();
+      writer.write(
+          text("[Open List menu]", NamedTextColor.AQUA)
+              .clickEvent(ClickEvent.runCommand("/waypointgui"))
+              .hoverEvent(Messages.CLICK_ME)
+      );
+    });
 
     format.setFooter(
         Footer.create().setPageButton("/" + getName() + " %s %s")
@@ -54,7 +69,7 @@ public class CommandListWaypoints extends FtcCommand {
     });
 
     entry.setIndex((viewerIndex, waypoint, it) -> {
-      return Component.text(viewerIndex + ")", NamedTextColor.GRAY);
+      return text(viewerIndex + ")", NamedTextColor.GRAY);
     });
 
     format.setEntry(entry);
@@ -94,16 +109,18 @@ public class CommandListWaypoints extends FtcCommand {
       throws CommandSyntaxException
   {
     WaypointManager manager = WaypointManager.getInstance();
-    List<Waypoint> waypoints = new ObjectArrayList<>(manager.getWaypoints());
+    List<Waypoint> waypoints;
+
+    if (source.isPlayer()) {
+      User user = Commands.getUserSender(source);
+      waypoints = WaypointListPage.getList(user);
+    } else {
+      waypoints = new ObjectArrayList<>(manager.getWaypoints());
+      waypoints.removeIf(waypoint -> Strings.isNullOrEmpty(waypoint.getEffectiveName()));
+    }
 
     // Remove private waypoints, and ones with no effective names
     waypoints.removeIf(waypoint -> {
-      var name = waypoint.getEffectiveName();
-
-      if (Strings.isNullOrEmpty(name)) {
-        return true;
-      }
-
       return !waypoint.get(WaypointProperties.PUBLIC);
     });
 

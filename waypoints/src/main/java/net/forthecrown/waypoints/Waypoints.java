@@ -2,20 +2,25 @@ package net.forthecrown.waypoints;
 
 import static net.kyori.adventure.text.Component.text;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.DataResult;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import java.nio.file.Path;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.annotation.Nullable;
 import net.forthecrown.Loggers;
 import net.forthecrown.antigrief.BannedWords;
 import net.forthecrown.command.Exceptions;
-import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.structure.BlockStructure;
 import net.forthecrown.structure.FunctionInfo;
 import net.forthecrown.structure.StructurePlaceConfig;
@@ -27,21 +32,30 @@ import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.PluginUtil;
 import net.forthecrown.utils.Time;
+import net.forthecrown.utils.io.PathUtil;
+import net.forthecrown.utils.io.PluginJar;
+import net.forthecrown.utils.io.Results;
+import net.forthecrown.utils.io.SerializationHelper;
 import net.forthecrown.utils.math.Bounds3i;
 import net.forthecrown.utils.math.Vectors;
+import net.forthecrown.waypoints.WaypointPlatform.FloorPlacer;
+import net.forthecrown.waypoints.WaypointPlatform.LoadedPlatform;
 import net.forthecrown.waypoints.WaypointScan.Result;
 import net.forthecrown.waypoints.type.PlayerWaypointType;
 import net.forthecrown.waypoints.type.WaypointType;
 import net.forthecrown.waypoints.type.WaypointTypes;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Snow;
 import org.bukkit.block.data.type.WallSign;
 import org.bukkit.entity.Player;
+import org.slf4j.Logger;
 import org.spongepowered.math.vector.Vector3i;
 
 public final class Waypoints {
@@ -49,7 +63,32 @@ public final class Waypoints {
 
   /* ------------------------- COLUMN CONSTANTS --------------------------- */
 
+  private static final Logger LOGGER = Loggers.getLogger();
+
   public static final UUID NIL_UUID = new UUID(0, 0);
+
+  public static final String PLATFORM_OUTLINE_TAG = "waypoint_platform_outline";
+
+  public static final Pattern VALID_NAME_PATTERN = Pattern.compile("[a-zA-Z0-9_$]+");
+
+  public static NamespacedKey EDIT_WAYPOINT_KEY = new NamespacedKey("waypoints", "edit_waypoint");
+
+  public static final Set<Material> NON_REPLACEABLE_FLOOR_MATERIALS = Set.of(
+      Material.BARRIER,
+      Material.LIGHT,
+      Material.BEDROCK,
+      Material.END_GATEWAY,
+      Material.END_PORTAL_FRAME,
+      Material.END_PORTAL,
+      Material.JIGSAW,
+      Material.STRUCTURE_BLOCK,
+      Material.STRUCTURE_VOID,
+      Material.DRAGON_EGG,
+      Material.NETHER_PORTAL,
+      Material.COMMAND_BLOCK,
+      Material.CHAIN_COMMAND_BLOCK,
+      Material.REPEATING_COMMAND_BLOCK
+  );
 
   public static final String POLE_STRUCTURE = "region_pole";
   public static final String FUNC_REGION_NAME = "region_name";
@@ -103,33 +142,26 @@ public final class Waypoints {
     structure.place(config);
   }
 
-  private static void processTopSign(Waypoint region,
-                                     FunctionInfo info,
-                                     StructurePlaceConfig config
+  private static void processTopSign(
+      Waypoint region,
+      FunctionInfo info,
+      StructurePlaceConfig config
   ) {
     var pos = config.getTransform().apply(info.getOffset());
     var world = ((ImmediateBlockBuffer) config.getBuffer()).getWorld();
 
     var block = Vectors.getBlock(pos, world);
 
-    org.bukkit.block.data.type.Sign signData =
-        (org.bukkit.block.data.type.Sign)
-            Material.OAK_SIGN.createBlockData();
-
-    signData.setRotation(BlockFace.NORTH);
-    block.setBlockData(signData, false);
-
-    Sign sign = (Sign) block.getState();
-
-    sign.line(1, signName(region));
-    sign.line(2, text("Waypoint"));
-
-    sign.update();
+    setSign(block, false, BlockFace.EAST, sign -> {
+      sign.line(1, signName(region));
+      sign.line(2, text("Waypoint"));
+    });
   }
 
-  private static void processResidentsSign(Waypoint region,
-                                           FunctionInfo info,
-                                           StructurePlaceConfig config
+  private static void processResidentsSign(
+      Waypoint region,
+      FunctionInfo info,
+      StructurePlaceConfig config
   ) {
     if (region.get(WaypointProperties.HIDE_RESIDENTS) || region.getResidents().isEmpty()) {
       return;
@@ -164,7 +196,7 @@ public final class Waypoints {
   }
 
   private static Component signName(Waypoint waypoint) {
-    var name = waypoint.get(WaypointProperties.NAME);
+    var name = waypoint.getEffectiveName();
     return text(Strings.isNullOrEmpty(name) ? "Wilderness" : name);
   }
 
@@ -239,26 +271,52 @@ public final class Waypoints {
    * @return True, if the name is valid, as specified in the above paragraph, false otherwise.
    */
   public static boolean isValidName(String name) {
-    for (var c: name.toCharArray()) {
-      if (!StringReader.isAllowedInUnquotedString(c)) {
-        return false;
-      }
+    return validateWaypointName(name).error().isPresent();
+  }
+
+  public static DataResult<String> validateWaypointName(String name) {
+    if (Strings.isNullOrEmpty(name)) {
+      return Results.error("Empty name");
+    }
+
+    Matcher matcher = VALID_NAME_PATTERN.matcher(name);
+    if (!matcher.matches()) {
+      return Results.error("Name can only contain alphanumeric character (a-z, 0-9, '_' or '$')");
     }
 
     WaypointManager manager = WaypointManager.getInstance();
-    Waypoint waypoint = manager.getExtensive(name);
+    WaypointConfig config = manager.config();
+    int maxLength = config.maxNameLength;
 
-    if (waypoint != null || BannedWords.contains(name)) {
-      return false;
+    if (name.length() >= maxLength) {
+      return Results.error("Name longer than max length (%s)", maxLength);
     }
 
-    for (var e: manager.getExtensions()) {
-      if (!e.isValidName(name)) {
-        return false;
+    for (String bannedName : config.bannedNames) {
+      if (name.equalsIgnoreCase(bannedName)) {
+        return Results.error("Banned name");
       }
     }
 
-    return true;
+    Waypoint waypoint = manager.getExtensive(name);
+
+    if (waypoint != null) {
+      return Results.error("Name already in use");
+    }
+
+    if (BannedWords.contains(name)) {
+      return Results.error("Inappropriate name");
+    }
+
+    for (var e: manager.getExtensions()) {
+      var res = e.isValidName(name);
+
+      if (res.error().isPresent()) {
+        return res.map(unit -> name);
+      }
+    }
+
+    return DataResult.success(name);
   }
 
   /**
@@ -276,16 +334,20 @@ public final class Waypoints {
    * all tests are passed however, then an empty optional is returned, indicating the area is
    * valid.
    *
-   * @param pos         The position the waypoint will be placed at. Note that this parameter should
-   *                    be shifted 1 block upward for region pole waypoints. As the platform
-   *                    underneath the region pole is considered as the starting block, instead of
-   *                    being under it. To ensure the above is the case use
-   *                    {@link PlayerWaypointType#isValid(Waypoint)}, as that performs that
-   *                    operation for you
-   * @param type        The type to use for validation, this is used to test the column in the
-   *                    center of the waypoint.
-   * @param w           The world the waypoint is in.
-   * @param testOverlap True, to ensure the given parameters do not overlap with another waypoint.
+   * @param pos          The position the waypoint will be placed at. Note that this parameter should
+   *                     be shifted 1 block upward for region pole waypoints. As the platform
+   *                     underneath the region pole is considered as the starting block, instead of
+   *                     being under it. To ensure the above is the case use
+   *                     {@link PlayerWaypointType#isValid(Waypoint)}, as that performs that
+   *                     operation for you
+   *
+   * @param type         The type to use for validation, this is used to test the column in the
+   *                     center of the waypoint.
+   *
+   * @param w            The world the waypoint is in.
+   * @param creationTest {@code true}, when the method is called to validate if a waypoint can
+   *                     be created, {@code false}, if it's current state is being tested
+   *
    * @return An empty optional if the area is valid, an optional containing a corresponding error
    * message, if the area is invalid
    */
@@ -293,9 +355,11 @@ public final class Waypoints {
       Vector3i pos,
       WaypointType type,
       World w,
-      boolean testOverlap
+      boolean creationTest
   ) {
-    Preconditions.checkArgument(type.isBuildable(), "Type is not buildable");
+    if (!type.isBuildable()) {
+      return Optional.empty();
+    }
 
     var bounds = type.createBounds()
         .move(pos)
@@ -337,6 +401,21 @@ public final class Waypoints {
       // since this layer must be solid, if it is solid,
       // skip block
       if (bounds.minY() == b.getY()) {
+        // Ensure that the block can even be replaced, must fail in cases of bedrock,
+        // cmd blocks or any other block that cannot be mined by players naturally
+        //
+        // TODO for the future: Integrate claim checking into this, don't want
+        //  players using this to grief somehow lol
+        if (creationTest) {
+          boolean nonReplaceable = NON_REPLACEABLE_FLOOR_MATERIALS.contains(b.getType());
+
+          if (nonReplaceable) {
+            return Optional.of(WExceptions.nonReplaceableFloorBlock(b));
+          }
+
+          continue;
+        }
+
         if (b.isSolid()) {
           continue;
         }
@@ -362,7 +441,7 @@ public final class Waypoints {
       return Optional.of(WExceptions.waypointBlockNotEmpty(b));
     }
 
-    if (testOverlap) {
+    if (creationTest) {
       Set<Waypoint> overlapping = WaypointManager.getInstance()
           .getChunkMap()
           .getOverlapping(bounds);
@@ -378,39 +457,43 @@ public final class Waypoints {
   }
 
   /**
-   * Sets the waypoint's name sign.
+   * Sets a block to be a sign.
+   * <p>
+   * Any specified {@code consumer} argument doesn't need to call the {@link Sign#update()} method.
+   * it's called for you after the consumer is ran.
    *
-   * @param waypoint The waypoint to set the name sign of
-   * @param name     The name to set the sign to, if null, the sign is removed
-   * @throws IllegalStateException If the given waypoint is not a {@link PlayerWaypointType}
+   * @param block The block to set
+   * @param wall {@code true}, to make the sign a wall sign, {@code false} otherwise
+   * @param direction Direction for the sign to face, will remain default if {@code null}
+   * @param consumer Consumer applied to sign block, sign will be unchanged if {@code null}.
    */
-  public static void setNameSign(Waypoint waypoint, String name)
-      throws IllegalStateException
-  {
-    if (!(waypoint.getType() instanceof PlayerWaypointType type)) {
-      throw new IllegalStateException(
-          "Only player/guild waypoints can have manual name signs"
-      );
+  public static void setSign(
+      Block block,
+      boolean wall,
+      @Nullable BlockFace direction,
+      @Nullable Consumer<Sign> consumer
+  ) {
+    Material material = wall ? Material.OAK_WALL_SIGN : Material.OAK_SIGN;
+    BlockData data = material.createBlockData();
+
+    if (direction != null) {
+      if (data instanceof org.bukkit.block.data.type.Sign sign) {
+        sign.setRotation(direction);
+      } else if (data instanceof WallSign wallSign) {
+        wallSign.setFacing(direction);
+      }
     }
 
-    Vector3i pos = waypoint.getPosition()
-        .add(0, type.getColumn().length, 0);
+    block.setBlockData(data, false);
 
-    World w = waypoint.getWorld();
-    Objects.requireNonNull(w, "World unloaded");
+    Sign sign = (Sign) block.getState();
+    sign.setWaxed(true);
 
-    Block b = Vectors.getBlock(pos, w);
-
-    if (Strings.isNullOrEmpty(name)) {
-      b.setType(Material.AIR);
-    } else {
-      b.setBlockData(Material.OAK_SIGN.createBlockData());
-
-      Sign sign = (Sign) b.getState();
-      sign.line(1, text(name));
-      sign.line(2, text("Waypoint"));
-      sign.update();
+    if (consumer != null) {
+      consumer.accept(sign);
     }
+
+    sign.update();
   }
 
   /**
@@ -429,84 +512,110 @@ public final class Waypoints {
    * is set as the created waypoint, otherwise, in the case of a player waypoint, the player's home
    * is set to the created waypoint.
    *
-   * @param source   The source attempting to create the waypoint.
+   * @param player The player attempting to create the waypoint.
+   * @param copy   {@code true}, if the created waypoint will serve as a relocation-copy for
+   *               another waypoint
    *
    * @return The created waypoint
    * @throws CommandSyntaxException If the waypoint creation fails at any stage
    */
-  public static Waypoint tryCreate(CommandSource source) throws CommandSyntaxException {
-    var player = source.asPlayer();
-    User user = Users.get(player);
-    Block b = WaypointTypes.findTopBlock(player);
-
-    if (b == null) {
-      throw WExceptions.FACE_WAYPOINT_TOP;
+  public static Waypoint tryCreate(Player player, Block clicked, boolean copy)
+      throws CommandSyntaxException
+  {
+    if (clicked == null) {
+      throw WExceptions.FACE_WAYPOINT;
     }
+
+    User user = Users.get(player);
+    Pair<Block, WaypointType> topAndType = WaypointTypes.findTopAndType(clicked);
+
+    if (!WaypointWorldGuard.canCreateAt(clicked, user)) {
+      throw WExceptions.creationDisabled();
+    }
+
+    if (topAndType == null) {
+      throw WExceptions.invalidWaypointTop(clicked.getType());
+    }
+
+    Block b = topAndType.getFirst();
+    WaypointType type = topAndType.getSecond();
 
     var config = WaypointManager.getInstance().config();
     if (config.isDisabledWorld(b.getWorld())) {
       throw WExceptions.WAYPOINTS_WRONG_WORLD;
     }
 
-    PlayerWaypointType type = null;
     Vector3i pos = Vectors.from(b);
 
-    Material topMaterial = b.getType();
-
-    for (var potentialType: WaypointTypes.REGISTRY.values()) {
-      if (!(potentialType instanceof PlayerWaypointType playerType)) {
-        continue;
-      }
-
-      Material[] arr = playerType.getColumn();
-      if (topMaterial != arr[arr.length - 1]) {
-        continue;
-      }
-
-      type = playerType;
-      break;
-    }
-
-    if (type == null) {
-      throw WExceptions.invalidWaypointTop(topMaterial);
-    }
-
-    type.onCreate(user, pos);
+    type.onCreate(user, pos, copy);
 
     var existing = WaypointManager.getInstance()
         .getChunkMap()
         .get(b.getWorld(), pos);
 
     Waypoint waypoint;
+
     if (existing.isEmpty()) {
-      pos = pos.sub(0, type.getColumn().length - 1, 0);
+      int topOffset = type.getTopOffset();
+      pos = pos.sub(0, topOffset, 0);
 
       // Ensure the area is correct and validate the
       // center block column to ensure it's a proper waypoint
-      var error = Waypoints.isValidWaypointArea(
-          pos,
-          type,
-          b.getWorld(),
-          true
-      );
+      Optional<CommandSyntaxException> error = isValidWaypointArea(pos, type, b.getWorld(), true);
 
       if (error.isPresent()) {
         throw error.get();
       }
 
-      waypoint = makeWaypoint(type, pos, source);
+      waypoint = makeWaypoint(type, pos, player);
+      waypoint.set(WaypointProperties.INVULNERABLE, true);
+
     } else {
-      waypoint = existing.iterator().next();
-
-      // Ensure the pole they're looking at is valid
-      var error = waypoint.getType().isValid(waypoint);
-      if (error.isPresent()) {
-        throw error.get();
-      }
+      throw WExceptions.overlappingWaypoints(existing.size());
     }
+
+    World w = b.getWorld();
+
+    placePlatform(w, waypoint.getPlatform());
+
+    waypoint.setLightBlock(true);
+    waypoint.setEditSign(true);
+    waypoint.setInfoSigns(true);
+    waypoint.updateNameSign();
+    waypoint.updateResidentsSign();
+    waypoint.updateOutline();
 
     type.onPostCreate(waypoint, user);
     return waypoint;
+  }
+
+  public static void clearPlatform(World world, Vector3i position) {
+    setPlatform(world, position, true);
+  }
+
+  public static void placePlatform(World world, Vector3i position) {
+    setPlatform(world, position, false);
+  }
+
+  private static void setPlatform(World world, Vector3i position, boolean clear) {
+    if (world == null || position == null) {
+      return;
+    }
+
+    var floor = getPlatform();
+    FloorPlacer placer = new FloorPlacer(world, position, clear);
+    floor.placeAt(placer);
+  }
+
+  public static WaypointPlatform getPlatform() {
+    Path floorToml = PathUtil.pluginPath("waypoint_platform.toml");
+    PluginJar.saveResources("waypoint_platform.toml", floorToml);
+
+    return SerializationHelper.readTomlAsJson(floorToml)
+        .flatMap(LoadedPlatform::load)
+        .mapError(s -> "Failed to load waypoint_platform.toml: " + s + ", falling back to default")
+        .resultOrPartial(LOGGER::error)
+        .orElse(WaypointPlatform.DEFAULT);
   }
 
   /**
@@ -540,7 +649,7 @@ public final class Waypoints {
     }
   }
 
-  public static Waypoint makeWaypoint(WaypointType type, Vector3i pos, CommandSource source) {
+  public static Waypoint makeWaypoint(WaypointType type, Vector3i pos, Player source) {
     Vector3i position;
 
     if (pos == null) {
@@ -552,12 +661,9 @@ public final class Waypoints {
     Waypoint waypoint = new Waypoint();
     waypoint.setType(type);
     waypoint.setPosition(position, source.getWorld());
+    waypoint.setCreationTime(Instant.now());
 
-    if (pos != null) {
-      source.sendMessage(WMessages.createdWaypoint(position, type));
-    } else {
-      source.sendSuccess(WMessages.createdWaypoint(position, type));
-    }
+    source.sendMessage(WMessages.createdWaypoint(position, type));
 
     WaypointManager.getInstance().addWaypoint(waypoint);
     return waypoint;

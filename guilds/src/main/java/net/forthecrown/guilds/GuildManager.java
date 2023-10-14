@@ -22,7 +22,6 @@ import net.forthecrown.Loggers;
 import net.forthecrown.guilds.multiplier.ExpModifiers;
 import net.forthecrown.guilds.unlockables.UnlockableColor;
 import net.forthecrown.guilds.unlockables.Upgradable;
-import net.forthecrown.guilds.util.DynmapUtil;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.ScoreIntMap;
 import net.forthecrown.utils.collision.ChunkCollisionMap;
@@ -247,12 +246,10 @@ public class  GuildManager {
   public void setChunkOwner(Guild guild, Vector2i pos) {
     chunkMap.put(guild, pos.x(), pos.y());
 
-    if (DynmapUtil.isInstalled()) {
-      if (guild == null) {
-        GuildWebmaps.unrenderChunk(pos);
-      } else {
-        GuildWebmaps.renderChunk(pos, guild);
-      }
+    if (guild == null) {
+      GuildWebmaps.unrenderChunk(pos);
+    } else {
+      GuildWebmaps.renderChunk(pos, guild);
     }
   }
 
@@ -266,10 +263,7 @@ public class  GuildManager {
     }
 
     chunkMap.remove(pos);
-
-    if (DynmapUtil.isInstalled()) {
-      GuildWebmaps.unrenderChunk(Guilds.chunkFromPacked(pos));
-    }
+    GuildWebmaps.unrenderChunk(Guilds.chunkFromPacked(pos));
   }
 
   // Data managing

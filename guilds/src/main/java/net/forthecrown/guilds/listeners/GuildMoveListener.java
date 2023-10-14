@@ -59,9 +59,4 @@ public class GuildMoveListener implements Listener {
         .append(guild.getPrefix())
     );
   }
-
-  public static boolean isInOwnGuild(Player player) {
-    Guild guild = Guilds.getStandingInOwn(player);
-    return guild != null;
-  }
 }

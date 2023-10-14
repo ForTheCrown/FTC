@@ -19,6 +19,7 @@ import net.forthecrown.cosmetics.CosmeticData;
 import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.cosmetics.travel.TravelEffect;
 import net.forthecrown.user.User;
+import net.forthecrown.utils.Locations;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.waypoints.Waypoint;
 import net.forthecrown.waypoints.WaypointManager;
@@ -194,7 +195,7 @@ public class WaypointVisit implements Runnable {
   }
 
   public Location getTeleportLocation() {
-    return teleportLocation == null ? null : teleportLocation.clone();
+    return Locations.clone(teleportLocation);
   }
 
   void findInitialTeleport() {
@@ -247,6 +248,8 @@ public class WaypointVisit implements Runnable {
 
     Player player = user.getPlayer();
     Entity teleportedEntity = findRootEntity(player);
+
+    destination.onVisit();
 
     if (!Objects.equals(teleportedEntity, player)) {
       hulkSmash = false;

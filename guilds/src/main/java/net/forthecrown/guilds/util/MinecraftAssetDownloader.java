@@ -53,15 +53,15 @@ public class MinecraftAssetDownloader {
   }
 
   public void run() {
-    Optional<URL> assetIndexResult = getVersionInfoUrl()
+    Optional<URL> clientJarResult = getVersionInfoUrl()
         .flatMap(this::getClientJarUrl)
         .resultOrPartial(LOGGER::error);
 
-    if (assetIndexResult.isEmpty()) {
+    if (clientJarResult.isEmpty()) {
       return;
     }
 
-    URL clientJarUrl = assetIndexResult.get();
+    URL clientJarUrl = clientJarResult.get();
     LOGGER.info("Beginning download of MC assets for version {}", gameVersion);
 
     try {

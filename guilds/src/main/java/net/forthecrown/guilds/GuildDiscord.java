@@ -495,6 +495,8 @@ public class GuildDiscord {
     var manager = channel.getManager()
         .setName(guild.getName() + "-Archived" + suffix);
 
+    manager.reason("FTC: " + reason);
+
     forEachDiscordMember(manager::removePermissionOverride);
 
     webHookMessage(channel, CHANNEL_OPENING_MESSAGE, false);

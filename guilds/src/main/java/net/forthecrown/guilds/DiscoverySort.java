@@ -1,16 +1,8 @@
 package net.forthecrown.guilds;
 
-import static net.kyori.adventure.text.Component.text;
-
 import java.util.Comparator;
 import lombok.Getter;
-import net.forthecrown.menu.MenuNode;
 import net.forthecrown.menu.Slot;
-import net.forthecrown.utils.inventory.ItemStacks;
-import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.ItemFlag;
 
 @Getter
 public enum DiscoverySort implements Comparator<Guild> {
@@ -69,62 +61,5 @@ public enum DiscoverySort implements Comparator<Guild> {
   @Override
   public Comparator<Guild> reversed() {
     return (o1, o2) -> this.compare(o2, o1);
-  }
-
-  public MenuNode toInvOption() {
-    return MenuNode.builder()
-        .setItem((user, context) -> {
-          var builder = ItemStacks.builder(
-              Material.RED_STAINED_GLASS_PANE
-          );
-
-          String namePrefix = "";
-
-          var sort = user.get(GUserProperties.DISCOVERY_SORT);
-          boolean selected = (sort == this);
-
-          if (selected) {
-            builder.addEnchant(Enchantment.BINDING_CURSE, 1)
-                .setFlags(ItemFlag.HIDE_ENCHANTS);
-
-            if (user.get(GUserProperties.DISCOVERY_SORT_INVERTED)) {
-              namePrefix = ASC_ARROW;
-              builder.addLore("Click to sort by descending");
-            } else {
-              namePrefix = DES_ARROW;
-              builder.addLore("Click to sort by ascending");
-            }
-
-            namePrefix += " ";
-          } else {
-            builder.addLore("Click to select");
-          }
-
-          builder.addLore("&7Set the order in which")
-              .addLore("&7guilds are displayed");
-
-          builder.setName(text(
-              namePrefix + getName(),
-              NamedTextColor.AQUA
-          ));
-
-          return builder.build();
-        })
-
-        .setRunnable((user, context, click) -> {
-          var sort = user.get(GUserProperties.DISCOVERY_SORT);
-          boolean selected = (sort == this);
-
-          if (selected) {
-            user.flip(GUserProperties.DISCOVERY_SORT_INVERTED);
-          } else {
-            user.set(GUserProperties.DISCOVERY_SORT_INVERTED, false);
-            user.set(GUserProperties.DISCOVERY_SORT, this);
-          }
-
-          click.shouldReloadMenu(true);
-        })
-
-        .build();
   }
 }

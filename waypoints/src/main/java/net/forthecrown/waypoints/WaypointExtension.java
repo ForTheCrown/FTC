@@ -3,6 +3,8 @@ package net.forthecrown.waypoints;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import com.mojang.datafixers.util.Unit;
+import com.mojang.serialization.DataResult;
 import net.forthecrown.command.arguments.ParseResult;
 import net.forthecrown.grenadier.CommandSource;
 
@@ -12,8 +14,8 @@ public interface WaypointExtension {
     return null;
   }
 
-  default boolean isValidName(String name) {
-    return true;
+  default DataResult<Unit> isValidName(String name) {
+    return DataResult.success(Unit.INSTANCE);
   }
 
   default void addSuggestions(SuggestionsBuilder builder, CommandSource source) {

@@ -9,6 +9,7 @@ public final class WaypointsListeners {
     register(new DayChangeListener());
     register(new HomeListener());
     register(new PlayerJoinListener());
+    register(new PlayerListener());
     register(new ServerListener());
     register(new WaypointDestroyListener());
     register(new WaypointListener());

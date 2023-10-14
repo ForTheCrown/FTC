@@ -12,7 +12,7 @@ public final class GuildWaypoints {
   private GuildWaypoints() {}
 
   public static final WaypointProperty<UUID> GUILD_OWNER
-      = new WaypointProperty<>("guildOwner", ArgumentTypes.uuid(), FtcCodecs.INT_ARRAY_UUID, null);
+      = new WaypointProperty<>("guild_owner", ArgumentTypes.uuid(), FtcCodecs.INT_ARRAY_UUID, null);
 
   public static final GuildWaypointType GUILD_TYPE = new GuildWaypointType();
 
@@ -25,6 +25,5 @@ public final class GuildWaypoints {
   public static void close() {
     WaypointManager waypoints = WaypointManager.getInstance();
     waypoints.removeExtension("guilds");
-    WaypointTypes.REGISTRY.remove("guild");
   }
 }

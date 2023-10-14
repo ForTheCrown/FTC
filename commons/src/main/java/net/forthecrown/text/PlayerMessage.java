@@ -1,14 +1,17 @@
 package net.forthecrown.text;
 
-import com.google.common.collect.Lists;
-import com.mojang.datafixers.util.Pair;
+import com.mojang.datafixers.util.Either;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.DynamicOps;
-import com.mojang.serialization.codecs.ListCodec;
+import com.mojang.serialization.codecs.EitherCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 import lombok.EqualsAndHashCode;
@@ -29,8 +32,35 @@ public class PlayerMessage implements ViewerAwareMessage {
   private static final String KEY_MESSAGE = "message";
   private static final String KEY_FLAGS = "flags";
 
-  private static final ListCodec<ChatParseFlag> FLAG_CODEC
-      = new ListCodec<>(FtcCodecs.enumCodec(ChatParseFlag.class));
+  private static final Codec<Set<ChatParseFlag>> FLAG_CODEC
+      = FtcCodecs.enumCodec(ChatParseFlag.class)
+      .listOf()
+      .xmap(ObjectOpenHashSet::new, ArrayList::new);
+
+  private static final Codec<PlayerMessage> RECORD_CODEC = RecordCodecBuilder.create(instance -> {
+    return instance
+        .group(
+            Codec.STRING.fieldOf("message").forGetter(o -> o.message),
+
+            FLAG_CODEC.optionalFieldOf("flags").forGetter(o -> {
+              return o.flags.isEmpty() ? Optional.empty() : Optional.of(o.flags);
+            })
+        )
+        .apply(instance, (message, flagsOpt) -> {
+          return new PlayerMessage(message, flagsOpt.orElse(null));
+        });
+  });
+
+  public static final Codec<PlayerMessage> CODEC = new EitherCodec<>(RECORD_CODEC, Codec.STRING)
+      .xmap(
+          either -> either.map(message1 -> message1, PlayerMessage::plain),
+          message1 -> {
+            if (message1.flags.isEmpty()) {
+              return Either.right(message1.message);
+            }
+            return Either.left(message1);
+          }
+      );
 
   private final String message;
   private final Set<ChatParseFlag> flags;
@@ -73,23 +103,11 @@ public class PlayerMessage implements ViewerAwareMessage {
   }
 
   public <S> DataResult<S> save(DynamicOps<S> ops) {
-    var map = ops.mapBuilder();
-    map.add(KEY_MESSAGE, ops.createString(message));
-    map.add(KEY_FLAGS, FLAG_CODEC.encodeStart(ops, Lists.newArrayList(flags)));
-    return map.build(ops.empty());
+    return CODEC.encodeStart(ops, this);
   }
 
   public static <S> DataResult<PlayerMessage> load(Dynamic<S> dynamic) {
-    var stringRes = dynamic.asString();
-
-    if (stringRes.result().isPresent()) {
-      return stringRes.map(PlayerMessage::plain);
-    }
-
-    var message = dynamic.get(KEY_MESSAGE).asString();
-    var flags = dynamic.get(KEY_FLAGS).decode(FLAG_CODEC).map(Pair::getFirst);
-
-    return message.apply2stable((s, o) -> new PlayerMessage(s, new HashSet<>(o)), flags);
+    return CODEC.parse(dynamic);
   }
 
   @Override

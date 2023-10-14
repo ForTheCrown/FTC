@@ -7,7 +7,6 @@ import net.forthecrown.waypoints.WExceptions;
 import net.forthecrown.waypoints.WPermissions;
 import net.forthecrown.waypoints.WaypointProperties;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Vehicle;
 
@@ -31,23 +30,14 @@ public interface VisitPredicate {
 
     var nearest = visit.getNearestWaypoint();
 
-    if (!visit.isNearWaypoint()) {
-      if (nearest == null) {
-        throw WExceptions.FAR_FROM_WAYPOINT;
-      } else {
-        throw WExceptions.farFromWaypoint(nearest);
-      }
+    if (visit.isNearWaypoint()) {
+      return;
+    }
+
+    if (nearest == null) {
+      throw WExceptions.FAR_FROM_WAYPOINT;
     } else {
-      var validTest = nearest.getType().isValid(nearest);
-
-      if (validTest.isEmpty()) {
-        return;
-      }
-
-      player.sendMessage(
-          Component.text("Cannot use this pole:", NamedTextColor.RED)
-      );
-      throw validTest.get();
+      throw WExceptions.farFromWaypoint(nearest);
     }
   };
 
@@ -77,6 +67,10 @@ public interface VisitPredicate {
       var waypoint = dest
           ? visit.getDestination()
           : visit.getNearestWaypoint();
+
+      if (!dest && !visit.isNearWaypoint()) {
+        return;
+      }
 
       // Should only happen if the nearest
       // waypoint is null, in the case of admins TPing

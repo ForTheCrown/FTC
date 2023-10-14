@@ -23,6 +23,10 @@ public class WaypointConfig {
   public Duration moveInCooldown = Duration.ZERO;
   public Duration validInviteTime = Duration.ofMinutes(10);
 
+  public int maxNameLength = 20;
+
+  public String[] bannedNames = {};
+
   Duration autoSaveInterval = Duration.ofMinutes(30);
 
   public boolean isDisabledWorld(World w) {

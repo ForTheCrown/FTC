@@ -1,16 +1,25 @@
 package net.forthecrown.waypoints.type;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.Objects;
 import java.util.Optional;
+import net.forthecrown.text.TextWriter;
 import net.forthecrown.user.TimeField;
 import net.forthecrown.user.User;
+import net.forthecrown.user.UserLookup.LookupEntry;
+import net.forthecrown.user.UserService;
+import net.forthecrown.user.Users;
+import net.forthecrown.user.name.DisplayIntent;
+import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.math.Bounds3i;
+import net.forthecrown.waypoints.WExceptions;
 import net.forthecrown.waypoints.Waypoint;
 import net.forthecrown.waypoints.WaypointManager;
 import net.forthecrown.waypoints.WaypointPrefs;
 import net.forthecrown.waypoints.WaypointProperties;
 import net.forthecrown.waypoints.Waypoints;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
@@ -32,8 +41,19 @@ public class PlayerWaypointType extends WaypointType {
   }
 
   @Override
-  public void onCreate(User creator, Vector3i topPos) throws CommandSyntaxException {
+  public void onCreate(User creator, Vector3i topPos, boolean copy) throws CommandSyntaxException {
+    if (copy) {
+      return;
+    }
+
     Waypoints.validateMoveInCooldown(creator);
+
+    var alreadyOwned = Waypoints.getHomeWaypoint(creator);
+    if (alreadyOwned == null) {
+      return;
+    }
+
+    throw WExceptions.homeAlreadySet(alreadyOwned);
   }
 
   @Override
@@ -77,5 +97,49 @@ public class PlayerWaypointType extends WaypointType {
   @Override
   protected boolean internalIsBuildable() {
     return true;
+  }
+
+  @Override
+  public void writeHover(TextWriter writer, Waypoint waypoint) {
+    getOwner(waypoint).ifPresent(user -> {
+      writer.field("Owner", user.displayName(writer.viewer(), DisplayIntent.HOVER_TEXT));
+    });
+  }
+
+  @Override
+  public boolean canEdit(User user, Waypoint waypoint) {
+    return getOwner(waypoint).map(user1 -> Objects.equals(user1, user)).orElse(false);
+  }
+
+  @Override
+  public ItemStack getDisplayItem(Waypoint waypoint) {
+    return getOwner(waypoint)
+        .map(User::getProfile)
+        .map(playerProfile -> {
+          return ItemStacks.headBuilder()
+              .setProfile(playerProfile)
+              .build();
+        })
+        .orElse(null);
+  }
+
+  Optional<User> getOwner(Waypoint waypoint) {
+    var ownerId = waypoint.get(WaypointProperties.OWNER);
+
+    if (ownerId == null || Objects.equals(ownerId, Waypoints.NIL_UUID)) {
+      return Optional.empty();
+    }
+
+    UserService service = Users.getService();
+    if (!service.userLoadingAllowed()) {
+      return Optional.empty();
+    }
+
+    LookupEntry entry = service.getLookup().getEntry(ownerId);
+    if (entry == null) {
+      return Optional.empty();
+    }
+
+    return Optional.of(service.getUser(entry));
   }
 }

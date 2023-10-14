@@ -1,10 +1,12 @@
 package net.forthecrown.guilds;
 
-import static net.forthecrown.command.Exceptions.format;
 import static net.forthecrown.command.Exceptions.create;
+import static net.forthecrown.command.Exceptions.format;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.user.User;
+import net.forthecrown.waypoints.WExceptions;
+import net.forthecrown.waypoints.Waypoint;
 
 public interface GuildExceptions {
 
@@ -40,6 +42,10 @@ public interface GuildExceptions {
   CommandSyntaxException G_EXTERNAL_WAYPOINT = create(
       "The chunk the waypoint is in is not claimed by your guild"
   );
+
+  static CommandSyntaxException waypointAlreadySet(Waypoint existing) {
+    return WExceptions.waypointAlreadySet(existing, "Your guild already has a waypoint", "guild");
+  }
 
   static CommandSyntaxException guildNameSmall(String name) {
     return format("'{0}' is too small for a guild name. Minimum {1, number} characters",

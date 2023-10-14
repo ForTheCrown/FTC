@@ -14,7 +14,6 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.forthecrown.Loggers;
 import net.forthecrown.guilds.unlockables.DiscordUnlocks;
-import net.forthecrown.guilds.util.DynmapUtil;
 import net.forthecrown.utils.ArrayIterator;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
@@ -154,9 +153,7 @@ public class GuildSettings {
     this.primaryColor = color;
 
     // Update dynmap
-    if (DynmapUtil.isInstalled()) {
-      GuildWebmaps.updateGuildChunks(getGuild());
-    }
+    GuildWebmaps.updateGuildChunks(getGuild());
 
     // Only change color for donators
     if (!guild.getSettings().hasFlags(ROLE_COLOR)) {
@@ -178,9 +175,7 @@ public class GuildSettings {
     this.secondaryColor = color;
 
     // Update dynmap
-    if (DynmapUtil.isInstalled()) {
-      GuildWebmaps.updateGuildChunks(getGuild());
-    }
+    GuildWebmaps.updateGuildChunks(getGuild());
   }
 
   public void setBanner(ItemStack item) {

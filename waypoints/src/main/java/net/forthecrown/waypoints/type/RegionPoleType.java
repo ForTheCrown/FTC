@@ -10,6 +10,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
@@ -85,5 +86,20 @@ public final class RegionPoleType extends WaypointType {
         waypoint.getPosition().add(0, 1, 0),
         waypoint.getWorld()
     );
+  }
+
+  @Override
+  public int getTopOffset() {
+    return getColumn().length;
+  }
+
+  @Override
+  public int getPlatformOffset() {
+    return 0;
+  }
+
+  @Override
+  public ItemStack getDisplayItem(Waypoint waypoint) {
+    return new ItemStack(Material.GLOWSTONE);
   }
 }

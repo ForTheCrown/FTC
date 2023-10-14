@@ -11,16 +11,17 @@ import net.forthecrown.guilds.DiscoverySort;
 import net.forthecrown.guilds.GUserProperties;
 import net.forthecrown.guilds.Guild;
 import net.forthecrown.guilds.Guilds;
-import net.forthecrown.text.TextWriters;
-import net.forthecrown.user.User;
-import net.forthecrown.utils.inventory.ItemStacks;
+import net.forthecrown.menu.ClickContext;
 import net.forthecrown.menu.MenuBuilder;
 import net.forthecrown.menu.MenuNode;
 import net.forthecrown.menu.Menus;
 import net.forthecrown.menu.Slot;
-import net.forthecrown.menu.ClickContext;
-import net.forthecrown.utils.context.Context;
 import net.forthecrown.menu.page.ListPage;
+import net.forthecrown.text.TextWriters;
+import net.forthecrown.user.User;
+import net.forthecrown.user.UserProperty;
+import net.forthecrown.utils.context.Context;
+import net.forthecrown.utils.inventory.ItemStacks;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import org.bukkit.Material;
@@ -40,6 +41,33 @@ public class GuildDiscoveryMenu extends ListPage<Guild> {
 
     this.statisticsMenu = new StatisticsMenu(this);
 
+    setSortingOptions(new SortingOptions<DiscoverySort, Guild>() {
+      @Override
+      public UserProperty<DiscoverySort> getProperty() {
+        return GUserProperties.DISCOVERY_SORT;
+      }
+
+      @Override
+      public UserProperty<Boolean> inversionProperty() {
+        return GUserProperties.DISCOVERY_SORT_INVERTED;
+      }
+
+      @Override
+      public DiscoverySort[] values() {
+        return DiscoverySort.values();
+      }
+
+      @Override
+      public String displayName(DiscoverySort discoverySort) {
+        return discoverySort.getName();
+      }
+
+      @Override
+      public String categoryName() {
+        return "guilds";
+      }
+    });
+
     initMenu(
         Menus.builder(MAX_INV_SIZE, "Guild Discovery"),
         true
@@ -49,10 +77,6 @@ public class GuildDiscoveryMenu extends ListPage<Guild> {
   @Override
   protected void createMenu(MenuBuilder builder) {
     super.createMenu(builder);
-
-    for (var s : DiscoverySort.values()) {
-      builder.add(s.getSlot(), s.toInvOption());
-    }
 
     builder.add(PUBLIC_ONLY_SLOT,
         MenuNode.builder()

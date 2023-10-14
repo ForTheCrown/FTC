@@ -7,6 +7,7 @@ import net.forthecrown.command.settings.SettingsBook;
 import net.forthecrown.user.Properties;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserProperty;
+import net.forthecrown.waypoints.menu.WaypointOrder;
 
 public class WaypointPrefs {
 
@@ -19,6 +20,12 @@ public class WaypointPrefs {
   public static final UserProperty<Boolean> HULK_SMASHING
       = Properties.booleanProperty("hulkSmashing", false);
 
+  public static final UserProperty<Boolean> MENU_ORDER_INVERTED
+      = Properties.booleanProperty("waypoints/menu_order_inverted", false);
+
+  public static final UserProperty<WaypointOrder> MENU_ORDER
+      = Properties.enumProperty("waypoints/list_order", WaypointOrder.NAME);
+
   public static final UserProperty<UUID> HOME_PROPERTY = Properties.uuidProperty()
       .key("homeWaypoint")
       .defaultValue(Waypoints.NIL_UUID)
@@ -27,7 +34,11 @@ public class WaypointPrefs {
 
         if (!Objects.equals(oldValue, Waypoints.NIL_UUID)) {
           Waypoint old = manager.get(oldValue);
-          old.removeResident(user.getUniqueId());
+
+          // May be null if waypoint was deleted
+          if (old != null) {
+            old.removeResident(user.getUniqueId());
+          }
         }
 
         if (!Objects.equals(value, Waypoints.NIL_UUID)) {

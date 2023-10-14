@@ -24,13 +24,7 @@ import net.forthecrown.guilds.GuildPermission;
 import net.forthecrown.guilds.GuildPermissions;
 import net.forthecrown.guilds.Guilds;
 import net.forthecrown.guilds.unlockables.DiscordUnlocks;
-import net.forthecrown.guilds.waypoints.GuildWaypoints;
 import net.forthecrown.text.Text;
-import net.forthecrown.utils.math.Vectors;
-import net.forthecrown.waypoints.WExceptions;
-import net.forthecrown.waypoints.Waypoint;
-import net.forthecrown.waypoints.Waypoints;
-import net.forthecrown.waypoints.type.WaypointTypes;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 class GuildSetNode extends GuildCommandNode {
@@ -59,10 +53,6 @@ class GuildSetNode extends GuildCommandNode {
   public void populateUsages(UsageFactory factory) {
     factory.usage("name <name>", "Sets your guild's name");
     factory.usage("leader <player>", "Sets your guild's leader");
-
-    factory.usage("waypoint")
-        .addInfo("Sets your guild's waypoint to the waypoint you're looking")
-        .addInfo("at, or the closest one to you");
 
     factory.usage("discordAnnouncements")
         .setCondition(CHANNEL_UNLOCKED)
@@ -94,9 +84,6 @@ class GuildSetNode extends GuildCommandNode {
     var leaderArg = argument("user", Arguments.USER);
     addGuildCommand(leaderArg, this::leader);
 
-    var waypointArg = literal("waypoint");
-    addGuildCommand(waypointArg, this::waypoint);
-
     command
         .then(flagArgument("unlimitedMembers", UNLIMITED_MEMBERS))
         .then(flagArgument("unlimitedChunks", UNLIMITED_CHUNKS))
@@ -116,9 +103,7 @@ class GuildSetNode extends GuildCommandNode {
 
         .then(literal("leader")
             .then(leaderArg)
-        )
-
-        .then(waypointArg);
+        );
   }
 
   private LiteralArgumentBuilder<CommandSource> donatorArg(String name, int flag) {
@@ -221,9 +206,9 @@ class GuildSetNode extends GuildCommandNode {
     return 0;
   }
 
-  private int leader(CommandContext<CommandSource> c,
-                     GuildProvider provider
-  ) throws CommandSyntaxException {
+  private int leader(CommandContext<CommandSource> c, GuildProvider provider)
+      throws CommandSyntaxException
+  {
     var guild = provider.get(c);
     var user = getUserSender(c);
 
@@ -274,6 +259,7 @@ class GuildSetNode extends GuildCommandNode {
     return 0;
   }
 
+/*
   private int waypoint(
       CommandContext<CommandSource> c,
       GuildProvider provider
@@ -336,11 +322,11 @@ class GuildSetNode extends GuildCommandNode {
     nearest.setType(GuildWaypoints.GUILD_TYPE);
     guild.moveWaypoint(nearest, user);
     return 0;
-  }
+  }*/
 
-  private int discordAnnouncements(CommandContext<CommandSource> c,
-                                   GuildProvider provider
-  ) throws CommandSyntaxException {
+  private int discordAnnouncements(CommandContext<CommandSource> c, GuildProvider provider)
+      throws CommandSyntaxException
+  {
     var guild = provider.get(c);
     var user = getUserSender(c);
 

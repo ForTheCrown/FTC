@@ -1,5 +1,6 @@
 package net.forthecrown.waypoints.type;
 
+import com.mojang.datafixers.util.Pair;
 import java.util.HashSet;
 import java.util.Set;
 import net.forthecrown.registry.Holder;
@@ -87,7 +88,7 @@ public class WaypointTypes {
    * @param block The block to test
    * @return True, if the block's type is a waypoint's top block
    */
-  public static boolean isTopOfWaypoint(Block block) {
+  public static WaypointType fromTopBlock(Block block) {
     var t = block.getType();
 
     for (var wt: buildableTypes) {
@@ -95,11 +96,11 @@ public class WaypointTypes {
       Material top = col[col.length - 1];
 
       if (t == top) {
-        return true;
+        return wt;
       }
     }
 
-    return false;
+    return null;
   }
 
   /**
@@ -119,11 +120,28 @@ public class WaypointTypes {
       return null;
     }
 
+    return findTopBlock(block);
+  }
+
+  public static @Nullable Block findTopBlock(Block block) {
     for (int i = 0; i < highestColumn + 2; i++) {
       Block b = block.getRelative(0, i, 0);
 
-      if (isTopOfWaypoint(b)) {
+      if (fromTopBlock(b) != null) {
         return b;
+      }
+    }
+
+    return null;
+  }
+
+  public static @Nullable Pair<Block, WaypointType> findTopAndType(Block block) {
+    for (int i = 0; i < highestColumn + 2; i++) {
+      Block b = block.getRelative(0, i, 0);
+      var wt = fromTopBlock(b);
+
+      if (wt != null) {
+        return Pair.of(b, wt);
       }
     }
 

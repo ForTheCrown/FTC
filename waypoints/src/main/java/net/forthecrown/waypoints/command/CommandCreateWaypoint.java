@@ -20,19 +20,6 @@ public class CommandCreateWaypoint extends FtcCommand {
     register();
   }
 
-  /*
-   * ----------------------------------------
-   * 			Command description:
-   * ----------------------------------------
-   *
-   * Valid usages of command:
-   * /CreateWaypoint
-   *
-   * Permissions used:
-   *
-   * Main Author:
-   */
-
   @Override
   public void populateUsages(UsageFactory factory) {
     factory.usage("", "Attempts to create a waypoint from the block")
@@ -50,17 +37,12 @@ public class CommandCreateWaypoint extends FtcCommand {
   @Override
   public void createCommand(GrenadierCommand command) {
     command
-        .executes(c -> {
-          Waypoints.tryCreate(c.getSource());
-          return 0;
-        })
-
         .then(literal("admin")
             .executes(c -> {
               Waypoints.makeWaypoint(
                   WaypointTypes.ADMIN,
                   null,
-                  c.getSource()
+                  c.getSource().asPlayer()
               );
               return 0;
             })
@@ -71,7 +53,7 @@ public class CommandCreateWaypoint extends FtcCommand {
               Waypoints.makeWaypoint(
                   WaypointTypes.REGION_POLE,
                   null,
-                  c.getSource()
+                  c.getSource().asPlayer()
               );
               return 0;
             })

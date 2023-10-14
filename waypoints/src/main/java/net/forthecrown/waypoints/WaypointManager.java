@@ -20,6 +20,7 @@ import net.forthecrown.utils.collision.WorldChunkMap;
 import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.utils.io.SerializationHelper;
 import net.forthecrown.waypoints.event.WaypointRemoveEvent;
+import net.forthecrown.waypoints.type.WaypointType;
 import org.slf4j.Logger;
 
 public class WaypointManager {
@@ -134,7 +135,19 @@ public class WaypointManager {
    * @param waypoint The waypoint to remove
    */
   public void removeWaypoint(Waypoint waypoint) {
-    waypoint.getType().onDelete(waypoint);
+    waypoint.setInfoSigns(false);
+    waypoint.setLightBlock(false);
+    waypoint.setEditSign(false);
+    waypoint.removeOutline();
+    waypoint.setNameSign(null);
+    waypoint.removeResidentsSign();
+
+    WaypointType type = waypoint.getType();
+    if (type.isBuildable()) {
+      Waypoints.clearPlatform(waypoint.getWorld(), waypoint.getPlatform());
+    }
+
+    type.onDelete(waypoint);
 
     waypoint.manager = null;
     byId.remove(waypoint.getId());
@@ -144,7 +157,7 @@ public class WaypointManager {
     var name = waypoint.get(WaypointProperties.NAME);
     if (!Strings.isNullOrEmpty(name)) {
       byName.remove(name.toLowerCase());
-      Waypoints.setNameSign(waypoint, null);
+      waypoint.setNameSign(null);
     }
 
     // If dynmap installed, remove marker

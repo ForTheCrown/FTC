@@ -4,6 +4,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.Getter;
+import net.forthecrown.text.TextWriter;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.math.Bounds3i;
 import net.forthecrown.waypoints.Waypoint;
@@ -11,6 +12,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
@@ -64,7 +66,7 @@ public abstract class WaypointType {
 
   }
 
-  public void onCreate(User creator, Vector3i topPos) throws CommandSyntaxException {
+  public void onCreate(User creator, Vector3i topPos, boolean copy) throws CommandSyntaxException {
 
   }
 
@@ -115,6 +117,14 @@ public abstract class WaypointType {
     );
   }
 
+  public int getTopOffset() {
+    return column == null ? -1 : column.length - 1;
+  }
+
+  public int getPlatformOffset() {
+    return 1;
+  }
+
   public TextColor getNameColor() {
     return NamedTextColor.GRAY;
   }
@@ -129,5 +139,17 @@ public abstract class WaypointType {
 
   protected boolean internalIsBuildable() {
     return false;
+  }
+
+  public boolean canEdit(User user, Waypoint waypoint) {
+    return false;
+  }
+
+  public ItemStack getDisplayItem(Waypoint waypoint) {
+    return null;
+  }
+
+  public void writeHover(TextWriter writer, Waypoint waypoint) {
+
   }
 }

@@ -2,6 +2,7 @@ package net.forthecrown.waypoints;
 
 import static net.forthecrown.command.Exceptions.create;
 import static net.forthecrown.command.Exceptions.format;
+import static net.kyori.adventure.text.Component.text;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -13,6 +14,8 @@ import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.waypoints.type.WaypointType;
 import net.forthecrown.waypoints.type.WaypointTypes;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.spongepowered.math.vector.Vector3i;
@@ -31,7 +34,8 @@ public interface WExceptions {
 
   CommandSyntaxException UNLOADED_WORLD = create("This waypoint is in an unloaded world!");
 
-  CommandSyntaxException FACE_WAYPOINT_TOP = create("You must be looking at a waypoint's top block");
+  CommandSyntaxException FACE_WAYPOINT
+      = create("You must be looking at a waypoint's pillar blocks");
 
   static CommandSyntaxException unknownRegion(StringReader reader, int cursor) {
     return format(
@@ -86,7 +90,7 @@ public interface WExceptions {
         )
         .asComponent();
 
-    return format("{0} is an invalid waypoint top block! Must be one of: {1}" + m, tops);
+    return format("{0} is an invalid waypoint top block! Must be one of: {1}", m, tops);
   }
 
   static CommandSyntaxException waypointBlockNotEmpty(Block pos) {
@@ -138,4 +142,48 @@ public interface WExceptions {
     return format("{0, user} does not have a home waypoint", user);
   }
 
+  static CommandSyntaxException nonReplaceableFloorBlock(Block block) {
+    Vector3i vec = Vectors.from(block);
+    return format("{0} at {1, vector} cannot be replaced to create a waypoint platform",
+        block.getType(), vec
+    );
+  }
+
+  static CommandSyntaxException waypointAlreadySet(
+      Waypoint existing,
+      String messagePrefix,
+      String waypointPrefix
+  ) {
+    Component how = text(
+        """
+        Right-Click the 'edit waypoint'
+        sign on the waypoint you want to delete
+        and select the delete option
+        """.trim()
+    );
+
+    var p = existing.getPosition();
+    Location location = new Location(existing.getWorld(), p.x(), p.y(), p.z());
+
+    return format(
+        "{2}, remove the old one before making a new one {0}\n"
+            + "Your current {3}-waypoint is at {1, location}",
+
+        text("[How?]", NamedTextColor.AQUA)
+            .hoverEvent(how),
+
+        location,
+
+        messagePrefix,
+        waypointPrefix
+    );
+  }
+
+  static CommandSyntaxException homeAlreadySet(Waypoint currentHome) {
+    return waypointAlreadySet(currentHome, "You already have a home waypoint", "home");
+  }
+
+  static CommandSyntaxException creationDisabled() {
+    return create("Waypoint creation is disabled here");
+  }
 }

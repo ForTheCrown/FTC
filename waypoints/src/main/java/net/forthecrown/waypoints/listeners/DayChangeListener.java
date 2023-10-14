@@ -8,6 +8,7 @@ import net.forthecrown.utils.Time;
 import net.forthecrown.waypoints.Waypoint;
 import net.forthecrown.waypoints.WaypointConfig;
 import net.forthecrown.waypoints.WaypointManager;
+import net.forthecrown.waypoints.WaypointProperties;
 import net.forthecrown.waypoints.WaypointScan;
 import net.forthecrown.waypoints.WaypointScan.Result;
 import org.bukkit.event.EventHandler;
@@ -24,7 +25,14 @@ class DayChangeListener implements Listener {
     WaypointConfig config = manager.config();
     Map<Waypoint, Result> toRemove = new HashMap<>();
 
+    boolean monthlyReset = event.getTime().getDayOfMonth() == 1;
+
     for (var w : manager.getWaypoints()) {
+      w.set(WaypointProperties.VISITS_DAILY, 0);
+      if (monthlyReset) {
+        w.set(WaypointProperties.VISITS_MONTHLY, 0);
+      }
+
       if (!w.getType().isBuildable()) {
         continue;
       }

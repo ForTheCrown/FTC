@@ -23,3 +23,14 @@ validCooldownTime = "10m"
 
 # Plugin data auto save interval
 autoSaveInterval = "30m"
+
+# Max length of a waypoint name
+maxNameLength = 20
+
+# Banned waypoint names, case insensitive
+bannedNames = [
+  "region",
+  "regionticket",
+  "ticket",
+  "region_ticket"
+]
