@@ -82,8 +82,10 @@ public class GuildWaypointType extends PlayerWaypointType {
   }
 
   @Override
-  public TextColor getNameColor() {
-    return NamedTextColor.GOLD;
+  public TextColor getNameColor(Waypoint waypoint) {
+    return getGuild(waypoint)
+        .map(guild -> guild.getSettings().getPrimaryColor().getTextColor())
+        .orElse(NamedTextColor.GOLD);
   }
 
   @Override

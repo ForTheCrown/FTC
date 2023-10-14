@@ -87,13 +87,14 @@ public class EditMenu extends MenuPage {
 
           if (canUse) {
             builder.addLore("&7Purchase a Region Ticket in the webshop!")
+                .addLoreRaw(Component.empty())
                 .addLore("&7Then click on this item with the renamed Region")
-                .addLore("&7Ticket in your cursor to name the waypoint.");
+                .addLore("&7Ticket on your cursor to name the waypoint.");
           } else {
             builder
                 .addEnchant(Enchantment.BINDING_CURSE, 1)
                 .addFlags(ItemFlag.HIDE_ENCHANTS)
-                .addLore("&cName already set / set by an external feature");
+                .addLore("&cName already set or set by an external feature");
           }
 
           return builder.build();

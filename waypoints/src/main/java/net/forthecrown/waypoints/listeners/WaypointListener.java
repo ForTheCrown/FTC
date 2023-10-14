@@ -1,6 +1,5 @@
 package net.forthecrown.waypoints.listeners;
 
-import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import java.util.List;
 import java.util.Set;
 import net.forthecrown.utils.math.Bounds3i;
@@ -9,6 +8,7 @@ import net.forthecrown.waypoints.Waypoint;
 import net.forthecrown.waypoints.Waypoints;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -26,20 +26,20 @@ class WaypointListener implements Listener {
 
   @EventHandler(ignoreCancelled = true)
   public void onBlockBreak(BlockBreakEvent event) {
-    cancel(event.getBlock(), event::setCancelled);
+    cancel(event.getBlock(), event);
   }
 
   @EventHandler(ignoreCancelled = true)
   public void onBlockPlace(BlockPlaceEvent event) {
-    cancel(event.getBlock(), event::setCancelled);
+    cancel(event.getBlock(), event);
   }
 
   @EventHandler(ignoreCancelled = true)
   public void onBlockFromTo(BlockFromToEvent event) {
-    cancel(event.getToBlock(), event::setCancelled);
+    cancel(event.getToBlock(), event);
   }
 
-  private void cancel(Block block, BooleanConsumer setCancelled) {
+  private void cancel(Block block, Cancellable cancellable) {
     Vector3i pos = Vectors.from(block);
 
     World world = block.getWorld();
@@ -49,7 +49,7 @@ class WaypointListener implements Listener {
       return;
     }
 
-    setCancelled.accept(true);
+    cancellable.setCancelled(true);
   }
 
   /* ----------------------------- EXPLOSIONS ------------------------------ */
@@ -108,6 +108,10 @@ class WaypointListener implements Listener {
     var bounds = Bounds3i.of(blocks);
 
     var waypoints = Waypoints.getInvulnerable(bounds, world);
+
+    if (waypoints.isEmpty()) {
+      return;
+    }
 
     for (var b : blocks) {
       for (var w : waypoints) {

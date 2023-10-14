@@ -70,17 +70,18 @@ public class SubEditMenu extends MenuPage {
 
           builder.addLore("&7Private waypoints require an invite")
               .addLore("&7even if the waypoint is named, and")
-              .addLore("&7they don't show how many people live there");
+              .addLore("&7they don't show how many people live there")
+              .addLoreRaw(empty());
 
           if (isPrivate) {
             builder
                 .addEnchant(Enchantment.BINDING_CURSE, 1)
                 .addFlags(ItemFlag.HIDE_ENCHANTS)
                 .setName("&eWaypoint state: &6Private")
-                .addLore("&7Click to set to public");
+                .addLore("&eClick to set to public");
           } else {
             builder.setName("&eWaypoint state: &6Public")
-                .addLore("&7Click to set to private");
+                .addLore("&eClick to set to private");
           }
 
           return builder.build();
@@ -121,9 +122,9 @@ public class SubEditMenu extends MenuPage {
               .setName("&eMove waypoint")
 
               .addLore("&7When selected, the menu will be closed")
-              .addLore("&7and the next time you use the waypoint creation tool")
-              .addLore("&7instead of creating a new waypoint, this one")
-              .addLore("&7will be moved instead.")
+              .addLore("&7and the next time you use the waypoint")
+              .addLore("&7creation tool; instead of creating a new")
+              .addLore("&7waypoint, this one will be moved instead.")
 
               .build();
         })

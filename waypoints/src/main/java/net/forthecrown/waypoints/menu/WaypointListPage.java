@@ -17,6 +17,7 @@ import net.forthecrown.waypoints.Waypoint;
 import net.forthecrown.waypoints.WaypointManager;
 import net.forthecrown.waypoints.WaypointPrefs;
 import net.forthecrown.waypoints.visit.WaypointVisit;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -92,7 +93,10 @@ public class WaypointListPage extends ListPage<Waypoint> {
 
   @Override
   protected ItemStack getItem(User user, Waypoint entry, Context context) {
-    return entry.createDisplayItem(user).build();
+    return entry.createDisplayItem(user)
+        .addLoreRaw(Component.empty())
+        .addLore("&6Click to visit!")
+        .build();
   }
 
   @Override

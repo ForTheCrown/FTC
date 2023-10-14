@@ -125,7 +125,7 @@ public abstract class WaypointType {
     return 1;
   }
 
-  public TextColor getNameColor() {
+  public TextColor getNameColor(Waypoint waypoint) {
     return NamedTextColor.GRAY;
   }
 

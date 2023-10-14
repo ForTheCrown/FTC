@@ -244,7 +244,7 @@ public class Waypoint {
 
     setWorld(world);
     this.position = position;
-    this.bounds = type.createBounds().move(position);
+    this.bounds = createBounds();
 
     if (hasBeenAdded()) {
       type.onPostMove(this);
@@ -253,6 +253,17 @@ public class Waypoint {
 
       Waypoints.updateDynmap(this);
     }
+  }
+
+  private Bounds3i createBounds() {
+    var bounds = type.createBounds().move(position);
+
+    int bottomOffset = type.getPlatformOffset();
+    if (bottomOffset > 0) {
+      bounds = bounds.expand(0, bottomOffset, 0, 0, 0, 0);
+    }
+
+    return bounds;
   }
 
   /**
@@ -573,10 +584,7 @@ public class Waypoint {
         ItemStacks.isEmpty(baseItem) ? new ItemStack(Material.NAME_TAG) : baseItem
     );
 
-    builder.setName(
-        Component.text("[" + effectiveName + "]")
-            .color(getType().getNameColor())
-    );
+    builder.setName(Component.text("[" + effectiveName + "]", getTextColor()));
 
     builder.addFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ITEM_SPECIFICS);
 
@@ -954,7 +962,7 @@ public class Waypoint {
   }
 
   private TextColor getTextColor() {
-    return type.getNameColor();
+    return type.getNameColor(this);
   }
 
   /**
@@ -1075,6 +1083,7 @@ public class Waypoint {
     }
 
     this.position = Vectors.read3i(tag.get(TAG_POS));
+    this.bounds = createBounds();
 
     if (tag.containsKey(TAG_WORLD)) {
       var key = TagUtil.readKey(tag.get(TAG_WORLD));
@@ -1082,8 +1091,6 @@ public class Waypoint {
       var world = Bukkit.getWorld(key);
       setWorld(world);
     }
-
-    this.bounds = type.createBounds().move(position);
 
     if (tag.containsKey(TAG_LAST_VALID)) {
       lastValidTime = tag.getLong(TAG_LAST_VALID);

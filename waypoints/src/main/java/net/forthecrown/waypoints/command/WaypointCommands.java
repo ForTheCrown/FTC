@@ -13,6 +13,7 @@ public class WaypointCommands {
 
   public static void createCommands() {
     new CommandCreateWaypoint();
+    new CommandFindPole();
     new CommandHomeWaypoint();
     new CommandInvite();
     new CommandListWaypoints();

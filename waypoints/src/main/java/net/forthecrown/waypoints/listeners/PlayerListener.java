@@ -78,7 +78,7 @@ public class PlayerListener implements Listener {
 
         if (!Objects.equals(targetType, copy.getType())) {
           player.sendMessage(
-              Text.format("Cannot move {0} waypoint to {1} type",
+              Text.format("Cannot move {0} waypoint to {1} waypoint",
                   NamedTextColor.RED,
                   copy.getType().getDisplayName(),
                   targetType.getDisplayName()

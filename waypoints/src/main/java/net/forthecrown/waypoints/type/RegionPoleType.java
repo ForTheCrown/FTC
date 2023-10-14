@@ -28,7 +28,7 @@ public final class RegionPoleType extends WaypointType {
   }
 
   @Override
-  public TextColor getNameColor() {
+  public TextColor getNameColor(Waypoint waypoint) {
     return NamedTextColor.YELLOW;
   }
 

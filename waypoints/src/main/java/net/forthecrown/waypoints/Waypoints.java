@@ -215,11 +215,7 @@ public final class Waypoints {
    * Gets all invulnerable waypoints at the given position in the given world
    */
   public static Set<Waypoint> getInvulnerable(Vector3i pos, World world) {
-    return removeVulnerable(
-        WaypointManager.getInstance()
-            .getChunkMap()
-            .get(world, pos)
-    );
+    return removeVulnerable(WaypointManager.getInstance().getChunkMap().get(world, pos));
   }
 
   /**
@@ -577,6 +573,7 @@ public final class Waypoints {
     World w = b.getWorld();
 
     placePlatform(w, waypoint.getPlatform());
+    type.onPostCreate(waypoint, user);
 
     waypoint.setLightBlock(true);
     waypoint.setEditSign(true);
@@ -585,7 +582,6 @@ public final class Waypoints {
     waypoint.updateResidentsSign();
     waypoint.updateOutline();
 
-    type.onPostCreate(waypoint, user);
     return waypoint;
   }
 
