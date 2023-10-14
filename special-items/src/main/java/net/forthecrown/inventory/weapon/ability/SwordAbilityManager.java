@@ -243,6 +243,10 @@ public class SwordAbilityManager {
       builder.cooldown(context.cooldown);
     }
 
+    if (json.has("rhines")) {
+      builder.rhineRequirement(json.getInt("rhines"));
+    }
+
     var cd = builder.cooldown();
     if (cd.getMin() <= 0 || cd.getMax() <= 0) {
       return Results.error("Cooldown min or max was below 0");

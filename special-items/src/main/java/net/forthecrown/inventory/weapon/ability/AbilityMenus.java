@@ -320,6 +320,18 @@ public class AbilityMenus extends MenuPage {
       return;
     }
 
+    var type = abilityType.getValue();
+    int price = type.getRhineRequirement();
+
+    if (price > 0) {
+      if (!user.hasBalance(price)) {
+        throw Exceptions.cannotAfford(price);
+      }
+
+      user.removeBalance(price);
+      user.sendMessage(Text.format("Paid &e{0, rhines}", NamedTextColor.GRAY, price));
+    }
+
     // Apply ability upgrade or apply ability to sword if existing
     // one is null or different
     if (existingAbility == null
