@@ -27,6 +27,7 @@ import net.forthecrown.text.PeriodFormat;
 import net.forthecrown.text.Text;
 import net.forthecrown.text.TextWriter;
 import net.forthecrown.text.TextWriters;
+import net.forthecrown.text.UnitFormat;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserTeleport.Type;
 import net.forthecrown.utils.Tasks;
@@ -67,6 +68,8 @@ public class WeaponAbilityType {
 
   private final IntList levelRequirements;
 
+  private final int rhineRequirement;
+
   @Setter(AccessLevel.PACKAGE)
   private Holder<WeaponAbilityType> holder;
 
@@ -86,6 +89,7 @@ public class WeaponAbilityType {
     this.advancementKey = builder.advancementKey;
     this.levelRequirements = builder.levelRequirements;
     this.trialArea = builder.trialArea;
+    this.rhineRequirement = builder.rhineRequirement;
 
     // Check arguments
     Preconditions.checkArgument(
@@ -231,6 +235,10 @@ public class WeaponAbilityType {
     if (!description.isEmpty()) {
       writer.newLine();
       writer.newLine();
+    }
+
+    if (rhineRequirement > 0) {
+      writer.field("Price", UnitFormat.rhines(rhineRequirement));
     }
 
     var adv = getAdvancement();
@@ -397,6 +405,8 @@ public class WeaponAbilityType {
     AbilityTrialArea trialArea;
 
     final IntList levelRequirements = new IntArrayList();
+
+    int rhineRequirement;
 
     public Builder addItem(ItemStack item) {
       Validate.isTrue(ItemStacks.notEmpty(item), "Empty item given");
