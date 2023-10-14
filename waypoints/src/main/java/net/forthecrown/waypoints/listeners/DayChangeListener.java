@@ -1,5 +1,6 @@
 package net.forthecrown.waypoints.listeners;
 
+import io.papermc.paper.util.Tick;
 import java.util.HashMap;
 import java.util.Map;
 import net.forthecrown.Loggers;
@@ -11,6 +12,8 @@ import net.forthecrown.waypoints.WaypointManager;
 import net.forthecrown.waypoints.WaypointProperties;
 import net.forthecrown.waypoints.WaypointScan;
 import net.forthecrown.waypoints.WaypointScan.Result;
+import net.forthecrown.waypoints.util.DelayedWaypointIterator;
+import net.forthecrown.waypoints.util.WaypointAction;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.slf4j.Logger;
@@ -22,8 +25,6 @@ class DayChangeListener implements Listener {
   @EventHandler(ignoreCancelled = true)
   public void onDayChange(DayChangeEvent event) {
     WaypointManager manager = WaypointManager.getInstance();
-    WaypointConfig config = manager.config();
-    Map<Waypoint, Result> toRemove = new HashMap<>();
 
     boolean monthlyReset = event.getTime().getDayOfMonth() == 1;
 
@@ -32,53 +33,78 @@ class DayChangeListener implements Listener {
       if (monthlyReset) {
         w.set(WaypointProperties.VISITS_MONTHLY, 0);
       }
+    }
 
-      if (!w.getType().isBuildable()) {
-        continue;
+    DelayedWaypointIterator it = new DelayedWaypointIterator(
+        manager.getWaypoints().iterator(),
+        Tick.of(1),
+        new RemovalAction(manager)
+    );
+
+    it.schedule();
+  }
+
+  private static class RemovalAction implements WaypointAction {
+
+    private final Map<Waypoint, Result> removed = new HashMap<>();
+    private final WaypointManager manager;
+    private final WaypointConfig config;
+
+    public RemovalAction(WaypointManager manager) {
+      this.manager = manager;
+      this.config = manager.config();
+    }
+
+    @Override
+    public void accept(Waypoint waypoint) {
+      if (!waypoint.getType().isBuildable()) {
+        return;
       }
 
-      Result result = WaypointScan.scan(w);
+      Result result = WaypointScan.scan(waypoint);
 
       if (result == Result.SUCCESS || result == Result.CANNOT_BE_DESTROYED) {
-        continue;
+        return;
       }
 
       if (result == Result.DESTROYED) {
-        toRemove.put(w, result);
-        continue;
+        removed.put(waypoint, result);
+        return;
       }
 
       // Residents empty, no set name, no guild or pole was broken
-      if (shouldRemove(w, config)) {
-        toRemove.put(w, result);
+      if (shouldRemove(waypoint, config)) {
+        removed.put(waypoint, result);
       }
     }
 
-    // No waypoints to remove so stop here
-    if (toRemove.isEmpty()) {
-      return;
+    private boolean shouldRemove(Waypoint waypoint, WaypointConfig config) {
+      if (waypoint.getLastValidTime() == -1) {
+        waypoint.setLastValidTime(System.currentTimeMillis());
+        return false;
+      }
+
+      long deletionDelay = config.waypointDeletionDelay.toMillis();
+      long deletionTime = waypoint.getLastValidTime() + deletionDelay;
+
+      return Time.isPast(deletionTime);
     }
 
-    // Remove all invalid waypoints
-    toRemove.forEach((waypoint, result) -> {
-      LOGGER.info("Auto-removing waypoint {}, reason={}",
-          waypoint.identificationInfo(),
-          result.getReason()
-      );
+    public void onFinish() {
+      // No waypoints to remove so stop here
+      if (removed.isEmpty()) {
+        return;
+      }
 
-      manager.removeWaypoint(waypoint);
-    });
-  }
+      // Remove all invalid waypoints
+      removed.forEach((waypoint, result) -> {
+        LOGGER.info("Auto-removing waypoint {}, reason={}",
+            waypoint.identificationInfo(),
+            result.getReason()
+        );
 
-  private boolean shouldRemove(Waypoint waypoint, WaypointConfig config) {
-    if (waypoint.getLastValidTime() == -1) {
-      waypoint.setLastValidTime(System.currentTimeMillis());
-      return false;
+        manager.removeWaypoint(waypoint);
+      });
     }
-
-    long deletionDelay = config.waypointDeletionDelay.toMillis();
-    long deletionTime = waypoint.getLastValidTime() + deletionDelay;
-
-    return Time.isPast(deletionTime);
   }
 }

@@ -6,6 +6,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import io.papermc.paper.util.Tick;
 import net.forthecrown.command.Commands;
 import net.forthecrown.command.Exceptions;
 import net.forthecrown.command.FtcCommand;
@@ -23,8 +24,14 @@ import net.forthecrown.waypoints.WPermissions;
 import net.forthecrown.waypoints.Waypoint;
 import net.forthecrown.waypoints.WaypointManager;
 import net.forthecrown.waypoints.WaypointProperty;
+import net.forthecrown.waypoints.Waypoints;
 import net.forthecrown.waypoints.WaypointsPlugin;
+import net.forthecrown.waypoints.type.WaypointTypes;
+import net.forthecrown.waypoints.util.DelayedWaypointIterator;
+import net.forthecrown.waypoints.util.WaypointAction;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.spongepowered.math.vector.Vector3i;
 
@@ -107,6 +114,8 @@ public class CommandWaypoints extends FtcCommand {
               return 0;
             })
         )
+
+        .then(literal("update-all").executes(this::updateAll))
 
         .then(argument("waypoint", WaypointCommands.WAYPOINT)
             // /waypoints <point> move
@@ -205,6 +214,19 @@ public class CommandWaypoints extends FtcCommand {
         );
   }
 
+  private int updateAll(CommandContext<CommandSource> c) {
+    WaypointManager manager = WaypointManager.getInstance();
+
+    DelayedWaypointIterator it = new DelayedWaypointIterator(
+        manager.getWaypoints().iterator(),
+        Tick.of(1),
+        new WaypointUpdateAction(c.getSource())
+    );
+
+    it.schedule();
+    return 0;
+  }
+
   private int property(CommandContext<CommandSource> c, boolean unset)
       throws CommandSyntaxException
   {
@@ -261,5 +283,60 @@ public class CommandWaypoints extends FtcCommand {
         )
     );
     return 0;
+  }
+
+  private static class WaypointUpdateAction implements WaypointAction {
+
+    final CommandSource source;
+    int updated = 0;
+
+    public WaypointUpdateAction(CommandSource source) {
+      this.source = source;
+    }
+
+    @Override
+    public void accept(Waypoint waypoint) {
+      if (waypoint.getType() == WaypointTypes.ADMIN) {
+        return;
+      }
+
+      var platform = waypoint.getPlatform();
+      if (platform != null) {
+        Waypoints.placePlatform(waypoint.getWorld(), platform);
+      }
+
+      if (waypoint.getType() == WaypointTypes.REGION_POLE) {
+        var pos = waypoint.getPosition();
+        var world = waypoint.getWorld();
+
+        var block = Vectors.getBlock(pos, world);
+
+        clearColumnUp(block.getRelative( 1, 1,  0));
+        clearColumnUp(block.getRelative(-1, 1,  0));
+        clearColumnUp(block.getRelative( 0, 1,  1));
+        clearColumnUp(block.getRelative( 0, 1, -1));
+      }
+
+      waypoint.setInfoSigns(true);
+      waypoint.updateOutline();
+      waypoint.updateResidentsSign();
+      waypoint.updateNameSign();
+      waypoint.setLightBlock(true);
+      waypoint.setEditSign(true);
+
+      updated++;
+    }
+
+    private void clearColumnUp(Block block) {
+      for (int i = 0; i < 3; i++) {
+        Block b = block.getRelative(0, i, 0);
+        b.setType(Material.AIR, false);
+      }
+    }
+
+    @Override
+    public void onFinish() {
+      source.sendSuccess(Text.format("Updated {0, number} waypoints", updated));
+    }
   }
 }

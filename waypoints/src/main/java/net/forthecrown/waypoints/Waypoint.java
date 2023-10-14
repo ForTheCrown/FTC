@@ -45,7 +45,6 @@ import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.math.Bounds3i;
 import net.forthecrown.utils.math.Direction;
 import net.forthecrown.utils.math.Vectors;
-import net.forthecrown.waypoints.type.PlayerWaypointType;
 import net.forthecrown.waypoints.type.WaypointType;
 import net.forthecrown.waypoints.type.WaypointTypes;
 import net.forthecrown.waypoints.util.UuidPersistentDataType;
@@ -425,7 +424,7 @@ public class Waypoint {
     }
 
     String[] visitInfo = !state ? null : new String[] { "/visit <region>", "to teleport." };
-    String[] helpText =  !state ? null : new String[] { "/polehelp", "for more info" };
+    String[] helpText =  !state ? null : new String[] { "/help waypoints", "for more info" };
 
     setInfoSign(world, top, Direction.NORTH, visitInfo);
     setInfoSign(world, top, Direction.SOUTH, visitInfo);
@@ -476,19 +475,20 @@ public class Waypoint {
    * @return {@code true}, if the name sign was successfully changed, {@code false} otherwise
    */
   public boolean setNameSign(String name) {
-    if (!(type instanceof PlayerWaypointType)) {
-      LOGGER.error("Tried to update name sign on non-player waypoint! waypoint: {}", this);
+    Vector3i top = getAnchor();
+    World w = getWorld();
+
+    if (top == null) {
+      LOGGER.error("Tried to update nameSign of non-player waypoint {}", this);
       return false;
     }
-
-    Vector3i pos = getAnchor().add(0, 1, 0);
-    World w = getWorld();
 
     if (w == null) {
       LOGGER.error("Cannot set nameSign of waypoint {}: World unloaded", this);
       return false;
     }
 
+    Vector3i pos = top.add(0, 1, 0);
     Block b = Vectors.getBlock(pos, w);
 
     if (name == null) {
@@ -496,7 +496,7 @@ public class Waypoint {
     } else {
       String actualName = name.isEmpty() ? "Wilderness" : name;
 
-      Waypoints.setSign(b, false, null, sign -> {
+      Waypoints.setSign(b, false, BlockFace.EAST, sign -> {
         setNameOnSide(sign.getSide(Side.FRONT), actualName);
         setNameOnSide(sign.getSide(Side.BACK), actualName);
       });
@@ -621,9 +621,9 @@ public class Waypoint {
     display.setViewRange(0.1f);
     display.setGlowing(true);
 
-    Vector3i boundsSize = bounds.size();
+    Vector3i boundsSize = getType().createBounds().size();
     var halfSize = boundsSize.toFloat().div(-2);
-    Vector3f translation = new Vector3f(halfSize.x(), 0, halfSize.y());
+    Vector3f translation = new Vector3f(halfSize.x(), 0, halfSize.z());
     Vector3f scale = new Vector3f(boundsSize.x(), 0.01f, boundsSize.z());
 
     // Amount the scale and translation are modified to prevent

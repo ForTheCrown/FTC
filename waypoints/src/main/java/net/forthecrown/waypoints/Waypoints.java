@@ -1,7 +1,5 @@
 package net.forthecrown.waypoints;
 
-import static net.kyori.adventure.text.Component.text;
-
 import com.google.common.base.Strings;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.datafixers.util.Pair;
@@ -22,11 +20,8 @@ import net.forthecrown.Loggers;
 import net.forthecrown.antigrief.BannedWords;
 import net.forthecrown.command.Exceptions;
 import net.forthecrown.structure.BlockStructure;
-import net.forthecrown.structure.FunctionInfo;
 import net.forthecrown.structure.StructurePlaceConfig;
 import net.forthecrown.structure.Structures;
-import net.forthecrown.structure.buffer.ImmediateBlockBuffer;
-import net.forthecrown.text.Text;
 import net.forthecrown.user.TimeField;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
@@ -44,7 +39,6 @@ import net.forthecrown.waypoints.WaypointScan.Result;
 import net.forthecrown.waypoints.type.PlayerWaypointType;
 import net.forthecrown.waypoints.type.WaypointType;
 import net.forthecrown.waypoints.type.WaypointTypes;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
@@ -123,81 +117,10 @@ public final class Waypoints {
         .addNonNullProcessor()
         .addRotationProcessor()
         .world(region.getWorld())
-
         .pos(region.getBounds().min())
-
-        // Function processors to ensure signs on pole
-        // display correct information
-        .addFunction(
-            FUNC_REGION_NAME,
-            (info, c) -> processTopSign(region, info, c)
-        )
-        .addFunction(
-            FUNC_RESIDENTS,
-            (info, c) -> processResidentsSign(region, info, c)
-        )
-
         .build();
 
     structure.place(config);
-  }
-
-  private static void processTopSign(
-      Waypoint region,
-      FunctionInfo info,
-      StructurePlaceConfig config
-  ) {
-    var pos = config.getTransform().apply(info.getOffset());
-    var world = ((ImmediateBlockBuffer) config.getBuffer()).getWorld();
-
-    var block = Vectors.getBlock(pos, world);
-
-    setSign(block, false, BlockFace.EAST, sign -> {
-      sign.line(1, signName(region));
-      sign.line(2, text("Waypoint"));
-    });
-  }
-
-  private static void processResidentsSign(
-      Waypoint region,
-      FunctionInfo info,
-      StructurePlaceConfig config
-  ) {
-    if (region.get(WaypointProperties.HIDE_RESIDENTS) || region.getResidents().isEmpty()) {
-      return;
-    }
-
-    var pos = config.getTransform().apply(info.getOffset());
-    var world = ((ImmediateBlockBuffer) config.getBuffer()).getWorld();
-    var block = Vectors.getBlock(pos, world);
-
-    WallSign signData = (WallSign) Material.OAK_WALL_SIGN.createBlockData();
-    signData.setFacing(info.getFacing().asBlockFace());
-    block.setBlockData(signData);
-
-    Sign sign = (Sign) block.getState();
-    var residents = region.getResidents();
-
-    if (residents.size() == 1) {
-      sign.line(1, text("Resident:"));
-      sign.line(2,
-          Text.format("{0, user}",
-              residents.keySet()
-                  .iterator()
-                  .next()
-          )
-      );
-    } else {
-      sign.line(1, text("Residents:"));
-      sign.line(2, text(residents.size()));
-    }
-
-    sign.update();
-  }
-
-  private static Component signName(Waypoint waypoint) {
-    var name = waypoint.getEffectiveName();
-    return text(Strings.isNullOrEmpty(name) ? "Wilderness" : name);
   }
 
   /**
@@ -489,7 +412,7 @@ public final class Waypoints {
       consumer.accept(sign);
     }
 
-    sign.update();
+    sign.update(false, false);
   }
 
   /**

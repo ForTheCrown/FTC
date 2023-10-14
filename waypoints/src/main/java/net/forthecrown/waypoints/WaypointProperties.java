@@ -15,7 +15,6 @@ import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.utils.io.FtcCodecs;
-import net.forthecrown.waypoints.type.PlayerWaypointType;
 import net.forthecrown.waypoints.type.WaypointTypes;
 import org.bukkit.inventory.ItemStack;
 
@@ -101,12 +100,7 @@ public class WaypointProperties {
       = new WaypointProperty<>("name", StringArgumentType.string(), Codec.STRING, null)
       .setCallback((waypoint, oldValue, value) -> {
         WaypointManager.getInstance().onRename(waypoint, oldValue, value);
-
-        if (waypoint.getType() == WaypointTypes.REGION_POLE && waypoint.get(INVULNERABLE)) {
-          Waypoints.placePole(waypoint);
-        } else if (waypoint.getType() instanceof PlayerWaypointType) {
-          waypoint.updateNameSign();
-        }
+        waypoint.updateNameSign();
       })
 
       .setValidator((waypoint, newValue) -> {
