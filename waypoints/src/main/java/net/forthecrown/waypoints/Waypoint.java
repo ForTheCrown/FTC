@@ -843,7 +843,12 @@ public class Waypoint {
       if (get(WaypointProperties.HIDE_RESIDENTS)) {
         front.line(1, text("Residents:"));
         front.line(2, text("¯\\_(ツ)_/¯"));
-      } else if (residents.size() == 1) {
+        return;
+      }
+
+      front.line(3, text("(Right-Click me!)"));
+
+      if (residents.size() == 1) {
         User resident = Users.get(residents.keySet().iterator().next());
         front.line(1, text("Resident:"));
         front.line(2, resident.nickOrName());
