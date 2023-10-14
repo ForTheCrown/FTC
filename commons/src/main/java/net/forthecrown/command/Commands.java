@@ -4,6 +4,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.lang.StackWalker.Option;
 import java.util.Collection;
+import net.forthecrown.Loggers;
 import net.forthecrown.command.arguments.Arguments;
 import net.forthecrown.command.arguments.ExpandedEntityArgument;
 import net.forthecrown.command.arguments.UserParseResult;
@@ -185,7 +186,11 @@ public final class Commands {
     String formattedCmd = String.format(format, args);
 
     if (Bukkit.isPrimaryThread()) {
-      Bukkit.dispatchCommand(Bukkit.getConsoleSender(), formattedCmd);
+      try {
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), formattedCmd);
+      } catch (Throwable t) {
+        Loggers.getLogger().error("Error executing command '{}'", formattedCmd, t);
+      }
     } else {
       Plugin plugin = PluginUtil.getCallingPlugin();
       Bukkit.getScheduler().runTask(plugin, () -> {
