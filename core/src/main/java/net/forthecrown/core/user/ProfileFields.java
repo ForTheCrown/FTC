@@ -21,6 +21,7 @@ import net.forthecrown.user.name.FieldPlacement;
 import net.forthecrown.user.name.ProfileDisplayElement;
 import net.forthecrown.user.name.UserNameFactory;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import org.bukkit.Location;
 
 interface ProfileFields {
@@ -109,7 +110,11 @@ interface ProfileFields {
       return;
     }
 
-    writer.field("IP", ip);
+    writer.field("IP",
+        text(ip)
+            .hoverEvent(text("Click to copy"))
+            .clickEvent(ClickEvent.copyToClipboard(ip))
+    );
   };
 
   ProfileDisplayElement RETURN_LOCATION = (writer, user, context) -> {
