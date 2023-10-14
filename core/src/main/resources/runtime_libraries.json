@@ -9,6 +9,7 @@
     "${grenadierAnnotations}",
     "${toml}",
     "${mathLib}",
-    "${configurate}"
+    "${configurate}",
+    "${nbtlib}"
   ]
 }

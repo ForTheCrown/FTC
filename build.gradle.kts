@@ -11,6 +11,7 @@ version = "1.0.0-SNAPSHOT"
 group = "net.forthecrown"
 
 val grenadier      = "net.forthecrown:grenadier:2.2.0"
+val nbtlib         = "net.forthecrown:nbt:1.5.1"
 val grenadierAnnot = "net.forthecrown:grenadier-annotations:1.3.0"
 val mathlib        = "org.spongepowered:math:2.1.0-SNAPSHOT"
 val toml           = "org.tomlj:tomlj:1.1.0"
@@ -61,6 +62,7 @@ subprojects {
     compileOnly(grenadierAnnot)
     compileOnly(mathlib)
     compileOnly(toml)
+    compileOnly(nbtlib)
 
     compileOnly("com.mojang:brigadier:1.0.18")
     compileOnly("com.mojang:datafixerupper:6.0.6")
@@ -100,6 +102,7 @@ subprojects {
           "toml" to toml,
           "mathLib" to mathlib,
           "configurate" to configurate,
+          "nbtlib" to nbtlib,
         )
       }
     }
