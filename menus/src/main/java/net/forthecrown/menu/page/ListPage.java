@@ -1,6 +1,7 @@
 package net.forthecrown.menu.page;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import lombok.Getter;
@@ -11,10 +12,15 @@ import net.forthecrown.menu.MenuNode;
 import net.forthecrown.menu.Slot;
 import net.forthecrown.text.page.PagedIterator;
 import net.forthecrown.user.User;
+import net.forthecrown.user.UserProperty;
 import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.context.ContextOption;
 import net.forthecrown.utils.inventory.ItemStacks;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
 public abstract class ListPage<T> extends MenuPage {
@@ -24,6 +30,8 @@ public abstract class ListPage<T> extends MenuPage {
 
   private final ContextOption<Integer> page;
 
+  private SortingOptions<?, T> sortingOptions;
+
   public ListPage(MenuPage parent, ContextOption<Integer> page, Slot startSlot) {
     super(parent);
     this.startSlot = startSlot;
@@ -32,6 +40,10 @@ public abstract class ListPage<T> extends MenuPage {
 
   public ListPage(MenuPage parent, ContextOption<Integer> page) {
     this(parent, page, Slot.of(1, 1));
+  }
+
+  public <C extends Comparator<T>> void setSortingOptions(SortingOptions<C, T> sortingOptions) {
+    this.sortingOptions = sortingOptions;
   }
 
   @Override
@@ -56,6 +68,19 @@ public abstract class ListPage<T> extends MenuPage {
         builder.getSize() - 1,
         movePageButton(1, pageSize)
     );
+
+    if (sortingOptions != null) {
+      Comparator<T>[] values = sortingOptions.values();
+      Slot sortSlot = Slot.of(8, 1);
+
+      for (int i = 0; i < values.length; i++) {
+        Comparator<T> val = values[i];
+        Slot slot = sortSlot.add(0, i);
+
+        MenuNode node = createSortingSlot(val, (SortingOptions) sortingOptions);
+        builder.add(slot, node);
+      }
+    }
 
     // Fill page with entries
     // The entries exist constantly, it's just that
@@ -109,6 +134,65 @@ public abstract class ListPage<T> extends MenuPage {
               .build()
       );
     }
+  }
+
+  private <C extends Comparator<T>> MenuNode createSortingSlot(
+      C option,
+      SortingOptions<C, T> options
+  ) {
+    return MenuNode.builder()
+        .setItem((user, context) -> {
+          var builder = ItemStacks.builder(Material.RED_STAINED_GLASS_PANE);
+
+          C selected = user.get(options.getProperty());
+
+          boolean isSelected = Objects.equals(selected, option);
+          boolean inverted = user.get(options.inversionProperty());
+
+          String namePrefix;
+
+          if (isSelected) {
+            builder.addEnchant(Enchantment.BINDING_CURSE, 1)
+                .addFlags(ItemFlag.HIDE_ENCHANTS);
+
+            if (inverted) {
+              namePrefix = "▲";
+              builder.addLore("Click to sort by descending");
+            } else {
+              namePrefix = "▼";
+              builder.addLore("Click to sort by ascending");
+            }
+
+            namePrefix += " ";
+          } else {
+            namePrefix = "";
+            builder.addLore("Click to select");
+          }
+
+          builder.addLore("&7Set the order in which")
+              .addLore("&7" + options.categoryName() + " are displayed");
+
+          builder.setName(
+              Component.text(namePrefix + options.displayName(option), NamedTextColor.AQUA)
+          );
+
+          return builder.build();
+        })
+
+        .setRunnable((user, context, click) -> {
+          C selected = user.get(options.getProperty());
+          boolean isSelected = Objects.equals(option, selected);
+
+          if (isSelected) {
+            user.flip(options.inversionProperty());
+          } else {
+            user.set(options.getProperty(), option);
+            user.set(options.inversionProperty(), false);
+          }
+
+          click.shouldReloadMenu(true);
+        })
+        .build();
   }
 
   protected abstract List<T> getList(User user, Context context);
@@ -194,5 +278,17 @@ public abstract class ListPage<T> extends MenuPage {
 
     setPage(0, context);
     super.onClick(user, context, click);
+  }
+
+  public interface SortingOptions<C extends Comparator<T>, T> {
+    UserProperty<C> getProperty();
+
+    UserProperty<Boolean> inversionProperty();
+
+    C[] values();
+
+    String displayName(C c);
+
+    String categoryName();
   }
 }
