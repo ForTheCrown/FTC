@@ -40,14 +40,15 @@ import org.slf4j.Logger;
 public class RoyalSword extends ExtendedItem {
   private static final Logger LOGGER = Loggers.getLogger();
 
-  public static final String
-      TAG_RANK = "rank",
-      TAG_LAST_FLAVOR = "lastFlavorChange",
-      TAG_EXTRA_DATA = "extraData",
-      TAG_GOALS = "goals",
-      TAG_ABILITY = "ability",
-      TAG_ABILITY_TYPE = "abilityType",
-      TAG_ABILITY_USES = "abilityUses";
+  public static final String TAG_RANK = "rank";
+  public static final String TAG_LAST_FLAVOR = "lastFlavorChange";
+  public static final String TAG_EXTRA_DATA = "extraData";
+  public static final String TAG_GOALS = "goals";
+  public static final String TAG_ABILITY = "ability";
+  public static final String TAG_ABILITY_TYPE = "abilityType";
+  public static final String TAG_ABILITY_USES = "abilityUses";
+
+  public static final int SWORD_MODEL_ID = 133501;
 
   public static final Component BORDER = Component.text(
       "                              ",
@@ -83,6 +84,8 @@ public class RoyalSword extends ExtendedItem {
 
   @Override
   protected void onUpdate(ItemStack item, ItemMeta meta) {
+    meta.setCustomModelData(SWORD_MODEL_ID);
+
     if (rank == null) {
       incrementRank(item);
     }

@@ -75,6 +75,9 @@ public class RoyalSwordType implements ExtendedItemType<RoyalSword> {
         .setNameRaw(RANK_1_NAME)
         .setUnbreakable(true)
         .setFlags(ItemFlag.HIDE_ATTRIBUTES)
+        .editMeta(meta -> {
+          meta.setCustomModelData(RoyalSword.SWORD_MODEL_ID);
+        })
         .addEnchant(DungeonEnchantments.SOUL_BOUND, 1);
   }
 }
