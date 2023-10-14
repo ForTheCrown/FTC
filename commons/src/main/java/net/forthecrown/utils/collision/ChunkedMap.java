@@ -222,7 +222,7 @@ public class ChunkedMap<T> {
   public @NotNull Set<T> get(@NotNull Vector3i pos) {
     Objects.requireNonNull(pos, "pos");
 
-    if (isEmpty() || totalArea.contains(pos)) {
+    if (isEmpty() || !totalArea.contains(pos)) {
       return ObjectSets.emptySet();
     }
 
