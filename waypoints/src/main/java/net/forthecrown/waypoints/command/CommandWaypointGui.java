@@ -12,6 +12,7 @@ import net.forthecrown.user.User;
 import net.forthecrown.waypoints.WPermissions;
 import net.forthecrown.waypoints.Waypoint;
 import net.forthecrown.waypoints.WaypointManager;
+import net.forthecrown.waypoints.WaypointProperties;
 import net.forthecrown.waypoints.menu.WaypointMenus;
 import org.jetbrains.annotations.Nullable;
 
@@ -62,6 +63,10 @@ public class CommandWaypointGui extends FtcCommand {
       open = WaypointMenus.LIST_PAGE;
     } else {
       if (residents) {
+        if (waypoint.get(WaypointProperties.HIDE_RESIDENTS)) {
+          return 0;
+        }
+
         open = WaypointMenus.RESIDENTS_LIST;
       } else if (!waypoint.canEdit(user)) {
         open = WaypointMenus.NO_PERMS;
