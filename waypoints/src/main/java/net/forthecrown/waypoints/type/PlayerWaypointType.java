@@ -13,6 +13,7 @@ import net.forthecrown.user.name.DisplayIntent;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.math.Bounds3i;
 import net.forthecrown.waypoints.WExceptions;
+import net.forthecrown.waypoints.WMessages;
 import net.forthecrown.waypoints.Waypoint;
 import net.forthecrown.waypoints.WaypointManager;
 import net.forthecrown.waypoints.WaypointPrefs;
@@ -64,6 +65,8 @@ public class PlayerWaypointType extends WaypointType {
 
     creator.setTimeToNow(TimeField.LAST_MOVEIN);
     creator.set(WaypointPrefs.HOME_PROPERTY, waypoint.getId());
+
+    creator.sendMessage(WMessages.HOME_WAYPOINT_SET);
   }
 
   @Override

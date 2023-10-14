@@ -15,7 +15,7 @@ public interface WMessages {
 
   Component HOME_WAYPOINT_SET = text(
       """
-      Set home waypoint.
+      Home waypoint set.
       Use /invite <player> to invite others\s
       Use /home to come to this waypoint when near another waypoint.
       """.trim(),
