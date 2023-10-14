@@ -128,6 +128,10 @@ public class EditMenu extends MenuPage {
             throw Exceptions.create("Item has no custom name");
           }
 
+          if (!ItemStacks.hasTagElement(meta, "region_ticket")) {
+            throw Exceptions.create("Not a region naming ticket!");
+          }
+
           String plainName = Text.plain(meta.displayName());
           validateName(plainName);
 
