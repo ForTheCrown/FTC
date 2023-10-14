@@ -24,6 +24,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -68,6 +69,10 @@ public class WeaponListener implements Listener {
   // interactions with air blocks will be cancelled
   @EventHandler
   public void onPlayerInteract(PlayerInteractEvent event) {
+    if (event.getAction() == Action.PHYSICAL) {
+      return;
+    }
+
     onInteract(event, null, event.getClickedBlock(), event.getAction().isLeftClick());
   }
 
