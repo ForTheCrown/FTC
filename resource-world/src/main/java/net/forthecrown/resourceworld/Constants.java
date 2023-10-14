@@ -13,7 +13,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.levelgen.Heightmap;
 import org.bukkit.HeightMap;
-import org.bukkit.craftbukkit.v1_20_R1.CraftHeightMap;
+import org.bukkit.craftbukkit.v1_20_R2.CraftHeightMap;
 
 public final class Constants {
   private Constants() {}

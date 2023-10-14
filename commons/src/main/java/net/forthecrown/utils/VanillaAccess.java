@@ -4,6 +4,7 @@ import com.mojang.datafixers.DataFixer;
 import io.papermc.paper.util.StacktraceDeobfuscator;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.lang.reflect.Field;
+import java.util.IdentityHashMap;
 import java.util.Locale;
 import java.util.Map;
 import net.forthecrown.Loggers;
@@ -42,15 +43,15 @@ import org.bukkit.block.TileState;
 import org.bukkit.block.banner.PatternType;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlockEntityState;
-import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlockStates;
-import org.bukkit.craftbukkit.v1_20_R1.block.CraftCommandBlock;
-import org.bukkit.craftbukkit.v1_20_R1.block.data.CraftBlockData;
-import org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_20_R1.util.CraftNamespacedKey;
+import org.bukkit.craftbukkit.v1_20_R2.CraftServer;
+import org.bukkit.craftbukkit.v1_20_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_20_R2.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_20_R2.block.CraftBlockEntityState;
+import org.bukkit.craftbukkit.v1_20_R2.block.CraftBlockStates;
+import org.bukkit.craftbukkit.v1_20_R2.block.CraftCommandBlock;
+import org.bukkit.craftbukkit.v1_20_R2.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_20_R2.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_20_R2.util.CraftNamespacedKey;
 import org.bukkit.entity.Player;
 import org.slf4j.Logger;
 import org.spongepowered.math.vector.Vector3i;
@@ -203,13 +204,30 @@ public final class VanillaAccess {
       Field frozen = findFrozenField(registry.getClass());
       frozen.setAccessible(true);
 
+      boolean currentlyFrozen = frozen.getBoolean(registry);
+
+      if (!currentlyFrozen) {
+        return;
+      }
+
       frozen.setBoolean(registry, false);
+
+      Field intrusiveMapField = intrusiveHolderField(registry.getClass());
+      intrusiveMapField.setAccessible(true);
+      intrusiveMapField.set(registry, new IdentityHashMap<>());
+
     } catch (Exception e) {
       throw new IllegalStateException(e);
     }
   }
 
   private static final String FROZEN_FIELD = "ca";
+
+  private static Field intrusiveHolderField(Class<?> c) throws NoSuchFieldException {
+    Field f = c.getDeclaredField("m");
+    f.setAccessible(true);
+    return f;
+  }
 
   private static Field findFrozenField(Class<?> c) throws NoSuchFieldException {
     for (var f : c.getDeclaredFields()) {

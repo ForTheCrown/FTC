@@ -9,7 +9,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 
-const val MC_VERSION = "1.20.1"
+const val MC_VERSION = "1.20.2"
 const val API_VERSION = "1.20"
 const val NMS_DEPENDENCY = "io.papermc.paper:dev-bundle:${MC_VERSION}-R0.1-SNAPSHOT"
 const val NMS_CONFIG_NAME = "paperweightDevelopmentBundle"

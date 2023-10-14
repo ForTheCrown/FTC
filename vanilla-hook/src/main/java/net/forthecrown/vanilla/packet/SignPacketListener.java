@@ -18,14 +18,14 @@ import net.minecraft.world.level.block.entity.SignBlockEntity;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Sign;
-import org.bukkit.craftbukkit.v1_20_R1.block.CraftHangingSign;
-import org.bukkit.craftbukkit.v1_20_R1.block.CraftSign;
+import org.bukkit.craftbukkit.v1_20_R2.block.CraftHangingSign;
+import org.bukkit.craftbukkit.v1_20_R2.block.CraftSign;
 
 class SignPacketListener {
 
   private final ListenersImpl renderer;
 
-  private static final int COMPATIBLE_VERSION = 3465;
+  private static final int COMPATIBLE_VERSION = 3578;
 
   private Field ClientboundLevelChunkPacketData_blockEntitiesData;
 

@@ -10,8 +10,8 @@ plugins {
 version = "1.0.0-SNAPSHOT"
 group = "net.forthecrown"
 
-val grenadier      = "net.forthecrown:grenadier:2.1.6"
-val grenadierAnnot = "net.forthecrown:grenadier-annotations:1.2.5"
+val grenadier      = "net.forthecrown:grenadier:2.2.0"
+val grenadierAnnot = "net.forthecrown:grenadier-annotations:1.3.0"
 val mathlib        = "org.spongepowered:math:2.1.0-SNAPSHOT"
 val toml           = "org.tomlj:tomlj:1.1.0"
 val configurate    = "org.spongepowered:configurate-core:4.1.2"

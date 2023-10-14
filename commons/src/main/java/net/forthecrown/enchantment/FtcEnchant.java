@@ -35,6 +35,7 @@ public abstract class FtcEnchant extends Enchantment {
     this.target = type;
     this.slots = Set.of(slots);
 
+    FtcEnchants.openForRegistrations();
     handle = new EnchantHandle(this, type, slots);
   }
 
