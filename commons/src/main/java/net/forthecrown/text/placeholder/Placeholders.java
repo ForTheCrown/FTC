@@ -2,8 +2,11 @@ package net.forthecrown.text.placeholder;
 
 import java.util.UUID;
 import net.forthecrown.BukkitServices;
+import net.forthecrown.text.PlayerMessage;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
 /**
@@ -26,6 +29,12 @@ public final class Placeholders {
 
   public static PlaceholderRenderer newRenderer() {
     return getService().newRenderer();
+  }
+
+  public static Component renderString(String str, Audience viewer) {
+    var message = PlayerMessage.allFlags(str).create(viewer);
+    var renderer = newRenderer().useDefaults();
+    return renderer.render(message, viewer);
   }
 
   public static void addDefault(String name, TextPlaceholder placeholder) {
