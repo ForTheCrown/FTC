@@ -27,4 +27,8 @@ pluginYml {
   depends {
     required("dynmap")
   }
+
+  loadAfter {
+    regular("project:vanilla-hook")
+  }
 }

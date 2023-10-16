@@ -23,6 +23,7 @@ import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.waypoints.WPermissions;
 import net.forthecrown.waypoints.Waypoint;
 import net.forthecrown.waypoints.WaypointManager;
+import net.forthecrown.waypoints.WaypointProperties;
 import net.forthecrown.waypoints.WaypointProperty;
 import net.forthecrown.waypoints.Waypoints;
 import net.forthecrown.waypoints.WaypointsPlugin;
@@ -323,6 +324,8 @@ public class CommandWaypoints extends FtcCommand {
       waypoint.updateNameSign();
       waypoint.setLightBlock(true);
       waypoint.setEditSign(true);
+
+      waypoint.set(WaypointProperties.INVULNERABLE, true);
 
       updated++;
     }
