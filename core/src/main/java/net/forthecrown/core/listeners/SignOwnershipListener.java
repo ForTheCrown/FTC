@@ -32,13 +32,17 @@ public class SignOwnershipListener implements Listener {
 
   @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
   public void onPlayerInteract(PlayerInteractEvent event) {
-    if (!event.getAction().isRightClick()) {
+    if (!event.getAction().isRightClick() ) {
       return;
     }
 
     BlockState state = event.getClickedBlock().getState();
 
     if (!(state instanceof Sign sign)) {
+      return;
+    }
+
+    if (sign.isWaxed())  {
       return;
     }
 
