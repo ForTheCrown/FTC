@@ -3,10 +3,12 @@ package net.forthecrown.scripts;
 import com.google.common.base.Strings;
 import com.mojang.datafixers.util.Unit;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -19,13 +21,16 @@ import net.forthecrown.scripts.module.ModuleManager;
 import net.forthecrown.scripts.module.ScriptModule;
 import net.forthecrown.scripts.module.ScriptableModule;
 import net.forthecrown.scripts.modules.ScoreboardModule;
+import net.forthecrown.scripts.modules.WorldsObject;
 import net.forthecrown.utils.Result;
 import net.forthecrown.utils.io.source.Source;
 import net.forthecrown.utils.io.source.Sources;
 import org.mozilla.javascript.NativeJavaClass;
 import org.mozilla.javascript.NativeObject;
+import org.mozilla.javascript.ScriptRuntime;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.TopLevel;
 import org.slf4j.Logger;
 
 class ModuleManagerImpl implements ModuleManager {
@@ -33,6 +38,8 @@ class ModuleManagerImpl implements ModuleManager {
   private static final Logger LOGGER = Loggers.getLogger();
 
   private final Map<String, JsModule> moduleMap = new Object2ObjectOpenHashMap<>();
+  private final Set<String> autoImported = new ObjectOpenHashSet<>();
+
   private final ScriptManager service;
 
   public ModuleManagerImpl(ScriptManager service) {
@@ -41,6 +48,9 @@ class ModuleManagerImpl implements ModuleManager {
 
   public void addBuiltIns() {
     addModule("scoreboard", ScoreboardModule.MODULE);
+    addModule("worlds", WorldsObject.MODULE);
+
+    //setAutoModule("worlds", true);
   }
 
   @Override
@@ -60,6 +70,30 @@ class ModuleManagerImpl implements ModuleManager {
   }
 
   @Override
+  public Result<Unit> setAutoModule(String name, boolean state) {
+    if (Strings.isNullOrEmpty(name)) {
+      return Result.error("Null name");
+    }
+    if (!moduleMap.containsKey(name)) {
+      return Result.error("No module with specified name");
+    }
+
+    if (state) {
+      if (!autoImported.add(name)) {
+        return Result.error("Module already set as auto import");
+      }
+
+      return Result.success(Unit.INSTANCE);
+    }
+
+    if (!autoImported.remove(name)) {
+      return Result.error("Module is already non-auto imported");
+    }
+
+    return Result.success(Unit.INSTANCE);
+  }
+
+  @Override
   public Optional<JsModule> getModule(String name) {
     return Optional.ofNullable(moduleMap.get(name));
   }
@@ -67,6 +101,40 @@ class ModuleManagerImpl implements ModuleManager {
   @Override
   public void remove(String moduleName) {
     moduleMap.remove(moduleName);
+    autoImported.remove(moduleName);
+  }
+
+  public Result<Unit> applyAutoImports(Script script) {
+    Result<Unit> result = Result.success(Unit.INSTANCE);
+    Set<String> alreadyImported = new HashSet<>();
+
+    for (String s : autoImported) {
+      JsModule module = moduleMap.get(s);
+
+      if (module == null) {
+        continue;
+      }
+
+      Result<Unit> importResult = importModule(
+          module,
+          new ImportInfo(true, s, s, List.of()),
+          script.getScriptObject()
+      );
+
+      if (importResult.isError()) {
+        if (!alreadyImported.isEmpty()) {
+          alreadyImported.forEach(script::remove);
+          alreadyImported.clear();
+        }
+      }
+
+      result = result.combine(importResult, (s1, s2) -> s1 + "; " + s2, (unit, unit2) -> {
+        alreadyImported.add(s);
+        return unit;
+      });
+    }
+
+    return result;
   }
 
   @Override
@@ -249,7 +317,9 @@ class ModuleManagerImpl implements ModuleManager {
     Scriptable dest;
 
     if (aliased) {
-      dest = new NativeObject();
+      var destObject = new NativeObject();
+      ScriptRuntime.setBuiltinProtoAndParent(destObject, scope, TopLevel.Builtins.Object);
+      dest = destObject;
     } else {
       dest = scope;
     }
