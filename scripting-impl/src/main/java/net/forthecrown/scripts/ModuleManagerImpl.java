@@ -95,6 +95,9 @@ class ModuleManagerImpl implements ModuleManager {
 
   @Override
   public Optional<JsModule> getModule(String name) {
+    if (Strings.isNullOrEmpty(name)) {
+      return Optional.empty();
+    }
     return Optional.ofNullable(moduleMap.get(name));
   }
 
