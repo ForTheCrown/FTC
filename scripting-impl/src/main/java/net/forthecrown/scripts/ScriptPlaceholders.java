@@ -1,5 +1,6 @@
 package net.forthecrown.scripts;
 
+import net.forthecrown.Loggers;
 import net.forthecrown.text.Text;
 import net.forthecrown.text.placeholder.PlaceholderContext;
 import net.forthecrown.text.placeholder.Placeholders;
@@ -44,7 +45,13 @@ class ScriptPlaceholders {
   }
 
   private static Component compileAndExec(Script script, PlaceholderContext ctx) {
-    script.compile();
+    try {
+      script.compile();
+    } catch (ScriptLoadException exc) {
+      Loggers.getLogger().error("Error compiling script {}", script, exc);
+      return null;
+    }
+
     script.put("viewer", ctx.viewer());
     script.put("renderer", ctx.renderer());
 
