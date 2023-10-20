@@ -291,6 +291,11 @@ public class RhinoScript implements Script {
         imported.forEach(this::runtimeImport);
       }
 
+      var modules = service.getModules();
+      modules.applyAutoImports(this).orThrow(s -> {
+        return new ScriptLoadException("Failed to auto-import modules: " + s);
+      });
+
       var callbackResult = processor.runCallbacks(this);
 
       if (callbackResult.isError()) {
@@ -316,17 +321,6 @@ public class RhinoScript implements Script {
     return array;
   }
 
-  private NativeObject evalScope() {
-    if (evaluationScope != null) {
-      return evaluationScope;
-    }
-
-    evaluationScope = new NativeObject();
-    evaluationScope.setParentScope(bindingScope);
-
-    return evaluationScope;
-  }
-
   @Override
   public ExecResult<Object> evaluate() {
     if (compiled == null) {
@@ -335,7 +329,7 @@ public class RhinoScript implements Script {
 
     try (Context ctx = enterContext()) {
       try {
-        Object o = compiled.exec(ctx, evalScope());
+        Object o = compiled.exec(ctx, evaluationScope);
         return ExecResultImpl.success(transformResult(o), this);
       } catch (Throwable t) {
         return ExecResultImpl.wrap(t, this);
