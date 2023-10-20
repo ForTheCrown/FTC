@@ -1,11 +1,14 @@
 package net.forthecrown.scripts.modules;
 
 import java.util.Optional;
+import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.scripts.ScriptUtils;
 import net.forthecrown.scripts.module.JsModule;
+import net.forthecrown.user.User;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.RenderType;
@@ -221,7 +224,7 @@ public class ScoreboardModule extends IdScriptableObject {
 
       case ID_getScore -> {
         String name = ScriptRuntime.toString(args, 0);
-        String playerName = ScriptRuntime.toString(args, 1);
+        String playerName = getEntryName(args, 1);
 
         yield getObjective(name)
             .flatMap(objective -> {
@@ -344,9 +347,31 @@ public class ScoreboardModule extends IdScriptableObject {
     };
   }
 
+  String getEntryName(Object[] args, int index) {
+    if (args.length <= index) {
+      return "undefined";
+    }
+
+    Object arg = Context.jsToJava(args[index], Object.class);
+
+    if (arg instanceof CommandSender entity) {
+      return entity.getName();
+    }
+
+    if (arg instanceof User user) {
+      return user.getName();
+    }
+
+    if (arg instanceof CommandSource source) {
+      return source.asBukkit().getName();
+    }
+
+    return String.valueOf(arg);
+  }
+
   boolean modifyScore(Object[] args, int action) {
     String name = ScriptRuntime.toString(args, 0);
-    String playerName = ScriptRuntime.toString(args, 1);
+    String playerName = getEntryName(args, 1);
     int scoreValue;
 
     if (action != -2) {
