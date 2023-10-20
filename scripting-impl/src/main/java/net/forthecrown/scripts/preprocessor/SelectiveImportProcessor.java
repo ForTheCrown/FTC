@@ -1,6 +1,7 @@
 package net.forthecrown.scripts.preprocessor;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.MatchResult;
@@ -15,7 +16,7 @@ class SelectiveImportProcessor extends RegexProcessor {
 
   public SelectiveImportProcessor() {
     super(Pattern.compile(
-        "import\s+\\{([a-zA-Z0-9_$, \\s]+)}(?:\s+as\s+([a-zA-Z0-9_$]+))?\s+from\s+\"([^\"]+)\";?"
+        "import\\s+\\{([a-zA-Z0-9_$, \\s]+)}(?:\\s+as\\s+([a-zA-Z0-9_$]+))?\\s+from\\s+\"([^\"]+)\";?"
     ));
   }
 
@@ -34,7 +35,7 @@ class SelectiveImportProcessor extends RegexProcessor {
 
     writer.deleteInput();
 
-    JsImport jsImport = new JsImport(true, path, alias, list);
+    JsImport jsImport = new JsImport(!Strings.isNullOrEmpty(alias), path, alias, list);
     callbacks.add(jsImport);
   }
 
