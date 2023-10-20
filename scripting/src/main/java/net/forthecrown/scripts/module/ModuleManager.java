@@ -4,7 +4,35 @@ import com.mojang.datafixers.util.Unit;
 import java.util.Optional;
 import net.forthecrown.scripts.Script;
 import net.forthecrown.utils.Result;
+import org.mozilla.javascript.Scriptable;
 
+/**
+ * Script module manager. Modules registered within this manager can be imported by scripts and
+ * used.
+ * <p>
+ * Custom modules can be created by implementing {@link Scriptable} and registering a
+ * {@link JsModule} instance that creates the implemented class.
+ * <br>
+ * Example: <pre><code>
+ * class SomeModule extends ScriptableObject {
+ *
+ *   public static final JsModule MODULE = scope -> {
+ *     SomeModule mod = new SomeModule();
+ *     mod.setParentScope(scope);
+ *     return mod;
+ *   }
+ *
+ *   &#064;Override
+ *   public Object get(String key, Scriptable start) {
+ *     return NOT_FOUND;
+ *   }
+ * }
+ * </code></pre>
+ * Then register it with <pre><code>
+ * ModuleManager manager = // ...
+ * manager.addModule("some_module", SomeModule.MODULE);
+ * </code></pre>
+ */
 public interface ModuleManager {
 
   /**
@@ -32,9 +60,20 @@ public interface ModuleManager {
    */
   Result<Unit> setAutoModule(String name, boolean state);
 
+  /**
+   * Gets a registered module.
+   * @param name Module's name
+   * @return Module optional
+   */
   Optional<JsModule> getModule(String name);
 
-  Result<Unit> importInto(Script script, ImportInfo info);
-
+  /**
+   * Remove a module with the specified {@code name}. If the module is marked as 'auto-import', then
+   * it will be removed from the auto-import list.
+   *
+   * @param moduleName Module's name
+   */
   void remove(String moduleName);
+
+  Result<Unit> importInto(Script script, ImportInfo info);
 }
