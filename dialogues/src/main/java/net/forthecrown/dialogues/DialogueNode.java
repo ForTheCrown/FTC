@@ -63,7 +63,7 @@ public class DialogueNode implements Predicate<User>, UserClickCallback {
       builder.onView(user -> {
         try (var viewScript = viewScriptSupplier.get()) {
           viewScript.put("reader", user);
-          viewScript.evaluate();
+          viewScript.evaluate().logError();
         }
       });
     }
@@ -126,7 +126,7 @@ public class DialogueNode implements Predicate<User>, UserClickCallback {
       Script script = supplier.get();
 
       script.put("reader", user);
-      var result = script.evaluate();
+      var result = script.evaluate().logError();
 
       if (!result.isSuccess()) {
         script.close();
