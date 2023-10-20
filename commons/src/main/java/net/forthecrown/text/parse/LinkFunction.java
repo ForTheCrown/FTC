@@ -30,7 +30,8 @@ public class LinkFunction extends TextFunction {
 
   @Override
   public boolean filter(MatchResult result, TextContext context) {
-    return !result.group().startsWith("${");
+    return !result.group().endsWith("}")
+        && !result.group().startsWith("${");
   }
 
   @Override
