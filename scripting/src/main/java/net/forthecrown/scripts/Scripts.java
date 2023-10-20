@@ -49,8 +49,13 @@ public final class Scripts {
   }
 
   public static Source scriptFileSource(String filePath) {
+    if (!filePath.endsWith(".js")) {
+      filePath += ".js";
+    }
+
     Path scriptsDir = getService().getScriptsDirectory();
     Path file = scriptsDir.resolve(filePath);
+
     return Sources.fromPath(file, scriptsDir);
   }
 
