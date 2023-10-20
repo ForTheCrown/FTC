@@ -16,8 +16,6 @@ import org.slf4j.Logger;
 
 public interface Script extends AutoCloseable {
 
-  Object NOT_FOUND = Scriptable.NOT_FOUND;
-
   /**
    * Gets the script source
    * @return Script source
@@ -124,8 +122,8 @@ public interface Script extends AutoCloseable {
    * Gets a value in the script's bindings.
    *
    * @param bindingName Binding name
-   * @return Binding value, or {@code null}, if the value is null, or {@link #NOT_FOUND} if the
-   *         value doesn't exist
+   * @return Binding value, or {@code null}, if the value is null, or {@link Scriptable#NOT_FOUND}
+   *         if the value doesn't exist
    *
    * @throws IllegalStateException If {@link #isCompiled()} returns false
    */
