@@ -97,6 +97,7 @@ public class PackManager {
     }
 
     Optional<PackMeta> result = PackLoader.load(element, new LoadContext(directory, this))
+        .mapError(s -> "Failed to load script pack '" + key + "': " + s)
         .resultOrPartial(LOGGER::error);
 
     if (result.isEmpty()) {

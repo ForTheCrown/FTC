@@ -53,11 +53,11 @@ public class PackLoader {
     JsonWrapper json = JsonWrapper.wrap(element.getAsJsonObject());
 
     if (!json.has("main-script")) {
-      return Results.error("No main set");
+      return Results.error("No 'main-script' set");
     }
 
     DataResult<Path> main = getScriptFile(json.get("main-script"), context.directory())
-        .mapError(string -> "Couldn't load main-script: " + string);
+        .mapError(string -> "Couldn't load 'main-script': " + string);
 
     if (main.error().isPresent()) {
       return Results.cast(main);
