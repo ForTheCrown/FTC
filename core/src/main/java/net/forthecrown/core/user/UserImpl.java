@@ -1,7 +1,6 @@
 package net.forthecrown.core.user;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import it.unimi.dsi.fastutil.objects.ObjectArrays;
 import java.time.Duration;
@@ -31,9 +30,6 @@ import net.forthecrown.core.user.UserLookupImpl.UserLookupEntry;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Grenadier;
 import net.forthecrown.text.Text;
-import net.forthecrown.text.ViewerAwareMessage;
-import net.forthecrown.text.channel.ChannelledMessage;
-import net.forthecrown.text.channel.MessageHandler;
 import net.forthecrown.user.NameRenderFlags;
 import net.forthecrown.user.Properties;
 import net.forthecrown.user.TimeField;
@@ -48,12 +44,10 @@ import net.forthecrown.user.name.DisplayContext;
 import net.forthecrown.user.name.DisplayIntent;
 import net.forthecrown.user.name.UserNameFactory;
 import net.forthecrown.utils.ArrayIterator;
-import net.forthecrown.utils.Audiences;
 import net.forthecrown.utils.Locations;
 import net.forthecrown.utils.Time;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.node.Node;
 import net.luckperms.api.node.types.PermissionNode;
@@ -94,12 +88,6 @@ public final class UserImpl implements User {
 
   private Location entityLocation;
   private Location returnLocation;
-
-  @Getter
-  private boolean afk;
-
-  @Getter
-  private ViewerAwareMessage afkReason;
 
   @Getter @Setter
   boolean online;
@@ -414,106 +402,6 @@ public final class UserImpl implements User {
     );
 
     return entry;
-  }
-
-  @Override
-  public void setAfk(boolean afk, @Nullable ViewerAwareMessage reason) throws UserOfflineException {
-    ensureOnline();
-    ensureValid();
-
-    this.afk = afk;
-
-    if (afk) {
-      this.afkReason = reason;
-    } else {
-      this.afkReason = null;
-    }
-
-    updateTabName();
-  }
-
-  @Override
-  public long getAfkTime() {
-    if (isAfk()) {
-      long afkStart = getTime(TimeField.AFK_START);
-      return Time.timeSince(afkStart) + getTime(TimeField.AFK_TIME);
-    }
-
-    return getTime(TimeField.AFK_TIME);
-  }
-
-  @Override
-  public void afk(@Nullable ViewerAwareMessage reason)
-      throws IllegalStateException, UserOfflineException
-  {
-    ensureOnline();
-    Preconditions.checkState(!isAfk(), "User is already AFK");
-    ensureValid();
-
-    setAfk(true , reason);
-
-    ViewerAwareMessage nonNullReason = reason == null
-        ? ViewerAwareMessage.wrap(Component.empty())
-        : reason;
-
-    ChannelledMessage channelled = ChannelledMessage.create(nonNullReason)
-        .setSource(this)
-        .setBroadcast()
-        .setChannelName("afk");
-
-    channelled.setRenderer((viewer, baseMessage) -> {
-      Component displayName;
-
-      if (Audiences.equals(viewer, this)) {
-        displayName = Component.text("You are");
-      } else {
-        displayName = Component.text()
-            .append(displayName(viewer))
-            .append(Component.text(" is"))
-            .build();
-      }
-
-      Component suffix;
-
-      if (Text.isEmpty(baseMessage)) {
-        suffix = Component.text(".");
-      } else {
-        suffix = Component.text(": ").append(baseMessage);
-      }
-
-      return Text.format("{0} now AFK{1}", NamedTextColor.GRAY, displayName, suffix);
-    });
-
-    channelled.setHandler(MessageHandler.EMPTY_IF_VIEWER_WAS_REMOVED);
-    channelled.send();
-  }
-
-  @Override
-  public void unafk() throws IllegalStateException, UserOfflineException {
-    ensureOnline();
-    Preconditions.checkState(afk, "User is not AFK");
-    ensureValid();
-
-    setAfk(false, null);
-
-    ChannelledMessage.announce(viewer -> {
-      Component displayName;
-
-      if (Audiences.equals(this, viewer)) {
-        displayName = Component.text("You are");
-      } else {
-        displayName = Component.text()
-            .append(displayName(viewer))
-            .append(Component.text(" is"))
-            .build();
-      }
-
-      return Component.text()
-          .color(NamedTextColor.GRAY)
-          .append(displayName)
-          .append(Component.text(" no longer AFK."))
-          .build();
-    });
   }
 
   @Override

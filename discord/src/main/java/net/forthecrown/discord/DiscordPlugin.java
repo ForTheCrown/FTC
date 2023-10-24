@@ -30,7 +30,7 @@ public class DiscordPlugin extends JavaPlugin {
     DiscordSRV.api.subscribe(new AnnouncementForwardingListener(this));
 
     var nameFactory = Users.getService().getNameFactory();
-    nameFactory.addProfileField("discord_id", new DiscordProfileField());
+    nameFactory.addProfileField("discord_id", 36, new DiscordProfileField());
   }
 
   @Override

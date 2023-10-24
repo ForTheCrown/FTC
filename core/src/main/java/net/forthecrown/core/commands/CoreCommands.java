@@ -95,7 +95,6 @@ public final class CoreCommands {
     new CommandList();
     new CommandHat();
     new CommandBack();
-    new CommandAfk();
     new CommandSettings();
     new CommandTell();
     new CommandReply();

@@ -30,7 +30,7 @@ public class MarriagePlugin extends JavaPlugin {
     Marriages.defineSettings(ftcServer.getGlobalSettingsBook());
 
     var nameFactory = Users.getService().getNameFactory();
-    nameFactory.addProfileField("spouse", new SpouseProfileElement());
+    nameFactory.addProfileField("spouse", 35, new SpouseProfileElement());
   }
 
   @Override

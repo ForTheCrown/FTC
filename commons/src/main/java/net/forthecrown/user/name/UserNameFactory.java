@@ -123,9 +123,10 @@ public interface UserNameFactory {
    * whenever a player views a user's profile with {@code /profile}
    *
    * @param id Element ID
+   * @param priority Element priotity, lower means element is rendered first
    * @param element Profile element
    */
-  void addProfileField(String id, ProfileDisplayElement element);
+  void addProfileField(String id, int priority, ProfileDisplayElement element);
 
   /**
    * Removes a profile display field
@@ -140,9 +141,10 @@ public interface UserNameFactory {
    * This element will only be displayed if the profile viewer is an 'admin'
    *
    * @param id Element ID
+   * @param priority Element priotity, lower means element is rendered first
    * @param element Profile element
    */
-  void addAdminProfileField(String id, ProfileDisplayElement element);
+  void addAdminProfileField(String id, int priority, ProfileDisplayElement element);
 
   /**
    * Removes a profile display field

@@ -2,6 +2,7 @@ package net.forthecrown.usables.actions;
 
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Optional;
@@ -16,12 +17,14 @@ import net.forthecrown.text.Text;
 import net.forthecrown.usables.Action;
 import net.forthecrown.usables.BuiltType;
 import net.forthecrown.usables.Interaction;
-import net.forthecrown.usables.UsableComponent;
 import net.forthecrown.usables.ObjectType;
+import net.forthecrown.usables.UsableComponent;
+import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.io.FtcCodecs;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.sound.Sound.Source;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
@@ -51,7 +54,9 @@ public class SoundAction implements Action {
     return instance
         .group(
             SOUND_CODEC.fieldOf("sound").forGetter(o -> o.sound),
-            Codec.DOUBLE.optionalFieldOf("play_radius", 0.0D).forGetter(o -> o.playRadius)
+            Codec.DOUBLE.optionalFieldOf("play_radius", 0.0D).forGetter(o -> o.playRadius),
+            Codec.INT.optionalFieldOf("tick_delay", 0).forGetter(o -> o.tickDelay),
+            Codec.INT.optionalFieldOf("repeats", 1).forGetter(o -> o.repeat)
         )
 
         .apply(instance, SoundAction::new);
@@ -80,6 +85,18 @@ public class SoundAction implements Action {
       .setDefaultValue(Source.MASTER)
       .build();
 
+  static final ArgumentOption<Integer> TICK_DELAY
+      = Options.argument(IntegerArgumentType.integer(0))
+      .setLabel("tick-delay")
+      .setDefaultValue(0)
+      .build();
+
+  static final ArgumentOption<Integer> REPEAT
+      = Options.argument(IntegerArgumentType.integer(1))
+      .setLabel("repeat")
+      .setDefaultValue(1)
+      .build();
+
   static final ArgumentOption<Double> PLAY_RADIUS = Options.argument(DoubleArgumentType.doubleArg(0d))
       .setLabel("play-radius")
       .setDefaultValue(0d)
@@ -88,6 +105,8 @@ public class SoundAction implements Action {
   static final OptionsArgument OPTIONS = OptionsArgument.builder()
       .addRequired(SOUND)
       .addOptional(PITCH)
+      .addOptional(TICK_DELAY)
+      .addOptional(REPEAT)
       .addOptional(VOLUME)
       .addOptional(CHANNEL)
       .addOptional(PLAY_RADIUS)
@@ -109,8 +128,10 @@ public class SoundAction implements Action {
             .build();
 
         double radius = options.getValue(PLAY_RADIUS);
+        int delay = options.getValue(TICK_DELAY);
+        int repeats = options.getValue(REPEAT);
 
-        return new SoundAction(sound, radius);
+        return new SoundAction(sound, radius, delay, repeats);
       })
 
       .suggester(OPTIONS::listSuggestions)
@@ -118,14 +139,32 @@ public class SoundAction implements Action {
 
   private final Sound sound;
   private final double playRadius;
+  private final int tickDelay;
+  private final int repeat;
 
-  public SoundAction(Sound sound, double playRadius) {
-    this.sound = sound;
+  public SoundAction(Sound sound, double playRadius, int tickDelay, int repeat) {
+    this.sound      = sound;
     this.playRadius = playRadius;
+    this.tickDelay  = tickDelay;
+    this.repeat     = repeat;
   }
 
   @Override
   public void onUse(Interaction interaction) {
+    int times = Math.max(repeat, 1);
+
+    for (int i = 1; i <= times; i++) {
+      int delay = tickDelay * i;
+
+      if (delay <= 0) {
+        playSound(interaction);
+      } else {
+        Tasks.runLater(() -> playSound(interaction), delay);
+      }
+    }
+  }
+
+  private void playSound(Interaction interaction) {
     Optional<Location> locationOpt = interaction.getValue("location", Location.class);
 
     if (playRadius <= 0 || locationOpt.isEmpty()) {
@@ -141,12 +180,25 @@ public class SoundAction implements Action {
 
   @Override
   public @Nullable Component displayInfo() {
-    return Text.format("{0}, vol={1, number}, pitch={2, number}, radius={3, number}",
-        sound.name(),
-        sound.volume(),
-        sound.pitch(),
-        playRadius
-    );
+    Component hover = Component.text("[Hover for more info]", NamedTextColor.AQUA)
+        .hoverEvent(
+            Text.format(
+                """
+                volume={0, number}
+                pitch={1, number}
+                channel={2, number}
+                delay={3, number}
+                repeat={4, number}
+                """.trim(),
+                sound.volume(),
+                sound.pitch(),
+                sound.source(),
+                tickDelay,
+                repeat
+            )
+        );
+
+    return Text.format("{0} {1}", sound.name(), hover);
   }
 
   @Override

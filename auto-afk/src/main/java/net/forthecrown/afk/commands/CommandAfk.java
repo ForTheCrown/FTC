@@ -1,11 +1,12 @@
-package net.forthecrown.core.commands;
+package net.forthecrown.afk.commands;
 
 import net.forthecrown.Permissions;
+import net.forthecrown.afk.Afk;
 import net.forthecrown.command.FtcCommand;
 import net.forthecrown.command.arguments.Arguments;
 import net.forthecrown.command.help.UsageFactory;
 import net.forthecrown.grenadier.GrenadierCommand;
-import net.forthecrown.text.ViewerAwareMessage;
+import net.forthecrown.text.PlayerMessage;
 import net.forthecrown.user.User;
 
 public class CommandAfk extends FtcCommand {
@@ -47,18 +48,16 @@ public class CommandAfk extends FtcCommand {
         .then(argument("msg", Arguments.MESSAGE)
             .executes(c -> afk(
                 getUserSender(c),
-                Arguments.getMessage(c, "msg")
+                Arguments.getPlayerMessage(c, "msg")
             ))
         );
   }
 
-  private int afk(User user, ViewerAwareMessage message) {
-    boolean alreadyAFK = user.isAfk();
-
-    if (alreadyAFK) {
-      user.unafk();
+  private int afk(User user, PlayerMessage message) {
+    if (Afk.isAfk(user)) {
+      Afk.unafk(user);
     } else {
-      user.afk(message);
+      Afk.afk(user, message);
     }
 
     return 0;

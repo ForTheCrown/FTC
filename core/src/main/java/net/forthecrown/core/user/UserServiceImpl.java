@@ -254,7 +254,7 @@ public class UserServiceImpl implements UserService {
       return Result.error("Join time not set");
     }
 
-    var played = Time.timeSince(join) - user.getAfkTime();
+    var played = Time.timeSince(join) - user.getTime(TimeField.AFK_TIME);
     var timeSeconds = (int) TimeUnit.MILLISECONDS.toSeconds(played);
 
     return Result.success(timeSeconds);

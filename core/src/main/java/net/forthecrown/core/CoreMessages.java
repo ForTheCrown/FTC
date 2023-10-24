@@ -1,6 +1,5 @@
 package net.forthecrown.core;
 
-import static net.forthecrown.text.Messages.AFK_SUFFIX;
 import static net.forthecrown.text.Text.format;
 import static net.forthecrown.text.Text.isEmpty;
 import static net.forthecrown.text.Text.vformat;
@@ -321,10 +320,6 @@ public interface CoreMessages {
 
               if (user.get(Properties.VANISHED)) {
                 text.append(VANISHED_LIST_SUFFIX);
-              }
-
-              if (user.isAfk()) {
-                text.append(AFK_SUFFIX);
               }
 
               return text.build();

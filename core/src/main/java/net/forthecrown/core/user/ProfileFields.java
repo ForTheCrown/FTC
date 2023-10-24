@@ -141,23 +141,23 @@ interface ProfileFields {
   ProfileDisplayElement IGNORED_USERS = blockedUsers(UserBlockList::getBlocked, "Blocked");
 
   static void registerAll(UserNameFactory factory) {
-    factory.addProfileField("name", REAL_NAME);
-    factory.addProfileField("privacy_state", PROFILE_PRIVATE_STATE);
-    factory.addProfileField("last_online", LAST_ONLINE);
-    factory.addProfileField("first_join", FIRST_JOIN);
+    factory.addProfileField("name", 0, REAL_NAME);
+    factory.addProfileField("privacy_state", 10, PROFILE_PRIVATE_STATE);
+    factory.addProfileField("last_online", 20, LAST_ONLINE);
+    factory.addProfileField("first_join", 30, FIRST_JOIN);
 
-    factory.addProfileField("rhines", RHINES);
-    factory.addProfileField("gems", GEMS);
-    factory.addProfileField("playtime", PLAYTIME);
-    factory.addProfileField("votes", VOTES);
+    factory.addProfileField("rhines", 40, RHINES);
+    factory.addProfileField("gems", 50, GEMS);
+    factory.addProfileField("playtime", 60, PLAYTIME);
+    factory.addProfileField("votes", 70, VOTES);
 
-    factory.addProfileField("uuid", UUID);
+    factory.addProfileField("uuid", Integer.MAX_VALUE, UUID);
 
-    factory.addAdminProfileField("ip", IP);
-    factory.addAdminProfileField("return_location", RETURN_LOCATION);
-    factory.addAdminProfileField("location", LOCATION);
-    factory.addAdminProfileField("separated", SEPARATED_USERS);
-    factory.addAdminProfileField("blocked", IGNORED_USERS);
+    factory.addAdminProfileField("ip", 10, IP);
+    factory.addAdminProfileField("return_location", 20, RETURN_LOCATION);
+    factory.addAdminProfileField("location", 30, LOCATION);
+    factory.addAdminProfileField("separated", 40, SEPARATED_USERS);
+    factory.addAdminProfileField("blocked", 50, IGNORED_USERS);
   }
 
   static ProfileDisplayElement blockedUsers(

@@ -326,55 +326,6 @@ public interface User extends ForwardingAudience.Single {
 
   void setNickname(String nickname);
 
-  /* ----------------------------- AFKING ------------------------------ */
-
-  /**
-   * Sets the user's AFK state
-   * @param afk AFK state
-   * @param reason Reason for the user being AFK, will be displayed when viewing {@code /profile}
-   *               for this user
-   *
-   * @throws UserOfflineException If the user is not online
-   */
-  void setAfk(boolean afk, @Nullable ViewerAwareMessage reason) throws UserOfflineException;
-
-  /**
-   * Gets the amount of time this user has been in an AFK state since logging in
-   * @return User's current AFK time
-   */
-  long getAfkTime();
-
-  /**
-   * Makes this user enter an AFK state
-   *
-   * @param reason The reason the user is entering the AFK state
-   * @throws IllegalStateException If the user is already AFK
-   * @throws UserOfflineException  If the user is not AFK
-   */
-  void afk(@Nullable ViewerAwareMessage reason) throws IllegalStateException, UserOfflineException;
-
-  /**
-   * Makes this user leave their AFK state
-   *
-   * @throws IllegalStateException If the user is not AFK
-   * @throws UserOfflineException  If the user is not online
-   */
-  void unafk() throws IllegalStateException, UserOfflineException;
-
-  /**
-   * Tests if this user is currently set as AFK
-   * @return {@code true}, if the user is AFK, {@code false} otherwise
-   */
-  boolean isAfk();
-
-  /**
-   * Gets the reason a user is AFK
-   * @return user-defined AFK reason, or {@code null}, if a reason was not set or if the user
-   *         is not AFK
-   */
-  @Nullable
-  ViewerAwareMessage getAfkReason();
-
   /* ----------------------------- CURRENCIES ------------------------------ */
 
   int getGems();

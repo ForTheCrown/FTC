@@ -43,7 +43,7 @@ public class GuildPlugin extends JavaPlugin {
 
     manager.load();
 
-    Users.getService().getNameFactory().addProfileField("ftc_guild", new GuildProfileElement());
+    Users.getService().getNameFactory().addProfileField("ftc_guild", 34, new GuildProfileElement());
 
     saver = PeriodicalSaver.create(manager::save, () -> Duration.ofMinutes(30));
     saver.start();
