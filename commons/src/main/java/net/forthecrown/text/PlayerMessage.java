@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -21,6 +22,7 @@ import net.forthecrown.text.parse.ChatParser;
 import net.forthecrown.text.parse.TextContext;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.io.FtcCodecs;
+import net.forthecrown.utils.io.Results;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
@@ -32,10 +34,63 @@ public class PlayerMessage implements ViewerAwareMessage {
   private static final String KEY_MESSAGE = "message";
   private static final String KEY_FLAGS = "flags";
 
+  private static final Codec<ChatParseFlag> SINGLE_FLAG_CODEC
+      = FtcCodecs.enumCodec(ChatParseFlag.class);
+
+  private static final Codec<Set<ChatParseFlag>> FLAG_SET_CODEC
+      = SINGLE_FLAG_CODEC.listOf().xmap(ObjectOpenHashSet::new, ArrayList::new);
+
+  private static final Codec<Set<ChatParseFlag>> FLAG_STRING_CODEC
+      = Codec.STRING.flatXmap(
+          s -> {
+            if (s.equalsIgnoreCase("all")) {
+              return Results.success(ChatParseFlag.all());
+            }
+
+            if (s.equalsIgnoreCase("none")) {
+              return Results.success(Set.of());
+            }
+
+            try {
+              return Results.success(Set.of(ChatParseFlag.valueOf(s.toUpperCase())));
+            } catch (IllegalArgumentException exc) {
+              return Results.error("Not 'all', 'none' or a specific flag");
+            }
+          },
+          flags -> {
+            if (flags.size() == 1) {
+              return Results.success(flags.iterator().next().name().toLowerCase());
+            }
+            if (flags.isEmpty()) {
+              return Results.success("none");
+            }
+            if (flags.size() >= ChatParseFlag.values().length) {
+              return Results.success("all");
+            }
+            return Results.error("Cannot encode multiple values in string");
+          }
+        );
+
   private static final Codec<Set<ChatParseFlag>> FLAG_CODEC
-      = FtcCodecs.enumCodec(ChatParseFlag.class)
-      .listOf()
-      .xmap(ObjectOpenHashSet::new, ArrayList::new);
+      = new EitherCodec<>(FLAG_SET_CODEC, FLAG_STRING_CODEC)
+      .xmap(
+          setSetEither -> {
+            return setSetEither.map(Function.identity(), Function.identity());
+          },
+
+          chatParseFlags -> {
+            if (chatParseFlags.isEmpty()) {
+              return Either.left(chatParseFlags);
+            }
+            if (chatParseFlags.size() >= ChatParseFlag.values().length) {
+              return Either.right(chatParseFlags);
+            }
+            if (chatParseFlags.size() > 2) {
+              return Either.left(chatParseFlags);
+            }
+            return Either.right(chatParseFlags);
+          }
+      );
 
   private static final Codec<PlayerMessage> RECORD_CODEC = RecordCodecBuilder.create(instance -> {
     return instance
@@ -91,7 +146,7 @@ public class PlayerMessage implements ViewerAwareMessage {
     return new PlayerMessage(string, flags);
   }
 
-  public static ViewerAwareMessage allFlags(String message) {
+  public static PlayerMessage allFlags(String message) {
     return new PlayerMessage(message, ChatParseFlag.all());
   }
 
