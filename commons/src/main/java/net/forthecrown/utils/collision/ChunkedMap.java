@@ -10,6 +10,7 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import it.unimi.dsi.fastutil.objects.ObjectSets;
 import java.util.AbstractCollection;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -65,7 +66,7 @@ public class ChunkedMap<T> {
    * Entries registered within this map.
    * <p>
    * Used mainly for testing if a value has been added to this map or not, entries themselves cache
-   * the bounds that a value has when {@link #add(BoundsHolder)} is called, so that changes to the
+   * the bounds that a value has when {@link #add(Object, Bounds3i)} is called, so that changes to the
    * underlying value don't alter the bounds of the entry. Because if that happened, this map
    * wouldn't know in which chunks an entry was stored.
    */
@@ -350,21 +351,26 @@ public class ChunkedMap<T> {
     }
 
     List<Entry<T>> inChunk = getChunk(toChunkLong(point.toInt()));
+    Collection<Entry<T>> values;
 
-    // If point is within existing entries, return first one,
-    // Don't do distance check
-    if (!inChunk.isEmpty()) {
-      return ObjectDoublePair.of(inChunk.get(0).value, 0.0D);
+    if (inChunk.isEmpty()) {
+      values = entries.values();
+    } else {
+      values = inChunk;
     }
 
     T nearest = null;
     double distSq = Double.MAX_VALUE;
 
-    for (var e : entries.values()) {
+    for (var e : values) {
       var bounds = e.bounds3i;
       var closest = bounds.getClosestPosition(point);
 
       double eDist = point.distanceSquared(closest);
+
+      if (eDist <= 0) {
+        return ObjectDoublePair.of(e.value, GenericMath.sqrt(eDist));
+      }
 
       if (eDist < distSq) {
         distSq = eDist;
