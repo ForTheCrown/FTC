@@ -1,12 +1,14 @@
 package net.forthecrown.waypoints;
 
 import static com.mojang.brigadier.arguments.BoolArgumentType.bool;
+import static com.mojang.brigadier.arguments.FloatArgumentType.floatArg;
 import static com.mojang.brigadier.arguments.IntegerArgumentType.integer;
 import static com.mojang.serialization.Codec.BOOL;
 import static com.mojang.serialization.Codec.INT;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import java.util.Map;
 import java.util.UUID;
 import net.forthecrown.command.Exceptions;
@@ -15,7 +17,6 @@ import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.utils.io.FtcCodecs;
-import net.forthecrown.waypoints.type.WaypointTypes;
 import org.bukkit.inventory.ItemStack;
 
 public class WaypointProperties {
@@ -70,12 +71,14 @@ public class WaypointProperties {
   public static final WaypointProperty<Integer> VISITS_TOTAL
       = new WaypointProperty<>("visits/total", integer(), INT, 0);
 
-  public static final WaypointProperty<ItemStack> DISPLAY_ITEM = new WaypointProperty<>(
-      "display_material",
-      Arguments.ITEMSTACK,
-      FtcCodecs.ITEM_CODEC,
-      null
-  );
+  public static final WaypointProperty<ItemStack> DISPLAY_ITEM
+      = new WaypointProperty<>("display_material", Arguments.ITEMSTACK, FtcCodecs.ITEM_CODEC, null);
+
+  public static final WaypointProperty<Float> VISIT_YAW
+      = new WaypointProperty<>("visit_rotation/yaw", floatArg(-180, 180), Codec.FLOAT, null);
+
+  public static final WaypointProperty<Float> VISIT_PITCH
+      = new WaypointProperty<>("visit_rotation/pitch", floatArg(-90, 90), Codec.FLOAT, null);
 
   /**
    * Property only used for region poles to determine whether they should display their resident
@@ -86,10 +89,6 @@ public class WaypointProperties {
       .setUpdatesMarker(false)
       .setCallback((waypoint, oldValue, value) -> {
         waypoint.updateResidentsSign();
-
-        if (waypoint.getType() == WaypointTypes.REGION_POLE && !waypoint.get(INVULNERABLE)) {
-          Waypoints.placePole(waypoint);
-        }
       });
 
   /**
@@ -104,11 +103,15 @@ public class WaypointProperties {
       })
 
       .setValidator((waypoint, newValue) -> {
-        if (Waypoints.isValidName(newValue)) {
+        DataResult<String> result = Waypoints.validateWaypointName(newValue);
+
+        if (result.error().isEmpty()) {
           return;
         }
 
-        throw Exceptions.format("Invalid waypoint name '{0}'", newValue);
+        throw Exceptions.format("Invalid waypoint name '{0}': {1}",
+            newValue, result.error().get().message()
+        );
       });
 
   /**

@@ -1,0 +1,196 @@
+name = "waypoints"
+permission = @admin_permission
+description = "Waypoints admin commands"
+
+literal("save") {
+  description = "Saves all waypoints"
+  executes = saveWaypoints()
+}
+
+literal("reload-config") {
+  description = "Reloads the waypoints config"
+  executes = reloadConfig()
+}
+
+literal("reload-all") {
+  description = "Reloads ALL waypoints"
+  executes = reloadWaypoints()
+}
+
+literal("update-all") {
+  description = "Updates all waypoints"
+  executes = updateAll()
+}
+
+literal("info").argument("waypoint", @waypoint) {
+  map_result("waypoint") = @to_waypoint
+  description = "Shows info about a waypoint"
+  executes = showInfo()
+}
+
+literal("update").argument("waypoint", @waypoint) {
+  description = "Updates a specific waypoint"
+  executes = updateWaypoint()
+  map_result("waypoint") = @to_waypoint
+}
+
+literal("remove").argument("waypoint", @waypoint) {
+  description = "Deletes a waypoint"
+  executes = removeWaypoint()
+  map_result("waypoint") = @to_waypoint
+}
+
+literal("draw-bounds").argument("waypoint", @waypoint) {
+  map_result("waypoint") = @to_waypoint
+  executes = drawBounds()
+  description = "Draws the bounds of a waypoint"
+}
+
+literal("create") {
+  literal("admin") {
+    description = "Creates an invisible admin waypoint"
+    executes = createAdmin()
+  }
+  literal("region-pole") {
+    description = "Creates a region-pole waypoint"
+    executes = createPole()
+  }
+}
+
+literal("move").argument("waypoint", @waypoint) {
+  map_result("waypoint") = @to_waypoint
+  executes = moveWaypoint()
+  description = "Moves a waypoint to where you're standing"
+
+  argument("pos", vec3i) {
+    label = "<pos: x y z>"
+    description = "Moves a waypoint to a specified xyz position"
+    map_result = result.apply()
+    executes = moveWaypoint()
+  }
+}
+
+literal("residents") {
+  literal("list").argument("waypoint", @waypoint) {
+    description = "Lists all residents in a waypoints"
+    executes = listResidents()
+    map_result("waypoint") = @to_waypoint
+  }
+
+  literal("add").argument("waypoint", @waypoint).argument("players", users) {
+    map_result = @result_to_users
+    description = "Adds all <players> to be residents of <waypoint>"
+    executes = addResidents()
+    map_result("waypoint") = @to_waypoint
+  }
+
+  literal("remove").argument("waypoint", @waypoint).argument("resident", user) {
+    map_result = @result_to_user
+    suggests = suggestResidents()
+    description = "Removes a resident from a waypoint"
+    executes = removeResident()
+    map_result("waypoint") = @to_waypoint
+  }
+
+  literal("set").argument("waypoint", @waypoint).argument("player", user).argument("time", @timestamp) {
+    map_result("player") = @result_to_user
+    description = "Sets a <player> to be a resident of a <waypoint> with a specific movein <time>"
+    executes = setResident()
+    map_result("waypoint") = @to_waypoint
+  }
+
+  literal("clear").argument("waypoint", @waypoint) {
+    description = "Removes all residents from a waypoint"
+    executes = clearResidents()
+    map_result("waypoint") = @to_waypoint
+  }
+}
+
+literal("property") {
+  literal("list").argument("waypoint", @waypoint) {
+    description = "Lists all property values in a waypoint"
+    executes = listProperties()
+    map_result("waypoint") = @to_waypoint
+  }
+
+  literal("unset").argument("waypoint", @waypoint).argument("property", @property) {
+    description = "Removes a property's value from a waypoint"
+    executes = unsetProperty()
+    map_result("waypoint") = @to_waypoint
+  }
+
+  literal("set").argument("waypoint", @waypoint).argument("property", @property).argument("value", greedy_string) {
+    suggests = suggestPropertyValues()
+    description = "Sets a property's value for a specific waypoint"
+    executes = setProperty()
+    map_result("waypoint") = @to_waypoint
+  }
+
+  literal("get").argument("waypoint", @waypoint).argument("property", @property) {
+    description = "Gets a property's value"
+    executes = getProperty()
+    map_result("waypoint") = @to_waypoint
+  }
+}
+
+literal("column") {
+  literal("clear").argument("waypoint", @waypoint) {
+    executes = breakColumn()
+    map_result("waypoint") = @to_waypoint
+    description = "Breaks the center column of a waypoint"
+  }
+  literal("place").argument("waypoint", @waypoint) {
+    executes = placeColumn()
+    map_result("waypoint") = @to_waypoint
+    description = "Places the center column of a waypoint"
+  }
+}
+
+literal("platform") {
+  literal("place").argument("waypoint", @waypoint) {
+    executes = placePlatform()
+    map_result("waypoint") = @to_waypoint
+    description = "Places a platform for a waypoint"
+  }
+
+  literal("break").argument("waypoint", @waypoint) {
+    executes = breakPlatform()
+    map_result("waypoint") = @to_waypoint
+    description = "Breaks a waypoint's platform"
+  }
+}
+
+literal("description") {
+  literal("get").argument("waypoint", @waypoint) {
+    description = "Gets a waypoint's description"
+    executes = getDescription()
+    map_result("waypoint") = @to_waypoint
+  }
+
+  literal("get-rendered").argument("waypoint", @waypoint) {
+    description = "Gets a waypoint's rendered description"
+    executes = getRenderedDescription()
+    map_result("waypoint") = @to_waypoint
+  }
+
+  literal("set").argument("waypoint", @waypoint).argument("description", greedy_string) {
+    suggests = descriptionSuggests()
+    description = "Sets a waypoint's description"
+    executes = setDescription()
+    map_result("waypoint") = @to_waypoint
+  }
+}
+
+literal("creation-date") {
+  literal("get").argument("waypoint", @waypoint) {
+    description = "Gets a waypoint's creation date"
+    executes = getCreationDate()
+    map_result("waypoint") = @to_waypoint
+  }
+
+  literal("set").argument("waypoint", @waypoint).argument("time", @timestamp) {
+    description = "Sets a waypoint's creation date"
+    executes = setCreationDate()
+    map_result("waypoint") = @to_waypoint
+  }
+}

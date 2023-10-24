@@ -1,6 +1,9 @@
 package net.forthecrown.waypoints.command;
 
+import net.forthecrown.command.Commands;
 import net.forthecrown.command.arguments.RegistryArguments;
+import net.forthecrown.grenadier.annotations.AnnotatedCommandContext;
+import net.forthecrown.waypoints.WaypointManager;
 import net.forthecrown.waypoints.WaypointProperties;
 import net.forthecrown.waypoints.WaypointProperty;
 
@@ -11,7 +14,7 @@ public class WaypointCommands {
   public static final RegistryArguments<WaypointProperty> PROPERTY
       = new RegistryArguments<>(WaypointProperties.REGISTRY, "Waypoint property");
 
-  public static void createCommands() {
+  public static void createCommands(WaypointManager manager) {
     new CommandCreateWaypoint();
     new CommandFindPole();
     new CommandHomeWaypoint();
@@ -21,6 +24,8 @@ public class WaypointCommands {
     new CommandSpawn();
     new CommandVisit();
     new CommandWaypointGui();
-    new CommandWaypoints();
+
+    AnnotatedCommandContext ctx = Commands.createAnnotationContext();
+    ctx.registerCommand(new CommandWaypoints(manager));
   }
 }

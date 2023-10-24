@@ -3,17 +3,15 @@ package net.forthecrown.waypoints;
 import static net.kyori.adventure.text.Component.empty;
 import static net.kyori.adventure.text.Component.text;
 
-import java.util.UUID;
+import java.util.Optional;
 import net.forthecrown.packet.SignRenderer;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.math.WorldVec3i;
-import net.forthecrown.waypoints.util.UuidPersistentDataType;
 import org.bukkit.DyeColor;
 import org.bukkit.block.Sign;
 import org.bukkit.block.sign.Side;
 import org.bukkit.block.sign.SignSide;
 import org.bukkit.entity.Player;
-import org.bukkit.persistence.PersistentDataContainer;
 
 public class WaypointSignRenderer implements SignRenderer {
 
@@ -23,21 +21,41 @@ public class WaypointSignRenderer implements SignRenderer {
     this.manager = manager;
   }
 
+  private Optional<Waypoint> fromEditSign(WorldVec3i pos) {
+    var entries = manager.getChunkMap().get(pos);
+    if (entries.isEmpty()) {
+      return Optional.empty();
+    }
+
+    for (Waypoint entry : entries) {
+      var signPos = entry.getEditSignPosition();
+
+      if (signPos == null) {
+        continue;
+      }
+
+      if (signPos.x() == pos.x() && signPos.y() == pos.y() && signPos.z() == pos.z()) {
+        return Optional.of(entry);
+      }
+    }
+
+    return Optional.empty();
+  }
+
   @Override
   public boolean test(Player player, WorldVec3i pos, Sign sign) {
-    var pdc = sign.getPersistentDataContainer();
-    return pdc.has(Waypoints.EDIT_WAYPOINT_KEY);
+    return fromEditSign(pos).isPresent();
   }
 
   @Override
   public void render(Player player, WorldVec3i pos, Sign sign) {
-    PersistentDataContainer pdc = sign.getPersistentDataContainer();
-    UUID id = pdc.get(Waypoints.EDIT_WAYPOINT_KEY, UuidPersistentDataType.INSTANCE);
-    Waypoint waypoint = manager.get(id);
+    var opt = fromEditSign(pos);
 
-    if (waypoint == null) {
+    if (opt.isEmpty()) {
       return;
     }
+
+    var waypoint = opt.get();
 
     SignSide front = sign.getSide(Side.FRONT);
     front.setGlowingText(true);

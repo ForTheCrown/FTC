@@ -14,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import net.forthecrown.Loggers;
 import net.forthecrown.command.Exceptions;
 import net.forthecrown.cosmetics.CosmeticData;
 import net.forthecrown.cosmetics.Cosmetics;
@@ -25,23 +26,26 @@ import net.forthecrown.waypoints.Waypoint;
 import net.forthecrown.waypoints.WaypointManager;
 import net.forthecrown.waypoints.WaypointPrefs;
 import net.forthecrown.waypoints.WaypointProperties;
-import net.forthecrown.waypoints.Waypoints;
 import net.forthecrown.waypoints.listeners.HulkSmash;
 import net.forthecrown.waypoints.type.WaypointTypes;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
+import org.slf4j.Logger;
 import org.spongepowered.math.vector.Vector3d;
 
 
 @Getter
 @Setter
 public class WaypointVisit implements Runnable {
+
+  private static final Logger LOGGER = Loggers.getLogger();
 
   /**
    * The user visiting the region
@@ -126,7 +130,8 @@ public class WaypointVisit implements Runnable {
     // from the pole. Mainly used by OwnedEntityHandler to check if it should
     // scan for entities or not. Pole distance check for non staff players
     // is run in CommandVisit
-    nearWaypoint = nearestWaypoint != null
+    nearWaypoint
+        = nearestWaypoint != null
         && nearestWaypoint.getBounds().contains(user.getPlayer());
 
     // For hulk smashing to be allowed we must pass 5 checks:
@@ -135,10 +140,14 @@ public class WaypointVisit implements Runnable {
     // 3) The area above the pole must only be air
     // 4) The area above the user must only be air
     // 5) The user shouldn't be in spectator mode
-    hulkSmash = WaypointManager.getInstance().config().hulkSmashPoles
+    boolean clearAboveDest = isClearAbove(getTeleportLocation().add(0, 1, 0));
+    boolean clearAbovePlayer
+        = isClearAbove(user.getLocation().add(0, Math.ceil(user.getPlayer().getHeight()), 0));
+
+    hulkSmash = manager.config().hulkSmashPoles
         && user.get(WaypointPrefs.HULK_SMASH_ENABLED)
-        && isClearAbove(getTeleportLocation())
-        && isClearAbove(user.getLocation().add(0, Math.ceil(user.getPlayer().getHeight()), 0))
+        && clearAboveDest
+        && clearAbovePlayer
         && user.getGameMode() != GameMode.SPECTATOR;
   }
 
@@ -150,6 +159,10 @@ public class WaypointVisit implements Runnable {
 
     for (int y = l.getBlockY(); y < MAX_Y; y++) {
       block = l.getWorld().getBlockAt(x, y, z);
+
+      if (block.getType() == Material.LIGHT) {
+        continue;
+      }
 
       if (block.isCollidable()) {
         return false;
@@ -175,6 +188,7 @@ public class WaypointVisit implements Runnable {
         .addPredicate(VisitPredicate.IS_NEAR)
         .addPredicate(VisitPredicate.DESTINATION_VALID)
         .addPredicate(VisitPredicate.NEAREST_VALID)
+        .addPredicate(VisitPredicate.NOT_AT_SAME)
 
         // This order matters, vehicles must be handled before
         // other passengers
@@ -205,12 +219,18 @@ public class WaypointVisit implements Runnable {
 
     Location playerLoc = user.getLocation();
 
+    Float yaw = destination.get(WaypointProperties.VISIT_YAW);
+    Float pitch = destination.get(WaypointProperties.VISIT_PITCH);
+
+    if (yaw == null) {
+      yaw = playerLoc.getYaw();
+    }
+    if (pitch == null) {
+      pitch = playerLoc.getPitch();
+    }
+
     setTeleportLocation(
-        new Location(
-            destination.getWorld(),
-            tpDest.x(), tpDest.y(), tpDest.z(),
-            playerLoc.getYaw(), playerLoc.getPitch()
-        )
+        new Location(destination.getWorld(), tpDest.x(), tpDest.y(), tpDest.z(), yaw, pitch)
     );
   }
 
@@ -240,7 +260,7 @@ public class WaypointVisit implements Runnable {
     if (destination.getType() == WaypointTypes.REGION_POLE
         && destination.get(WaypointProperties.INVULNERABLE)
     ) {
-      Waypoints.placePole(destination);
+      destination.placeColumn();
     }
 
     // Run start handlers

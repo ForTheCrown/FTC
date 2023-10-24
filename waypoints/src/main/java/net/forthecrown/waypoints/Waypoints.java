@@ -19,9 +19,6 @@ import javax.annotation.Nullable;
 import net.forthecrown.Loggers;
 import net.forthecrown.antigrief.BannedWords;
 import net.forthecrown.command.Exceptions;
-import net.forthecrown.structure.BlockStructure;
-import net.forthecrown.structure.StructurePlaceConfig;
-import net.forthecrown.structure.Structures;
 import net.forthecrown.user.TimeField;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
@@ -39,6 +36,7 @@ import net.forthecrown.waypoints.WaypointScan.Result;
 import net.forthecrown.waypoints.type.PlayerWaypointType;
 import net.forthecrown.waypoints.type.WaypointType;
 import net.forthecrown.waypoints.type.WaypointTypes;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
@@ -83,45 +81,6 @@ public final class Waypoints {
       Material.CHAIN_COMMAND_BLOCK,
       Material.REPEATING_COMMAND_BLOCK
   );
-
-  public static final String POLE_STRUCTURE = "region_pole";
-  public static final String FUNC_REGION_NAME = "region_name";
-  public static final String FUNC_RESIDENTS = "region_residents";
-
-  /**
-   * Default size of the pole (5, 5, 5)
-   */
-  public static Vector3i DEFAULT_POLE_SIZE = Vector3i.from(5);
-
-  public static BlockStructure getRegionPole() {
-    return Structures.get().getRegistry().orNull(POLE_STRUCTURE);
-  }
-
-  public static Vector3i poleSize() {
-    return Structures.get()
-        .getRegistry()
-        .get(POLE_STRUCTURE)
-        .map(BlockStructure::getDefaultSize)
-        .orElse(DEFAULT_POLE_SIZE);
-  }
-
-  public static void placePole(Waypoint region) {
-    var structure = getRegionPole();
-
-    if (structure == null) {
-      Loggers.getLogger().warn("No pole structure found in registry! Cannot place!");
-      return;
-    }
-
-    var config = StructurePlaceConfig.builder()
-        .addNonNullProcessor()
-        .addRotationProcessor()
-        .world(region.getWorld())
-        .pos(region.getBounds().min())
-        .build();
-
-    structure.place(config);
-  }
 
   /**
    * Gets all invulnerable waypoints within the given bounds in the given world
@@ -190,7 +149,7 @@ public final class Waypoints {
    * @return True, if the name is valid, as specified in the above paragraph, false otherwise.
    */
   public static boolean isValidName(String name) {
-    return validateWaypointName(name).error().isPresent();
+    return validateWaypointName(name).result().isPresent();
   }
 
   public static DataResult<String> validateWaypointName(String name) {
@@ -438,7 +397,7 @@ public final class Waypoints {
    * @return The created waypoint
    * @throws CommandSyntaxException If the waypoint creation fails at any stage
    */
-  public static Waypoint tryCreate(Player player, Block clicked, boolean copy)
+  public static Waypoint tryCreate(Player player, Block clicked, Waypoint copy)
       throws CommandSyntaxException
   {
     if (clicked == null) {
@@ -466,7 +425,7 @@ public final class Waypoints {
 
     Vector3i pos = Vectors.from(b);
 
-    type.onCreate(user, pos, copy);
+    type.onCreate(user, pos, copy != null);
 
     var existing = WaypointManager.getInstance()
         .getChunkMap()
@@ -486,8 +445,13 @@ public final class Waypoints {
         throw error.get();
       }
 
-      waypoint = makeWaypoint(type, pos, player);
-      waypoint.set(WaypointProperties.INVULNERABLE, true);
+      if (copy == null) {
+        waypoint = makeWaypoint(type, pos, player);
+        waypoint.set(WaypointProperties.INVULNERABLE, true);
+      } else {
+        copy.setPosition(pos, b.getWorld());
+        return copy;
+      }
 
     } else {
       throw WExceptions.overlappingWaypoints(existing.size());
@@ -498,12 +462,7 @@ public final class Waypoints {
     placePlatform(w, waypoint.getPlatform());
     type.onPostCreate(waypoint, user);
 
-    waypoint.setLightBlock(true);
-    waypoint.setEditSign(true);
-    waypoint.setInfoSigns(true);
-    waypoint.updateNameSign();
-    waypoint.updateResidentsSign();
-    waypoint.updateOutline();
+    waypoint.update(true);
 
     return waypoint;
   }
@@ -569,22 +528,30 @@ public final class Waypoints {
   }
 
   public static Waypoint makeWaypoint(WaypointType type, Vector3i pos, Player source) {
-    Vector3i position;
+    Location location = source.getLocation();
 
-    if (pos == null) {
-      position = Vectors.intFrom(source.getLocation());
-    } else {
-      position = pos;
+    if (pos != null) {
+      location.setX(pos.x());
+      location.setY(pos.y());
+      location.setZ(pos.z());
     }
+
+    Waypoint created = makeWaypoint(type, location);
+
+    source.sendMessage(WMessages.createdWaypoint(created.getPosition(), type));
+    return created;
+  }
+
+  public static Waypoint makeWaypoint(WaypointType type, Location location) {
+    Vector3i position = Vectors.intFrom(location);
 
     Waypoint waypoint = new Waypoint();
     waypoint.setType(type);
-    waypoint.setPosition(position, source.getWorld());
+    waypoint.setPosition(position, location.getWorld());
     waypoint.setCreationTime(Instant.now());
 
-    source.sendMessage(WMessages.createdWaypoint(position, type));
-
     WaypointManager.getInstance().addWaypoint(waypoint);
+
     return waypoint;
   }
 

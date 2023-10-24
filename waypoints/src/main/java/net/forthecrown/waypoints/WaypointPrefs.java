@@ -1,6 +1,5 @@
 package net.forthecrown.waypoints;
 
-import java.util.Objects;
 import java.util.UUID;
 import net.forthecrown.command.settings.Setting;
 import net.forthecrown.command.settings.SettingsBook;
@@ -29,23 +28,6 @@ public class WaypointPrefs {
   public static final UserProperty<UUID> HOME_PROPERTY = Properties.uuidProperty()
       .key("homeWaypoint")
       .defaultValue(Waypoints.NIL_UUID)
-      .callback((user, value, oldValue) -> {
-        var manager = WaypointManager.getInstance();
-
-        if (!Objects.equals(oldValue, Waypoints.NIL_UUID)) {
-          Waypoint old = manager.get(oldValue);
-
-          // May be null if waypoint was deleted
-          if (old != null) {
-            old.removeResident(user.getUniqueId());
-          }
-        }
-
-        if (!Objects.equals(value, Waypoints.NIL_UUID)) {
-          Waypoint newHome = manager.get(value);
-          newHome.addResident(user.getUniqueId());
-        }
-      })
       .build();
 
   static void createSettings(SettingsBook<User> settingsBook) {

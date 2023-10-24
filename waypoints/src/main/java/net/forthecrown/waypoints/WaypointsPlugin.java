@@ -36,7 +36,7 @@ public class WaypointsPlugin extends JavaPlugin {
 
     saver.start();
 
-    WaypointCommands.createCommands();
+    WaypointCommands.createCommands(WaypointManager.instance);
     WaypointsListeners.registerAll();
 
     Registry<SignRenderer> renderers = PacketListeners.listeners().getSignRenderers();

@@ -51,7 +51,6 @@ public class PlayerListener implements Listener {
     MovingWaypoint copySource = copyingWaypoint.get(player.getUniqueId());
 
     WaypointManager manager = WaypointManager.getInstance();
-    Waypoint created;
     Waypoint copy;
 
     event.setCancelled(true);
@@ -92,7 +91,7 @@ public class PlayerListener implements Listener {
     }
 
     try {
-      created = Waypoints.tryCreate(player, block, copy != null);
+      Waypoints.tryCreate(player, block, copy);
     } catch (CommandSyntaxException exc) {
       Exceptions.handleSyntaxException(player, exc);
       return;
@@ -102,11 +101,6 @@ public class PlayerListener implements Listener {
 
     if (copySource != null) {
       copySource.cancel();
-    }
-
-    if (copy != null) {
-      created.copyFrom(copy);
-      manager.removeWaypoint(copy);
     }
   }
 

@@ -4,6 +4,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Optional;
 import net.forthecrown.utils.math.Bounds3i;
 import net.forthecrown.waypoints.Waypoint;
+import net.forthecrown.waypoints.WaypointManager;
 import net.forthecrown.waypoints.WaypointProperties;
 import net.forthecrown.waypoints.Waypoints;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -47,16 +48,12 @@ public final class RegionPoleType extends WaypointType {
       return;
     }
 
-    var oldBounds = waypoint.getBounds().toWorldBounds(waypoint.getWorld());
-
-    for (var b : oldBounds) {
-      b.setType(Material.AIR, false);
-    }
+    waypoint.breakColumn();
   }
 
   @Override
   public @NotNull Bounds3i createBounds() {
-    return boundsFromSize(Waypoints.poleSize());
+    return boundsFromSize(WaypointManager.getInstance().config().playerWaypointSize);
   }
 
   @Override
@@ -65,7 +62,7 @@ public final class RegionPoleType extends WaypointType {
       return;
     }
 
-    Waypoints.placePole(waypoint);
+    waypoint.placeColumn();
   }
 
   @Override

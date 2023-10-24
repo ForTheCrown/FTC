@@ -16,7 +16,6 @@ import net.forthecrown.waypoints.WExceptions;
 import net.forthecrown.waypoints.WMessages;
 import net.forthecrown.waypoints.Waypoint;
 import net.forthecrown.waypoints.WaypointManager;
-import net.forthecrown.waypoints.WaypointPrefs;
 import net.forthecrown.waypoints.WaypointProperties;
 import net.forthecrown.waypoints.Waypoints;
 import org.bukkit.Material;
@@ -63,9 +62,9 @@ public class PlayerWaypointType extends WaypointType {
       waypoint.set(WaypointProperties.OWNER, creator.getUniqueId());
     }
 
-    creator.setTimeToNow(TimeField.LAST_MOVEIN);
-    creator.set(WaypointPrefs.HOME_PROPERTY, waypoint.getId());
+    waypoint.addResident(creator.getUniqueId());
 
+    creator.setTimeToNow(TimeField.LAST_MOVEIN);
     creator.sendMessage(WMessages.HOME_WAYPOINT_SET);
   }
 

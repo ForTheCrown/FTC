@@ -88,13 +88,10 @@ public class HulkSmash implements Listener {
   private BukkitTask tickTask;
 
   private void tick() {
-    var vel = user.getPlayer().getVelocity();
-    double velY = vel.getY();
-
     // Test if on ground, god-damn floating point errors, use some magic
     // floating point value that a player's Y velocity is always at, when
     // standing on the ground
-    if (!user.getPlayer().isGliding() && velY >= -0.07841 && velY <= 0) {
+    if (user.getPlayer().isOnGround()) {
       ++groundTicks;
     }
 

@@ -21,6 +21,19 @@ public interface VisitPredicate {
     throw WExceptions.ONLY_IN_VEHICLE;
   };
 
+  VisitPredicate NOT_AT_SAME = visit -> {
+    if (!visit.isNearWaypoint()) {
+      return;
+    }
+    var near = visit.getNearestWaypoint();
+
+    if (!near.equals(visit.getDestination())) {
+      return;
+    }
+
+    throw Exceptions.create("Already at destination waypoint");
+  };
+
   VisitPredicate IS_NEAR = visit -> {
     var player = visit.getUser();
 

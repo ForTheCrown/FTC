@@ -1,6 +1,8 @@
 package net.forthecrown.waypoints;
 
 import static net.forthecrown.waypoints.Waypoints.PLATFORM_OUTLINE_TAG;
+import static net.forthecrown.waypoints.Waypoints.clearPlatform;
+import static net.forthecrown.waypoints.Waypoints.placePlatform;
 import static net.kyori.adventure.text.Component.empty;
 import static net.kyori.adventure.text.Component.text;
 
@@ -16,10 +18,13 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.BiConsumer;
 import lombok.Getter;
 import lombok.Setter;
 import net.forthecrown.Loggers;
@@ -234,7 +239,9 @@ public class Waypoint {
     if (hasBeenAdded() && getWorld() != null) {
       type.onPreMove(this, position, world);
       manager.getChunkMap().remove(getWorld(), this);
-      removeOutline();
+
+      update(false);
+      clearPlatform(getWorld(), getPlatform());
 
       if (!Objects.equals(world, getWorld())) {
         WaypointWebmaps.removeMarker(this);
@@ -242,13 +249,16 @@ public class Waypoint {
     }
 
     setWorld(world);
+
     this.position = position;
     this.bounds = createBounds();
 
     if (hasBeenAdded()) {
       type.onPostMove(this);
       manager.getChunkMap().add(world, bounds, this);
-      updateOutline();
+
+      update(true);
+      placePlatform(getWorld(), getPlatform());
 
       Waypoints.updateDynmap(this);
     }
@@ -263,6 +273,36 @@ public class Waypoint {
     }
 
     return bounds;
+  }
+
+  public void breakColumn() {
+    forEachColumnBlock((material, block) -> {
+      block.setType(Material.AIR, false);
+    });
+  }
+
+  public void placeColumn() {
+    forEachColumnBlock((material, block) -> {
+      block.setType(material, false);
+    });
+  }
+
+  public void forEachColumnBlock(BiConsumer<Material, Block> consumer) {
+    Material[] column = type.getColumn();
+    World world = getWorld();
+
+    if (column == null || world == null || !hasBeenAdded()) {
+      return;
+    }
+
+    Vector3i pos = getPosition().add(0, 1 - type.getPlatformOffset(), 0);
+
+    for (int i = 0; i < column.length; i++) {
+      Material mat = column[i];
+      Vector3i blockPos = pos.add(0, i, 0);
+
+      consumer.accept(mat, Vectors.getBlock(blockPos, world));
+    }
   }
 
   /**
@@ -378,37 +418,12 @@ public class Waypoint {
   public ItemStack getDisplayItem() {
     var propertyValue = get(WaypointProperties.DISPLAY_ITEM);
     if (ItemStacks.notEmpty(propertyValue)) {
-      return propertyValue.clone();
+      var cloned = propertyValue.clone();
+      cloned.setAmount(1);
+      return cloned;
     }
 
     return type.getDisplayItem(this);
-  }
-
-  /**
-   * Copies data from the specified {@code other} waypoint to this one.
-   * <p>
-   * Copied data includes: Residents and properties
-   *
-   * @param other Waypoint to copy from
-   */
-  public void copyFrom(@NotNull Waypoint other) {
-    Objects.requireNonNull(other, "Null other");
-
-    Object2LongMap<UUID> residentsCopy = new Object2LongOpenHashMap<>(other.getResidents());
-    residentsCopy.forEach((uuid, timestamp) -> {
-      User user = Users.get(uuid);
-      user.set(WaypointPrefs.HOME_PROPERTY, getId());
-
-      // Call this method even though the HOME_PROPERTY's callback
-      // calls addResident to keep track of when the user set their
-      // home here accurately
-      this.residents.put(uuid, timestamp);
-    });
-
-    unknownProperties = other.unknownProperties == null ? null : other.unknownProperties.copy();
-    properties = other.properties;
-    description = other.description;
-    creationTime = other.creationTime;
   }
 
   /**
@@ -539,15 +554,23 @@ public class Waypoint {
     }
   }
 
-  public void setEditSign(boolean state) {
+  public Vector3i getEditSignPosition() {
     var top = getAnchor();
+    if (top == null) {
+      return null;
+    }
+    return top.sub(-1, 1, 0);
+  }
+
+  public void setEditSign(boolean state) {
+    var signPos = getEditSignPosition();
     var world = getWorld();
 
-    if (top == null || world == null) {
+    if (signPos == null || world == null) {
       return;
     }
 
-    Block block = Vectors.getBlock(top.sub(-1, 1, 0), world);
+    Block block = Vectors.getBlock(signPos, world);
 
     if (!state) {
       block.setType(Material.AIR, false);
@@ -589,15 +612,29 @@ public class Waypoint {
     builder.addFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ITEM_SPECIFICS);
 
     BufferedTextWriter writer = TextWriters.buffered();
-    writer.setFieldStyle(Style.style(NamedTextColor.GRAY));
-    writer.setFieldValueStyle(Style.style(NamedTextColor.YELLOW));
-    writer.setFieldSeparator(Component.text(": ", NamedTextColor.GRAY));
+    configureWriter(writer);
     writer.viewer(viewer);
 
     writeHover(writer);
     builder.addLoreRaw(writer.getBuffer());
 
     return builder;
+  }
+
+  public void update(boolean state) {
+    if (state) {
+      updateNameSign();
+      updateOutline();
+      updateResidentsSign();
+    } else {
+      setNameSign(null);
+      removeOutline();
+      removeResidentsSign();
+    }
+
+    setEditSign(state);
+    setInfoSigns(state);
+    setLightBlock(state);
   }
 
   /* ------------------------- PLATFORM OUTLINE -------------------------- */
@@ -866,10 +903,6 @@ public class Waypoint {
 
   public void addResident(UUID uuid) {
     setResident(uuid, System.currentTimeMillis());
-
-    if (hasBeenAdded()) {
-      updateResidentsSign();
-    }
   }
 
   public void setResident(UUID uuid, long time) {
@@ -878,6 +911,16 @@ public class Waypoint {
     }
 
     residents.put(uuid, time);
+
+    if (hasBeenAdded()) {
+      updateResidentsSign();
+
+      var service = Users.getService();
+      if (service.userLoadingAllowed()) {
+        var user = Users.get(uuid);
+        user.set(WaypointPrefs.HOME_PROPERTY, getId());
+      }
+    }
   }
 
   public void removeResident(UUID uuid) {
@@ -885,6 +928,19 @@ public class Waypoint {
 
     if (hasBeenAdded()) {
       updateResidentsSign();
+
+      var service = Users.getService();
+      if (service.userLoadingAllowed()) {
+        var user = Users.get(uuid);
+        user.set(WaypointPrefs.HOME_PROPERTY, null);
+      }
+    }
+  }
+
+  public void clearResidents() {
+    Set<UUID> residents = new HashSet<>(this.residents.keySet());
+    for (UUID resident : residents) {
+      removeResident(resident);
     }
   }
 
@@ -893,6 +949,12 @@ public class Waypoint {
   }
 
   /* ------------------------------ DISPLAY ------------------------------- */
+
+  public void configureWriter(TextWriter writer) {
+    writer.setFieldStyle(Style.style(NamedTextColor.GRAY));
+    writer.setFieldValueStyle(Style.style(NamedTextColor.YELLOW));
+    writer.setFieldSeparator(Component.text(": ", NamedTextColor.GRAY));
+  }
 
   public @Nullable Component displayName() {
     var effectiveName = getEffectiveName();
@@ -903,8 +965,8 @@ public class Waypoint {
 
     var color = getTextColor();
     var writer = TextWriters.newWriter();
-    writer.setFieldStyle(Style.style(NamedTextColor.GRAY));
 
+    configureWriter(writer);
     writeHover(writer);
 
     return Text.format("[{0}]", color, effectiveName)

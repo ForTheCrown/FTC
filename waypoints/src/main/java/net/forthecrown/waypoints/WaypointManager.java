@@ -15,7 +15,6 @@ import lombok.Getter;
 import net.forthecrown.Loggers;
 import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.nbt.CompoundTag;
-import net.forthecrown.user.Users;
 import net.forthecrown.utils.collision.WorldChunkMap;
 import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.utils.io.SerializationHelper;
@@ -135,12 +134,7 @@ public class WaypointManager {
    * @param waypoint The waypoint to remove
    */
   public void removeWaypoint(Waypoint waypoint) {
-    waypoint.setInfoSigns(false);
-    waypoint.setLightBlock(false);
-    waypoint.setEditSign(false);
-    waypoint.removeOutline();
-    waypoint.setNameSign(null);
-    waypoint.removeResidentsSign();
+    waypoint.update(false);
 
     WaypointType type = waypoint.getType();
     if (type.isBuildable()) {
@@ -150,14 +144,13 @@ public class WaypointManager {
     type.onDelete(waypoint);
 
     waypoint.manager = null;
-    byId.remove(waypoint.getId());
+    byId.remove(waypoint.getId(), waypoint);
     chunkMap.remove(waypoint.getWorld(), waypoint);
 
     // If has name, remove from name lookup map
     var name = waypoint.get(WaypointProperties.NAME);
     if (!Strings.isNullOrEmpty(name)) {
-      byName.remove(name.toLowerCase());
-      waypoint.setNameSign(null);
+      byName.remove(name.toLowerCase(), waypoint);
     }
 
     // If dynmap installed, remove marker
@@ -166,11 +159,7 @@ public class WaypointManager {
     // If waypoint has residents, loop through them and
     // remove them from the waypoint
     if (!waypoint.getResidents().isEmpty()) {
-      waypoint.getResidents()
-          .keySet()
-          .stream()
-          .map(Users::get)
-          .forEach(user -> user.set(WaypointPrefs.HOME_PROPERTY, null));
+      waypoint.clearResidents();
     }
 
     WaypointRemoveEvent event = new WaypointRemoveEvent(waypoint);

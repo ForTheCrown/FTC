@@ -1,6 +1,5 @@
 package net.forthecrown.waypoints.listeners;
 
-import io.papermc.paper.util.Tick;
 import java.util.HashMap;
 import java.util.Map;
 import net.forthecrown.Loggers;
@@ -37,7 +36,6 @@ class DayChangeListener implements Listener {
 
     DelayedWaypointIterator it = new DelayedWaypointIterator(
         manager.getWaypoints().iterator(),
-        Tick.of(1),
         new RemovalAction(manager)
     );
 
