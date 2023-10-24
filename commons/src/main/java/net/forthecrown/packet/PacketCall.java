@@ -1,5 +1,6 @@
 package net.forthecrown.packet;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import net.forthecrown.user.User;
 import net.minecraft.network.protocol.Packet;
@@ -26,4 +27,6 @@ public interface PacketCall {
   void setCancelled(boolean cancelled);
 
   void setReplacementPacket(Packet<?> replacementPacket);
+
+  void waitForSync(Callable<?> runnable);
 }

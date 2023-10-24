@@ -2,6 +2,7 @@ package net.forthecrown.vanilla.packet;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import net.forthecrown.Loggers;
 import net.forthecrown.packet.PacketCall;
 import net.forthecrown.packet.PacketHandler;
 import net.forthecrown.utils.math.Vectors;
@@ -20,8 +21,11 @@ import org.bukkit.World;
 import org.bukkit.block.Sign;
 import org.bukkit.craftbukkit.v1_20_R2.block.CraftHangingSign;
 import org.bukkit.craftbukkit.v1_20_R2.block.CraftSign;
+import org.slf4j.Logger;
 
 class SignPacketListener {
+
+  private static final Logger LOGGER = Loggers.getLogger();
 
   private final ListenersImpl renderer;
 
@@ -47,6 +51,12 @@ class SignPacketListener {
 
   @PacketHandler(ignoreCancelled = true)
   public void onChunkLoad(ClientboundLevelChunkWithLightPacket packet, PacketCall call)
+      throws ReflectiveOperationException
+  {
+    onChunkLoadSync(packet, call);
+  }
+
+  private void onChunkLoadSync(ClientboundLevelChunkWithLightPacket packet, PacketCall call)
       throws ReflectiveOperationException
   {
     var registry = renderer.getSignRenderers();
@@ -178,10 +188,6 @@ class SignPacketListener {
 
   @PacketHandler(ignoreCancelled = true)
   public void onBlockEntityData(ClientboundBlockEntityDataPacket packet, PacketCall call) {
-    if (renderer.getSignRenderers().isEmpty()) {
-      return;
-    }
-
     if (packet.getType() != BlockEntityType.SIGN
         && packet.getType() != BlockEntityType.HANGING_SIGN
     ) {
@@ -229,10 +235,12 @@ class SignPacketListener {
     }
 
     sign.applyTo(entity);
-    return sign.getSnapshot();
+    return entity;
   }
 
-  private static interface SnapshotGetter<T extends SignBlockEntity> extends Sign {
+  // Hacky ass solution to accessing the BlockEntity NMS snapshot after
+  // creating an instance of a Bukkit sign
+  private interface SnapshotGetter<T extends SignBlockEntity> extends Sign {
 
     T getSnapshot();
 

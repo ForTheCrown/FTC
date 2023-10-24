@@ -1,5 +1,8 @@
 package net.forthecrown.vanilla.packet;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import lombok.Getter;
 import lombok.Setter;
@@ -64,5 +67,20 @@ public class PacketCallImpl implements PacketCall {
   @Override
   public World getWorld() {
     return player.getWorld();
+  }
+
+  @Override
+  public void waitForSync(Callable<?> runnable) {
+    try {
+      CompletableFuture.runAsync(() -> {
+        try {
+          runnable.call();
+        } catch (Throwable t) {
+          t.printStackTrace();
+        }
+      }, executor).get();
+    } catch (InterruptedException | ExecutionException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

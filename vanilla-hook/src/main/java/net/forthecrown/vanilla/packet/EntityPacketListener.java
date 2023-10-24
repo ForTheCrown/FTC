@@ -2,6 +2,7 @@ package net.forthecrown.vanilla.packet;
 
 import io.papermc.paper.adventure.PaperAdventure;
 import java.util.Optional;
+import net.forthecrown.Loggers;
 import net.forthecrown.packet.PacketCall;
 import net.forthecrown.packet.PacketHandler;
 import net.forthecrown.registry.Holder;
@@ -11,10 +12,13 @@ import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.network.syncher.SynchedEntityData.DataValue;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
+import org.slf4j.Logger;
 
 public class EntityPacketListener {
 
-  static final int ID_CUSTOM_NAME = 6;
+  private static final Logger LOGGER = Loggers.getLogger();
+
+  static final int ID_CUSTOM_NAME = 2;
 
   final ListenersImpl listeners;
 
