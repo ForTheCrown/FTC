@@ -1,6 +1,9 @@
 package net.forthecrown.guilds.listeners;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import net.forthecrown.Loggers;
 import net.forthecrown.guilds.Guild;
 import net.forthecrown.guilds.Guilds;
@@ -17,6 +20,9 @@ public class GuildMoveListener implements Listener {
 
   private static final Logger LOGGER = Loggers.getLogger();
 
+  // Map<PlayerId, GuildId>, mapping players to the guild that owns the chunk they're currently located in
+  private final static Map<UUID, UUID> MAP = new Object2ObjectOpenHashMap<>();
+
   @EventHandler(ignoreCancelled = true)
   public void onChunkEnter(PlayerMoveEvent event) {
     // Add cooldown to limit amount ran per player
@@ -30,26 +36,27 @@ public class GuildMoveListener implements Listener {
 
     var manager = Guilds.getManager();
 
-    Guild guildFrom = manager.getChunkMap().get(event.getFrom());
-    Guild guildTo = manager.getChunkMap().get(event.getTo());
+    UUID playerId = event.getPlayer().getUniqueId();
+    UUID guildIdFrom = MAP.get(playerId);
 
-    LOGGER.debug("GuildMoveListener triggered, from={}, to={}",
-        guildFrom == null ? null : guildFrom.getName(),
-        guildTo == null ? null : guildTo.getName()
-    );
+    Guild guildTo = manager.getOwner(Guilds.getChunk(event.getTo()));
+    Guild guildFrom = manager.getGuild(guildIdFrom);
 
     // ? -> Guild
     if (guildTo != null) {
       // No message when moving between chunks of same guild
-      if (Objects.equals(guildFrom, guildTo)) {
+      // Jules: use Objects.equals(o, o1) to minimize MAP lookups
+      if (Objects.equals(MAP.get(playerId), guildTo.getId())) {
         return;
       }
 
       sendInfo(event.getPlayer(), guildTo, "Entering ");
+      MAP.put(playerId, guildTo.getId());
     }
     // Guild -> Wild
-    else if (guildFrom != null) {
+    else if (guildIdFrom != null) {
       sendInfo(event.getPlayer(), guildFrom, "Leaving ");
+      MAP.remove(playerId);
     }
   }
 
