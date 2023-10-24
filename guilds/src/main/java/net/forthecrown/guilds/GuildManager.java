@@ -19,6 +19,7 @@ import java.util.Objects;
 import java.util.UUID;
 import lombok.Getter;
 import net.forthecrown.Loggers;
+import net.forthecrown.Worlds;
 import net.forthecrown.guilds.multiplier.ExpModifiers;
 import net.forthecrown.guilds.unlockables.UnlockableColor;
 import net.forthecrown.guilds.unlockables.Upgradable;
@@ -43,7 +44,7 @@ public class  GuildManager {
   private final GuildDataStorage storage;
 
   @Getter
-  private final ChunkCollisionMap<Guild> chunkMap = new ChunkCollisionMap<>();
+  private final ChunkCollisionMap<Guild> chunkMap;
 
   private final Object2ObjectMap<UUID, Guild> byId = new Object2ObjectOpenHashMap<>();
   final Object2ObjectMap<String, Guild> byName = new Object2ObjectOpenHashMap<>();
@@ -73,6 +74,9 @@ public class  GuildManager {
           ? uuid + " doesn't belong to a guild!"
           : null;
     });
+
+    this.chunkMap = new ChunkCollisionMap<>();
+    this.chunkMap.setWorld(Worlds.overworld());
 
     try {
       this.renderer = new BannerRenderer();

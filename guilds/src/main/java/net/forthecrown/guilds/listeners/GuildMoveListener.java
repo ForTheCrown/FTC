@@ -1,6 +1,7 @@
 package net.forthecrown.guilds.listeners;
 
 import java.util.Objects;
+import net.forthecrown.Loggers;
 import net.forthecrown.guilds.Guild;
 import net.forthecrown.guilds.Guilds;
 import net.forthecrown.utils.Cooldown;
@@ -10,8 +11,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.slf4j.Logger;
 
 public class GuildMoveListener implements Listener {
+
+  private static final Logger LOGGER = Loggers.getLogger();
 
   @EventHandler(ignoreCancelled = true)
   public void onChunkEnter(PlayerMoveEvent event) {
@@ -29,10 +33,14 @@ public class GuildMoveListener implements Listener {
     Guild guildFrom = manager.getChunkMap().get(event.getFrom());
     Guild guildTo = manager.getChunkMap().get(event.getTo());
 
+    LOGGER.debug("GuildMoveListener triggered, from={}, to={}",
+        guildFrom == null ? null : guildFrom.getName(),
+        guildTo == null ? null : guildTo.getName()
+    );
+
     // ? -> Guild
     if (guildTo != null) {
       // No message when moving between chunks of same guild
-      // Jules: use Objects.equals(o, o1) to minimize MAP lookups
       if (Objects.equals(guildFrom, guildTo)) {
         return;
       }
@@ -47,16 +55,9 @@ public class GuildMoveListener implements Listener {
 
   // Format a message and send to player's action bar
   private void sendInfo(Player player, Guild guild, String info) {
-    // Jules: Add braces to if statement
-    if (guild == null) {
-      return; // shouldn't happen?
-      // Jules: Might happen if the guild has been removed,
-      // or if chunk was unclaimed
-    }
-
-    player.sendActionBar(Component.text(info)
-        .color(NamedTextColor.GOLD)
-        .append(guild.getPrefix())
+    player.sendActionBar(
+        Component.text(info, NamedTextColor.GOLD)
+            .append(guild.getPrefix())
     );
   }
 }
