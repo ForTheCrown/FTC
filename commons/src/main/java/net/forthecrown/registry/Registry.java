@@ -4,9 +4,29 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.DynamicOps;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import it.unimi.dsi.fastutil.objects.*;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrays;
+import it.unimi.dsi.fastutil.objects.ObjectCollection;
+import it.unimi.dsi.fastutil.objects.ObjectCollections;
+import it.unimi.dsi.fastutil.objects.ObjectSet;
+import it.unimi.dsi.fastutil.objects.ObjectSets;
+import java.util.Arrays;
+import java.util.ListIterator;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 import lombok.Getter;
 import net.forthecrown.Loggers;
 import net.forthecrown.nbt.BinaryTag;
@@ -14,16 +34,12 @@ import net.forthecrown.nbt.BinaryTags;
 import net.forthecrown.nbt.StringTag;
 import net.forthecrown.utils.AbstractListIterator;
 import net.forthecrown.utils.ArrayIterator;
+import net.forthecrown.utils.io.Results;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.intellij.lang.annotations.Pattern;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
-
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 /**
  * A registry is a map of string keys to entries and an array of entry id 2 entries at the same
@@ -816,6 +832,52 @@ public class Registry<V> implements Iterable<V> {
   }
 
   /* --------------------------- SERIALIZATION ---------------------------- */
+
+  public Codec<V> registryCodec() {
+    return new Codec<>() {
+      @Override
+      public <T> DataResult<Pair<V, T>> decode(DynamicOps<T> ops, T input) {
+        return Registry.this.decode(ops, input).map(v -> Pair.of(v, input));
+      }
+
+      @Override
+      public <T> DataResult<T> encode(V input, DynamicOps<T> ops, T prefix) {
+        return getKey(input)
+            .map(ops::createString)
+            .map(Results::success)
+            .orElseGet(() -> {
+              return Results.error("Unregistered value: %s", input);
+            });
+      }
+    };
+  }
+
+  public <S> DataResult<V> decode(DynamicOps<S> ops, S value) {
+    return decode(new Dynamic<>(ops, value));
+  }
+
+  public <S> DataResult<V> decode(Dynamic<S> dynamic) {
+    var idResult = dynamic.asNumber();
+    var stringResult = dynamic.asString();
+
+    if (stringResult.result().isPresent()) {
+      return stringResult.flatMap(s -> {
+        return get(s)
+            .map(DataResult::success)
+            .orElseGet(() -> Results.error("Unknown value '%s'", s));
+      });
+    }
+
+    if (idResult.result().isPresent()) {
+      return idResult.flatMap(idNumber -> {
+        return get(idNumber.intValue())
+            .map(DataResult::success)
+            .orElseGet(() -> Results.error("Unknown value '%s'", idNumber));
+      });
+    }
+
+    return Results.error("Registry values can only be loaded from Strings/ID numbers");
+  }
 
   /**
    * Reads a value from the give element.
