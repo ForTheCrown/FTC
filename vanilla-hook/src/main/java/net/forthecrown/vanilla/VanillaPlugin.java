@@ -9,8 +9,21 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class VanillaPlugin extends JavaPlugin {
 
+  static final int CURRENT_DATA_VERSION = 3578;
+
   @Override
   public void onEnable() {
+    // Ensure the plugin's set vanilla version is the
+    // same as the server's version
+    int serverDataVersion = Bukkit.getUnsafe().getDataVersion();
+    if (serverDataVersion != CURRENT_DATA_VERSION) {
+      throw new IllegalStateException(String.format(
+          "Minecraft DataVersion mismatch for vanilla-hook plugin! Versions: server=%s plugin=%s",
+          serverDataVersion, CURRENT_DATA_VERSION
+      ));
+    }
+
+
     var listeners = ListenersImpl.getListeners();
     listeners.initalize();
 

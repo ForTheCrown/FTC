@@ -1,9 +1,10 @@
 package net.forthecrown.vanilla.packet;
 
+import static net.forthecrown.vanilla.utils.Reflect.getField;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.UUID;
 import net.forthecrown.packet.PacketCall;
@@ -91,15 +92,5 @@ class GamemodePacketListener {
         = new ClientboundPlayerInfoUpdatePacket(buf);
 
     call.setReplacementPacket(replacementPacket);
-  }
-
-  static <T> T getField(Object o, String fieldName) {
-    try {
-      Field f = o.getClass().getDeclaredField(fieldName);
-      f.setAccessible(true);
-      return (T) f.get(o);
-    } catch (Throwable t) {
-      throw new RuntimeException(t);
-    }
   }
 }
