@@ -274,7 +274,7 @@ public final class VanillaAccess {
   }
 
   public static int getDataVersion() {
-    return SharedConstants.getCurrentVersion().getDataVersion().getVersion();
+    return Bukkit.getUnsafe().getDataVersion();
   }
 
   public static Map<PatternType, String> getPatternFilenames() {
