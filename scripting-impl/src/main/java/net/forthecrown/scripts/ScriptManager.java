@@ -110,6 +110,8 @@ public class ScriptManager implements ScriptService {
       ScriptableObject.putConstProperty(topLevelScope, autoImportedClass.getSimpleName(), njc);
     }
 
+    FtcScriptRuntime.initStandardObjects(topLevelScope);
+
     return topLevelScope;
   }
 
