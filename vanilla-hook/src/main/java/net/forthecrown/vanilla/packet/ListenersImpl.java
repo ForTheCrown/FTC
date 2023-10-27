@@ -96,7 +96,7 @@ public class ListenersImpl implements PacketListeners {
       value = new DataValue<>(accessor.getId(), accessor.getSerializer(), vanillaValue);
     } else {
       EntityDataAccessor<Optional<net.minecraft.network.chat.Component>> accessor
-          = Accessors.find(ACCESSOR_CUSTOM_NAME, TextDisplay.class);
+          = Accessors.find(ACCESSOR_CUSTOM_NAME, net.minecraft.world.entity.Entity.class);
 
       Optional<net.minecraft.network.chat.Component> vanillaValue
           = Optional.ofNullable(PaperAdventure.asVanilla(text));

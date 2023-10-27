@@ -50,6 +50,6 @@ public class Accessors {
       }
     }
 
-    return null;
+    throw new IllegalStateException("Cannot find DataAccessor with ID " + accessorId);
   }
 }
