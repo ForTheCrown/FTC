@@ -6,6 +6,7 @@ import com.mojang.serialization.Codec;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -75,6 +76,8 @@ public class UserServiceImpl implements UserService {
   private final Registry<Currency> currencies;
 
   private boolean componentRegistryFrozen = false;
+
+  private final List<String> defunctProperties = new ArrayList<>();
 
   public UserServiceImpl(CorePlugin plugin) {
     this.plugin = plugin;
@@ -311,6 +314,17 @@ public class UserServiceImpl implements UserService {
   @Override
   public Registry<UserProperty<?>> getUserProperties() {
     return propertyRegistry;
+  }
+
+  @Override
+  public void setPropertyDefunct(String propertyId) {
+    Objects.requireNonNull(propertyId, "Null propertyId");
+    Preconditions.checkArgument(
+        !propertyRegistry.contains(propertyId),
+        "propertyId belongs to currently registered property"
+    );
+
+    defunctProperties.add(propertyId);
   }
 
   void ensureNotFrozen() {

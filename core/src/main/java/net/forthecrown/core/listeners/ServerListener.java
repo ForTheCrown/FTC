@@ -7,6 +7,7 @@ import net.forthecrown.core.user.UserServiceImpl;
 import net.forthecrown.enchantment.FtcEnchants;
 import net.forthecrown.events.EarlyShutdownEvent;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.ServerLoadEvent;
@@ -14,7 +15,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 class ServerListener implements Listener {
 
-  @EventHandler(ignoreCancelled = true)
+  @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
   public void onServerLoad(ServerLoadEvent event) {
     CorePlugin plugin = JavaPlugin.getPlugin(CorePlugin.class);
     plugin.getUserService().onServerLoaded();

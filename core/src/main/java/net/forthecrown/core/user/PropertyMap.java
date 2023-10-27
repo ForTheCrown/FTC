@@ -192,14 +192,20 @@ public class PropertyMap implements UserComponent {
     var registry = Users.getService().getUserProperties();
 
     JsonObject unknown = new JsonObject();
+    UserServiceImpl service = (UserServiceImpl) Users.getService();
 
     for (var e : obj.entrySet()) {
+      if (service.getDefunctProperties().contains(e.getKey())) {
+        LOGGER.debug("Skipping defunct property '{}'", e.getKey());
+        continue;
+      }
+
       // Get property by entry name
       UserProperty<Object> property = (UserProperty<Object>) registry.orNull(e.getKey());
 
       // Test the property isn't null
       if (property == null) {
-        Loggers.getLogger().warn(
+        LOGGER.warn(
             "Found unknown user property: '{}', adding to unknown property list",
             e.getKey()
         );

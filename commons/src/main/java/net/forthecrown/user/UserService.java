@@ -98,6 +98,17 @@ public interface UserService {
   Registry<UserProperty<?>> getUserProperties();
 
   /**
+   * Marks a user property as 'defunct' meaning it will be ignored when loading user properties.
+   * <p>
+   * The result will be erroneous if the specified {@code propertyId} is the ID of a currently
+   * registered property.
+   *
+   * @param propertyId Property ID
+   * @return Mark result
+   */
+  void setPropertyDefunct(String propertyId);
+
+  /**
    * Creates a UUID user property builder
    * @return Created builder
    */
