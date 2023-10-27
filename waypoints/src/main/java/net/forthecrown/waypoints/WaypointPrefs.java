@@ -1,6 +1,5 @@
 package net.forthecrown.waypoints;
 
-import java.util.UUID;
 import net.forthecrown.command.settings.Setting;
 import net.forthecrown.command.settings.SettingsBook;
 import net.forthecrown.user.Properties;
@@ -24,11 +23,6 @@ public class WaypointPrefs {
 
   public static final UserProperty<WaypointOrder> MENU_ORDER
       = Properties.enumProperty("waypoints/list_order", WaypointOrder.NAME);
-
-  public static final UserProperty<UUID> HOME_PROPERTY = Properties.uuidProperty()
-      .key("homeWaypoint")
-      .defaultValue(Waypoints.NIL_UUID)
-      .build();
 
   static void createSettings(SettingsBook<User> settingsBook) {
     Setting hulkSmashing = Setting.create(WaypointPrefs.HULK_SMASH_ENABLED)

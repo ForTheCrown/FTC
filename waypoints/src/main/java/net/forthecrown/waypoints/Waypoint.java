@@ -902,38 +902,42 @@ public class Waypoint {
   }
 
   public void addResident(UUID uuid) {
-    setResident(uuid, System.currentTimeMillis());
-  }
-
-  public void setResident(UUID uuid, long time) {
-    if (isResident(uuid)) {
+    if (!isResident(uuid)) {
       return;
     }
 
-    residents.put(uuid, time);
+    setResident(uuid, System.currentTimeMillis());
+  }
+
+  public void setResident(UUID playerId, long time) {
+    Objects.requireNonNull(playerId, "Null playerId");
+
+    residents.put(playerId, time);
 
     if (hasBeenAdded()) {
       updateResidentsSign();
 
-      var service = Users.getService();
-      if (service.userLoadingAllowed()) {
-        var user = Users.get(uuid);
-        user.set(WaypointPrefs.HOME_PROPERTY, getId());
-      }
+      WaypointHomes.getWaypoint(playerId).ifPresent(w -> {
+        // Don't modify if the player's current home if it's already this region
+        if (Objects.equals(getId(), w.getId())) {
+          return;
+        }
+
+        w.removeResident(playerId);
+      });
+
+      WaypointHomes.setHome(playerId, this);
     }
   }
 
-  public void removeResident(UUID uuid) {
-    residents.removeLong(uuid);
+  public void removeResident(UUID playerId) {
+    Objects.requireNonNull(playerId, "Null playerId");
+
+    residents.removeLong(playerId);
 
     if (hasBeenAdded()) {
       updateResidentsSign();
-
-      var service = Users.getService();
-      if (service.userLoadingAllowed()) {
-        var user = Users.get(uuid);
-        user.set(WaypointPrefs.HOME_PROPERTY, null);
-      }
+      WaypointHomes.setHome(playerId, null);
     }
   }
 

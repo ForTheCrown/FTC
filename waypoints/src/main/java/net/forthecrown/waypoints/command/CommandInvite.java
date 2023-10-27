@@ -13,7 +13,8 @@ import net.forthecrown.user.UserBlockList;
 import net.forthecrown.waypoints.WExceptions;
 import net.forthecrown.waypoints.WMessages;
 import net.forthecrown.waypoints.WPermissions;
-import net.forthecrown.waypoints.Waypoints;
+import net.forthecrown.waypoints.Waypoint;
+import net.forthecrown.waypoints.WaypointHomes;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Sound;
 
@@ -44,9 +45,9 @@ public class CommandInvite extends FtcCommand {
                 throw Exceptions.format("You have inviting turned off");
               }
 
-              var waypoint = Waypoints.getHomeWaypoint(user);
+              Optional<Waypoint> waypoint = WaypointHomes.getHome(user);
 
-              if (waypoint == null) {
+              if (waypoint.isEmpty()) {
                 throw WExceptions.NO_HOME_REGION;
               }
 
@@ -65,7 +66,7 @@ public class CommandInvite extends FtcCommand {
               }
 
               for (var target : targets) {
-                waypoint.invite(user.getUniqueId(), target.getUniqueId());
+                waypoint.get().invite(user.getUniqueId(), target.getUniqueId());
 
                 target.sendMessage(WMessages.targetInvited(user));
                 target.playSound(Sound.UI_TOAST_IN, 2, 1.3f);

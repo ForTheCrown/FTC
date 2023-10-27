@@ -6,6 +6,8 @@ import net.forthecrown.packet.PacketListeners;
 import net.forthecrown.packet.SignRenderer;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.user.User;
+import net.forthecrown.user.UserService;
+import net.forthecrown.user.Users;
 import net.forthecrown.utils.PeriodicalSaver;
 import net.forthecrown.utils.TomlConfigs;
 import net.forthecrown.waypoints.command.WaypointCommands;
@@ -41,6 +43,9 @@ public class WaypointsPlugin extends JavaPlugin {
 
     Registry<SignRenderer> renderers = PacketListeners.listeners().getSignRenderers();
     renderers.register("waypoint_edit_sign", new WaypointSignRenderer(WaypointManager.instance));
+
+    UserService service = Users.getService();
+    service.setPropertyDefunct("homeWaypoint");
   }
 
   @Override

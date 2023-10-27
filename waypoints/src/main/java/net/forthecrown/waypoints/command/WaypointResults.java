@@ -1,6 +1,7 @@
 package net.forthecrown.waypoints.command;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.Optional;
 import net.forthecrown.command.Exceptions;
 import net.forthecrown.command.arguments.ParseResult;
 import net.forthecrown.grenadier.CommandSource;
@@ -12,6 +13,7 @@ import net.forthecrown.user.Users;
 import net.forthecrown.waypoints.WExceptions;
 import net.forthecrown.waypoints.WPermissions;
 import net.forthecrown.waypoints.Waypoint;
+import net.forthecrown.waypoints.WaypointHomes;
 import net.forthecrown.waypoints.WaypointProperties;
 import net.forthecrown.waypoints.Waypoints;
 
@@ -76,9 +78,9 @@ public interface WaypointResults {
       User user = Users.get(lookup);
       boolean self = source.textName().equals(user.getName());
 
-      Waypoint waypoint = Waypoints.getHomeWaypoint(user);
+      Optional<Waypoint> waypoint = WaypointHomes.getHome(user);
 
-      if (waypoint == null) {
+      if (waypoint.isEmpty()) {
         if (self) {
           throw WExceptions.NO_HOME_REGION;
         } else {
@@ -95,11 +97,11 @@ public interface WaypointResults {
         );
       }
 
-      if (shouldValidate && !self && isAccessInvalid(source, waypoint)) {
+      if (shouldValidate && !self && isAccessInvalid(source, waypoint.get())) {
         throw WExceptions.notInvited(user);
       }
 
-      return waypoint;
+      return waypoint.get();
     }
   }
 

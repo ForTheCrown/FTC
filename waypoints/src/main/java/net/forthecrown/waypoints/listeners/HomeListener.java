@@ -1,7 +1,9 @@
 package net.forthecrown.waypoints.listeners;
 
+import java.util.Optional;
 import net.forthecrown.user.event.HomeCommandEvent;
 import net.forthecrown.waypoints.Waypoint;
+import net.forthecrown.waypoints.WaypointHomes;
 import net.forthecrown.waypoints.Waypoints;
 import net.forthecrown.waypoints.visit.WaypointVisit;
 import org.bukkit.event.EventHandler;
@@ -24,13 +26,13 @@ public class HomeListener implements Listener {
       return;
     }
 
-    Waypoint home = Waypoints.getHomeWaypoint(user);
+    Optional<Waypoint> home = WaypointHomes.getHome(user);
 
-    if (home == null) {
+    if (home.isEmpty()) {
       return;
     }
 
     event.setCancelled(true);
-    WaypointVisit.visit(user, home);
+    WaypointVisit.visit(user, home.get());
   }
 }

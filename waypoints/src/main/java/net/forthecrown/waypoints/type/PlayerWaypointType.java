@@ -15,6 +15,7 @@ import net.forthecrown.utils.math.Bounds3i;
 import net.forthecrown.waypoints.WExceptions;
 import net.forthecrown.waypoints.WMessages;
 import net.forthecrown.waypoints.Waypoint;
+import net.forthecrown.waypoints.WaypointHomes;
 import net.forthecrown.waypoints.WaypointManager;
 import net.forthecrown.waypoints.WaypointProperties;
 import net.forthecrown.waypoints.Waypoints;
@@ -48,12 +49,12 @@ public class PlayerWaypointType extends WaypointType {
 
     Waypoints.validateMoveInCooldown(creator);
 
-    var alreadyOwned = Waypoints.getHomeWaypoint(creator);
-    if (alreadyOwned == null) {
+    var alreadyOwned = WaypointHomes.getHome(creator);
+    if (alreadyOwned.isEmpty()) {
       return;
     }
 
-    throw WExceptions.homeAlreadySet(alreadyOwned);
+    throw WExceptions.homeAlreadySet(alreadyOwned.get());
   }
 
   @Override

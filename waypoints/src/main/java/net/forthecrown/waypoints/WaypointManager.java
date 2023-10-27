@@ -20,6 +20,7 @@ import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.utils.io.SerializationHelper;
 import net.forthecrown.waypoints.event.WaypointRemoveEvent;
 import net.forthecrown.waypoints.type.WaypointType;
+import net.forthecrown.waypoints.util.MultiHomeFixer;
 import org.slf4j.Logger;
 
 public class WaypointManager {
@@ -227,6 +228,11 @@ public class WaypointManager {
     return Collections.unmodifiableCollection(byId.values());
   }
 
+  private void runMultiWaypointHomeCheck() {
+    MultiHomeFixer fixer = new MultiHomeFixer(this);
+    fixer.run();
+  }
+
   /* --------------------------- SERIALIZATION ---------------------------- */
 
   protected void load(CompoundTag tag) {
@@ -239,9 +245,11 @@ public class WaypointManager {
         waypoint.load(e.getValue().asCompound());
         addWaypoint(waypoint);
       } catch (Throwable t) {
-        LOGGER.debug("Couldn't load waypoint {}", e.getKey(), t);
+        LOGGER.error("Couldn't load waypoint {}", e.getKey(), t);
       }
     }
+
+    runMultiWaypointHomeCheck();
   }
 
   protected void save(CompoundTag tag) {

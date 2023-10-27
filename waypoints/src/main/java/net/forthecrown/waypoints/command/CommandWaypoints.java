@@ -39,8 +39,8 @@ import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.waypoints.WMessages;
 import net.forthecrown.waypoints.WPermissions;
 import net.forthecrown.waypoints.Waypoint;
+import net.forthecrown.waypoints.WaypointHomes;
 import net.forthecrown.waypoints.WaypointManager;
-import net.forthecrown.waypoints.WaypointPrefs;
 import net.forthecrown.waypoints.WaypointProperties;
 import net.forthecrown.waypoints.WaypointProperty;
 import net.forthecrown.waypoints.Waypoints;
@@ -356,7 +356,7 @@ public class CommandWaypoints {
       @Argument("player") User user,
       @Argument("time") Instant time
   ) throws CommandSyntaxException {
-    UUID currentHome = user.get(WaypointPrefs.HOME_PROPERTY);
+    UUID currentHome = WaypointHomes.getHome(user).map(Waypoint::getId).orElse(null);
 
     if (Objects.equals(waypoint.getId(), currentHome)) {
       long movein = waypoint.getResidents().getLong(user.getUniqueId());

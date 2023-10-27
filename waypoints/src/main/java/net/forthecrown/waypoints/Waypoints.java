@@ -583,14 +583,4 @@ public final class Waypoints {
 
     WaypointWebmaps.updateMarker(waypoint);
   }
-
-  public static Waypoint getHomeWaypoint(User user) {
-    UUID homeId = user.get(WaypointPrefs.HOME_PROPERTY);
-    if (NIL_UUID.equals(homeId)) {
-      return null;
-    }
-
-    var manager = WaypointManager.getInstance();
-    return manager.get(homeId);
-  }
 }
