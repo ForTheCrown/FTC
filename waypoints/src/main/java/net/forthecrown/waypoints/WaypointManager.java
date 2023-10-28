@@ -250,6 +250,7 @@ public class WaypointManager {
     }
 
     runMultiWaypointHomeCheck();
+    syncResidents();
   }
 
   protected void save(CompoundTag tag) {
@@ -258,6 +259,14 @@ public class WaypointManager {
       w.save(cTag);
 
       tag.put(w.getId().toString(), cTag);
+    }
+  }
+
+  private void syncResidents() {
+    for (Waypoint waypoint : getWaypoints()) {
+      for (UUID uuid : waypoint.getResidents().keySet()) {
+        WaypointHomes.setHome(uuid, waypoint);
+      }
     }
   }
 }
