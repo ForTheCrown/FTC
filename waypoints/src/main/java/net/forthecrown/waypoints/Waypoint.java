@@ -59,6 +59,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.mutable.Mutable;
+import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
@@ -1000,10 +1002,13 @@ public class Waypoint {
       writer.newLine();
     }
 
-    type.writeHover(writer, this);
+    Mutable<Boolean> anythingWritten = new MutableBoolean(false);
+
+    type.writeHover(writer, this, anythingWritten);
 
     if (Worlds.overworld().equals(getWorld())) {
       writer.field("Location", Text.format("{0, vector}", getPosition()));
+      anythingWritten.setValue(true);
     }
 
     if (!get(WaypointProperties.HIDE_RESIDENTS)) {
@@ -1015,10 +1020,15 @@ public class Waypoint {
         UUID resident = this.residents.keySet().iterator().next();
         writer.formattedField("Resident", "{0, user}", resident);
       }
+
+      anythingWritten.setValue(true);
     }
 
-    writer.newLine();
-    writer.newLine();
+    if (anythingWritten.getValue()) {
+      writer.newLine();
+      writer.newLine();
+    }
+
     writer.field("Stats");
 
     writer.field("Visits today", get(WaypointProperties.VISITS_DAILY));

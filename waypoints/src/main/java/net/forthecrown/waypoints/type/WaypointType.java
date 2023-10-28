@@ -10,6 +10,7 @@ import net.forthecrown.utils.math.Bounds3i;
 import net.forthecrown.waypoints.Waypoint;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import org.apache.commons.lang3.mutable.Mutable;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
@@ -149,7 +150,7 @@ public abstract class WaypointType {
     return null;
   }
 
-  public void writeHover(TextWriter writer, Waypoint waypoint) {
+  public void writeHover(TextWriter writer, Waypoint waypoint, Mutable<Boolean> written) {
 
   }
 }

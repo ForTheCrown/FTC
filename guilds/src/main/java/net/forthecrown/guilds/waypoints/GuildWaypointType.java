@@ -11,12 +11,14 @@ import net.forthecrown.guilds.GuildMember;
 import net.forthecrown.guilds.GuildPermission;
 import net.forthecrown.guilds.GuildPermissions;
 import net.forthecrown.guilds.Guilds;
+import net.forthecrown.text.TextWriter;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.waypoints.Waypoint;
 import net.forthecrown.waypoints.type.PlayerWaypointType;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import org.apache.commons.lang3.mutable.Mutable;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.spongepowered.math.vector.Vector3i;
@@ -86,6 +88,16 @@ public class GuildWaypointType extends PlayerWaypointType {
     return getGuild(waypoint)
         .map(guild -> guild.getSettings().getPrimaryColor().getTextColor())
         .orElse(NamedTextColor.GOLD);
+  }
+
+  @Override
+  public void writeHover(TextWriter writer, Waypoint waypoint, Mutable<Boolean> written) {
+    super.writeHover(writer, waypoint, written);
+
+    getGuild(waypoint).ifPresent(guild -> {
+      written.setValue(true);
+      writer.field("Guild", guild.displayName());
+    });
   }
 
   @Override

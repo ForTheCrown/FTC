@@ -19,6 +19,7 @@ import net.forthecrown.waypoints.WaypointHomes;
 import net.forthecrown.waypoints.WaypointManager;
 import net.forthecrown.waypoints.WaypointProperties;
 import net.forthecrown.waypoints.Waypoints;
+import org.apache.commons.lang3.mutable.Mutable;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -103,8 +104,9 @@ public class PlayerWaypointType extends WaypointType {
   }
 
   @Override
-  public void writeHover(TextWriter writer, Waypoint waypoint) {
+  public void writeHover(TextWriter writer, Waypoint waypoint, Mutable<Boolean> written) {
     getOwner(waypoint).ifPresent(user -> {
+      written.setValue(true);
       writer.field("Owner", user.displayName(writer.viewer(), DisplayIntent.HOVER_TEXT));
     });
   }
