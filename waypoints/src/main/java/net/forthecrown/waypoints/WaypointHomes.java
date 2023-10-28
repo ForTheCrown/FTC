@@ -37,4 +37,8 @@ public class WaypointHomes {
     Objects.requireNonNull(user, "Null user");
     setHome(user.getUniqueId(), waypoint);
   }
+
+  public static void clear() {
+    playerId2Home.clear();
+  }
 }

@@ -96,6 +96,7 @@ public class WaypointManager {
     byName.clear();
     byId.clear();
     chunkMap.clear();
+    WaypointHomes.clear();
   }
 
   /**
