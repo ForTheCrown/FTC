@@ -3,12 +3,15 @@ package net.forthecrown.scripts;
 import com.google.gson.JsonParser;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Grenadier;
+import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.text.Text;
+import net.forthecrown.utils.inventory.ItemStacks;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.NativeJSON;
 import org.mozilla.javascript.ScriptRuntime;
@@ -36,6 +39,29 @@ public final class ScriptUtils {
     }
 
     return Text.valueOf(val);
+  }
+
+  public static ItemStack toItemStack(Object[] args, int index) {
+    if (args.length <= index) {
+      return null;
+    }
+    Object value = args[index];
+
+    if (value instanceof String string) {
+      return ItemStacks.fromNbtString(string);
+    }
+
+    Object jType = Context.jsToJava(value, Object.class);
+
+    if (jType instanceof CompoundTag tag) {
+      return ItemStacks.load(tag);
+    }
+
+    if (jType instanceof ItemStack itemStack) {
+      return itemStack;
+    }
+
+    throw ScriptRuntime.typeError("Not an itemstack " + value);
   }
 
   public static CommandSource toSource(Object[] args, int index) {

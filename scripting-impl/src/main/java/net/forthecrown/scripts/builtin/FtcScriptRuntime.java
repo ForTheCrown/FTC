@@ -1,7 +1,8 @@
-package net.forthecrown.scripts;
+package net.forthecrown.scripts.builtin;
 
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Grenadier;
+import net.forthecrown.scripts.ScriptUtils;
 import org.bukkit.Bukkit;
 import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.NativeObject;
@@ -27,9 +28,12 @@ public class FtcScriptRuntime {
     return runString(source, args, 1);
   };
 
-  static void initStandardObjects(NativeObject object) {
+  static final Callable GIVE_ITEM = new GiveItemFunction();
+
+  public static void initStandardObjects(NativeObject object) {
     ScriptableObject.putConstProperty(object, "command", EXEC_CONSOLE);
     ScriptableObject.putConstProperty(object, "runAs", EXEC_AS);
+    ScriptableObject.putConstProperty(object, "giveItem", GIVE_ITEM);
   }
 
   static Object runString(CommandSource sender, Object[] args, int argsStart) {
