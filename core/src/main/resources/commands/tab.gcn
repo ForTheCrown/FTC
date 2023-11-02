@@ -2,6 +2,11 @@ name = "tab"
 aliases = "user_tab" | "usertab"
 description = "Modifys a player's tab prefix/suffix/display name"
 
+literal("update") {
+  description = "Updates the TAB menu for every player"
+  executes = update()
+}
+
 literal("name").argument("user", user) {
   map_result = @result_to_user
 

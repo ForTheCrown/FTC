@@ -1,5 +1,6 @@
 package net.forthecrown.core.commands.admin;
 
+import net.forthecrown.core.TabList;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.annotations.Argument;
 import net.forthecrown.grenadier.annotations.CommandFile;
@@ -12,6 +13,11 @@ import net.kyori.adventure.text.format.NamedTextColor;
 
 @CommandFile("commands/tab.gcn")
 public class CommandTab {
+
+  void update(CommandSource source) {
+    TabList.update();
+    source.sendSuccess(Component.text("Updated TAB menu for all players"));
+  }
 
   void setSuffix(CommandSource source, @Argument("user") User user, @Argument("text") Component text) {
     set(source, user, "suffix", Properties.SUFFIX, text);
