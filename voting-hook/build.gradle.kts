@@ -22,4 +22,8 @@ pluginYml {
   depends {
     required("VotingPlugin")
   }
+
+  loadAfter {
+    regular("project:leaderboards")
+  }
 }

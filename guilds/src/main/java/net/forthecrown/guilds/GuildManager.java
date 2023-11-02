@@ -23,6 +23,7 @@ import net.forthecrown.Worlds;
 import net.forthecrown.guilds.multiplier.ExpModifiers;
 import net.forthecrown.guilds.unlockables.UnlockableColor;
 import net.forthecrown.guilds.unlockables.Upgradable;
+import net.forthecrown.leaderboards.Leaderboards;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.ScoreIntMap;
 import net.forthecrown.utils.collision.ChunkCollisionMap;
@@ -247,13 +248,19 @@ public class  GuildManager {
     return chunkMap.getChunks(guild);
   }
 
-  public void setChunkOwner(Guild guild, Vector2i pos) {
-    chunkMap.put(guild, pos.x(), pos.y());
+  public void setChunkOwner(Guild guild, Vector2i chunkPos) {
+    if (guild == null) {
+      chunkMap.remove(chunkPos.x(), chunkPos.y());
+    } else {
+      chunkMap.put(guild, chunkPos.x(), chunkPos.y());
+    }
+
+    Leaderboards.updateWithSource("guilds/chunks");
 
     if (guild == null) {
-      GuildWebmaps.unrenderChunk(pos);
+      GuildWebmaps.unrenderChunk(chunkPos);
     } else {
-      GuildWebmaps.renderChunk(pos, guild);
+      GuildWebmaps.renderChunk(chunkPos, guild);
     }
   }
 
@@ -268,6 +275,8 @@ public class  GuildManager {
 
     chunkMap.remove(pos);
     GuildWebmaps.unrenderChunk(Guilds.chunkFromPacked(pos));
+
+    Leaderboards.updateWithSource("guilds/chunks");
   }
 
   // Data managing

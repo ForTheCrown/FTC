@@ -86,6 +86,18 @@ public interface UserService {
    */
   ScoreIntMap<UUID> getVotes();
 
+  ScoreIntMap<UUID> getBalances();
+
+  ScoreIntMap<UUID> getGems();
+
+  /**
+   * Gets a score map of players' total playtime (in seconds)
+   * @return Playtime
+   */
+  ScoreIntMap<UUID> getPlaytime();
+
+  ScoreIntMap<UUID> getMonthlyPlaytime();
+
   /**
    * Gets the user property registry.
    * <p>

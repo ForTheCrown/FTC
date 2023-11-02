@@ -37,29 +37,30 @@ public class FilterParser implements Suggester<CommandSource> {
     value = reader.readInt();
 
     suggest(reader.getCursor(), suggestAnd());
-    int beforeSkip = reader.getCursor();
-
-    reader.skipWhitespace();
 
     if (reader.canRead() && reader.peek() == '&') {
       reader.skip();
-      reader.skipWhitespace();
       and = parse();
     } else {
       and = null;
-      reader.setCursor(beforeSkip);
     }
 
     return new ScoreFilter(value, op, and);
   }
 
   Operation parseOp() throws CommandSyntaxException {
+    if (!reader.canRead()) {
+      throw Grenadier.exceptions()
+          .createWithContext("Expected Operation token (< > <= >= = !=)", reader);
+    }
+
     int peek = reader.peek();
     return switch (peek) {
       case '<' -> {
         reader.skip();
 
         if (reader.canRead() && reader.peek() == '=') {
+          reader.skip();
           yield Operation.LESS_THAN_EQUAL;
         }
 
@@ -70,6 +71,7 @@ public class FilterParser implements Suggester<CommandSource> {
         reader.skip();
 
         if (reader.canRead() && reader.peek() == '=') {
+          reader.skip();
           yield Operation.GREATER_THAN_EQUAL;
         }
 

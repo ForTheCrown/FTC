@@ -206,21 +206,14 @@ public @UtilityClass class FtcCodecs {
             WORLD_CODEC.optionalFieldOf("world").forGetter(o -> Optional.ofNullable(o.getWorld())),
 
             Codec.DOUBLE.fieldOf("x").forGetter(Location::getX),
-            Codec.DOUBLE.fieldOf("y").forGetter(Location::getZ),
-            Codec.DOUBLE.fieldOf("z").forGetter(Location::getY),
+            Codec.DOUBLE.fieldOf("y").forGetter(Location::getY),
+            Codec.DOUBLE.fieldOf("z").forGetter(Location::getZ),
 
-            Codec.FLOAT.optionalFieldOf("yaw").forGetter(o -> {
-              float yaw = o.getYaw();
-              return yaw == 0 ? Optional.empty() : Optional.of(yaw);
-            }),
-
-            Codec.FLOAT.optionalFieldOf("pitch").forGetter(o -> {
-              float pitch = o.getPitch();
-              return pitch == 0 ? Optional.empty() : Optional.of(pitch);
-            })
+            Codec.FLOAT.optionalFieldOf("yaw", 0f).forGetter(Location::getYaw),
+            Codec.FLOAT.optionalFieldOf("pitch", 0f).forGetter(Location::getPitch)
         )
         .apply(instance, (world, x, y, z, yaw, pitch) -> {
-          return new Location(world.orElse(null), x, y, z, yaw.orElse(0f), pitch.orElse(0f));
+          return new Location(world.orElse(null), x, y, z, yaw, pitch);
         });
   });
 

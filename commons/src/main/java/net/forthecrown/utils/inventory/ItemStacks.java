@@ -5,6 +5,7 @@ import it.unimi.dsi.fastutil.Hash.Strategy;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenCustomHashMap;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -237,6 +238,14 @@ public final class ItemStacks {
     return !isEmpty(stack);
   }
 
+  /**
+   * Tests if an inventory has room for all items in the specified {@code items} list
+   * @param inventory Inventory to test against
+   * @param items Item to test
+   * @return {@code true}, if there is enough room for all items to be placed into the inventory,
+   *         {@code false} otherwise
+   * @throws NullPointerException If the {@code inventory} or {@code items} are null
+   */
   public static boolean hasRoom(Inventory inventory, Collection<ItemStack> items) {
     Objects.requireNonNull(inventory);
     Objects.requireNonNull(items);
@@ -295,10 +304,25 @@ public final class ItemStacks {
     return null;
   }
 
+  /**
+   * Tests if the specified {@code inventory} has room for the specified {@code item} to be added
+   * @param inventory Inventory to test against
+   * @param item Item to test
+   * @return {@code true}, if the {@code item} can be added to the inventory,
+   *         {@code false} otherwise
+   */
   public static boolean hasRoom(Inventory inventory, ItemStack item) {
     return hasRoom(inventory, item, item.getAmount());
   }
 
+  /**
+   * Tests if the specified {@code inventory} has room for the specified {@code item} to be added
+   * @param inventory Inventory to test against
+   * @param item Item to test
+   * @param requiredCount Amount of items
+   * @return {@code true}, if the {@code item} can be added to the inventory,
+   *         {@code false} otherwise
+   */
   public static boolean hasRoom(Inventory inventory, ItemStack item, int requiredCount) {
     if (requiredCount < 1) {
       return true;
@@ -327,6 +351,11 @@ public final class ItemStacks {
     return false;
   }
 
+  /**
+   * Counts the total amount of each item in a specified {@code items} list.
+   * @param items Items to count
+   * @return Item to total quantity map
+   */
   public static Object2IntMap<ItemStack> countItems(Collection<ItemStack> items) {
     Object2IntMap<ItemStack> map = new Object2IntOpenCustomHashMap<>(ITEM_HASH);
     for (ItemStack item : items) {
@@ -341,6 +370,14 @@ public final class ItemStacks {
     return map;
   }
 
+  /**
+   * Gives or drops each item in the specified {@code items} array. Or drops them at
+   * {@link Inventory#getLocation()}, if there's no space for them.
+   *
+   * @param inventory Inventory to place items into
+   * @param items Items to give
+   * @see #giveOrDropItem(Inventory, ItemStack)
+   */
   public static void giveOrDrop(Inventory inventory, ItemStack... items) {
     if (items.length == 1) {
       giveOrDropItem(inventory, items[0]);
@@ -350,6 +387,14 @@ public final class ItemStacks {
     giveOrDrop(inventory, List.of(items));
   }
 
+  /**
+   * Gives or drops each item in the specified {@code items} list. Or drops them at
+   * {@link Inventory#getLocation()}, if there's no space for them.
+   *
+   * @param inventory Inventory to place items into
+   * @param items Items to give
+   * @see #giveOrDropItem(Inventory, ItemStack)
+   */
   public static void giveOrDrop(Inventory inventory, Collection<ItemStack> items) {
     for (ItemStack item : items) {
       giveOrDropItem(inventory, item);
@@ -365,20 +410,100 @@ public final class ItemStacks {
     giveOrDrop(inventory, itemStack);
   }
 
-  public static void giveOrDropItem(Inventory inventory, ItemStack itemStack) {
-    if (ItemStacks.isEmpty(itemStack)) {
+  /**
+   * Places an item into the specified {@code inventory}, if there is space, otherwise, drops the
+   * item at {@link Inventory#getLocation()}.
+   * <p>
+   * Any item given to this method will be split with {@link #splitByMax(ItemStack)} to ensure every
+   * part of the item is given or dropped.
+   *
+   * @param inventory Inventory to place item into
+   * @param item Item to place into
+   */
+  public static void giveOrDropItem(Inventory inventory, ItemStack item) {
+    if (ItemStacks.isEmpty(item)) {
       throw new IllegalArgumentException("Empty item stack");
     }
 
-    if (hasRoom(inventory, itemStack)) {
-      inventory.addItem(itemStack.clone());
-      return;
+    List<ItemStack> split = splitByMax(item);
+
+    for (ItemStack itemStack : split) {
+      if (hasRoom(inventory, itemStack)) {
+        inventory.addItem(itemStack.clone());
+        return;
+      }
+
+      Location location = inventory.getLocation();
+      Objects.requireNonNull(location, "Inventory has no location");
+      location.getWorld().dropItem(location, itemStack.clone());
+    }
+  }
+
+  /**
+   * Delegate for {@link #splitBySize(ItemStack, int)} with the specified {@code itemStack}'s
+   * max stack size as the splitting size
+   *
+   * @param itemStack Item to split
+   * @return Split item list
+   */
+  public static List<ItemStack> splitByMax(ItemStack itemStack) {
+    if (isEmpty(itemStack)) {
+      return List.of();
+    }
+    return splitBySize(itemStack, itemStack.getMaxStackSize());
+  }
+
+  /**
+   * Divides a specified {@code item} into a list by a specified item {@code size}
+   * <p>
+   * If the specified {@code item} is empty, an empty list is returned. If it's size is less than
+   * the specified {@code size}, a singleton list is returned.
+   * <p>
+   * The item stack is divided into separate items each limited to the specified {@code size}, an
+   * extra item may be included if the item's amount is not perfectly divisible by the size, aka, a
+   * remainder item.
+   *
+   * @param item Item to split
+   * @param size Size to split to
+   *
+   * @return Split item list
+   */
+  public static List<ItemStack> splitBySize(ItemStack item, int size) {
+    if (isEmpty(item)) {
+      return List.of();
+    }
+    if (size < 1) {
+      throw new IllegalArgumentException("Cannot split an item into sizes less than 1");
     }
 
-    Location location = inventory.getLocation();
-    Objects.requireNonNull(location, "Inventory has no location");
+    int amount = item.getAmount();
 
-    location.getWorld().dropItem(location, itemStack.clone());
+    if (amount <= size) {
+      return List.of(item);
+    }
+
+    // Get the amount of max-size stacks to give and the last half-sized stack
+    int fullStacks = amount / size;
+    int remainder  = amount % size;
+    int itemCount  = fullStacks + (remainder > 0 ? 1 : 0);
+
+    List<ItemStack> items = new ArrayList<>(itemCount);
+
+    for (int i = 0; i < fullStacks; i++) {
+      items.add(withAmount(item, size));
+    }
+
+    if (remainder > 0) {
+      items.add(withAmount(item, remainder));
+    }
+
+    return items;
+  }
+
+  private static ItemStack withAmount(ItemStack i, int amount) {
+    ItemStack clone = i.clone();
+    clone.setAmount(amount);
+    return clone;
   }
 
   /* ------------------------ INVENTORY ITERATION ------------------------- */
@@ -390,9 +515,7 @@ public final class ItemStacks {
    * @param inventory The inventory to run the loop on
    * @param consumer  The consumer to apply to the inventory
    */
-  public static void forEachNonEmptyStack(Inventory inventory,
-                                          Consumer<ItemStack> consumer
-  ) {
+  public static void forEachNonEmptyStack(Inventory inventory, Consumer<ItemStack> consumer) {
     nonEmptyIterator(inventory).forEachRemaining(consumer);
   }
 

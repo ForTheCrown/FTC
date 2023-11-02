@@ -4,9 +4,12 @@ import java.time.Duration;
 import lombok.Getter;
 import net.forthecrown.FtcServer;
 import net.forthecrown.guilds.commands.GuildCommands;
+import net.forthecrown.guilds.leaderboards.GuildLeaderboardSource;
+import net.forthecrown.guilds.leaderboards.GuildLeaderboardSource.ScoreAccessor;
 import net.forthecrown.guilds.listeners.GuildEvents;
 import net.forthecrown.guilds.unlockables.Unlockables;
 import net.forthecrown.guilds.waypoints.GuildWaypoints;
+import net.forthecrown.leaderboards.Leaderboards;
 import net.forthecrown.user.UserService;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.PeriodicalSaver;
@@ -47,6 +50,11 @@ public class GuildPlugin extends JavaPlugin {
 
     saver = PeriodicalSaver.create(manager::save, () -> Duration.ofMinutes(30));
     saver.start();
+
+    var sources = Leaderboards.getSources();
+    sources.register("guilds/members", new GuildLeaderboardSource(manager, ScoreAccessor.MEMBERS));
+    sources.register("guilds/exp", new GuildLeaderboardSource(manager, ScoreAccessor.GUILD_EXP));
+    sources.register("guilds/chunks", new GuildLeaderboardSource(manager, ScoreAccessor.CHUNKS));
   }
 
   @Override

@@ -70,14 +70,14 @@ public class NameFactoryImpl implements UserNameFactory {
     TextComponent.Builder builder = text();
 
     Component prefix = formatPrefix(user, ctx);
-    if (prefix != null) {
+    if (prefix != null && !ctx.intentMatches(DisplayIntent.HOLOGRAM)) {
       builder.append(prefix);
     }
 
     builder.append(name);
 
     Component suffix = formatSuffix(user, ctx);
-    if (suffix != null) {
+    if (suffix != null && !ctx.intentMatches(DisplayIntent.HOLOGRAM)) {
       builder.append(suffix);
     }
 

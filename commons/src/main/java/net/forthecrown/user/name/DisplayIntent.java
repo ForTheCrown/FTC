@@ -29,7 +29,12 @@ public enum DisplayIntent {
    * Means a name is being formatted for display inside another user's
    * {@link net.kyori.adventure.text.event.HoverEvent} text
    */
-  HOVER_TEXT(false);
+  HOVER_TEXT(false),
+
+  /**
+   * User's name is being displayed in hologram
+   */
+  HOLOGRAM(false);
 
   final boolean hoverTextAllowed;
 }

@@ -23,4 +23,8 @@ pluginYml {
     optional("VotingPlugin")
     optional("project:shops")
   }
+
+  loadAfter {
+    regular("project:leaderboards")
+  }
 }

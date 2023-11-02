@@ -39,21 +39,23 @@ public class UserDataStorage {
   private final Path gems;
   private final Path playtime;
   private final Path votes;
+  private final Path monthlyPlaytime;
 
   private final Path userLookup;
 
   public UserDataStorage(Path dir) {
-    this.directory = dir;
-    this.userDirectory = directory.resolve("userdata");
+    this.directory       = dir;
+    this.userDirectory   = directory.resolve("userdata");
 
-    this.alts     = directory.resolve("alts.json");
+    this.alts            = directory.resolve("alts.json");
 
-    this.balances = directory.resolve("balances.json");
-    this.gems     = directory.resolve("gems.json");
-    this.playtime = directory.resolve("playtime.json");
-    this.votes    = directory.resolve("votes.json");
+    this.balances        = directory.resolve("balances.json");
+    this.gems            = directory.resolve("gems.json");
+    this.playtime        = directory.resolve("playtime.json");
+    this.votes           = directory.resolve("votes.json");
+    this.monthlyPlaytime = directory.resolve("playtime_monthly.json");
 
-    this.userLookup = directory.resolve("profiles.json");
+    this.userLookup      = directory.resolve("profiles.json");
   }
 
   public Path file(String first, String... others) {

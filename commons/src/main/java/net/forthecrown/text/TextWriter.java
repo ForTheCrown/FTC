@@ -26,12 +26,12 @@ public interface TextWriter extends ComponentLike {
 
   default void field(Object field) {
     line(Text.valueOf(field, viewer()).applyFallbackStyle(getFieldStyle()));
-    write(getFieldSeparator());
+    write(getFieldSeparator().applyFallbackStyle(getFieldStyle()));
   }
 
   default void fieldSameLine(Object field, Object value) {
     write(Text.valueOf(field, viewer()).applyFallbackStyle(getFieldStyle()));
-    write(getFieldSeparator());
+    write(getFieldSeparator().applyFallbackStyle(getFieldStyle()));
     fieldValue(value);
   }
 

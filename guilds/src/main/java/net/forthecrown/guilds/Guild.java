@@ -27,6 +27,7 @@ import net.forthecrown.guilds.commands.GuildInvite;
 import net.forthecrown.guilds.unlockables.UnlockableChunkUpgrade;
 import net.forthecrown.guilds.unlockables.Upgradable;
 import net.forthecrown.guilds.waypoints.GuildWaypoints;
+import net.forthecrown.leaderboards.Leaderboards;
 import net.forthecrown.text.channel.ChannelledMessage;
 import net.forthecrown.text.PlayerMessage;
 import net.forthecrown.text.Text;
@@ -308,6 +309,8 @@ public class Guild implements InventoryHolder, HoverEventSource<Component> {
     Guilds.getManager()
         .getExpTop()
         .set(getId(), (int) totalExp);
+
+    Leaderboards.updateWithSource("guilds/exp");
   }
 
   public GuildMember getMember(UUID id) {
@@ -436,6 +439,8 @@ public class Guild implements InventoryHolder, HoverEventSource<Component> {
           .addRoleToMember(m, role.get())
           .submit();
     });
+
+    Leaderboards.updateWithSource("guilds/members");
   }
 
   public void join(User user) {

@@ -14,8 +14,10 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.Loggers;
 import net.forthecrown.challenges.event.ChallengeCompleteEvent;
+import net.forthecrown.leaderboards.Leaderboards;
 import net.forthecrown.registry.Holder;
 import net.forthecrown.scripts.Script;
+import net.forthecrown.scripts.ScriptLoadException;
 import net.forthecrown.scripts.Scripts;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
@@ -117,17 +119,7 @@ public class ChallengeEntry {
     float goal = challenge.getGoal(user);
     float newVal = Math.min(value + current, goal);
 
-    LOGGER.debug("Added {} (now at {}) points to {}'s goal towards {} (goal={})",
-        value, newVal, user, holder.getKey(), goal
-    );
-
-    if (newVal >= challenge.getGoal(user)) {
-      LOGGER.debug("{} is at/over goal ({}) for {}",
-          user,
-          challenge.getGoal(user),
-          holder.getKey()
-      );
-
+    if (newVal >= goal) {
       boolean canComplete = challenge.canComplete(user);
 
       ChallengeCompleteEvent event = new ChallengeCompleteEvent(user, holder);
@@ -147,7 +139,6 @@ public class ChallengeEntry {
     }
 
     progress.put(holder.getKey(), newVal);
-    LOGGER.debug("put() called");
   }
 
   private void potentiallyAddStreak(StreakCategory category) {
@@ -170,6 +161,9 @@ public class ChallengeEntry {
     var event = new StreakIncreaseEvent(user, category, streakValue, this);
     event.callEvent();
 
+    Leaderboards.updateWithSource("streaks/current/" + category.name().toLowerCase());
+    Leaderboards.updateWithSource("streaks/highest/" + category.name().toLowerCase());
+
     // Find script callbacks for streak increase
     var scripts = manager.getStorage().getScripts(category);
 
@@ -181,8 +175,14 @@ public class ChallengeEntry {
     // Run all scripts for each category
     scripts.forEach(sources -> {
       try (Script script = Scripts.newScript(sources)) {
-        script.compile()
-            .evaluate()
+        try {
+          script.compile();
+        } catch (ScriptLoadException exc) {
+          LOGGER.error("Failed to load script {} to trigger streak increase script", script, exc);
+          return;
+        }
+
+        script.evaluate()
             .flatMapScript(script1 -> {
               return script1.invoke(Challenges.METHOD_STREAK_INCREASE, user, streakValue);
             })
@@ -192,8 +192,6 @@ public class ChallengeEntry {
   }
 
   public void clear() {
-    LOGGER.debug("clear() called");
-
     progress.clear();
     completedKeys.clear();
     streaks.clear();

@@ -20,6 +20,7 @@ import net.forthecrown.Loggers;
 import net.forthecrown.core.CoreConfig;
 import net.forthecrown.core.CorePlugin;
 import net.forthecrown.core.user.PropertyImpl.BuilderImpl;
+import net.forthecrown.leaderboards.Leaderboards;
 import net.forthecrown.registry.Holder;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;
@@ -69,6 +70,7 @@ public class UserServiceImpl implements UserService {
   private final ScoreIntMap<UUID> balances;
   private final ScoreIntMap<UUID> gems;
   private final ScoreIntMap<UUID> playtime;
+  private final ScoreIntMap<UUID> monthlyPlaytime;
   private final ScoreIntMap<UUID> votes;
 
   private final Registry<UserProperty<?>> propertyRegistry;
@@ -94,12 +96,15 @@ public class UserServiceImpl implements UserService {
     this.gems     = new ScoreIntMap<>();
     this.playtime = new ScoreIntMap<>();
     this.votes    = new ScoreIntMap<>();
+    this.monthlyPlaytime = new ScoreIntMap<>();
 
+    this.monthlyPlaytime.setValidator(KeyValidator.IS_PLAYER);
     this.balances.setValidator(KeyValidator.IS_PLAYER);
     this.gems.setValidator(KeyValidator.IS_PLAYER);
     this.playtime.setValidator(KeyValidator.IS_PLAYER);
     this.votes.setValidator(KeyValidator.IS_PLAYER);
 
+    this.monthlyPlaytime.setFatalErrors(false);
     this.balances.setFatalErrors(false);
     this.gems.setFatalErrors(false);
     this.playtime.setFatalErrors(false);
@@ -163,6 +168,8 @@ public class UserServiceImpl implements UserService {
     storage.saveMap(playtime, storage.getPlaytime());
     storage.saveMap(votes,    storage.getVotes());
 
+    storage.saveMap(monthlyPlaytime, storage.getMonthlyPlaytime());
+
     storage.saveProfiles(lookup);
     storage.saveAlts(altUsers);
 
@@ -185,6 +192,8 @@ public class UserServiceImpl implements UserService {
     storage.loadMap(gems,     storage.getGems());
     storage.loadMap(playtime, storage.getPlaytime());
     storage.loadMap(votes,    storage.getVotes());
+
+    storage.loadMap(monthlyPlaytime, storage.getMonthlyPlaytime());
 
     for (UserImpl user : userMaps) {
       storage.loadUser(user);
@@ -241,6 +250,10 @@ public class UserServiceImpl implements UserService {
       }
 
       playtime.add(user.getUniqueId(), seconds);
+      monthlyPlaytime.add(user.getUniqueId(), seconds);
+
+      Leaderboards.updateWithSource("playtime/total");
+      Leaderboards.updateWithSource("playtime/monthly");
     });
 
     LOGGER.debug("calling unloadUser on onUserLeave");

@@ -16,9 +16,6 @@ import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket.Ent
 import net.minecraft.world.level.GameType;
 
 /**
- * This class should be in literally any other module, but I do not want to start using NMS code in
- * the core module, so it's staying here for the time being
- * <p>
  * This stops the tab list from displaying users in gray and italic so people don't know who's in
  * spectator
  */

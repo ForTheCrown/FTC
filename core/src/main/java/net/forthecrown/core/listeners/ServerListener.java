@@ -5,6 +5,7 @@ import net.forthecrown.core.CorePlugin;
 import net.forthecrown.core.user.Components;
 import net.forthecrown.core.user.UserServiceImpl;
 import net.forthecrown.enchantment.FtcEnchants;
+import net.forthecrown.events.DayChangeEvent;
 import net.forthecrown.events.EarlyShutdownEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -36,5 +37,16 @@ class ServerListener implements Listener {
   @EventHandler(ignoreCancelled = true)
   public void onPluginDisable(PluginDisableEvent event) {
     Components.unregisterAll(event.getPlugin());
+  }
+
+  @EventHandler(ignoreCancelled = true)
+  public void onDayChange(DayChangeEvent event) {
+    if (event.getTime().getDayOfMonth() != 1) {
+      return;
+    }
+
+    CorePlugin plugin = JavaPlugin.getPlugin(CorePlugin.class);
+    UserServiceImpl service = plugin.getUserService();
+    service.getMonthlyPlaytime().clear();
   }
 }

@@ -28,6 +28,31 @@ public record ScoreFilter(int value, Operation operation, ScoreFilter and)
     return and.test(value);
   }
 
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    append(builder);
+    return builder.toString();
+  }
+
+  private void append(StringBuilder builder) {
+    switch (operation) {
+      case NOT_EQUALS -> builder.append("!=");
+      case EQUALS -> builder.append("=");
+      case LESS_THAN -> builder.append("<");
+      case LESS_THAN_EQUAL -> builder.append("<=");
+      case GREATER_THAN -> builder.append(">");
+      case GREATER_THAN_EQUAL -> builder.append(">=");
+    }
+
+    builder.append(value);
+
+    if (and != null) {
+      builder.append("&");
+      and.append(builder);
+    }
+  }
+
   public enum Operation {
     LESS_THAN,
     LESS_THAN_EQUAL,

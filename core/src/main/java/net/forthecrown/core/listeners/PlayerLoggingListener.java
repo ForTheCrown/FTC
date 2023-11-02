@@ -56,6 +56,8 @@ class PlayerLoggingListener implements Listener {
 
       Location serverSpawn = FtcServer.server().getServerSpawn();
       player.teleport(serverSpawn);
+
+      LOGGER.info("Player {} (uuid={}) joined for the first time", name, id);
     } else {
       entry = lookup.getEntry(id);
       firstJoin = false;
@@ -67,6 +69,7 @@ class PlayerLoggingListener implements Listener {
         );
 
         entry = lookup.createEntry(id, name);
+        firstJoin = true;
       }
     }
 

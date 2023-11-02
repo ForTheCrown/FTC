@@ -21,4 +21,8 @@ dependencies {
 pluginYml {
   name = "FTC-Guilds"
   main = "net.forthecrown.guilds.GuildPlugin"
+
+  loadAfter {
+    regular("project:leaderboards")
+  }
 }

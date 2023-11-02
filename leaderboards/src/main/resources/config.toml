@@ -1,0 +1,10 @@
+
+# Radius in which leaderboards are rendered for players
+#
+# Note:
+# Values for this option are clamped to a range of [1..100]
+#
+renderRadius = 25
+
+# Interval at which leaderboards are saved
+autosaveInterval = "30m"

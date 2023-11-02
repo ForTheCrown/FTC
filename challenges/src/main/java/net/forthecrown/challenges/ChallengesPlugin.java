@@ -3,7 +3,11 @@ package net.forthecrown.challenges;
 import java.time.Duration;
 import lombok.Getter;
 import net.forthecrown.challenges.commands.CommandChallenges;
+import net.forthecrown.challenges.leaderboards.ChallengeStreakSource;
 import net.forthecrown.challenges.listeners.ChallengeListeners;
+import net.forthecrown.leaderboards.LeaderboardSource;
+import net.forthecrown.leaderboards.Leaderboards;
+import net.forthecrown.registry.Registry;
 import net.forthecrown.utils.PeriodicalSaver;
 import net.forthecrown.utils.TomlConfigs;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -27,6 +31,16 @@ public class ChallengesPlugin extends JavaPlugin {
 
     ChallengeListeners.registerAll(this);
     new CommandChallenges(challenges);
+
+    Registry<LeaderboardSource> sources = Leaderboards.getSources();
+
+    for (StreakCategory value : StreakCategory.values()) {
+      String key = value.name().toLowerCase();
+      String currentKey = "streaks/current/" + key;
+      String highestKey = "streaks/highest/" + key;
+      sources.register(currentKey, new ChallengeStreakSource(value, challenges, false));
+      sources.register(highestKey, new ChallengeStreakSource(value, challenges, true));
+    }
   }
 
   @Override

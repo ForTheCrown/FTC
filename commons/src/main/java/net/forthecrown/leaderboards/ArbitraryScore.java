@@ -1,16 +1,20 @@
 package net.forthecrown.leaderboards;
 
 import java.util.UUID;
-import net.forthecrown.user.Users;
-import net.forthecrown.user.name.DisplayIntent;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public record PlayerScore(UUID playerId, int value) implements LeaderboardScore {
+public record ArbitraryScore(String name, int value) implements LeaderboardScore {
+
+  @Override
+  public @Nullable UUID playerId() {
+    return null;
+  }
 
   @Override
   public @NotNull Component displayName(Audience viewer) {
-    return Users.get(playerId).displayName(viewer, DisplayIntent.HOLOGRAM);
+    return Component.text(name);
   }
 }

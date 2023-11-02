@@ -1,6 +1,7 @@
 package net.forthecrown.leaderboards;
 
-import net.kyori.adventure.text.Component;
+import net.forthecrown.registry.Holder;
+import net.forthecrown.text.PlayerMessage;
 import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,30 +18,28 @@ public interface Leaderboard {
 
   boolean isSpawned();
 
-  String getName();
+  Holder<LeaderboardSource> getSource();
 
-  LeaderboardSource getSource();
-
-  void setSource(LeaderboardSource source);
+  void setSource(Holder<LeaderboardSource> source);
 
   @Nullable Location getLocation();
 
   void setLocation(@Nullable Location location);
 
   @Nullable
-  Component getFooter();
+  PlayerMessage getFooter();
 
-  void setFooter(@Nullable Component footer);
-
-  @Nullable
-  Component getHeader();
-
-  void setHeader(@Nullable Component header);
+  void setFooter(@Nullable PlayerMessage footer);
 
   @Nullable
-  Component getFormat();
+  PlayerMessage getHeader();
 
-  void setFormat(@Nullable Component format);
+  void setHeader(@Nullable PlayerMessage header);
+
+  @Nullable
+  PlayerMessage getFormat();
+
+  void setFormat(@Nullable PlayerMessage format);
 
   int getMaxEntries();
 

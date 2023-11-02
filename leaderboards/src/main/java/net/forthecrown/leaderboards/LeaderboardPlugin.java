@@ -1,30 +1,55 @@
 package net.forthecrown.leaderboards;
 
+import lombok.Getter;
 import net.forthecrown.BukkitServices;
 import net.forthecrown.events.Events;
-import net.forthecrown.leaderboards.listeners.EntityListeners;
-import net.forthecrown.packet.EntityRenderer;
-import net.forthecrown.packet.PacketListeners;
-import net.forthecrown.registry.Registry;
+import net.forthecrown.leaderboards.commands.LeaderboardCommands;
+import net.forthecrown.leaderboards.listeners.PlayerListener;
+import net.forthecrown.leaderboards.listeners.ServerListener;
+import net.forthecrown.utils.PeriodicalSaver;
+import net.forthecrown.utils.TomlConfigs;
 import org.bukkit.plugin.java.JavaPlugin;
 
+@Getter
 public class LeaderboardPlugin extends JavaPlugin {
+
+  private BoardsConfig boardsConfig;
+  private ServiceImpl service;
+
+  private PeriodicalSaver saver;
+
+  static LeaderboardPlugin plugin() {
+    return JavaPlugin.getPlugin(LeaderboardPlugin.class);
+  }
 
   @Override
   public void onEnable() {
-    ServiceImpl service = new ServiceImpl();
+    service = new ServiceImpl(this);
+    saver = PeriodicalSaver.create(service::save, () -> boardsConfig.autosaveInterval());
+
     BukkitServices.register(LeaderboardService.class, service);
+    service.getTriggers().activate();
+    service.createDefaultSources();
 
-    Registry<EntityRenderer> entityRenderers = PacketListeners.listeners().getEntityRenderers();
-    BoardRenderer renderer = new BoardRenderer(service);
-    entityRenderers.register("leaderboards", renderer);
+    Events.register(new ServerListener(this));
+    Events.register(new PlayerListener(this));
 
-    Events.register(new EntityListeners(service));
+    LeaderboardCommands.createCommands(this);
   }
 
   @Override
   public void onDisable() {
-    var entityRenderers = PacketListeners.listeners().getEntityRenderers();
-    entityRenderers.remove("leaderboards");
+    service.getTriggers().close();
+  }
+
+  @Override
+  public void reloadConfig() {
+    this.boardsConfig = TomlConfigs.loadPluginConfig(this, BoardsConfig.class);
+    saver.start();
+  }
+
+  public void reload() {
+    reloadConfig();
+    service.load();
   }
 }
