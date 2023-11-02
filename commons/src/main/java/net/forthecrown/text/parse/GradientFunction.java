@@ -10,7 +10,7 @@ import net.kyori.adventure.text.format.TextColor;
 public class GradientFunction extends TextFunction {
 
   public GradientFunction() {
-    super(Pattern.compile("< *((?:crazy[ \\-_]*)?gradient) *= *([a-zA-Z0-9&#, ]+): *(.+) *>"));
+    super(Pattern.compile("< *((?:crazy[ \\-_]*)?gradient) *= *([a-zA-Z0-9&#_, ]+): *(.+) *>"));
   }
 
   @Override

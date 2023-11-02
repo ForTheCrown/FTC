@@ -28,7 +28,7 @@ public class ChatParser {
    * color codes with section codes
    */
   private static final Pattern COLOR_CHAR_PATTERN
-      = Pattern.compile("(\\\\|)&((#[0-9a-fA-F]{6})|([0-9a-fA-FK-Ok-orRxX]))");
+      = Pattern.compile("\\\\?&((#[0-9a-fA-F]{6})|([0-9a-fA-FK-Ok-orRxX]))");
 
   private static final LegacyComponentSerializer serializer = LegacyComponentSerializer.builder()
       .character(SECTION_CHAR)
@@ -38,6 +38,7 @@ public class ChatParser {
   private ChatParser() {
     // Create default functions
     functions.add(new GradientFunction());
+    functions.add(new RainbowFunction());
     functions.add(new PlayerFunction());
     functions.add(new TimeFunction());
     functions.add(new HyperlinkFunction());
