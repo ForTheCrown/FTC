@@ -38,6 +38,7 @@ public class PlaceholderServiceImpl implements PlaceholderService {
     defaultSources.add(new TranslatedPlaceholders());
 
     defaults.add("text", new ComponentPlaceholder());
+    defaults.add("border", new BorderPlaceholder());
   }
 
   @Override
