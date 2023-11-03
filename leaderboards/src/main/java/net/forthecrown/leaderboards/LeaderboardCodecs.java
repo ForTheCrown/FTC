@@ -37,6 +37,7 @@ public final class LeaderboardCodecs {
             optionalTextField("footer", BoardImpl::getFooter),
             optionalTextField("header", BoardImpl::getHeader),
             optionalTextField("format", BoardImpl::getFormat),
+            optionalTextField("you_format", BoardImpl::getYouFormat),
 
             FtcCodecs.enumCodec(Order.class)
                 .optionalFieldOf("order", Order.DESCENDING)
@@ -55,7 +56,10 @@ public final class LeaderboardCodecs {
                 .forGetter(BoardImpl::getDisplayMeta),
 
             Codec.BOOL.optionalFieldOf("spawned", false)
-                .forGetter(BoardImpl::isSpawned)
+                .forGetter(BoardImpl::isSpawned),
+
+            Codec.BOOL.optionalFieldOf("include_you", true)
+                .forGetter(BoardImpl::isIncludeYou)
         )
         .apply(instance, LeaderboardCodecs::loadBoard);
   });
@@ -81,12 +85,14 @@ public final class LeaderboardCodecs {
       Optional<PlayerMessage> footer,
       Optional<PlayerMessage> header,
       Optional<PlayerMessage> format,
+      Optional<PlayerMessage> youFormat,
       Order order,
       Optional<ScoreFilter> scoreFilter,
       Integer maxEntries,
       Boolean fillMissingSlots,
       TextDisplayMeta displayMeta,
-      Boolean spawned
+      Boolean spawned,
+      Boolean includeYou
   ) {
     BoardImpl board = new BoardImpl(null);
     board.setSource(source.orElse(null));
@@ -94,11 +100,13 @@ public final class LeaderboardCodecs {
     board.setFooter(footer.orElse(null));
     board.setHeader(header.orElse(null));
     board.setFormat(format.orElse(null));
+    board.setYouFormat(youFormat.orElse(null));
     board.setOrder(order);
     board.setFilter(scoreFilter.orElse(null));
     board.setMaxEntries(maxEntries);
     board.setFillMissingSlots(fillMissingSlots);
     board.setSpawned(spawned);
+    board.setIncludeYou(includeYou);
 
     if (displayMeta != null) {
       board.setDisplayMeta(displayMeta);
