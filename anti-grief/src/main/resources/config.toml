@@ -1,0 +1,40 @@
+
+# If true, punishments will be announced in general chat, if false they will only be announced in
+# staff chat
+announcePunishments = false
+
+# Interval in which the plugin auto-saves its data
+autosaveInterval = "30m"
+
+# Default reasons for certain types of punishments,
+# valid values are:
+# - ban
+# - ip_ban
+# - jail
+# - kick (Only visible in punishments UI)
+# - mute (Only visible in punishments UI)
+# - softmute (Only visible in punishments UI)
+[defaultReasons]
+ban = "This server is not for you"
+ip_ban = "This server is not for you"
+
+# Block types that will trigger the vein mining reporter
+veinReporterBlocks = [
+  # "COAL_ORE",
+  # "COPPER_ORE",
+  # "GOLD_ORE",
+  # "IRON_ORE",
+  # "LAPIS_ORE",
+  # "DEEPSLATE_COAL_ORE",
+  # "DEEPSLATE_COPPER_ORE",
+  # "DEEPSLATE_GOLD_ORE",
+  # "DEEPSLATE_IRON_ORE",
+  # "DEEPSLATE_LAPIS_ORE",
+  "DIAMOND_ORE",
+  "EMERALD_ORE",
+  "REDSTONE_ORE",
+  "DEEPSLATE_DIAMOND_ORE",
+  "DEEPSLATE_EMERALD_ORE",
+  "DEEPSLATE_REDSTONE_ORE",
+  "NETHERITE_SCRAP"
+]

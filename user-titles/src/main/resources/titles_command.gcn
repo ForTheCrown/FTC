@@ -1,0 +1,52 @@
+name = "usertitles"
+aliases = "user_titles"
+        | "titles"
+        | "userranks"
+        | "user_ranks"
+        | "ranks"
+        | "rank"
+
+description = "Manages user titles and rank tiers"
+
+executes = openMenu()
+
+literal("reload") {
+  requires = permission(ADMIN_PERMISSION)
+  description = "Reloads the plugin"
+  executes = reloadPlugin()
+}
+
+literal("info").argument(ARG, user) {
+  requires = permission(ADMIN_PERMISSION)
+  map_result = @result_to_user
+  executes = showTitlesInfo()
+  description = "Displays a <user>'s titles and their rank tier"
+}
+
+literal("set").argument(ARG, user).argument(TITLE, @title) {
+  requires = permission(ADMIN_PERMISSION)
+  map_result = @result_to_user
+  executes = setTitle()
+  description = "Set's a <user>'s active title to <title>"
+}
+
+literal("add").argument(ARG, user).argument(TITLES, @titles) {
+  requires = permission(ADMIN_PERMISSION)
+  map_result = @result_to_user
+  executes = addTitles()
+  description = "Adds a <title> to a <user>'s available titles"
+}
+
+literal("remove").argument(ARG, user).argument(TITLES, @titles) {
+  requires = permission(ADMIN_PERMISSION)
+  map_result = @result_to_user
+  executes = removeTitles()
+  description = "Removes a <title> from a <user>'s available titles"
+}
+
+literal("tier").argument(ARG, user).argument(TIER, @tier) {
+  requires = permission(ADMIN_PERMISSION)
+  map_result = @result_to_user
+  executes = setTier()
+  description = "Sets a <user>'s rank tier to <tier>"
+}

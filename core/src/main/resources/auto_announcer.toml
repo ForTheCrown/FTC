@@ -1,0 +1,43 @@
+# Interval at which announcements are broadcast
+interval = "5m"
+
+# Sets the order the announcements are announced in
+# Possible values:
+# - 'incrementing' Goes through each announcement in order
+# - 'random' Goes through announcements in a random order, may repeat
+# - 'shuffle' Goes through all announcements in a random order without repetition
+# - 'decrementing' Goes through in reverse order from 'incrementing'
+order = "incrementing"
+
+# Format the announcements use, supports all default placeholders and the
+# '${message}' placeholder
+format = "${prefix} ${message}"
+
+# Message array
+# Supports all global placeholders
+messages = [
+  "&eGuild EXP&r can be used to unlock features for your guild.",
+  "You can see guild territories on &e/map",
+  "Do &e/g info&r followed by a guild name to view its statistics.",
+  "Toggle showing ranks in chat with &e/rankchat",
+  "To visit a region, do &e/visit&r when you are near a region pole.",
+  "The server's discord is available at &e${text: content='[discord]' run_command='/discord' hover='Click me!'}.",
+  "Remember, there are &eplayer shops&r in Hazelguard.",
+  "If you like a challenge, you can try to complete &ethe Dungeons&r. Follow the signs in Hazelguard.",
+  "Let others know you are afk with &e/afk.",
+  "More information about the &6ranks&r can be found in &e${text: content='[ranks]' run_command='/ranks' hover='Click me!'}.",
+  "If you need to gather a lot of materials, please use the &aResource World.",
+  "You can get the ${rank: knight} &rtag by completing 3 levels in the Dungeons.",
+  "You can get a new ${special_item: royal_weapon, 5} in Hazelguard.",
+  "There is a skeleton farm in Hazelguard if you need xp or bones.",
+  "You can find the closest region pole with &e[findpole]",
+  "If you are having trouble understanding region poles, you can do &e[polehelp]",
+  "You can &e${text: content='[vote]' run_command='/voteall' hover='Click me!'}&r to receive &6Bank Tickets &rused in the &e${text: content='[bank]' run_command='/bank' hover='Click me!'}",
+  "&eThe End &fis only open for the last week of every month. Afterward, it closes and resets",
+  "The map of the world can be seen with &a${text: content='[map]' run_command='/map' hover='Click me!'}",
+  "Suggestions for the server are always welcome.",
+  "Hovering over &e${text: content='text in chat' hover='Well done lol'} &rcan display extra info.",
+  "Do &e/visit Bank&r to travel to the bank via region poles.",
+  "Use the levers in the Bank Vault to unlock better treasures.",
+  "Do &e/settings&r to customize your experience on the server."
+]

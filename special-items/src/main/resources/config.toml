@@ -1,0 +1,7 @@
+allowNonOwnerSwords = false
+
+[swordAnimation]
+postAnimationDump = { x = 273, y = 99, z = 178 }
+initialDistance = 2.5
+claimScript = "weapon_ability/sword_claim.js"
+claimTest = "weapon_ability/test_claim.js"

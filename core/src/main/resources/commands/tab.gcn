@@ -1,0 +1,53 @@
+name = "tab"
+aliases = "user_tab" | "usertab"
+description = "Modifys a player's tab prefix/suffix/display name"
+
+literal("update") {
+  description = "Updates the TAB menu for every player"
+  executes = update()
+}
+
+literal("name").argument("user", user) {
+  map_result = @result_to_user
+
+  literal("unset") {
+    description = "Clears a <user>'s tab display name"
+    executes = unsetName()
+  }
+
+  argument("text", chat) {
+    map_result = result.asComponent()
+    executes = setName()
+    description = "Sets a <user>'s tab display name"
+  }
+}
+
+literal("prefix").argument("user", user) {
+  map_result = @result_to_user
+
+  literal("unset") {
+    description = "Clears a <user>'s tab prefix"
+    executes = unsetPrefix()
+  }
+
+  argument("text", chat) {
+    map_result = result.asComponent()
+    executes = setPrefix()
+    description = "Sets a <user>'s tab prefix"
+  }
+}
+
+literal("suffix").argument("user", user) {
+  map_result = @result_to_user
+
+  literal("unset") {
+    description = "Clears a <user>'s tab suffix"
+    executes = unsetSuffix()
+  }
+
+  argument("text", chat) {
+    map_result = result.asComponent()
+    executes = setSuffix()
+    description = "Sets a <user>'s tab suffix"
+  }
+}

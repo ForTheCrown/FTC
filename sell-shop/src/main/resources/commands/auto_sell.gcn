@@ -1,0 +1,24 @@
+name = "autosell"
+aliases = "autoselling" | "auto_sell" | "auto_selling"
+description = "Admin command for managing players' auto sell"
+
+literal("list").argument("player", user) {
+  map_result = @result_to_user
+  description = "Lists all of the auto-sell material of a <player>"
+  executes = listOther()
+}
+
+literal("add").argument("player", user).argument("material", @material) {
+  description = "Adds a <material> to a <player>'s auto-sell list"
+  executes = add()
+}
+
+literal("remove").argument("player", user).argument("material", @material) {
+  description = "Removes a <material> from a <player>'s auto-sell list"
+  executes = remove()
+}
+
+literal("clear").argument("player", user) {
+  description = "Clears a <player>'s auto-sell list"
+  executes = clear()
+}

@@ -1,0 +1,86 @@
+package net.forthecrown.core.commands.item;
+
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.forthecrown.command.Exceptions;
+import net.forthecrown.command.help.UsageFactory;
+import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.types.ArgumentTypes;
+import net.forthecrown.grenadier.types.RegistryArgument;
+import net.forthecrown.text.Text;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Material;
+import org.bukkit.Registry;
+
+public class ItemCooldownNode extends ItemModifierNode {
+
+  private static final RegistryArgument<Material> MATERIAL_ARG
+      = ArgumentTypes.registry(Registry.MATERIAL, "material");
+
+  public ItemCooldownNode() {
+    super("item_cooldown", "itemcooldown");
+  }
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    var prefixed = factory.withPrefix("<material>");
+
+    prefixed.usage("")
+        .addInfo("Shows how long a <material> is on cooldown for you");
+
+    prefixed.usage("<time>")
+        .addInfo("Sets your <material>'s cooldown to <time>");
+  }
+
+  @Override
+  String getArgumentName() {
+    return "cooldown";
+  }
+
+  @Override
+  public void create(LiteralArgumentBuilder<CommandSource> command) {
+    command.then(argument("material", MATERIAL_ARG)
+        .executes(c -> {
+          var player = c.getSource().asPlayer();
+          Material material = c.getArgument("material", Material.class);
+
+          if (!player.hasCooldown(material)) {
+            throw Exceptions.format("You do not have a cooldown for {0}",
+                material
+            );
+          }
+
+          int remainingTicks = player.getCooldown(material);
+
+          c.getSource().sendMessage(
+              Text.format(
+                  "Material &e{0}&r remaining cooldown: &e{1, time, -ticks}&r.",
+                  NamedTextColor.GRAY,
+                  material,
+                  remainingTicks
+              )
+          );
+          return 0;
+        })
+
+        .then(argument("cooldown", ArgumentTypes.time())
+            .executes(c -> {
+              var player = c.getSource().asPlayer();
+              Material material = c.getArgument("material", Material.class);
+              long cooldownTicks = ArgumentTypes.getTicks(c, "cooldown");
+
+              player.setCooldown(material, (int) cooldownTicks);
+
+              c.getSource().sendMessage(
+                  Text.format(
+                      "Set &e{0}&r's cooldown to &e{1, time, -ticks -short}&r.",
+                      NamedTextColor.GRAY,
+                      material,
+                      cooldownTicks
+                  )
+              );
+              return 0;
+            })
+        )
+    );
+  }
+}

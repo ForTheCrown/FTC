@@ -1,0 +1,22 @@
+# Maximum EXP multiplier
+maxExpMultiplier = 8
+
+# Interval at which players can update their guild's discord roles
+roleUpdateInterval = "10m"
+
+# 'guilds' category ID, not name
+# Put discord on developer mode, right-click on the category and
+# then right-click on 'Copy ID'
+guildsChannelCategory = 0
+
+# Webhook avatar's icon
+webhookAvatarPath = "steven_avatar.png"
+
+# Toggles the use of webhooks to send bot messages in the guild
+# text channels
+useWebhooks = true
+
+# Weekend multiplier value, set to 0 or less to disable
+# This value is added on to the multiplier, which is by
+# '1' by default
+weekendModifier = 0.5

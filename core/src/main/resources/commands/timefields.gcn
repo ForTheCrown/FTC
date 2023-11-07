@@ -1,0 +1,37 @@
+name = "timefield"
+description = "Allows you to edit users' timestamp fields"
+
+literal("query").argument("user", user) {
+  map_result = @result_to_user
+  executes = queryFields()
+  description = "Shows a user's time field values"
+
+  argument("field", @field) {
+    map_result = @holder_to_value
+    executes = queryFields()
+    description = "Shows a specific field's value for a player"
+  }
+}
+
+literal("set").argument("field", @field).argument("user", user) {
+  map_result("user") = @result_to_user
+  map_result("field") = @holder_to_value
+
+  literal("present") {
+    executes = setField()
+    description = "Sets a time field's value to the present for a player"
+  }
+
+  argument("value", @time) {
+    executes = setField()
+    description = "Sets a time field's value to a set value"
+  }
+}
+
+literal("unset").argument("field", @field).argument("user", user) {
+  map_result("user") = @result_to_user
+  map_result("field") = @holder_to_value
+
+  description = "Removes a field's value from a player"
+  executes = unsetField()
+}

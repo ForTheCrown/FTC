@@ -1,0 +1,42 @@
+[arrow_effects]
+slot = { x = 2, y = 2 }
+material = "bow"
+noEffectButton = true
+description = [
+  "Upgrade your arrows with fancy particle",
+  "trails as they fly through the air"
+]
+
+[emotes]
+slot = { x = 3, y = 3 }
+material = "totem_of_undying"
+description = [
+  "Poking, smooching, bonking and more",
+  "to interact with friends!"
+]
+
+[login_effects]
+slot = { x = 4, y = 2 }
+material = "glowstone_dust"
+noEffectButton = true
+description = [
+  "Spice up your join/leave messages",
+  "with a little showing off!"
+]
+
+[travel_effects]
+slot = { x = 5, y = 3 }
+material = "feather"
+noEffectButton = true
+description = [
+  "Spice up your travels with some effects :D"
+]
+
+[death_effects]
+slot = { x = 6, y = 2 }
+material = "skeleton_skull"
+noEffectButton = true
+description = [
+  "Make your death more spectacular by",
+  "exploding into pretty particles"
+]

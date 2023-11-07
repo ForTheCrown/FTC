@@ -1,0 +1,6 @@
+# Effect type prices (in gems)
+prices: {
+  arrow_effects:  1000,
+  death_effects:  2000,
+  travel_effects: 2500
+}

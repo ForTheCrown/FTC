@@ -1,0 +1,12 @@
+# Maximum number of daily challenges
+maxDailyChallenges = 5
+
+# Maximum number of weekly challenges
+maxWeeklyChallenges = 4
+
+# Maximum streak a player can have
+maxStreak = 366
+
+# When resetting challenges, can the newly selected challenges have
+# any challenges that were in use before the reset
+allowRepeatingChallenges = false

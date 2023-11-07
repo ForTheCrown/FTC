@@ -1,0 +1,100 @@
+# Specifies extra/custom ranks that the FTC plugin will load
+#
+# This TOML file has to be made of table sections, the name of each table being
+# the registry key of a rank. Registry keys are unique string identifiers used
+# to internally locate ranks.
+# ------------------------------------------------------------------------------
+# Format:
+# ------------------------------------------------------------------------------
+# 'tier' (required):
+#  Determines the rank's tier, can be one of: 'free', 'tier_1', 'tier_2' or
+#  'tier_3'
+#  This value MUST be specified for each rank, otherwise an error will be thrown
+#
+# examples:
+# - tier = "tier_3"
+# - tier = "tier_2"
+# - tier = "tier_1"
+# - tier = "free"
+# ------------------------------------------------------------------------------
+# 'prefix' (required):
+#  The rank's prefix, shown in the TAB menu, and optionally in chat. This value,
+#  like the above one, MUST be set, otherwise, error.
+#
+# examples:
+# - prefix = "&7[&eA Prefix&7]"
+# - prefix = "&f[<gradient=red,blue:Rank Name>&f]"
+# ------------------------------------------------------------------------------
+# 'genderEquivalent' (optional):
+#  Allows for you to set a female/male/non-binary equivalent to a rank that will
+#  be given alongside itself.
+#
+# examples:
+# - genderEquivalent = "rank_registry_key"
+# ------------------------------------------------------------------------------
+# 'hidden' (optional, false by default):
+#  Can be either 'true' or 'false'. If true, it means the rank won't be shown to
+#  any users unless they have already unlocked the rank.
+#
+# examples:
+# - hidden = true
+# - hidden = false
+# ------------------------------------------------------------------------------
+# 'defaultTitle' (optional, false by default):
+#  Determines if a rank becomes available when a user gets the rank's tier, or
+#  if it has to be earned separately.
+#
+#  If this is set to true, then the 'slot' value (documented below) must also
+#  be set.
+#
+# examples:
+# - defaultTitle = true
+# - defaultTitle = false
+# ------------------------------------------------------------------------------
+# 'description' (optional):
+#  Specifies an array of text that makes up the rank's description, which is
+#  displayed in hover text and in the item's lore in the /rank menu.
+#
+# examples:
+# - description = [ "Foo bar" ]
+# - description = [ "Foo bar", "Another bar" ]
+# - description = [ { text = "a JSON-style text component", color = "red" } ]
+# ------------------------------------------------------------------------------
+# 'slot' (optional, if defaultTitle == false):
+#  Sets the slot in which the rank is displayed in the /rank menu. This entry's
+#  value must be either an integer or a table with a 'row' and 'column' key.
+#
+#  Note: No matter if the input is a slot table, or index, the slot must not be
+#  outside the alloted 2x7 top area in the /rank menu
+#
+# examples:
+# - slot = 13
+# - slot = { column = 1, row = 2 }
+# ------------------------------------------------------------------------------
+# Example rank:
+# ------------------------------------------------------------------------------
+# [rank_key]
+# tier = "tier_1"
+# prefix = "&7[&eA cool rank&7]"
+# genderEquivalent = "registry_key/w_other_gender"
+# hidden = true
+# defaultTitle = false
+# description = [
+#   "This rank is &lvery&r cool :)"
+# ]
+# slot = { column = 1, row = 2 }
+# ------------------------------------------------------------------------------
+
+[booster]
+tier = "free"
+prefix = "&7[<gradient=#BE91FD,#E1A5CA:Booster>&7]"
+description = [
+  "Earned by boosting the Discord server."
+]
+
+[streaming]
+tier = "free"
+prefix = "&f[<gradient=#AA64FF,#C882FF:Streaming>&f]"
+description = [
+  "Given to verified content creators."
+]

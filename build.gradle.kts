@@ -1,165 +1,110 @@
-import java.util.Date
+import net.forthecrown.gradle.FtcExtension
+import net.forthecrown.gradle.MC_VERSION
 
 plugins {
   java
-
-  id("io.papermc.paperweight.userdev") version "1.5.5"
+  id("io.freefair.lombok") version "8.0.1"
   id("ftc_plugin")
 }
 
-val minecraftVersion = "1.20.1"
-val baseJarName = "ForTheCrown"
-ftc.jarBaseName = baseJarName
-
-// Dependency values, these are also used in processResources
-val grenadierAnnotations = "net.forthecrown:grenadier-annotations:1.2.0"
-val grenadier = "net.forthecrown:grenadier:2.1.0"
-val nashorn   = "org.openjdk.nashorn:nashorn-core:15.4"
-val mathlib   = "org.spongepowered:math:2.1.0-SNAPSHOT"
-val toml      = "org.tomlj:tomlj:1.1.0"
-
+version = "1.0.0-SNAPSHOT"
 group = "net.forthecrown"
-version = "${minecraftVersion}-${ftc.buildId}-${if (ftc.isDebugBuild) "SNAPSHOT" else "RELEASE"}"
+
+val grenadier      = "net.forthecrown:grenadier:2.2.0"
+val nbtlib         = "net.forthecrown:nbt:1.5.1"
+val grenadierAnnot = "net.forthecrown:grenadier-annotations:1.3.0"
+val mathlib        = "org.spongepowered:math:2.1.0-SNAPSHOT"
+val toml           = "org.tomlj:tomlj:1.1.0"
+val configurate    = "org.spongepowered:configurate-core:4.1.2"
+val apiVersion     = MC_VERSION
 
 repositories {
   mavenCentral()
-
-  // Brigadier
-  maven("https://libraries.minecraft.net")
-
-  // Math library
-  maven("https://repo.spongepowered.org/repository/maven-public")
-
-  // Dynmap
-  maven("https://mvn.lumine.io/repository/maven-public/")
-
-  // WorldGuard
-  maven("https://maven.enginehub.org/repo/")
-
-  // DiscordSRV
-  maven("https://nexus.scarsz.me/content/groups/public/")
-
-  // GSit
-  maven("https://jitpack.io")
-
-  // AncientGates
-  maven("https://repo.codemc.org/repository/maven-public/")
-
-  // VotingPlugin
-  maven("https://nexus.bencodez.com/repository/maven-public")
 }
 
-dependencies {
-  testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
-
-  // Lombok
-  compileOnly("org.projectlombok:lombok:1.18.26")
-  annotationProcessor("org.projectlombok:lombok:1.18.26")
-
-  // FTC libraries
-  compileOnly(grenadier)
-  compileOnly(grenadierAnnotations)
-  testImplementation(grenadier)
-
-  // Misc libraries
-  compileOnly(toml)
-  compileOnly(nashorn)
-  compileOnly("org.apache.commons:commons-text:1.10.0")
-  compileOnly(mathlib)
-  testImplementation(mathlib)
-
-  // Plugin dependencies
-  compileOnly("us.dynmap:DynmapCoreAPI:3.4")
-  compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit:2.5.2")
-  compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.7")
-  compileOnly("com.discordsrv:discordsrv:1.26.0")
-  compileOnly("net.luckperms:api:5.4")
-  compileOnly("org.mcteam.ancientgates:ancientgates:2.6")
-  compileOnly("com.bencodez:votingplugin:6.11.3")
-  compileOnly("com.github.Gecolay.GSit:core:1.4.10")
-
-  // Minecraft, Bukkit and Paper
-  paperweight.paperDevBundle("${minecraftVersion}-R0.1-SNAPSHOT")
+val buildAll = task("build-all-plugins") {
+  group = "build"
+  description = "Builds all plugin modules"
 }
 
-java {
-  toolchain.languageVersion.set(JavaLanguageVersion.of(17))
-}
+subprojects {
+  apply(plugin = "java")
+  apply(plugin = "io.freefair.lombok")
+  apply(plugin = "ftc_plugin")
 
-base {
-  this.archivesName.set(baseJarName)
-}
+  group = rootProject.group
+  version = rootProject.version
 
-tasks {
-  jar {
-    archiveBaseName.set(baseJarName)
+  afterEvaluate {
+    val ftcExtension = this.extensions.findByType(FtcExtension::class.java) ?: return@afterEvaluate
+
+    if (ftcExtension.skipDependency || !ftcExtension.apiFor.isNullOrEmpty()) {
+      return@afterEvaluate
+    }
+
+    buildAll.dependsOn(":${this.name}:buildAndCopyToRoot")
   }
 
-  test {
-    useJUnitPlatform()
+  repositories {
+    mavenCentral()
+    maven("https://libraries.minecraft.net")
+    maven("https://repo.papermc.io/repository/maven-public/")
   }
 
-  build {
-    doLast {
-      if (!ftc.isDebugBuild) {
-        ftc.incrementBuildId()
+  dependencies {
+    testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
+    testImplementation("com.google.guava:guava:32.1.2-jre")
+    testImplementation("io.papermc.paper:paper-api:${apiVersion}-R0.1-SNAPSHOT")
+
+    compileOnly("io.papermc.paper:paper-api:${apiVersion}-R0.1-SNAPSHOT")
+
+    compileOnly(grenadier)
+    compileOnly(grenadierAnnot)
+    compileOnly(mathlib)
+    compileOnly(toml)
+    compileOnly(nbtlib)
+
+    compileOnly("com.mojang:brigadier:1.0.18")
+    compileOnly("com.mojang:datafixerupper:6.0.6")
+
+    compileOnly(configurate)
+  }
+
+  java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+  }
+
+  tasks {
+    test {
+      useJUnitPlatform()
+    }
+
+    javadoc {
+      options.encoding = Charsets.UTF_8.name()
+    }
+
+    compileJava {
+      options.encoding = Charsets.UTF_8.name()
+      options.release.set(17)
+      options.compilerArgs.add("-Xmaxerrs")
+      options.compilerArgs.add("3000")
+    }
+
+    processResources {
+      if (this.project.name != "core") {
+        return@processResources
       }
 
-      ftc.syncJarAttributes()
-    }
-  }
-
-  assemble {
-    dependsOn(reobfJar)
-  }
-
-  compileJava {
-    options.encoding = Charsets.UTF_8.name()
-    options.release.set(17)
-
-    options.compilerArgs.add("-Xlint:all")
-    options.compilerArgs.add("-Xmaxwarns")
-    options.compilerArgs.add("300")
-  }
-
-  processResources {
-    filteringCharset = Charsets.UTF_8.name()
-
-    val fileList = listOf(
-      "paper-plugin.yml",
-      "runtime_dependencies.json"
-    )
-
-    filesMatching(fileList) {
-      expand(
-        "grenadier_annotations" to grenadierAnnotations,
-        "version"               to version,
-        "nashorn"               to nashorn,
-        "grenadier"             to grenadier,
-        "buildID"               to ftc.buildId,
-        "debugbuild"            to ftc.isDebugBuild,
-        "buildDate"             to Date().toString(),
-        "mathlib"               to mathlib,
-        "toml"                  to toml
-      )
-    }
-
-    val copyDetails: ArrayList<FileCopyDetails> = ArrayList()
-    eachFile {
-      copyDetails.add(this)
-    }
-
-    doLast {
-      copyDetails.forEach {
-        val target = File(destinationDir, it.path)
-        target.setLastModified(it.lastModified)
+      filesMatching("runtime_libraries.json") {
+        expand(
+          "grenadier" to grenadier,
+          "grenadierAnnotations" to grenadierAnnot,
+          "toml" to toml,
+          "mathLib" to mathlib,
+          "configurate" to configurate,
+          "nbtlib" to nbtlib,
+        )
       }
-    }
-  }
-
-  reobfJar {
-    doLast {
-      ftc.syncJarAttributes()
     }
   }
 }

@@ -1,0 +1,43 @@
+name = "user_earnings"
+aliases = "userearnings" | "earnings"
+description = "Manage earnings with players"
+
+literal("get").argument("player", user) {
+  map_result = @result_to_user
+  description = "Gets a list of all Rhines a player has earned from selling materials"
+  executes = getEarnings()
+}
+
+literal("clear").argument("players", users) {
+  map_result = @result_to_users
+  description = "Clears players' earnings"
+  executes = clearEarnings()
+}
+
+literal("add").argument("player", user) {
+  map_result = @result_to_user
+
+  argument("material", @material).argument("amount", int(min=1)) {
+    executes = addEarnings()
+    description = "Adds earnings to a player"
+  }
+}
+
+literal("remove").argument("player", user) {
+  map_result = @result_to_user
+
+  argument("material", @material).argument("amount", int(min=1)) {
+    executes = addEarnings()
+    description = "Removes earnings from a player"
+  }
+}
+
+literal("set").argument("player", user) {
+  map_result = @result_to_user
+
+  argument("material", @material).argument("amount", int) {
+    description = "Sets a player's material earnings"
+    executes = setEarnings()
+  }
+}
+

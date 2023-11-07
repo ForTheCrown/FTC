@@ -1,0 +1,56 @@
+name        = "scripts"
+aliases     = 'script'
+permission  = 'ftc.commands.scripts'
+description = "Command that provides access to FTC's scripting engine"
+
+literal("reload-config") {
+  executes = configReload()
+  description = "Reloads the scripting plugin config"
+}
+
+literal("reload-scripts") {
+  executes = scriptsReload()
+  description = "Reloads all currently active scripts"
+}
+
+literal("loaded") {
+  literal("list") {
+    executes = listActive()
+    description = "Lists all loaded scripts"
+  }
+
+  literal("reload").argument("active", @active_script) {
+    executes = reloadActive()
+    description = "Reloads a specific script"
+  }
+
+  literal("close").argument("active", @active_script) {
+    executes = closeActive()
+    description = "Closes a loaded script"
+  }
+}
+
+literal("run").argument("script_name", @script_argument) {
+  executes = runScript()
+
+  label = "<script>"
+  description = "Executes a <script>"
+
+  argument('options', @run_options) {
+    executes = runScript()
+
+    label = "[args=<string>] [-keep-loaded] [method=<string>]"
+    description = [
+      "Executes a <script>",
+      "Options:",
+      "'args' - Sets the string arguments that are passed to the script",
+      "'method' - specifies the name of the method to run after",
+      "the global scope has been executed",
+
+      "'-keep-loaded' - If set, the script will stay loaded after",
+      "execution has finished, use this if the script has a",
+      "scheduler or event listener that needs to run for longer",
+      "than the script's initial lifetime",
+    ]
+  }
+}

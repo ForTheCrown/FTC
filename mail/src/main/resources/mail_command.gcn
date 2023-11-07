@@ -1,0 +1,108 @@
+name = "mail"
+description = "Mail command"
+permission = @mail_permission
+
+executes = showMail()
+
+argument("page", int(min=1)) {
+  label = "<page: number(1..)>"
+  executes = showMail()
+
+  argument("pageSize", int(min=5, max=20)) {
+    label = "[<page size: number(5..20)>]"
+    description = "Shows you your mail"
+    executes = showMail()
+  }
+}
+
+literal("read_other") {
+  requires = permission(@other_permission)
+
+  argument("user", user) {
+    map_result = @result_to_user
+    executes = readOther()
+    description = "Reads another <user>'s mail"
+
+    argument("page", int(min=1)) {
+      label = "[<page: number(1..)>]"
+      executes = readOther()
+
+      argument("pageSize", int(min=5, max=20)) {
+        label = "[<page size: number(5..20)>]"
+        description = "Shows you a <users>'s mail"
+        executes = readOther()
+      }
+    }
+  }
+}
+
+literal("send").argument("targets", @mail_targets) {
+  literal("-anonymous") {
+    requires = permission(@flags_permission)
+
+    argument("message", message) {
+      map_result = @result_to_message
+      executes = sendMailAnonymous()
+      description = "Sends a mail message to a <target> player"
+    }
+  }
+
+  argument("message", message) {
+    map_result = @result_to_message
+    executes = sendMail()
+    description = "Sends a mail message to a <target> player"
+  }
+}
+
+literal("send_item") {
+  requires = permission(@item_permission)
+
+  argument("target", @mail_target) {
+    literal("-anonymous") {
+      requires = permission(@flags_permission)
+
+      argument("message", message) {
+        map_result = @result_to_message
+        executes = sendItemAnonymous()
+        description = "Sends a mail message to a <target> player with an item"
+      }
+    }
+
+    argument("message", message) {
+      map_result = @result_to_message
+      executes = sendItem()
+      description = "Sends a mail message to a <target> player with an item"
+    }
+  }
+}
+
+literal("admin_send") {
+  requires = permission(@admin_permission)
+
+  argument("targets", @mail_targets).argument("options", @admin_options) {
+    label = "[<options>] message=<message>"
+    description = [
+      "Sends an admin mail message, options:",
+      "- [rhines=<amount>]: Sets the message's rhine rewards",
+      "- [gems=<amount>]: Sets the message's gem rewards",
+      "- [guildExp=<amount>]: Sets the GuildEXP reward",
+      "- [items=<item list>]: Sets the items that are in the message",
+      "- [script=<script name>]: Script executed when mail is claimed",
+      "- [tags=<tag list>]: Sets a list of string tags used to identify the message",
+      "- [-multiply-guild-exp]: Sets whether to use the GuildEXP multiplier or not when rewarding GuildEXP"
+    ]
+    executes = sendAdmin()
+  }
+}
+
+literal("mark_read").argument("options", @options) {
+  executes = markRead()
+}
+
+literal("claim").argument("options" @options) {
+  executes = claimRewards()
+}
+
+literal("delete").argument("options", @options) {
+  executes = deleteMail()
+}

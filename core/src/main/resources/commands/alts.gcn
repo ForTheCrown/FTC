@@ -1,0 +1,37 @@
+name = "alts"
+aliases = "useralts" | "user_alts"
+description = "Modify user alt accounts"
+
+literal("info").argument("user", user) {
+  map_result = @result_to_user
+  description = "Shows alt account info relating to a <user>"
+  executes = showInfo()
+}
+
+literal("add").argument("alt", user) {
+  map_result = @result_to_user
+
+  argument("main", user) {
+    map_result = @result_to_user
+
+    executes = add()
+    description = "Marks an <alt> player as an alt account for a <main>"
+  }
+}
+
+literal("remove").argument("alt", user) {
+  map_result = @result_to_user
+
+  argument("main", user) {
+    map_result = @result_to_user
+
+    executes = remove()
+    description = "Removes an <alt> account from a <main> account"
+  }
+}
+
+literal("clear").argument("main", user) {
+  map_result = @result_to_user
+  executes = clear()
+  description = "Clears all alt account links from a <main> account"
+}

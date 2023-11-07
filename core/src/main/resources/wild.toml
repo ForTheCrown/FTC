@@ -1,0 +1,23 @@
+
+# The max range /wild will move you to in a world
+spawn_range = 15000
+
+# Max attempts made to find a wild destination location
+max_attempts = 1024
+
+# Determines if /wild teleports you into the air and gives you slow falling
+# or teleports you to the highest non-air block at a location
+falling_wild = false
+
+# Biomes you cannot /wild into
+banned_biomes = [
+  "ocean",
+  "frozen_ocean",
+  "deep_ocean",
+  "warm_ocean",
+  "lukewarm_ocean",
+  "cold_ocean",
+  "deep_lukewarm_ocean",
+  "deep_cold_ocean",
+  "deep_frozen_ocean"
+]

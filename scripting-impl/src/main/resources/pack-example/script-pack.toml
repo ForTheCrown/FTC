@@ -1,0 +1,10 @@
+# Sets the main script
+main-script = "main.js"
+
+required-plugins = [ "FTC-ExtendedItems" ]
+
+# A list of export name to implementation script
+# - 'script' Is a file path inside this pack's directory
+[exports]
+json = { script = "exports/json", values = ["o_parse as parse", "stringify"]}
+example = "exports/example"

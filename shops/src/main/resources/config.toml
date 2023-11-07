@@ -1,0 +1,41 @@
+
+# Determines if interactions with normal shops should be logged to console
+logNormalUses = false
+# Determines if interactions with admin shops should be logged to console
+logAdminUses = true
+# Max sign shop price
+maxPrice = 1000000
+# The amount of time a signshop will stay in memory
+unloadDelay = "5m"
+
+# Cooldown between market actions like claiming, abandoning and transferring
+marketActionCooldown = "1d"
+
+# Determines if auto evictions are enabled
+autoEvictEnabled = true
+
+# Delay between a shop being marked for eviction and the shop actually
+# being evicted
+evictionDelay = "14days"
+
+# Interval between market scans
+scanInterval = "1d"
+
+# Time that sign shops have to be unused for to warrant a shop being evicted
+# for having no useful sign shops
+unusedShopKickTime = "2w"
+
+# The period of time a user must be inactive for their shop to be
+# evicted for inactivity
+inactiveKickTime = "2months"
+
+# Minimum amount of sign shops required inside a market to avoid auto
+# eviction
+minimumShopAmount = 5
+
+# Default price of a market shop
+defaultPrice = 55000
+
+# Minimum amount of stock required inside each sign shop inside a
+# market shop
+minStock = 0.5

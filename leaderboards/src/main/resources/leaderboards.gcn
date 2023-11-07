@@ -1,0 +1,260 @@
+name = "leaderboards"
+aliases = 'lb'
+description = "Leaderboards admin command"
+
+literal("reload-config") {
+  executes = reloadConfig()
+  description = "Reloads the Leaderboards Config"
+}
+
+literal("reload-boards") {
+  executes = reloadBoards()
+  description = "Reloads all leaderboards from disc"
+}
+
+literal("save") {
+  executes = saveBoards()
+  description = "Saves all leaderboards to disk"
+}
+
+literal("list") {
+  executes = listBoards()
+  description = "Lists all leaderboards"
+
+  argument("page", int(min=1)) {
+    label = "[<page size>]"
+    executes = listBoards()
+
+    argument("pageSize", int(min=5, max=20)) {
+      label = "[<page size>]"
+      executes = listBoards()
+      description = "Lists all leaderboards on a specific page"
+    }
+  }
+}
+
+literal("create").argument("name", ftc_key) {
+  executes = createBoard()
+  description = "Creates a new leaderboard with 'dummy' source"
+}
+
+literal("info").argument("board" @lb) {
+  executes = showInfo()
+  description = "Shows info about a leaderboard"
+}
+
+literal("update").argument("board" @lb) {
+  executes = updateBoard()
+  description = "Updates a leaderboard"
+}
+
+literal("update-all") {
+  executes = updateAll()
+  description = "Updates all leaderboards"
+}
+
+literal("kill").argument("board" @lb) {
+  executes = killBoard()
+  description = "Kills a leaderboard"
+}
+
+literal("remove").argument("board" @lb) {
+  executes = removeBoard()
+  description = "Kills and deletes a leaderboard"
+}
+
+literal("spawn").argument("board" @lb) {
+  executes = spawnBoard()
+  description = "Spawns a leaderboard"
+}
+
+literal("location").argument("board" @lb) {
+  executes = setLocation()
+  description = "Moves a leaderboard to where you're standing"
+
+  argument("pos", vec3d) {
+    label = "<pos: x y z>"
+    executes = setLocation()
+    map_result = result.apply()
+    description = "Moves a leaderboard to the specified xyz coordinates"
+  }
+}
+
+literal("footer").argument("board" @lb).argument("text", greedy_string) {
+  executes = setFooter()
+  suggests = suggestFooter()
+  description = "Sets the footer used by a leaderboard"
+}
+
+literal("header").argument("board" @lb).argument("text", greedy_string) {
+  executes = setHeader()
+  suggests = suggestHeader()
+  description = "Sets the header (title) used by a leaderboard"
+}
+
+literal("format").argument("board" @lb).argument("text", greedy_string) {
+  executes = setFormat()
+  suggests = suggestFormat()
+  description = "Sets the format used by a leaderboard"
+}
+
+literal("you-format") {
+  literal("set").argument("board" @lb).argument("text", greedy_string) {
+    executes = setYouFormat()
+    description = "Sets the format used when displaying the 'You' entry"
+  }
+  literal("unset").argument("board" @lb) {
+    executes = setYouFormat()
+    description = [
+      "Reverts the format used for displaying the 'You' entry",
+      "back to the regular format"
+    ]
+  }
+}
+
+literal("include-you").argument("board" @lb).argument("value", bool) {
+  executes = setIncludeYou()
+  description = [
+    "Enables/Disables the 'You' entry being displayed",
+    "",
+    "The 'You' entry will not be shown if a non-player leaderboard",
+    "is being rendered, or if the player has no score in the leaderboard"
+  ]
+}
+
+literal("order").argument("board" @lb).argument("order", @order) {
+  executes = setOrder()
+  description = "Sets the order in which elements are listed"
+}
+
+literal("source").argument("board" @lb).argument("source", @source) {
+  executes = setSource()
+  description = "Sets the data source used by a leaderboard"
+}
+
+literal("max-size").argument("board" @lb).argument("size", int(min=1, max=50)) {
+  executes = setMaxSize()
+  description = "Sets the maximum amount of entries a leaderboard will show"
+}
+
+literal("fill-empty").argument("board" @lb).argument("value", bool) {
+  executes = setFillEmpty()
+  description = [
+    "Sets whether the leaderboard size is changed or if empty",
+    "slots are filled with '-' values"
+  ]
+}
+
+literal("filter") {
+  literal("set").argument("board" @lb).argument("filter", @filter) {
+    executes = setFilter()
+    description = "Sets a leaderboard's score filter"
+  }
+  literal("unset").argument("board" @lb) {
+    executes = setFilter()
+    description = "Removes a leaderboard's filter"
+  }
+}
+
+literal("entity") {
+  literal("yaw").argument("board" @lb).argument("value", float(min=-180, max=180)) {
+    executes = setYaw()
+    description = "Sets the yaw (x rotation) of a leaderboard"
+  }
+  literal("pitch").argument("board" @lb).argument("value", float(min=-180, max=180)) {
+    executes = setPitch()
+    description = "Sets the pitch (y rotation) of a leaderboard"
+  }
+
+  literal("scale") {
+    literal("set").argument("board" @lb).argument("value", vec3d) {
+      executes = setScale()
+      description = "Sets a leaderboard's scale"
+    }
+    literal("unset").argument("board" @lb) {
+      executes = setScale()
+      description = "Removes a set scale value from a leaderboard"
+    }
+  }
+
+  literal("translation") {
+    literal("set").argument("board" @lb).argument("value", vec3d) {
+      executes = setTranslation()
+      description = "Sets the transformation offset of a leaderboard"
+    }
+    literal("unset").argument("board" @lb) {
+      executes = setTranslation()
+      description = "Removes a set offset value from a leaderboard"
+    }
+  }
+
+  literal("billboard").argument("board" @lb).argument("value", @billboard) {
+    executes = setBillboard()
+    description = [
+      "Sets the 'billboard' value of a leaderboard",
+      "A 'billboard' decides if a leaderboard is always rotated to face you",
+      "or is at a fixed angle"
+    ]
+  }
+  literal("text-align").argument("board" @lb).argument("value", @alignment) {
+    executes = setAlign()
+    description = "Sets the text alignment of a leaderboard (left, right, or center)"
+  }
+
+  literal("background-color") {
+    literal("set").argument("board" @lb).argument("value", @color) {
+      executes = setBackColor()
+      description = "Sets the background color of a leaderboard"
+    }
+    literal("unset").argument("board" @lb) {
+      executes = setBackColor()
+      description = "Removes a set background color value from a leaderboard"
+    }
+  }
+
+  literal("brightness") {
+    literal("set").argument("board" @lb)
+        .argument("skylight", int(min=0, max=15))
+        .argument("blocklight", int(min=0, max=15))
+    {
+      executes = setBrightness()
+      description = "Sets the 'brightness' of a leaderboard"
+    }
+    literal("unset").argument("board" @lb) {
+      executes = setBrightness()
+      description = "Removes a set 'brightness' value from a leaderboard"
+    }
+  }
+
+  literal("shadowed").argument("board" @lb).argument("value", bool) {
+    label = "<true|false>"
+    executes = setShadowed()
+    description = "Sets the background color of a leaderboard"
+  }
+  literal("see-through").argument("board" @lb).argument("value", bool) {
+    executes = setSeeThrough()
+    description = "Sets if a leaderboard can be seen through"
+  }
+
+  literal("line-width") {
+    literal("set").argument("board" @lb).argument("value", int(min=1)) {
+      executes = setLineWidth()
+      description = "Sets a leaderboard's line width"
+    }
+    literal("unset").argument("board" @lb) {
+      executes = setLineWidth()
+      description = "Removes a leaderboard's set line-width value"
+    }
+  }
+
+  literal("text-opacity") {
+    literal("set").argument("board" @lb).argument("value", int(min=0, max=127)) {
+      executes = setOpacity()
+      description = "Sets the text opacity of a leaderboard"
+    }
+    literal("unset").argument("board" @lb) {
+      executes = setOpacity()
+      description = "Removes the set text opacity value of leaderboard"
+    }
+  }
+}

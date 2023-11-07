@@ -1,0 +1,17 @@
+name = "ftccore"
+description = "FTC-Core admin command"
+
+literal("reload") {
+  description = "Reloads the FTC-Core plugin"
+  executes = reload()
+}
+
+literal("reload-config") {
+  description = "Reloads the FTC-Core config"
+  executes = reloadConfig()
+}
+
+literal("save") {
+  description = "Forces the plugin to save all data"
+  executes = save()
+}

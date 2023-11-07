@@ -1,0 +1,12 @@
+pattern = [
+  "ABBBA",
+  "BBCBB",
+  "BCCCB",
+  "BBCBB",
+  "ABBBA"
+]
+
+[where]
+A = "minecraft:chiseled_stone_bricks"
+B = "minecraft:stone_bricks"
+C = "minecraft:polished_andesite"

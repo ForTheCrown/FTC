@@ -1,0 +1,14 @@
+
+# List of import placeholders values.
+# These can be used inside javascript imports by putting an '@' infront of the placeholder name,
+# for example: 'import Files from "@nio.file.Files";'
+[importPlaceholders]
+ftc         = "net.forthecrown"
+fastutil    = "it.unimi.dsi.fastutil"
+bukkit      = "org.bukkit"
+nio         = "java.nio"
+jutil       = "java.util"
+jlang       = "java.lang"
+worldguard  = "com.sk89q.worldguard"
+worldedit   = "com.sk89q.worldedit"
+kyori       = "net.kyori.adventure"

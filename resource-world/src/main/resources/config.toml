@@ -1,0 +1,55 @@
+
+# List of seeds to pick from when generating the ResourceWorld
+# If this list is empty, will iterate through random seeds until an
+# 'acceptable' seed is found
+legalSeeds = []
+
+# List of seeds that CANNOT be used when generating the
+# Resource world
+bannedSeeds = []
+
+# AncientGates rw -> spawn portal gate
+toHazGate = "res_to_haz"
+
+# AncientGates spawn -> rw portal gate
+toResGate = "haz_to_res"
+
+# Name of the WorldGuard region that protects the resource world
+# spawn area
+worldGuardSpawn = "rg_spawn"
+
+# Name of the structure in the FTC-Structures plugin that is used
+# as a world spawn structure
+spawnStructure = "rw_spawn"
+
+# Warp that will teleport users back to the portal
+portalWarp = "portal"
+
+# Interal at which the plugin automatically saves all data
+autosaveInterval = "30m"
+
+# Interval at which the resource world is reset
+resetInterval = "60d"
+
+# Config option about the RW data tracker, which tracks what blocks
+# are and aren't naturally placed, this is to provide double drops.
+#
+# Determines the amount of time an RW 'section' stays in memory
+sectionRetentionTime = "5m"
+
+# The amount of blocks the worldguard region will go beyond the spawn structure
+# For example, a value of 5 means the worldguard region will be 5 blocks larger
+# than the spawn structure
+worldGuardRegionReach = 5
+
+# Amount of blocks the spawn's WorldGuard region protects UNDER the spawn
+# The WG region will stretch from max_y -> (spawn_y - worldGuardSizeY)
+worldGuardSizeY = 20
+
+[messages]
+resetStart = "&eThe resource world is not closed, will open in ~1 hour"
+resetEnd = "&eThe resource world has reset"
+
+[doubleDrop]
+enabled = true
+rate = 0.5

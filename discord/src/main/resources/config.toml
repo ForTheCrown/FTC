@@ -1,0 +1,8 @@
+
+# Enables/disables forwarding logger calls to Discord
+forwardingEnabled = true
+forwarderLevel = "ERROR"
+forwardingChannel = "error-log"
+
+updateChannelId = 0
+forwardDiscordAnnouncementsToServer = true

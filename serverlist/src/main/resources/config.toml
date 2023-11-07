@@ -1,0 +1,40 @@
+
+# Randomizes the max player count
+#
+# The random values range for the randomized max player count is
+# [maxPlayerCount -> maxPlayerCount + maxPlayerRandomRange]
+#
+# Set to 0 or below to disable randomization
+#
+maxPlayerRandomRange = 5
+
+# Infer the profile of the player viewing the serverlist based off their IP.
+#
+# This may sometimes not work or cause wrong profiles to be connected to the
+# wrong IP due to dynamic IP addresses
+#
+inferPlayerBasedOffIp = true
+
+# Allow/prevent changing the server's Protocol Version number
+#
+# If changed, can display the server as being outdated when in reality it isn't
+# May be used my some entries in serverlist.toml to display a red text or invalid
+# version when the whitelist is enabled or the server is otherwise not accessible
+# to regular players
+#
+allowChangingProtocolVersions = true
+
+# Will prevent the chaning of version text.
+#
+# Version text is the text displayed when a server has an outdated version for a client,
+# next to the 5 connection bars. If this (and allowChangingProtocolVersions) are enabled,
+# That text can be changed.
+#
+allowChangingVersionText = true
+
+# Forces the server to close all ping requests without sending a reply, thus
+# appearing as offline
+appearOffline = false
+
+# Base motd the serverlist uses
+baseMotd = "&6&lForTheCrown &7- &e${message}\n&7Currently on ${version}"

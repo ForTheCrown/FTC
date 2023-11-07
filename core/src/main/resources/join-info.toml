@@ -1,0 +1,38 @@
+# Determines information that is displayed to players when they log into the server
+#
+# --------------------------------------------------------------------------------------------------
+# Format
+# --------------------------------------------------------------------------------------------------
+# 'visisble' (optional, will assume 'true' if not set)
+#  Determines if a section's information should be displayed at all
+#
+#  This value can be a 'true' or 'false' , or one of the following
+#  - 'dates': { dates = [ "dd.mm.yyyy", "dd.mm.yyyy" ] }
+#     Text will be visible between the 2 dates
+#
+#  - 'days': { days = [ "dd.mm", "dd.mm" ] }
+#     Text will be visible every between the 2 given dates, every year
+#
+# Examples:
+# - "visible = true"
+# - "visible = false"
+# - "visible = { dates = [ "01.01.2024", "07.02.2024" ] }"
+# - "visible = { days = [ "01.01", "07.01" ] }"
+# --------------------------------------------------------------------------------------------------
+# 'info' (required value)
+#  Text to display, placeholders are supported
+#
+# Examples:
+# - "info = 'Hello, world!'"
+# - "info = 'Greetings, ${viewer}'"
+# - "info = 'Greetings, ${viewer}, you are at ${viewer.block} in the ${viewer.world} World'"
+# --------------------------------------------------------------------------------------------------
+# Example section:
+# --------------------------------------------------------------------------------------------------
+# [event_info]
+# visible = { dates = [ "01.02.2023", "07.02.2023" ] }
+# info = [
+#   "The event is live!",
+#   "Head to &a${text: content='[The event warp]', run_command='/warp event', hover='Click me!'} &rto check it out"
+# ]
+# --------------------------------------------------------------------------------------------------

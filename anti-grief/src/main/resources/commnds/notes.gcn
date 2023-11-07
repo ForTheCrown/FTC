@@ -1,0 +1,23 @@
+name = "notes"
+description = "Allows you to view, add and remove staff notes from various players"
+
+argument("user", user) {
+  executes = showNotes()
+  description = "Views the notes attached to a player"
+}
+
+literal("clear").argument("user", user) {
+  executes = clearNotes()
+  description = "Clears all notes attached to a player"
+}
+
+literal("add").argument("user", user).argument("message", chat) {
+  map_result = result.asComponent()
+  executes = addNote()
+  description = "Adds a staff note to a player"
+}
+
+literal("remove").argument("user", user).argument("index", int(min=1)) {
+  executes = removeNote()
+  description = "Removes a staff note from a player"
+}

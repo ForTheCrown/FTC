@@ -1,0 +1,65 @@
+
+# Plugin data autosave interval
+autosaveInterval = "30m"
+
+# Cooldown that's started after a player teleports
+# before they can teleport again
+tpCooldown = "3s"
+
+# Time it takes for a TPA request to expire
+tpaExpireTime = "3m"
+
+# Maximum length a player's nickname can have
+maxNickLength = 16
+
+# Maximum amount of hoppers in a chunk
+hoppersInOneChunk = 128
+
+# Worlds people cannot set their homes to or TPA into
+illegalWorlds = [ "world_void", "world_test", "world_event", "void" ]
+
+# The time of day the day reset happens
+# In hh:mm:ss format
+dayUpdateTime = 00:00:01
+
+# Disables ALL placeholders used by FTC plugins,
+# this means every instance of '${placeholder}' will be left unrendered
+placeholdersDisabled = false
+
+# Toggles enchantment levels that are above the vanilla maximum
+# from being reset to the max in anvils
+# If false, max levels are not reset, if true, they are
+#
+# Note:
+# This option will only allow levels above the max, if one of the 2
+# items in the equation already has a level above the maximum, otherwise
+# vanilla behaiviour is retained
+allowHighLevelEnchantments = true
+
+# Alt account joining rule, prevents alt accounts joining when they shouldn't be
+#
+# Possible Values:
+# - 'never': Never stop alt accounts from joining
+# - 'always': Always stop alt accounts from joining
+# - 'if_other_online': If the account has another alt/main online, then deny joining
+preventAltJoining = "if_other_online"
+
+# Enables/disables mobs getting a health bar for a short duration after being hit
+mobHealthBarsEnabled = true
+
+# Enables damage numbers being spawned when an entity is attacked
+damageNumbersEnabled = true
+
+# Whether Right-Clicking with coins in your main hand will cause those coins
+# to be deposited, disabling this will not disable the /deposit command
+rightClickDeposits = true
+
+# Threshold at which durability warnings are thrown to players
+#
+# Uses the following equation to determine the durability at which
+# to start warnings:
+# minDurability = item.max_durability * durabilityWarningThreshold
+#
+# Set to 0 or less to disable
+#
+durabilityWarningThreshold = 0.1

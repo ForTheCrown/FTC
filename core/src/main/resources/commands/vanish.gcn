@@ -1,0 +1,24 @@
+name = "vanish"
+permission = @perm
+description = "Allows staff to become invisible to non-staff"
+aliases = "v"
+
+executes = toggleSelf()
+
+literal("silent") {
+  description = "Toggles vanish without a join/leave message"
+  executes = toggleSelfSilent()
+}
+
+argument("other", user) {
+  requires = permission(@others_perm)
+  map_result = @result_to_user
+
+  description = "Toggles vanish for another player"
+  executes = toggleOther()
+
+  literal("silent") {
+    description = "Toggles vanish for another player without announcing a join/leave message"
+    executes = toggleOtherSilent()
+  }
+}

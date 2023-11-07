@@ -1,0 +1,15 @@
+
+# Delay until an unmoving player is automatically set as AFK
+autoAfkDelay = "30m"
+
+# Maximum time a player is allowed to be offline
+# If this time is surpssed by a user in a given day, the action specified by
+# 'allowedTimeSurpassed' is performed
+allowedAfkTime = "2h"
+
+# What action is taken when the maximum 'allowedAfkTime' is surpassed by a player
+# Possible values:
+# - 'kick': The player is kicked
+# - 'tempban' The player is tempbanned until the next day starts at 00:00:00 server time
+# - 'permban': lmao
+allowedTimeSurpassed = "kick"
