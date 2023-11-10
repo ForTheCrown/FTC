@@ -1,7 +1,6 @@
 package net.forthecrown.webmap.bluemap;
 
 import com.flowpowered.math.vector.Vector2d;
-import com.google.common.base.Preconditions;
 import com.mojang.datafixers.util.Unit;
 import de.bluecolored.bluemap.api.markers.ExtrudeMarker;
 import de.bluecolored.bluemap.api.math.Shape;

@@ -2,7 +2,6 @@ package net.forthecrown.webmap.dynmap;
 
 import com.google.common.base.Strings;
 import com.mojang.datafixers.util.Unit;
-import java.util.Objects;
 import net.forthecrown.utils.Result;
 import net.forthecrown.webmap.MapLayer;
 import net.forthecrown.webmap.MapMarker;

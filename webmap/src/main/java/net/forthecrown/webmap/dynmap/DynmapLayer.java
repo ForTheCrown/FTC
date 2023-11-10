@@ -3,7 +3,6 @@ package net.forthecrown.webmap.dynmap;
 import com.google.common.base.Strings;
 import com.mojang.datafixers.util.Unit;
 import java.util.Collection;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import net.forthecrown.utils.Result;

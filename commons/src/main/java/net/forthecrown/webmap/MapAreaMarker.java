@@ -4,7 +4,6 @@ import com.mojang.datafixers.util.Unit;
 import javax.annotation.Nullable;
 import net.forthecrown.utils.Result;
 import org.bukkit.Color;
-import org.spongepowered.math.vector.Vector2d;
 
 /**
  * Marker that encompasses a polygonal area with a height ranging between 2 user-defined Y levels
