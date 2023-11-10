@@ -18,6 +18,9 @@ public class PlayerJoinLeaveListener implements Listener {
 
   @EventHandler(ignoreCancelled = true)
   public void onUserJoin(UserJoinEvent event) {
+    if (event.isFirstJoin()) {
+      return;
+    }
 
     event.setRenderer((user, viewer) -> {
       var displayName = user.displayName(viewer, DisplayIntent.JOIN_LEAVE_MESSAGE);
