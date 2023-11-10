@@ -1,5 +1,6 @@
 package net.forthecrown.webmap.bluemap;
 
+import com.google.common.base.Strings;
 import com.google.gson.JsonElement;
 import de.bluecolored.bluemap.api.BlueMapAPI;
 import de.bluecolored.bluemap.api.BlueMapMap;
@@ -63,8 +64,9 @@ public class BlueWebmap implements WebMap {
 
   @Override
   public Optional<MapLayer> getLayer(@NotNull World world, String id) {
-    Objects.requireNonNull(id, "Null id");
-    Objects.requireNonNull(world, "Null world");
+    if (world == null || Strings.isNullOrEmpty(id)) {
+      return Optional.empty();
+    }
 
     return getMap(world)
         .map(blueMapMap -> {
@@ -80,10 +82,15 @@ public class BlueWebmap implements WebMap {
 
   @Override
   public Result<MapLayer> createLayer(@NotNull World world, String id, String name) {
-    Objects.requireNonNull(id, "Null id");
-    Objects.requireNonNull(world, "Null world");
-    Objects.requireNonNull(name, "Null name");
-
+    if (Strings.isNullOrEmpty(id)) {
+      return Result.error("Null/empty ID");
+    }
+    if (Strings.isNullOrEmpty(name)) {
+      return Result.error("Null/empty layer name");
+    }
+    if (world == null) {
+      return Result.error("Null world");
+    }
     var opt = getMap(world);
 
     if (opt.isEmpty()) {
@@ -105,6 +112,10 @@ public class BlueWebmap implements WebMap {
 
   @Override
   public Optional<MapIcon> getIcon(String id) {
+    if (Strings.isNullOrEmpty(id)) {
+      return Optional.empty();
+    }
+
     return Optional.ofNullable(iconIndex.getIconPath(id))
         .filter(Files::exists)
         .map(path -> new BlueMapIcon(id, path.toString(), iconIndex));
@@ -112,9 +123,15 @@ public class BlueWebmap implements WebMap {
 
   @Override
   public Result<MapIcon> createIcon(String id, String name, InputStream iconData) {
-    Objects.requireNonNull(id, "Null id");
-    Objects.requireNonNull(name, "Null name");
-    Objects.requireNonNull(iconData, "Null icon data");
+    if (Strings.isNullOrEmpty(id)) {
+      return Result.error("Null/empty ID");
+    }
+    if (Strings.isNullOrEmpty(name)) {
+      return Result.error("Null/empty icon name");
+    }
+    if (iconData == null) {
+      return Result.error("Null icon-data");
+    }
 
     return iconIndex.createIconFile(id, iconData)
         .map(path -> new BlueMapIcon(id, path.toString(), iconIndex));

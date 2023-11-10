@@ -1,5 +1,7 @@
 package net.forthecrown.webmap.dynmap;
 
+import com.google.common.base.Strings;
+import com.mojang.datafixers.util.Unit;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
@@ -9,6 +11,7 @@ import net.forthecrown.webmap.MapAreaMarker;
 import net.forthecrown.webmap.MapIcon;
 import net.forthecrown.webmap.MapLayer;
 import net.forthecrown.webmap.MapPointMarker;
+import net.forthecrown.webmap.WebMapUtils;
 import org.bukkit.World;
 import org.dynmap.markers.AreaMarker;
 import org.dynmap.markers.Marker;
@@ -40,9 +43,13 @@ public class DynmapLayer implements MapLayer {
   }
 
   @Override
-  public void setName(String name) {
-    Objects.requireNonNull(name, "Null name");
+  public Result<Unit> setName(String name) {
+    if (Strings.isNullOrEmpty(name)) {
+      return Result.error("Null/empty name");
+    }
+
     set.setMarkerSetLabel(name);
+    return Result.unit();
   }
 
   @Override
@@ -61,7 +68,10 @@ public class DynmapLayer implements MapLayer {
 
   @Override
   public Optional<MapPointMarker> findPointMarker(String id) {
-    Objects.requireNonNull(id, "Null id");
+    if (Strings.isNullOrEmpty(id)) {
+      return Optional.empty();
+    }
+
     return Optional.ofNullable(set.findMarker(id))
         .map(marker -> new DynmapPointMarker(marker, this));
   }
@@ -75,6 +85,16 @@ public class DynmapLayer implements MapLayer {
       double z,
       MapIcon icon
   ) {
+    if (Strings.isNullOrEmpty(id)) {
+      return Result.error("Null/empty ID");
+    }
+    if (Strings.isNullOrEmpty(name)) {
+      return Result.error("Null/empty marker name");
+    }
+    if (icon == null) {
+      return Result.error("Null icon");
+    }
+
     if (findPointMarker(id).isPresent()) {
       return Result.error("Point marker with ID '%s' already exists", id);
     }
@@ -93,7 +113,9 @@ public class DynmapLayer implements MapLayer {
 
   @Override
   public Optional<MapAreaMarker> findAreaMarker(String id) {
-    Objects.requireNonNull(id, "Null id");
+    if (Strings.isNullOrEmpty(id)) {
+      return Optional.empty();
+    }
 
     return Optional.ofNullable(set.findAreaMarker(id))
         .map(m -> new DynmapAreaMarker(m, this));
@@ -106,6 +128,18 @@ public class DynmapLayer implements MapLayer {
       double[] xCorners,
       double[] zCorners
   ) {
+    if (Strings.isNullOrEmpty(id)) {
+      return Result.error("Null/empty ID");
+    }
+    if (Strings.isNullOrEmpty(name)) {
+      return Result.error("Null/empty marker name");
+    }
+
+    var cornersResult = WebMapUtils.validateAreaCoordinates(xCorners, zCorners);
+    if (cornersResult.isError()) {
+      return cornersResult.cast();
+    }
+
     if (findAreaMarker(id).isPresent()) {
       return Result.error("Area marker with ID '%s' already exists", id);
     }

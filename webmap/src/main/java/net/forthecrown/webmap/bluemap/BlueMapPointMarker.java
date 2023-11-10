@@ -1,6 +1,8 @@
 package net.forthecrown.webmap.bluemap;
 
+import com.mojang.datafixers.util.Unit;
 import de.bluecolored.bluemap.api.markers.POIMarker;
+import net.forthecrown.utils.Result;
 import net.forthecrown.webmap.MapIcon;
 import net.forthecrown.webmap.MapPointMarker;
 
@@ -47,12 +49,17 @@ public class BlueMapPointMarker extends BlueMapMarker implements MapPointMarker 
   }
 
   @Override
-  public void setIcon(MapIcon icon) {
+  public Result<Unit> setIcon(MapIcon icon) {
+    if (icon == null) {
+      return Result.error("Null icon");
+    }
     if (!(icon instanceof BlueMapIcon blu)) {
-      return;
+      return Result.error("Icon from a different implementation (How???)");
     }
 
     this.icon = blu;
     marker.setIcon(blu.path, 0, 0);
+
+    return Result.unit();
   }
 }

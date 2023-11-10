@@ -1,8 +1,10 @@
 package net.forthecrown.webmap.bluemap;
 
+import com.mojang.datafixers.util.Unit;
 import de.bluecolored.bluemap.api.AssetStorage;
 import java.io.IOException;
 import net.forthecrown.Loggers;
+import net.forthecrown.utils.Result;
 import net.forthecrown.webmap.MapIcon;
 import org.slf4j.Logger;
 
@@ -40,8 +42,8 @@ public class BlueMapIcon implements MapIcon {
   }
 
   @Override
-  public void setName(String name) {
-    // No-op, I guess
+  public Result<Unit> setName(String name) {
+    return Result.error("Not-implemented");
   }
 
   @Override

@@ -1,5 +1,6 @@
 package net.forthecrown.utils;
 
+import com.mojang.datafixers.util.Unit;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DataResult.PartialResult;
 import java.util.Objects;
@@ -12,12 +13,18 @@ import org.jetbrains.annotations.NotNull;
 
 public class Result<V> {
 
+  private static final Result<Unit> UNIT = new Result<>(Unit.INSTANCE, null);
+
   private final V value;
   private final String error;
 
   private Result(V value, String error) {
     this.value = value;
     this.error = error;
+  }
+
+  public static Result<Unit> unit() {
+    return UNIT;
   }
 
   /**
@@ -27,6 +34,11 @@ public class Result<V> {
    */
   public static <V> Result<V> success(V value) {
     Objects.requireNonNull(value);
+
+    if (value == Unit.INSTANCE) {
+      return (Result<V>) UNIT;
+    }
+
     return new Result<>(value, null);
   }
 

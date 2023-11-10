@@ -1,6 +1,7 @@
 package net.forthecrown.webmap.dynmap;
 
-import java.util.Objects;
+import com.mojang.datafixers.util.Unit;
+import net.forthecrown.utils.Result;
 import net.forthecrown.webmap.MapIcon;
 import net.forthecrown.webmap.MapLayer;
 import net.forthecrown.webmap.MapPointMarker;
@@ -41,13 +42,16 @@ public class DynmapPointMarker extends DynmapMarker implements MapPointMarker {
   }
 
   @Override
-  public void setIcon(MapIcon icon) {
-    Objects.requireNonNull(icon, "Null icon");
+  public Result<Unit> setIcon(MapIcon icon) {
+    if (icon == null) {
+      return Result.error("Null icon");
+    }
 
     if (!(icon instanceof DynmapIcon ico)) {
-      return;
+      return Result.error("Icon from a different implementation (How???)");
     }
 
     marker.setMarkerIcon(ico.icon);
+    return Result.unit();
   }
 }

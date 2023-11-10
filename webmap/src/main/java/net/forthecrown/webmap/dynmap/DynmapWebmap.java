@@ -1,5 +1,6 @@
 package net.forthecrown.webmap.dynmap;
 
+import com.google.common.base.Strings;
 import java.io.InputStream;
 import java.util.Objects;
 import java.util.Optional;
@@ -68,8 +69,9 @@ public class DynmapWebmap implements WebMap {
 
   @Override
   public Optional<MapLayer> getLayer(@NotNull World world, String id) {
-    Objects.requireNonNull(world, "Null world");
-    Objects.requireNonNull(id, "Null id");
+    if (world == null || Strings.isNullOrEmpty(id)) {
+      return Optional.empty();
+    }
 
     return apiOptional()
         .map(DynmapCommonAPI::getMarkerAPI)
@@ -79,9 +81,15 @@ public class DynmapWebmap implements WebMap {
 
   @Override
   public Result<MapLayer> createLayer(@NotNull World world, String id, String name) {
-    Objects.requireNonNull(id, "Null id");
-    Objects.requireNonNull(world, "Null world");
-    Objects.requireNonNull(name, "Null name");
+    if (Strings.isNullOrEmpty(id)) {
+      return Result.error("Null/empty ID");
+    }
+    if (Strings.isNullOrEmpty(name)) {
+      return Result.error("Null/empty layer name");
+    }
+    if (world == null) {
+      return Result.error("Null world");
+    }
 
     return apiResult().flatMap(api -> {
       var markers = api.getMarkerAPI();
@@ -98,7 +106,9 @@ public class DynmapWebmap implements WebMap {
 
   @Override
   public Optional<MapIcon> getIcon(String id) {
-    Objects.requireNonNull(id, "Null id");
+    if (Strings.isNullOrEmpty(id)) {
+      return Optional.empty();
+    }
 
     return apiOptional()
         .map(DynmapCommonAPI::getMarkerAPI)
@@ -108,9 +118,15 @@ public class DynmapWebmap implements WebMap {
 
   @Override
   public Result<MapIcon> createIcon(String id, String name, InputStream iconData) {
-    Objects.requireNonNull(id, "Null id");
-    Objects.requireNonNull(name, "Null name");
-    Objects.requireNonNull(iconData, "Null icon data");
+    if (Strings.isNullOrEmpty(id)) {
+      return Result.error("Null/empty ID");
+    }
+    if (Strings.isNullOrEmpty(name)) {
+      return Result.error("Null/empty icon name");
+    }
+    if (iconData == null) {
+      return Result.error("Null icon-data");
+    }
 
     return apiResult().flatMap(api -> {
       var markers = api.getMarkerAPI();

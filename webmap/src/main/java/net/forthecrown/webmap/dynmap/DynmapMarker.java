@@ -1,6 +1,9 @@
 package net.forthecrown.webmap.dynmap;
 
+import com.google.common.base.Strings;
+import com.mojang.datafixers.util.Unit;
 import java.util.Objects;
+import net.forthecrown.utils.Result;
 import net.forthecrown.webmap.MapLayer;
 import net.forthecrown.webmap.MapMarker;
 import org.bukkit.Bukkit;
@@ -23,15 +26,18 @@ public abstract class DynmapMarker implements MapMarker {
   }
 
   @Override
-  public void setLayer(MapLayer layer) {
-    Objects.requireNonNull(layer, "Null layer");
-
+  public Result<Unit> setLayer(MapLayer layer) {
+    if (layer == null) {
+      return Result.error("Null layer");
+    }
     if (!(layer instanceof DynmapLayer la)) {
-      return;
+      return Result.error("Layer from a different implementation (How did this happen???)");
     }
 
     description.setMarkerSet(la.set);
     this.layer = layer;
+
+    return Result.unit();
   }
 
   @Override
@@ -50,9 +56,13 @@ public abstract class DynmapMarker implements MapMarker {
   }
 
   @Override
-  public void setTitle(String title) {
-    Objects.requireNonNull(title, "Null title");
+  public Result<Unit> setTitle(String title) {
+    if (Strings.isNullOrEmpty(title)) {
+      return Result.error("Null/empty title");
+    }
+
     description.setLabel(title);
+    return Result.unit();
   }
 
   @Override

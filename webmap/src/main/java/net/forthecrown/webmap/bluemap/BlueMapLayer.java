@@ -1,5 +1,7 @@
 package net.forthecrown.webmap.bluemap;
 
+import com.google.common.base.Strings;
+import com.mojang.datafixers.util.Unit;
 import de.bluecolored.bluemap.api.BlueMapMap;
 import de.bluecolored.bluemap.api.markers.ExtrudeMarker;
 import de.bluecolored.bluemap.api.markers.MarkerSet;
@@ -40,8 +42,13 @@ public class BlueMapLayer implements MapLayer {
   }
 
   @Override
-  public void setName(String name) {
+  public Result<Unit> setName(String name) {
+    if (Strings.isNullOrEmpty(name)) {
+      return Result.error("Null/empty name");
+    }
+
     set.setLabel(name);
+    return Result.unit();
   }
 
   @Override
@@ -62,6 +69,10 @@ public class BlueMapLayer implements MapLayer {
 
   @Override
   public Optional<MapPointMarker> findPointMarker(String id) {
+    if (Strings.isNullOrEmpty(id)) {
+      return Optional.empty();
+    }
+
     return Optional.ofNullable(set.get(id))
         .filter(marker -> marker instanceof POIMarker)
         .map(marker -> new BlueMapPointMarker(this, id, (POIMarker) marker));
@@ -76,6 +87,16 @@ public class BlueMapLayer implements MapLayer {
       double z,
       MapIcon icon
   ) {
+    if (Strings.isNullOrEmpty(id)) {
+      return Result.error("Null/empty ID");
+    }
+    if (Strings.isNullOrEmpty(name)) {
+      return Result.error("Null/empty marker name");
+    }
+    if (icon == null) {
+      return Result.error("Null icon");
+    }
+
     if (findPointMarker(id).isPresent()) {
       return Result.error("Marker with ID '%s' is already defined", id);
     }
@@ -96,6 +117,10 @@ public class BlueMapLayer implements MapLayer {
 
   @Override
   public Optional<MapAreaMarker> findAreaMarker(String id) {
+    if (Strings.isNullOrEmpty(id)) {
+      return Optional.empty();
+    }
+
     return Optional.ofNullable(set.get(id))
         .filter(marker -> marker instanceof ExtrudeMarker)
         .map(marker -> new BlueMapAreaMarker(this, id, (ExtrudeMarker) marker));
@@ -108,17 +133,25 @@ public class BlueMapLayer implements MapLayer {
       double[] xCorners,
       double[] zCorners
   ) {
+    if (Strings.isNullOrEmpty(id)) {
+      return Result.error("Null/empty ID");
+    }
+    if (Strings.isNullOrEmpty(name)) {
+      return Result.error("Null/empty marker name");
+    }
+
     if (findAreaMarker(id).isPresent()) {
       return Result.error("Marker with ID '%s' is already defined", id);
     }
 
+    var shapeResult = BlueMapAreaMarker.shapeFromPoints(xCorners, zCorners);
+    if (shapeResult.isError()) {
+      return shapeResult.cast();
+    }
+
     var builder = ExtrudeMarker.builder();
     builder.label(name);
-    builder.shape(
-        BlueMapAreaMarker.shapeFromPoints(xCorners, zCorners),
-        world.getMinHeight(),
-        world.getMaxHeight()
-    );
+    builder.shape(shapeResult.getValue(), world.getMinHeight(), world.getMaxHeight());
 
     var marker = builder.build();
     set.put(id, marker);

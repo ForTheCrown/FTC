@@ -1,8 +1,11 @@
 package net.forthecrown.webmap.bluemap;
 
+import com.google.common.base.Strings;
+import com.mojang.datafixers.util.Unit;
 import de.bluecolored.bluemap.api.markers.DetailMarker;
 import de.bluecolored.bluemap.api.markers.Marker;
 import java.util.Objects;
+import net.forthecrown.utils.Result;
 import net.forthecrown.webmap.MapLayer;
 import net.forthecrown.webmap.MapMarker;
 import org.bukkit.World;
@@ -25,15 +28,20 @@ public abstract class BlueMapMarker implements MapMarker {
   }
 
   @Override
-  public void setLayer(MapLayer layer) {
+  public Result<Unit> setLayer(MapLayer layer) {
+    if (layer == null) {
+      return Result.error("Null layer");
+    }
     if (!(layer instanceof BlueMapLayer blu)) {
-      return;
+      return Result.error("Layer from a different implementation (How did this happen???)");
     }
 
     this.layer.set.remove(id);
     blu.set.put(id, marker);
 
     this.layer = blu;
+
+    return Result.unit();
   }
 
   @Override
@@ -52,9 +60,13 @@ public abstract class BlueMapMarker implements MapMarker {
   }
 
   @Override
-  public void setTitle(String title) {
-    Objects.requireNonNull(title, "Null title");
+  public Result<Unit> setTitle(String title) {
+    if (Strings.isNullOrEmpty(title)) {
+      return Result.error("Null/empty title");
+    }
+
     marker.setLabel(title);
+    return Result.unit();
   }
 
   @Override

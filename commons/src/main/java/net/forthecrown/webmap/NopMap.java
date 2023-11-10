@@ -11,6 +11,10 @@ class NopMap implements WebMap {
 
   static final NopMap NOP = new NopMap();
 
+  static <T> Result<T> noOpRes() {
+    return Result.error("NO-OP implementation (FTC-Webmap not installed or was disabled)");
+  }
+
   @Override
   public Optional<MapLayer> getLayer(@NotNull World world, String id) {
     return Optional.empty();
@@ -18,7 +22,7 @@ class NopMap implements WebMap {
 
   @Override
   public Result<MapLayer> createLayer(@NotNull World world, String id, String name) {
-    return Result.error("NO-OP implementation (No FTC-Webmap installed)");
+    return noOpRes();
   }
 
   @Override
@@ -28,7 +32,7 @@ class NopMap implements WebMap {
 
   @Override
   public Result<MapIcon> createIcon(String id, String name, InputStream iconData) {
-    return Result.error("NO-OP implementation (No FTC-Webmap installed)");
+    return noOpRes();
   }
 
   @Override

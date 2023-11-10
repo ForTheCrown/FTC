@@ -1,9 +1,12 @@
 package net.forthecrown.webmap.dynmap;
 
 import com.google.common.base.Preconditions;
+import com.mojang.datafixers.util.Unit;
 import java.util.Objects;
+import net.forthecrown.utils.Result;
 import net.forthecrown.webmap.MapAreaMarker;
 import net.forthecrown.webmap.MapLayer;
+import net.forthecrown.webmap.WebMapUtils;
 import org.bukkit.Color;
 import org.dynmap.markers.AreaMarker;
 import org.jetbrains.annotations.Nullable;
@@ -36,12 +39,11 @@ public class DynmapAreaMarker extends DynmapMarker implements MapAreaMarker {
   }
 
   @Override
-  public void setCorners(double[] x, double[] z) {
-    Objects.requireNonNull(x, "Null x points");
-    Objects.requireNonNull(z, "Null z points");
-    Preconditions.checkArgument(x.length == z.length, "points arrays size mismatch");
-
-    marker.setCornerLocations(x, z);
+  public Result<Unit> setCorners(double[] x, double[] z) {
+    return WebMapUtils.validateAreaCoordinates(x, z).map(unit -> {
+      marker.setCornerLocations(x, z);
+      return unit;
+    });
   }
 
   @Override
@@ -107,5 +109,36 @@ public class DynmapAreaMarker extends DynmapMarker implements MapAreaMarker {
   @Override
   public void setLineSize(int size) {
     marker.setLineStyle(size, marker.getLineOpacity(), marker.getLineColor());
+  }
+
+  @Override
+  public boolean holesSupported() {
+    return false;
+  }
+
+  @Override
+  public void clearHoles() {
+    // No op, dynmap doesn't support holes
+  }
+
+  @Override
+  public Result<Unit> addHole(double[] xCorners, double[] zCorners) {
+    // No op, dynmap doesn't support holes
+    return Result.unit();
+  }
+
+  @Override
+  public void removeHole(int index) {
+    // No op, dynmap doesn't support holes
+  }
+
+  @Override
+  public int getHolesSize() {
+    return 0;
+  }
+
+  @Override
+  public double[][] getHoles() {
+    return WebMapUtils.EMPTY_CORNERS;
   }
 }
