@@ -16,6 +16,8 @@ public abstract class AbstractHelpEntry implements HelpEntry {
 
   public abstract CommandDisplayInfo createDisplay();
 
+  public abstract String getCategory();
+
   @Override
   public String getMainLabel() {
     return createDisplay().label();

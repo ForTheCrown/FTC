@@ -7,8 +7,10 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
@@ -31,20 +33,52 @@ public class CommandDocs {
   private final Map<String, List<CommandDocument>> documents
       = new Object2ObjectOpenHashMap<>();
 
-  private boolean generateWikiHeader;
   private boolean removeSquareBrackets;
+  private boolean genWikiHeader;
+  private boolean genContentTable;
+  private boolean genIdTags;
+
+  private Collection<String> included = List.of();
+  private Collection<String> excluded = List.of();
 
   public void fill() {
+    boolean noCustomFilter = included.isEmpty() && excluded.isEmpty();
+
     FtcHelpList.helpList()
         .getAllEntries()
         .stream()
         .filter(entry -> entry instanceof AbstractHelpEntry)
         .map(entry -> (AbstractHelpEntry) entry)
+
+        .filter(entry -> {
+          if (noCustomFilter) {
+            return true;
+          }
+
+          Collection<String> keywords = new HashSet<>(entry.getKeywords());
+          keywords.add("#" + entry.getCategory());
+
+          boolean includeFound = included.isEmpty();
+
+          for (String keyword : keywords) {
+            if (excluded.contains(keyword)) {
+              return false;
+            }
+            if (included.contains(keyword)) {
+              includeFound = true;
+            }
+          }
+
+          return includeFound;
+        })
+
         .forEach(this::createDocumentation);
 
     documents.forEach((key, value) -> {
       value.sort(Comparator.comparing(document -> document.name));
     });
+
+
   }
 
   private void createDocumentation(AbstractHelpEntry command) {
@@ -79,49 +113,59 @@ public class CommandDocs {
   }
 
   public void writeSingleton(Path output) throws IOException {
+    PathUtil.ensureParentExists(output);
+
     try (var writer = Files.newBufferedWriter(output)) {
-      if (generateWikiHeader) {
+      if (genWikiHeader) {
         writeHugoHeader(writer, "commands", "All");
         writer.newLine();
       }
 
-      writer.write("# Table of contents");
-      writer.newLine();
-
-      int index = 1;
-
       // Table of contents
-      for (var e: documents.entrySet()) {
-        var name = e.getKey();
-
-        writer.write(index++ + ". ");
-        writer.write("[");
-        writer.write(name);
-        writer.write("](#");
-        writer.write(name);
-        writer.write(")");
+      if (genContentTable) {
+        writer.write("# Table of contents");
         writer.newLine();
 
-        //int subIndex = 1;
+        int index = 1;
 
-        // Write sub paragraphs
-        for (var v: e.getValue()) {
-          writer.write("    ");
-          // writer.write(subIndex++ + ". ");
-          writer.write("- ");
+        for (var e: documents.entrySet()) {
+          var name = e.getKey();
 
-          // Sub-paragraphs don't work, the hyperlinks in the titles don't
-          // do anything
-          // writer.write("[");
+          writer.write(index++ + ". ");
 
-          writer.write("/");
-          writer.write(v.name);
+          if (genIdTags) {
+            writer.write("[");
+            writer.write(name);
+            writer.write("](#");
+            writer.write(name);
+            writer.write(")");
+          } else {
+            writer.write(name);
+          }
 
-          // writer.write("]");
-          // writer.write("(#");
-          // writer.write(v.clickId);
-          // writer.write(")");
           writer.newLine();
+
+          //int subIndex = 1;
+
+          // Write sub paragraphs
+          for (var v: e.getValue()) {
+            writer.write("    ");
+            // writer.write(subIndex++ + ". ");
+            writer.write("- ");
+
+            // Sub-paragraphs don't work, the hyperlinks in the titles don't
+            // do anything
+            // writer.write("[");
+
+            writer.write("/");
+            writer.write(v.name);
+
+            // writer.write("]");
+            // writer.write("(#");
+            // writer.write(v.clickId);
+            // writer.write(")");
+            writer.newLine();
+          }
         }
       }
 
@@ -134,9 +178,12 @@ public class CommandDocs {
 
         writer.write("## ");
         writer.write(name);
-        writer.write(" <a name=\"");
-        writer.write(id);
-        writer.write("\"></a>");
+
+        if (genIdTags) {
+          writer.write(" <a id=\"");
+          writer.write(id);
+          writer.write("\"></a>");
+        }
 
         for (var d: e.getValue()) {
           d.write(writer, 3);
@@ -202,26 +249,36 @@ public class CommandDocs {
       String packageName,
       BufferedWriter writer
   ) throws IOException {
-    if (generateWikiHeader) {
+    if (genWikiHeader) {
       writeHugoHeader(writer, packageName, packageName);
       writer.newLine();
       writer.newLine();
     }
 
-    writer.write("# Table of Contents");
-    writer.newLine();
-
-    for (var d: documents) {
-      writer.write("- [/");
-      writer.write(d.name);
-      writer.write("](#");
-      writer.write(d.clickId);
-      writer.write(")");
+    if (genContentTable) {
+      writer.write("# Table of Contents");
       writer.newLine();
-    }
 
-    writer.newLine();
-    writer.write("# Commands");
+      for (var d: documents) {
+        writer.write("- ");
+
+        if (!genIdTags) {
+          writer.write(d.name);
+          writer.newLine();
+          continue;
+        }
+
+        writer.write("[/");
+        writer.write(d.name);
+        writer.write("](#");
+        writer.write(d.clickId);
+        writer.write(")");
+        writer.newLine();
+      }
+
+      writer.newLine();
+      writer.write("# Commands");
+    }
 
     for (var d: documents) {
       d.write(writer, 2);
@@ -273,9 +330,13 @@ public class CommandDocs {
       writer.write("#".repeat(headerLevel));
       writer.write(" /");
       writer.write(name);
-      writer.write(" <a id=\"");
-      writer.write(clickId);
-      writer.write("\"></a>");
+
+      if (genIdTags) {
+        writer.write(" <a id=\"");
+        writer.write(clickId);
+        writer.write("\"></a>");
+      }
+
       writer.newLine();
 
       if (!Strings.isNullOrEmpty(description)) {
@@ -330,7 +391,13 @@ public class CommandDocs {
         String[] info = usage.getInfo();
         for (String s : info) {
           writer.write("  ");
+
+          if (removeSquareBrackets) {
+            s = s.replaceAll("[<>]+", "");
+          }
+
           writer.write(filterUsageText(s));
+
           writer.write("  ");
           writer.newLine();
         }
@@ -338,12 +405,7 @@ public class CommandDocs {
     }
 
     String filterUsageText(String str) {
-      if (removeSquareBrackets) {
-        str = str.replaceAll("[<>]+", "");
-      }
-
       return str
-          .replace("\"", "&quot;")
           .replace("&", "&amp;")
           .replace("<", "&lt;")
           .replace(">", "&gt;");

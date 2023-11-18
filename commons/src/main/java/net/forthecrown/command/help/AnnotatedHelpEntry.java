@@ -26,6 +26,11 @@ public class AnnotatedHelpEntry extends AbstractHelpEntry {
   }
 
   @Override
+  public String getCategory() {
+    return category;
+  }
+
+  @Override
   public CommandDisplayInfo createDisplay() {
     return CommandDisplayInfo.create(
         Either.right(node),
