@@ -26,6 +26,8 @@ public class ItemDataNode extends ItemModifierNode {
 
   @Override
   public void populateUsages(UsageFactory factory) {
+    factory.usage("give_command", "Creates a `/give` command for the item you're holding");
+
     DataCommands.addUsages(factory, "Item", usage -> {
       var label = usage.getArguments();
 
