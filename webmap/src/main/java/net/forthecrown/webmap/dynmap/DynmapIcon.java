@@ -1,6 +1,8 @@
 package net.forthecrown.webmap.dynmap;
 
-import java.util.Objects;
+import com.google.common.base.Strings;
+import com.mojang.datafixers.util.Unit;
+import net.forthecrown.utils.Result;
 import net.forthecrown.webmap.MapIcon;
 import org.dynmap.markers.MarkerIcon;
 
@@ -23,9 +25,13 @@ public class DynmapIcon implements MapIcon {
   }
 
   @Override
-  public void setName(String name) {
-    Objects.requireNonNull(name, "Null name");
+  public Result<Unit> setName(String name) {
+    if (Strings.isNullOrEmpty(name)) {
+      return Result.error("Null/empty string");
+    }
+
     icon.setMarkerIconLabel(name);
+    return Result.unit();
   }
 
   @Override
