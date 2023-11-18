@@ -7,10 +7,13 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import net.forthecrown.Worlds;
 import net.forthecrown.text.Text;
 import net.forthecrown.user.UserService;
+import net.forthecrown.utils.Locations;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 
 @Getter
@@ -42,6 +45,15 @@ public class CoreConfig {
   private int hoppersInOneChunk = 128;
 
   private double durabilityWarningThreshold = 0.1d;
+
+  private Location firstTimeSpawn;
+
+  public Location firstTimeSpawn() {
+    if (firstTimeSpawn == null) {
+      return new Location(Worlds.overworld(), 267.5, 77, 267.5, -180, 0);
+    }
+    return Locations.clone(firstTimeSpawn);
+  }
 
   public enum AltJoinPrevention {
     ALWAYS {

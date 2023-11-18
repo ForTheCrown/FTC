@@ -63,3 +63,12 @@ rightClickDeposits = true
 # Set to 0 or less to disable
 #
 durabilityWarningThreshold = 0.1
+
+# Location a player will be teleported to when they first join the server
+[firstTimeSpawn]
+world = "minecraft:overworld"
+x = 267.5
+y = 77.0
+z = 267.5
+yaw = -180.0
+pitch = 0

@@ -55,7 +55,10 @@ class PlayerLoggingListener implements Listener {
       firstJoin = true;
 
       Location serverSpawn = FtcServer.server().getServerSpawn();
-      player.teleport(serverSpawn);
+      Location firstTimeSpawn = plugin.getFtcConfig().firstTimeSpawn();
+
+      player.teleport(firstTimeSpawn);
+      player.setBedSpawnLocation(serverSpawn, true);
 
       LOGGER.info("Player {} (uuid={}) joined for the first time", name, id);
     } else {
