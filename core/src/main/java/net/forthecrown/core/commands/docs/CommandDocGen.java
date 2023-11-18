@@ -1,5 +1,6 @@
 package net.forthecrown.core.commands.docs;
 
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -26,9 +27,16 @@ public class CommandDocGen extends FtcCommand {
   private static final ArgumentOption<Boolean> TYPE
       = Options.argument(ArgumentTypes.map(TYPE_MAP), "type");
 
+  private static final ArgumentOption<Boolean> REMOVE_SQUARE_BRACKETS
+      = Options.argument(BoolArgumentType.bool())
+      .setLabel("remove-square-brackets")
+      .setDefaultValue(false)
+      .build();
+
   private static final OptionsArgument OPTIONS = OptionsArgument.builder()
       .addFlag(GEN_HEADER)
       .addRequired(TYPE)
+      .addOptional(REMOVE_SQUARE_BRACKETS)
       .build();
 
   public CommandDocGen() {
@@ -53,11 +61,13 @@ public class CommandDocGen extends FtcCommand {
   }
 
   private void genDocs(CommandContext<CommandSource> context, ParsedOptions options) {
-    boolean singleton = options.getValueOptional(TYPE).orElse(true);
-    boolean genHeader = options.has(GEN_HEADER);
+    boolean singleton     = options.getValueOptional(TYPE).orElse(true);
+    boolean genHeader     = options.has(GEN_HEADER);
+    boolean removeSquares = options.getValue(REMOVE_SQUARE_BRACKETS);
 
     CommandDocs docs = new CommandDocs();
     docs.setGenerateWikiHeader(genHeader);
+    docs.setRemoveSquareBrackets(removeSquares);
 
     Path pluginDir = PathUtil.pluginPath();
 

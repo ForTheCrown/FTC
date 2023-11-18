@@ -32,6 +32,7 @@ public class CommandDocs {
       = new Object2ObjectOpenHashMap<>();
 
   private boolean generateWikiHeader;
+  private boolean removeSquareBrackets;
 
   public void fill() {
     FtcHelpList.helpList()
@@ -322,21 +323,25 @@ public class CommandDocs {
 
         writer.write("<pre class=\"command-usage-arguments\">");
         String args = usage.argumentsWithPrefix(name);
-        writer.write("/" + escapeHtml(args));
+        writer.write("/" + filterUsageText(args));
         writer.write("</pre>  ");
         writer.newLine();
 
         String[] info = usage.getInfo();
         for (String s : info) {
           writer.write("  ");
-          writer.write(escapeHtml(s));
+          writer.write(filterUsageText(s));
           writer.write("  ");
           writer.newLine();
         }
       }
     }
 
-    String escapeHtml(String str) {
+    String filterUsageText(String str) {
+      if (removeSquareBrackets) {
+        str = str.replaceAll("[<>]+", "");
+      }
+
       return str
           .replace("\"", "&quot;")
           .replace("&", "&amp;")
