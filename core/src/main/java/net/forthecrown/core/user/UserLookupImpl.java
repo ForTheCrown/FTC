@@ -212,10 +212,12 @@ public class UserLookupImpl implements UserLookup {
   public synchronized void changeIp(UserLookupEntry entry, String ip) {
     unsaved = true;
 
-    var existing = entry.getIp();
-
+    String existing = entry.getIp();
     if (existing != null) {
-      byIp.remove(existing);
+      UserLookupEntry existingEntry = byIp.get(existing);
+      if (existingEntry != null && existingEntry.uniqueId.equals(entry.uniqueId)) {
+        byIp.remove(existing);
+      }
     }
 
     entry.setIp(ip);
