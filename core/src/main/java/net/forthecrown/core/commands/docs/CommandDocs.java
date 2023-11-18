@@ -12,7 +12,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import net.forthecrown.command.help.AbstractHelpEntry;
 import net.forthecrown.command.help.CommandDisplayInfo;
 import net.forthecrown.command.help.FtcHelpList;
@@ -21,18 +23,67 @@ import net.forthecrown.text.Text;
 import net.forthecrown.utils.ArrayIterator;
 import net.forthecrown.utils.PluginUtil;
 import net.forthecrown.utils.io.PathUtil;
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.text.WordUtils;
 
+@Getter @Setter
 @RequiredArgsConstructor
 public class CommandDocs {
-  private final boolean addDocumentStubs;
 
-  private final Map<Package, List<CommandDocument>> documents
+  private final Map<String, List<CommandDocument>> documents
       = new Object2ObjectOpenHashMap<>();
 
-  public void write(Path output) throws IOException {
+  private boolean generateWikiHeader;
+
+  public void fill() {
+    FtcHelpList.helpList()
+        .getAllEntries()
+        .stream()
+        .filter(entry -> entry instanceof AbstractHelpEntry)
+        .map(entry -> (AbstractHelpEntry) entry)
+        .forEach(this::createDocumentation);
+
+    documents.forEach((key, value) -> {
+      value.sort(Comparator.comparing(document -> document.name));
+    });
+  }
+
+  private void createDocumentation(AbstractHelpEntry command) {
+    CommandDisplayInfo display = command.createDisplay();
+
+    var category = display.category();
+    if (Strings.isNullOrEmpty(category)) {
+      category = "uncategorized";
+    }
+
+    if (category.contains("help")
+        || category.contains("test")
+        || category.contains("click")
+    ) {
+      return;
+    }
+
+    String name = display.label();
+    String perm = display.permission();
+    String desc = display.getDescription();
+    List<String> aliases = display.aliases();
+
+    CommandDocument document = new CommandDocument(name, perm, aliases, desc);
+    document.usages.addAll(command.getUsages());
+
+    document.clickId = category.toLowerCase()
+        .replace("_", ".")
+        .replace(".", "-");
+
+    List<CommandDocument> list = documents.computeIfAbsent(category, c -> new ObjectArrayList<>());
+    list.add(document);
+  }
+
+  public void writeSingleton(Path output) throws IOException {
     try (var writer = Files.newBufferedWriter(output)) {
+      if (generateWikiHeader) {
+        writeHugoHeader(writer, "commands", "All");
+        writer.newLine();
+      }
+
       writer.write("# Table of contents");
       writer.newLine();
 
@@ -40,13 +91,13 @@ public class CommandDocs {
 
       // Table of contents
       for (var e: documents.entrySet()) {
-        var name = packageName(e.getKey());
+        var name = e.getKey();
 
         writer.write(index++ + ". ");
         writer.write("[");
         writer.write(name);
         writer.write("](#");
-        writer.write(packageId(e.getKey()));
+        writer.write(name);
         writer.write(")");
         writer.newLine();
 
@@ -77,17 +128,17 @@ public class CommandDocs {
 
       // Write contents
       for (var e: documents.entrySet()) {
-        var name = packageName(e.getKey());
-        var id = packageId(e.getKey());
+        var name = e.getKey();
+        var id = e.getKey();
 
-        writer.write("# ");
+        writer.write("## ");
         writer.write(name);
         writer.write(" <a name=\"");
         writer.write(id);
         writer.write("\"></a>");
 
         for (var d: e.getValue()) {
-          d.write(writer);
+          d.write(writer, 3);
           ++totalCommands;
         }
       }
@@ -98,11 +149,11 @@ public class CommandDocs {
   }
 
   public void writeSeparated(Path outputDirectory) throws IOException {
-    var res = PathUtil.ensureDirectoryExists(outputDirectory);
-
     for (var e: documents.entrySet()) {
-      String pName = packageName(e.getKey());
-      Path path = outputDirectory.resolve(pName.toLowerCase() + ".md");
+      String pName = e.getKey();
+      Path path = outputDirectory.resolve(pName.toLowerCase().replace("/", "-") + ".md");
+
+      PathUtil.ensureParentExists(path);
 
       BufferedWriter writer = Files.newBufferedWriter(path);
       writeCategory(e.getValue(), pName, writer);
@@ -110,22 +161,21 @@ public class CommandDocs {
     }
   }
 
-  private void writeCategory(List<CommandDocument> documents,
-                             String packageName,
-                             BufferedWriter writer
-  ) throws IOException {
+  private void writeHugoHeader(BufferedWriter writer, String title, String desc)
+      throws IOException
+  {
     writer.write("---");
 
     writer.newLine();
     writer.write("title: ");
     writer.write('"');
-    writer.write(packageName);
+    writer.write(title);
     writer.write('"');
 
     writer.newLine();
     writer.write("linkTitle: ");
     writer.write('"');
-    writer.write(packageName);
+    writer.write(title);
     writer.write('"');
 
     writer.newLine();
@@ -139,13 +189,23 @@ public class CommandDocs {
 
     writer.newLine();
     writer.write("  ");
-    writer.write(packageName);
-    writer.write(" Commands");
+    writer.write(desc);
+    writer.write(" commands");
 
     writer.newLine();
     writer.write("---");
-    writer.newLine();
-    writer.newLine();
+  }
+
+  private void writeCategory(
+      List<CommandDocument> documents,
+      String packageName,
+      BufferedWriter writer
+  ) throws IOException {
+    if (generateWikiHeader) {
+      writeHugoHeader(writer, packageName, packageName);
+      writer.newLine();
+      writer.newLine();
+    }
 
     writer.write("# Table of Contents");
     writer.newLine();
@@ -163,15 +223,13 @@ public class CommandDocs {
     writer.write("# Commands");
 
     for (var d: documents) {
-      d.write(writer);
+      d.write(writer, 2);
     }
 
     writeMetadata(writer, documents.size());
   }
 
-  private void writeMetadata(BufferedWriter writer, int written)
-      throws IOException
-  {
+  private void writeMetadata(BufferedWriter writer, int written) throws IOException {
     writer.newLine();
     writer.write("# Metadata");
     writer.newLine();
@@ -199,66 +257,6 @@ public class CommandDocs {
     writer.write(Text.NUMBER_FORMAT.format(written));
   }
 
-
-  private String packageId(Package p) {
-    return p.getName().replaceAll("\\.", "_");
-  }
-
-  private String packageName(Package p) {
-    var name = p.getName();
-
-    if (name.equalsIgnoreCase("net.forthecrown.commands")) {
-      return "Uncategorized";
-    }
-
-    return WordUtils.capitalize(
-        name.replaceAll("net.forthecrown.commands.", "")
-            .replaceAll("\\.", " ")
-    );
-  }
-
-  public void fill() {
-    FtcHelpList.helpList().getAllEntries().stream()
-        .filter(entry -> entry instanceof AbstractHelpEntry)
-        .map(entry -> (AbstractHelpEntry) entry)
-        .forEach(this::createDocumentation);
-
-    documents.forEach((key, value) -> {
-      value.sort(Comparator.comparing(document -> document.name));
-    });
-  }
-
-  public void createDocumentation(AbstractHelpEntry command) {
-    CommandDisplayInfo display = command.createDisplay();
-
-    var category = display.category();
-
-    if (category.contains("help")
-        || category.contains("test")
-        || category.contains("click")
-    ) {
-      return;
-    }
-
-    String name = display.label();
-    String perm = display.permission();
-    String desc = display.getDescription();
-    List<String> aliases = display.aliases();
-
-    CommandDocument document = new CommandDocument(name, perm, aliases, desc);
-    document.usages.addAll(command.getUsages());
-
-    document.clickId = category.toLowerCase()
-        .replace("_", ".")
-        .replace(".", "-");
-
-    var list = documents.computeIfAbsent(
-        command.getClass().getPackage(),
-        aPackage -> new ObjectArrayList<>()
-    );
-    list.add(document);
-  }
-
   @RequiredArgsConstructor
   class CommandDocument {
     private final String name;
@@ -269,11 +267,12 @@ public class CommandDocs {
 
     private String clickId;
 
-    public void write(BufferedWriter writer) throws IOException {
+    public void write(BufferedWriter writer, int headerLevel) throws IOException {
       writer.newLine();
-      writer.write("## /");
+      writer.write("#".repeat(headerLevel));
+      writer.write(" /");
       writer.write(name);
-      writer.write(" <a name=\"");
+      writer.write(" <a id=\"");
       writer.write(clickId);
       writer.write("\"></a>");
       writer.newLine();
@@ -291,11 +290,8 @@ public class CommandDocs {
         writer.newLine();
       }
 
-      writer.write("**Command metadata**:  ");
-      writer.newLine();
-
       if (!Strings.isNullOrEmpty(permission)) {
-        writer.write("Permission: `" + permission + "`  ");
+        writer.write("**Permission**: `" + permission + "`  ");
         writer.newLine();
       }
 
@@ -305,7 +301,7 @@ public class CommandDocs {
           joiner.add(s);
         }
 
-        writer.write("Aliases: " + joiner);
+        writer.write("**Aliases**: " + joiner);
         writer.write("  ");
         writer.newLine();
       }
@@ -314,48 +310,45 @@ public class CommandDocs {
         return;
       }
 
-      writer.write("### Usages");
-      writer.newLine();
-
-      writeUsagesAsBlock(writer);
+      writeUsages(writer);
     }
 
     void writeUsages(BufferedWriter writer) throws IOException {
-
-      writer.write("---");
+      writer.write("**Uses**:");
       writer.newLine();
 
-      for (Usage u : usages) {
-        writer.write("```txt");
+      for (Usage usage : usages) {
+        writer.write("- ");
+
+        writer.write("<pre class=\"command-usage-arguments\">");
+        String args = usage.argumentsWithPrefix(name);
+        writer.write("/" + escapeHtml(args));
+        writer.write("</pre>  ");
         writer.newLine();
 
-        String argument = "/" + name + " " + u.getArguments();
-        writer.write(argument);
-        writer.newLine();
-
-        writer.write("```");
-        writer.newLine();
-
-        writer.write("**Description**:  ");
-        writer.newLine();
-
-        for (var s : u.getInfo()) {
-          writer.write(StringEscapeUtils.escapeHtml4(s));
-
-          // 2 spaces forces newline in Markdown
+        String[] info = usage.getInfo();
+        for (String s : info) {
+          writer.write("  ");
+          writer.write(escapeHtml(s));
           writer.write("  ");
           writer.newLine();
         }
-
-        writer.newLine();
-        writer.write("---");
-        writer.newLine();
       }
+    }
+
+    String escapeHtml(String str) {
+      return str
+          .replace("\"", "&quot;")
+          .replace("&", "&amp;")
+          .replace("<", "&lt;")
+          .replace(">", "&gt;");
     }
 
     void writeUsagesAsBlock(BufferedWriter writer)
         throws IOException
     {
+      writer.write("### Usages:");
+      writer.newLine();
       writer.write("```yaml");
       writer.newLine();
 
@@ -376,8 +369,6 @@ public class CommandDocs {
               writer.newLine();
             }
           }
-        } else if (addDocumentStubs) {
-          writer.write("> No documentation given :(  ");
         }
 
         if (uIt.hasNext()) {

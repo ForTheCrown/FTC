@@ -54,12 +54,11 @@ public abstract class AbstractHelpEntry implements HelpEntry {
     return strings;
   }
 
-  static String packageNameToCategory(String packageName) {
+  public static String packageNameToCategory(String packageName) {
     return packageName
-        .replace("net.forthecrown.", "")
-        .replace("net.forthecrown", "")
-        .replace("commands.", "")
-        .replace("commands", "")
+        .replaceAll("net\\.forthecrown\\.?", "")
+        .replaceAll("\\.?commands?\\.?", "")
+        .replace("core", "")
         .replace('.', '/');
   }
 }

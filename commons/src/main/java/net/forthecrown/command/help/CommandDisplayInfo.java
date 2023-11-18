@@ -131,7 +131,10 @@ public record CommandDisplayInfo(
 
     if (source.hasPermission(Permissions.ADMIN)) {
       writer.field("Permission", permission == null ? "unset" : permission);
-      writer.field("Category", category);
+
+      if (!Strings.isNullOrEmpty(category)) {
+        writer.field("Category", category);
+      }
     }
   }
 
