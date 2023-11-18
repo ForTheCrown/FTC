@@ -2,6 +2,7 @@ package net.forthecrown.core.commands.help;
 
 import com.google.common.base.Strings;
 import com.google.gson.JsonElement;
+import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
@@ -34,6 +35,7 @@ import net.forthecrown.command.help.Usage;
 import net.forthecrown.command.help.UsageFactory;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Completions;
+import net.forthecrown.grenadier.Grenadier;
 import net.forthecrown.text.TextWriters;
 import net.forthecrown.text.ViewerAwareMessage;
 import net.forthecrown.text.page.Footer;
@@ -73,6 +75,7 @@ public class HelpListImpl implements FtcHelpList {
   private final Map<String, FtcCommand> existingCommands = new HashMap<>();
 
   private final List<HelpEntry> entries = new ObjectArrayList<>();
+  private final List<LoadedHelpEntry> loadedEntries = new ObjectArrayList<>();
 
   // Context used to pass data onto the page formatter
   private final ContextSet contextSet = ContextSet.create();
@@ -447,6 +450,19 @@ public class HelpListImpl implements FtcHelpList {
     });
     entries.removeIf(entry -> entry instanceof LoadedHelpEntry);
     existingCommands.values().removeIf(cmd -> cmd instanceof LoadedEntryCommand);
+
+    CommandDispatcher<CommandSource> dispatcher = Grenadier.dispatcher();
+
+    for (LoadedHelpEntry entry : loadedEntries) {
+      if (entry.getCommand() == null) {
+        continue;
+      }
+
+      var cmd = entry.getCommand();
+      Commands.removeChild(dispatcher.getRoot(), cmd.getName());
+    }
+
+    loadedEntries.clear();
   }
 
   public void load() {
@@ -482,6 +498,7 @@ public class HelpListImpl implements FtcHelpList {
       }
 
       addEntry(helpEntry);
+      loadedEntries.add(helpEntry);
     }
   }
 }

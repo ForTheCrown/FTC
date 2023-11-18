@@ -2,6 +2,7 @@ package net.forthecrown.command;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.tree.CommandNode;
 import java.lang.StackWalker.Option;
 import java.util.Collection;
 import net.forthecrown.Loggers;
@@ -197,5 +198,9 @@ public final class Commands {
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), formattedCmd);
       });
     }
+  }
+
+  public static void removeChild(CommandNode<?> node, String name) {
+    node.removeCommand(name);
   }
 }
