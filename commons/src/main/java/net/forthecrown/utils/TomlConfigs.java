@@ -17,6 +17,8 @@ import net.forthecrown.utils.io.configurate.TomlConfigurationLoader;
 import net.forthecrown.utils.math.WorldVec3i;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -97,24 +99,26 @@ public final class TomlConfigs {
         .registerExact(WorldVec3i.class, new WorldVec3iSerializer())
 
         .register(Component.class, new ComponentSerializerType())
+        .register(World.class, WorldSerializer.INSTANCE)
+        .register(Location.class, LocationSerializer.INSTANCE)
 
         // Auto generated via a TypeScript script
-        .registerExact(Vector2f.class, new Vector2fSerializer())
-        .registerExact(Vector2d.class, new Vector2dSerializer())
-        .registerExact(Vector2i.class, new Vector2iSerializer())
-        .registerExact(Vector2l.class, new Vector2lSerializer())
-        .registerExact(Vector3f.class, new Vector3fSerializer())
-        .registerExact(Vector3d.class, new Vector3dSerializer())
-        .registerExact(Vector3i.class, new Vector3iSerializer())
-        .registerExact(Vector3l.class, new Vector3lSerializer())
-        .registerExact(Vector4f.class, new Vector4fSerializer())
-        .registerExact(Vector4d.class, new Vector4dSerializer())
-        .registerExact(Vector4i.class, new Vector4iSerializer())
-        .registerExact(Vector4l.class, new Vector4lSerializer())
-        .registerExact(VectorNf.class, new VectorNfSerializer())
-        .registerExact(VectorNd.class, new VectorNdSerializer())
-        .registerExact(VectorNi.class, new VectorNiSerializer())
-        .registerExact(VectorNl.class, new VectorNlSerializer());
+        .registerExact(Vector2f.class, Vector2fSerializer.INSTANCE)
+        .registerExact(Vector2d.class, Vector2dSerializer.INSTANCE)
+        .registerExact(Vector2i.class, Vector2iSerializer.INSTANCE)
+        .registerExact(Vector2l.class, Vector2lSerializer.INSTANCE)
+        .registerExact(Vector3f.class, Vector3fSerializer.INSTANCE)
+        .registerExact(Vector3d.class, Vector3dSerializer.INSTANCE)
+        .registerExact(Vector3i.class, Vector3iSerializer.INSTANCE)
+        .registerExact(Vector3l.class, Vector3lSerializer.INSTANCE)
+        .registerExact(Vector4f.class, Vector4fSerializer.INSTANCE)
+        .registerExact(Vector4d.class, Vector4dSerializer.INSTANCE)
+        .registerExact(Vector4i.class, Vector4iSerializer.INSTANCE)
+        .registerExact(Vector4l.class, Vector4lSerializer.INSTANCE)
+        .registerExact(VectorNf.class, VectorNfSerializer.INSTANCE)
+        .registerExact(VectorNd.class, VectorNdSerializer.INSTANCE)
+        .registerExact(VectorNi.class, VectorNiSerializer.INSTANCE)
+        .registerExact(VectorNl.class, VectorNlSerializer.INSTANCE);
   }
 
   public static Duration parseDuration(String strValue) throws CommandSyntaxException {
@@ -175,6 +179,92 @@ public final class TomlConfigs {
   }
 }
 
+enum WorldSerializer implements TypeSerializer<World> {
+  INSTANCE;
+
+  @Override
+  public World deserialize(Type type, ConfigurationNode node) throws SerializationException {
+    String value = node.getString();
+    if (value == null) {
+      return null;
+    }
+    World world;
+
+    if (value.contains(":")) {
+      NamespacedKey key = NamespacedKey.fromString(value);
+
+      if (key == null) {
+        world = null;
+      } else {
+        world = Bukkit.getWorld(key);
+      }
+    } else {
+      world = Bukkit.getWorld(value);
+    }
+
+    if (world == null) {
+      throw new SerializationException("Unknown world: '" + value + "'");
+    }
+
+    return world;
+  }
+
+  @Override
+  public void serialize(Type type, @Nullable World obj, ConfigurationNode node)
+      throws SerializationException
+  {
+    if (obj == null) {
+      return;
+    }
+
+    node.set(obj.getName());
+  }
+}
+
+enum LocationSerializer implements TypeSerializer<Location> {
+  INSTANCE;
+
+  @Override
+  public Location deserialize(Type type, ConfigurationNode node) throws SerializationException {
+    World world;
+
+    if (node.hasChild("world")) {
+      world = node.node("world").get(World.class);
+    } else {
+      world = null;
+    }
+
+    double x = node.node("x").getDouble();
+    double y = node.node("y").getDouble();
+    double z = node.node("z").getDouble();
+
+    float yaw = node.node("yaw").getFloat();
+    float pitch = node.node("pitch").getFloat();
+
+    return new Location(world, x, y, z, yaw, pitch);
+  }
+
+  @Override
+  public void serialize(Type type, @Nullable Location obj, ConfigurationNode node)
+      throws SerializationException
+  {
+    if (obj == null) {
+      return;
+    }
+
+    var world = obj.getWorld();
+    if (world != null) {
+      node.node("world").set(World.class, obj.getWorld());
+    }
+
+    node.node("x").set(obj.getX());
+    node.node("y").set(obj.getY());
+    node.node("z").set(obj.getZ());
+
+    node.node("yaw").set(obj.getYaw());
+    node.node("pitch").set(obj.getPitch());
+  }
+}
 
 class WorldVec3iSerializer implements TypeSerializer<WorldVec3i> {
 
@@ -220,7 +310,8 @@ class WorldVec3iSerializer implements TypeSerializer<WorldVec3i> {
 
 // Auto generated via a TypeScript script
 
-class Vector2fSerializer implements TypeSerializer<Vector2f> {
+enum Vector2fSerializer implements TypeSerializer<Vector2f> {
+  INSTANCE;
 
   @Override
   public Vector2f deserialize(Type type, ConfigurationNode node) throws SerializationException {
@@ -242,7 +333,8 @@ class Vector2fSerializer implements TypeSerializer<Vector2f> {
   }
 }
 
-class Vector2dSerializer implements TypeSerializer<Vector2d> {
+enum Vector2dSerializer implements TypeSerializer<Vector2d> {
+  INSTANCE;
 
   @Override
   public Vector2d deserialize(Type type, ConfigurationNode node) throws SerializationException {
@@ -264,7 +356,8 @@ class Vector2dSerializer implements TypeSerializer<Vector2d> {
   }
 }
 
-class Vector2iSerializer implements TypeSerializer<Vector2i> {
+enum Vector2iSerializer implements TypeSerializer<Vector2i> {
+  INSTANCE;
 
   @Override
   public Vector2i deserialize(Type type, ConfigurationNode node) throws SerializationException {
@@ -286,7 +379,8 @@ class Vector2iSerializer implements TypeSerializer<Vector2i> {
   }
 }
 
-class Vector2lSerializer implements TypeSerializer<Vector2l> {
+enum Vector2lSerializer implements TypeSerializer<Vector2l> {
+  INSTANCE;
 
   @Override
   public Vector2l deserialize(Type type, ConfigurationNode node) throws SerializationException {
@@ -308,7 +402,8 @@ class Vector2lSerializer implements TypeSerializer<Vector2l> {
   }
 }
 
-class Vector3fSerializer implements TypeSerializer<Vector3f> {
+enum Vector3fSerializer implements TypeSerializer<Vector3f> {
+  INSTANCE;
 
   @Override
   public Vector3f deserialize(Type type, ConfigurationNode node) throws SerializationException {
@@ -332,7 +427,8 @@ class Vector3fSerializer implements TypeSerializer<Vector3f> {
   }
 }
 
-class Vector3dSerializer implements TypeSerializer<Vector3d> {
+enum Vector3dSerializer implements TypeSerializer<Vector3d> {
+  INSTANCE;
 
   @Override
   public Vector3d deserialize(Type type, ConfigurationNode node) throws SerializationException {
@@ -356,7 +452,8 @@ class Vector3dSerializer implements TypeSerializer<Vector3d> {
   }
 }
 
-class Vector3iSerializer implements TypeSerializer<Vector3i> {
+enum Vector3iSerializer implements TypeSerializer<Vector3i> {
+  INSTANCE;
 
   @Override
   public Vector3i deserialize(Type type, ConfigurationNode node) throws SerializationException {
@@ -380,7 +477,8 @@ class Vector3iSerializer implements TypeSerializer<Vector3i> {
   }
 }
 
-class Vector3lSerializer implements TypeSerializer<Vector3l> {
+enum Vector3lSerializer implements TypeSerializer<Vector3l> {
+  INSTANCE;
 
   @Override
   public Vector3l deserialize(Type type, ConfigurationNode node) throws SerializationException {
@@ -404,7 +502,8 @@ class Vector3lSerializer implements TypeSerializer<Vector3l> {
   }
 }
 
-class Vector4fSerializer implements TypeSerializer<Vector4f> {
+enum Vector4fSerializer implements TypeSerializer<Vector4f> {
+  INSTANCE;
 
   @Override
   public Vector4f deserialize(Type type, ConfigurationNode node) throws SerializationException {
@@ -430,7 +529,8 @@ class Vector4fSerializer implements TypeSerializer<Vector4f> {
   }
 }
 
-class Vector4dSerializer implements TypeSerializer<Vector4d> {
+enum Vector4dSerializer implements TypeSerializer<Vector4d> {
+  INSTANCE;
 
   @Override
   public Vector4d deserialize(Type type, ConfigurationNode node) throws SerializationException {
@@ -456,7 +556,8 @@ class Vector4dSerializer implements TypeSerializer<Vector4d> {
   }
 }
 
-class Vector4iSerializer implements TypeSerializer<Vector4i> {
+enum Vector4iSerializer implements TypeSerializer<Vector4i> {
+  INSTANCE;
 
   @Override
   public Vector4i deserialize(Type type, ConfigurationNode node) throws SerializationException {
@@ -482,7 +583,8 @@ class Vector4iSerializer implements TypeSerializer<Vector4i> {
   }
 }
 
-class Vector4lSerializer implements TypeSerializer<Vector4l> {
+enum Vector4lSerializer implements TypeSerializer<Vector4l> {
+  INSTANCE;
 
   @Override
   public Vector4l deserialize(Type type, ConfigurationNode node) throws SerializationException {
@@ -508,7 +610,8 @@ class Vector4lSerializer implements TypeSerializer<Vector4l> {
   }
 }
 
-class VectorNfSerializer implements TypeSerializer<VectorNf> {
+enum VectorNfSerializer implements TypeSerializer<VectorNf> {
+  INSTANCE;
 
   @Override
   public VectorNf deserialize(Type type, ConfigurationNode node) throws SerializationException {
@@ -539,7 +642,8 @@ class VectorNfSerializer implements TypeSerializer<VectorNf> {
   }
 }
 
-class VectorNdSerializer implements TypeSerializer<VectorNd> {
+enum VectorNdSerializer implements TypeSerializer<VectorNd> {
+  INSTANCE;
 
   @Override
   public VectorNd deserialize(Type type, ConfigurationNode node) throws SerializationException {
@@ -570,7 +674,8 @@ class VectorNdSerializer implements TypeSerializer<VectorNd> {
   }
 }
 
-class VectorNiSerializer implements TypeSerializer<VectorNi> {
+enum VectorNiSerializer implements TypeSerializer<VectorNi> {
+  INSTANCE;
 
   @Override
   public VectorNi deserialize(Type type, ConfigurationNode node) throws SerializationException {
@@ -601,7 +706,8 @@ class VectorNiSerializer implements TypeSerializer<VectorNi> {
   }
 }
 
-class VectorNlSerializer implements TypeSerializer<VectorNl> {
+enum VectorNlSerializer implements TypeSerializer<VectorNl> {
+  INSTANCE;
 
   @Override
   public VectorNl deserialize(Type type, ConfigurationNode node) throws SerializationException {
@@ -644,7 +750,7 @@ const N_DIM = 999;
 const DIMENSIONS = [ 2, 3, 4, N_DIM  ];
 const DIM_NAMES  = [ 'x', 'y', 'z', 'w' ];
 
-const TYPE_NAMES = {
+const TYPE_NAMES: {[key: string]: VectorType} = {
   f: {
     primitive: 'float',
     object: 'Float'
@@ -670,7 +776,7 @@ for (let dimIndex = 0; dimIndex < DIMENSIONS.length; dimIndex++) {
   let dimension = DIMENSIONS[dimIndex];
 
   for (const suffix in TYPE_NAMES) {
-    let vectorType: any = TYPE_NAMES[suffix];
+    let vectorType: VectorType = TYPE_NAMES[suffix];
     genVector(dimension, suffix, vectorType);
   }
 }
@@ -686,7 +792,7 @@ function genVector(dimensions: number, suffix: string, vType: VectorType) {
   let deserializeBody = "";
 
   let className = `${vectorType}Serializer`;
-  let reg = `//builder.registerExact(${vectorType}.class, new ${className}());`
+  let reg = `//builder.registerExact(${vectorType}.class, ${className}.INSTANCE);`
   registerMethods.push(reg);
 
   if (dimensions == N_DIM) {
@@ -736,7 +842,8 @@ return new ${vectorType}(${ctorString});
   }
 
 out += `
-class ${className} implements TypeSerializer<${vectorType}> {
+enum ${className} implements TypeSerializer<${vectorType}> {
+  INSTANCE;
 
   @Override
   public ${vectorType} deserialize(Type type, ConfigurationNode node) throws SerializationException {
