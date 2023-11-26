@@ -60,7 +60,7 @@ public class TitlesCommand {
 
   void reloadPlugin(CommandSource source) {
     TitlesPlugin plugin = JavaPlugin.getPlugin(TitlesPlugin.class);
-    plugin.loadTitles();
+    plugin.reloadConfig();
 
     source.sendSuccess(Component.text("Reloaded user ranks"));
   }

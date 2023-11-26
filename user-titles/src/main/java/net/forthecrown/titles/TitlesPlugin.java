@@ -42,6 +42,8 @@ public class TitlesPlugin extends JavaPlugin {
     TitleSettings.add(server.getGlobalSettingsBook());
 
     TitlePlaceholders.registerAll();
+
+    reloadConfig();
   }
 
   @Override
