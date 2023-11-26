@@ -3,11 +3,13 @@ package net.forthecrown.utils;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import net.forthecrown.Loggers;
 import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.grenadier.types.TimeArgument;
 import net.forthecrown.utils.io.PathUtil;
@@ -25,6 +27,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.loader.HeaderMode;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.ObjectMapper;
 import org.spongepowered.configurate.serialize.SerializationException;
 import org.spongepowered.configurate.serialize.TypeSerializer;
@@ -53,7 +56,22 @@ public final class TomlConfigs {
     return loadConfig("config.toml", plugin, type);
   }
 
+  private static void validateClass(Class<?> type) {
+    var logger = Loggers.getLogger();
+
+    if (!type.isAnnotationPresent(ConfigSerializable.class)) {
+      logger.warn("No @ConfigSerializable present on class {}", type);
+    }
+
+    Field[] fields = type.getDeclaredFields();
+    if (fields.length == 0) {
+      logger.warn("Config class {} has no fields", type);
+    }
+  }
+
   public static <T> T loadConfig(String configName, JavaPlugin plugin, Class<T> type) {
+    validateClass(type);
+
     Path path = PathUtil.pluginPath(plugin, configName);
 
     try {
