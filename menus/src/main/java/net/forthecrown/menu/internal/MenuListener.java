@@ -3,7 +3,6 @@ package net.forthecrown.menu.internal;
 import net.forthecrown.Loggers;
 import net.forthecrown.menu.MenuFlag;
 import net.forthecrown.menu.MenuHolder;
-import net.forthecrown.menu.Slot;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -18,12 +17,7 @@ public class MenuListener implements Listener {
 
   @EventHandler(ignoreCancelled = true)
   public void onInventoryClick(InventoryClickEvent event) {
-    LOGGER.debug("InventoryClickEvent, holder={}",
-        event.getView().getTopInventory().getHolder()
-    );
-
     if (!(event.getView().getTopInventory().getHolder() instanceof MenuHolder holder)) {
-      LOGGER.debug("Not a menu click");
       return;
     }
 
@@ -31,8 +25,6 @@ public class MenuListener implements Listener {
     var clicked = event.getClickedInventory();
 
     if (clicked == null || clicked instanceof PlayerInventory) {
-      LOGGER.debug("Click was not inside menu");
-
       menu.onExternalClick(event);
       return;
     }
@@ -43,8 +35,6 @@ public class MenuListener implements Listener {
 
   @EventHandler(ignoreCancelled = true)
   public void onInventoryClose(InventoryCloseEvent event) {
-    LOGGER.debug("inventoryClose, holder={}", event.getView().getTopInventory().getHolder());
-
     if (!(event.getView().getTopInventory().getHolder() instanceof MenuHolder holder)) {
       return;
     }
@@ -55,17 +45,12 @@ public class MenuListener implements Listener {
 
   @EventHandler(ignoreCancelled = true)
   public void onInventoryDrag(InventoryDragEvent event) {
-    LOGGER.debug("InventoryDragEvent, holder={}", event.getView().getTopInventory().getHolder());
-
     if (!(event.getView().getTopInventory().getHolder() instanceof MenuHolder holder)) {
       return;
     }
 
     var menu = holder.getMenu();
     var view = event.getView();
-
-    var slots = event.getRawSlots();
-    LOGGER.debug("slots={}", slots.stream().map(Slot::of).toList());
 
     for (var i: event.getRawSlots()) {
       var inv = view.getInventory(i);
@@ -75,9 +60,7 @@ public class MenuListener implements Listener {
       }
 
       if (!menu.hasFlag(MenuFlag.ALLOW_ITEM_MOVING)) {
-        LOGGER.debug("Cancelling drag event");
         event.setCancelled(true);
-
         return;
       }
     }
