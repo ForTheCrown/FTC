@@ -1,6 +1,5 @@
 package net.forthecrown.menu.internal;
 
-import net.forthecrown.Loggers;
 import net.forthecrown.menu.MenuFlag;
 import net.forthecrown.menu.MenuHolder;
 import org.bukkit.event.EventHandler;
@@ -9,11 +8,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.PlayerInventory;
-import org.slf4j.Logger;
 
 public class MenuListener implements Listener {
-
-  private static final Logger LOGGER = Loggers.getLogger();
 
   @EventHandler(ignoreCancelled = true)
   public void onInventoryClick(InventoryClickEvent event) {
@@ -29,7 +25,6 @@ public class MenuListener implements Listener {
       return;
     }
 
-    LOGGER.debug("Click was inside menu");
     menu.onMenuClick(event);
   }
 
