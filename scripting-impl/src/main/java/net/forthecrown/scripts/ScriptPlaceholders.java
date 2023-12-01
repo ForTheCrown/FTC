@@ -58,6 +58,7 @@ class ScriptPlaceholders {
     ctx.context().forEach(script::put);
 
     ExecResult<Object> obj = script.evaluate().logError();
+    script.close();
 
     if (!obj.isSuccess()) {
       return null;
