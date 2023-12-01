@@ -111,6 +111,8 @@ public final class CoreCommands {
     new CommandDeleteHome();
     new CommandSetHome();
 
+    new CommandLeave();
+
     CommandSelfOrUser.createCommands();
     CommandDumbThing.createCommands();
     CommandSpecificGameMode.createCommands();
