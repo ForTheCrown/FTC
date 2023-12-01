@@ -1,6 +1,7 @@
 package net.forthecrown.structure;
 
 import com.google.gson.JsonElement;
+import com.mojang.serialization.JsonOps;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,6 +12,7 @@ import net.forthecrown.registry.Holder;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.registry.RegistryListener;
+import net.forthecrown.structure.pool.StructurePool;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.utils.io.SerializationHelper;
@@ -112,8 +114,10 @@ public final class Structures {
         return;
       }
 
-      var pool = StructurePool.load(element.getAsJsonArray());
-      poolRegistry.register(key, pool);
+      StructurePool.CODEC.parse(JsonOps.INSTANCE, element)
+          .mapError(string -> "Failed to load structure pool '" + key + "': " + string)
+          .resultOrPartial(LOGGER::error)
+          .ifPresent(pool -> poolRegistry.register(key, pool));
     });
   }
 
