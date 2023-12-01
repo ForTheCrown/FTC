@@ -80,6 +80,32 @@ literal("location").argument("board" @lb) {
   }
 }
 
+literal("copy").argument("board" @lb).literal("from").argument("source" @lb) {
+  executes = copyBoard()
+
+  description = [
+    "Copies data from one leaderboard to another",
+    "List of elements copied from the first board to the second:",
+    "- `format`",
+    "- `you format`",
+    "- `header`",
+    "- `footer`",
+    "- `include-you`",
+    "- `max-size`",
+    "- `fill-empty`",
+    "- `scale`",
+    "- `translation`",
+    "- `brightness`",
+    "- `billboard`",
+    "- `text-alignment`",
+    "- `background-color`",
+    "- `text-shadow`",
+    "- `see-through`",
+    "- `line-width`",
+    "- `opacity`"
+  ]
+}
+
 literal("footer").argument("board" @lb).argument("text", greedy_string) {
   executes = setFooter()
   suggests = suggestFooter()

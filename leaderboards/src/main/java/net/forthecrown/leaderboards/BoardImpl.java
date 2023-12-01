@@ -235,6 +235,30 @@ public class BoardImpl implements Leaderboard {
     return fillMissingSlots;
   }
 
+  public void copyFrom(BoardImpl board) {
+    if (board.header != null) {
+      this.header = board.header;
+    }
+    if (board.footer != null) {
+      this.footer = board.footer;
+    }
+    if (board.format != null) {
+      this.format = board.format;
+    }
+    if (board.youFormat != null) {
+      this.youFormat = board.youFormat;
+    }
+
+    if (board.maxEntries != DEFAULT_MAX_SIZE) {
+      this.maxEntries = board.maxEntries;
+    }
+
+    this.fillMissingSlots = board.fillMissingSlots;
+    this.includeYou = board.includeYou;
+
+    this.displayMeta.copyFrom(board.displayMeta);
+  }
+
   @Override
   public boolean update() {
     if (service == null) {

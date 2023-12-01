@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import net.forthecrown.command.Commands;
@@ -223,6 +224,27 @@ public class CommandLeaderboard {
             NamedTextColor.GRAY,
             board.displayName(),
             location
+        )
+    );
+  }
+
+  void copyBoard(
+      CommandSource source,
+      @Argument("board") BoardImpl board,
+      @Argument("source") BoardImpl copySource
+  ) throws CommandSyntaxException {
+    if (Objects.equals(board, copySource)) {
+      throw Exceptions.create("Cannot copy from self");
+    }
+
+    board.copyFrom(copySource);
+    board.update();
+
+    source.sendSuccess(
+        format("Copied all style data from {0} into {1}",
+            NamedTextColor.GRAY,
+            copySource.displayName(),
+            board.displayName()
         )
     );
   }

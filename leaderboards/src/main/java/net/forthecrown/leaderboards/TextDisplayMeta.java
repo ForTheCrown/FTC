@@ -131,6 +131,28 @@ public class TextDisplayMeta {
     this.opacity = opacity;
   }
 
+  public void copyFrom(TextDisplayMeta meta) {
+    if (!meta.scale.equals(Vector3f.ONE)) {
+      this.scale = meta.scale;
+    }
+    if (!meta.translation.equals(Vector3f.ZERO)) {
+      this.translation = meta.translation;
+    }
+
+    if (meta.brightness != null) {
+      this.brightness = meta.brightness;
+    }
+
+    this.billboard = meta.billboard;
+    this.align = meta.align;
+    this.backgroundColor = meta.backgroundColor;
+
+    this.shadowed = meta.shadowed;
+    this.seeThrough = meta.seeThrough;
+    this.lineWidth = meta.lineWidth;
+    this.opacity = meta.opacity;
+  }
+
   public void setScale(Vector3f scale) {
     Objects.requireNonNull(scale, "Null scale");
     this.scale = scale;
