@@ -83,15 +83,15 @@ public class WeightedList<T> {
   }
 
   public boolean isEmpty() {
-    return values.isEmpty();
+    return values.isEmpty() || totalWeight < 1;
   }
 
   public int size() {
     return values.size();
   }
 
-  public Iterator<T> iterator(Random random) {
-    return new WeightedIterator(random);
+  public WeightedIterator<T> iterator(Random random) {
+    return new Iter(random);
   }
 
   @Override
@@ -101,18 +101,29 @@ public class WeightedList<T> {
 
   /* ----------------------------- SUB CLASSES ------------------------------ */
 
+  public interface WeightedIterator<T> extends Iterator<T> {
+
+    @Override
+    T next();
+
+    @Override
+    boolean hasNext();
+
+    int weight();
+  }
+
   private record Entry<T>(T value, int weight) {
 
   }
 
-  private class WeightedIterator implements Iterator<T> {
+  private class Iter implements WeightedIterator<T> {
 
     private final Random random;
     private final WeightedList<T> remaining;
 
     private Entry<T> current;
 
-    public WeightedIterator(Random random) {
+    public Iter(Random random) {
       this.random = random;
 
       remaining = new WeightedList<>();
@@ -141,6 +152,15 @@ public class WeightedList<T> {
       remaining.remove(current);
 
       return current.value;
+    }
+
+    @Override
+    public int weight() {
+      if (current == null) {
+        return -1;
+      }
+
+      return current.weight;
     }
 
     @Override
