@@ -5,6 +5,7 @@ import java.util.Objects;
 import net.forthecrown.FtcServer;
 import net.forthecrown.Worlds;
 import net.forthecrown.command.settings.SettingsBook;
+import net.forthecrown.core.commands.CommandLeave;
 import net.forthecrown.text.ViewerAwareMessage;
 import net.forthecrown.text.channel.ChannelledMessage;
 import net.forthecrown.text.placeholder.Placeholders;
@@ -72,5 +73,18 @@ public class FtcServerImpl implements FtcServer {
         .setBroadcast()
         .setRenderer(plugin.getAnnouncer().renderer(Placeholders.newRenderer().useDefaults()))
         .send();
+  }
+
+  @Override
+  public void registerLeaveListener(String id, LeaveCommandListener listener) {
+    Objects.requireNonNull(id, "Null ID");
+    Objects.requireNonNull(listener, "Null listener");
+    CommandLeave.listeners.put(id, listener);
+  }
+
+  @Override
+  public void unregisterLeaveListener(String id) {
+    Objects.requireNonNull(id, "Null ID");
+    CommandLeave.listeners.remove(id);
   }
 }

@@ -27,4 +27,12 @@ public interface FtcServer {
   default void announce(ComponentLike like) {
     announce(viewer -> Text.valueOf(like, viewer));
   }
+
+  void registerLeaveListener(String id, LeaveCommandListener listener);
+
+  void unregisterLeaveListener(String id);
+
+  interface LeaveCommandListener {
+    boolean onUse(User player);
+  }
 }
