@@ -99,6 +99,7 @@ public class ScriptPack {
 
     if (exports.isEmpty()) {
       LOGGER.debug("No exports created");
+      return;
     }
 
     for (PackExport export : exports) {
@@ -140,6 +141,7 @@ public class ScriptPack {
         LOGGER.error("Couldn't register module '{}': {}", export.getName(), string);
       }, unit -> {
         exportedModuleNames.add(export.getName());
+        LOGGER.info("Created export '{}' from pack {}", export.getName(), meta.getDirectory());
       });
     }
   }
