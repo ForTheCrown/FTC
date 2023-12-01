@@ -135,6 +135,7 @@ public final class Registries {
         || c == '.'
         || c == '\\'
         || c == '/'
+        || c == '-'
         || c == '+';
   }
 
