@@ -1,5 +1,6 @@
 package net.forthecrown.utils.collision;
 
+import com.destroystokyo.paper.event.entity.EntityTeleportEndGatewayEvent;
 import io.papermc.paper.event.entity.EntityMoveEvent;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Entity;
@@ -40,6 +41,11 @@ class EntityListener implements Listener {
 
   @EventHandler(ignoreCancelled = true)
   public void onPlayerTeleport(EntityTeleportEvent event) {
+    system.run(event.getEntity(), event.getFrom(), event.getTo(), true);
+  }
+
+  @EventHandler(ignoreCancelled = true)
+  public void onEntityTeleportEndGateway(EntityTeleportEndGatewayEvent event) {
     system.run(event.getEntity(), event.getFrom(), event.getTo(), true);
   }
 }

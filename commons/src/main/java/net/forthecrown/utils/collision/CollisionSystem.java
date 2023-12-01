@@ -56,6 +56,8 @@ public abstract class CollisionSystem<S extends Entity, T> {
 
     var pl = Bukkit.getPluginManager();
     pl.registerEvents(eventListener, plugin);
+
+    listenerRegistered = true;
   }
 
   public void stopListening() {

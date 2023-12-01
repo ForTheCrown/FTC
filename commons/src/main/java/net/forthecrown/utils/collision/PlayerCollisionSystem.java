@@ -1,5 +1,6 @@
 package net.forthecrown.utils.collision;
 
+import com.destroystokyo.paper.event.player.PlayerTeleportEndGatewayEvent;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -43,6 +44,11 @@ class PlayerListener implements Listener {
 
   @EventHandler(ignoreCancelled = true)
   public void onPlayerTeleport(PlayerTeleportEvent event) {
+    onMove(event, true);
+  }
+
+  @EventHandler(ignoreCancelled = true)
+  public void onPlayerTeleportEndGateway(PlayerTeleportEndGatewayEvent event) {
     onMove(event, true);
   }
 }
