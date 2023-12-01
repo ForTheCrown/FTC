@@ -5,6 +5,7 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Grenadier;
 import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.text.Text;
+import net.forthecrown.user.User;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
@@ -27,7 +28,10 @@ public final class ScriptUtils {
     }
 
     Object val = args[index];
+    return toText(context, scope, val);
+  }
 
+  public static Component toText(Context context, Scriptable scope, Object val) {
     if (val == null || Undefined.isUndefined(val)) {
       return null;
     }
@@ -45,13 +49,13 @@ public final class ScriptUtils {
     if (args.length <= index) {
       return null;
     }
+
     Object value = args[index];
-
-    if (value instanceof String string) {
-      return ItemStacks.fromNbtString(string);
-    }
-
     Object jType = Context.jsToJava(value, Object.class);
+
+    if (jType instanceof CharSequence string) {
+      return ItemStacks.fromNbtString(string.toString());
+    }
 
     if (jType instanceof CompoundTag tag) {
       return ItemStacks.load(tag);
@@ -85,6 +89,14 @@ public final class ScriptUtils {
     }
 
     Object o = Context.jsToJava(value, Object.class);
+
+    if (o instanceof User user) {
+      if (!user.isOnline()) {
+        throw ScriptRuntime.typeError("User " + user.getName() + " is not online");
+      }
+
+      return Grenadier.createSource(user.getPlayer());
+    }
 
     if (o instanceof CommandSender sender) {
       return Grenadier.createSource(sender);
