@@ -1,7 +1,7 @@
 package net.forthecrown.webmap.listeners;
 
 import static net.forthecrown.webmap.HideSetting.DYNMAP_HIDE;
-import static net.forthecrown.webmap.HideSetting.HIDDEN;
+import static net.forthecrown.webmap.HideSetting.VISIBLE;
 
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
@@ -26,15 +26,17 @@ public class GameModeListener implements Listener {
     GameMode oldMode = player.getGameMode();
     GameMode newMode = event.getNewGameMode();
 
+    // Out of spectator
     if (oldMode == GameMode.SPECTATOR && newMode != GameMode.SPECTATOR) {
       boolean hide = user.get(DYNMAP_HIDE);
-      HIDDEN.setState(user, hide);
+      VISIBLE.setState(user, !hide);
     }
 
+    // Into spectator
     if (newMode == GameMode.SPECTATOR && oldMode != GameMode.SPECTATOR) {
-      boolean hide = HIDDEN.getState(user);
+      boolean hide = !VISIBLE.getState(user);
       user.set(DYNMAP_HIDE, hide);
-      HIDDEN.setState(user, true);
+      VISIBLE.setState(user, false);
     }
   }
 }

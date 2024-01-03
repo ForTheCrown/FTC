@@ -13,7 +13,7 @@ public class HideSetting {
   public static final UserProperty<Boolean> DYNMAP_HIDE
       = Properties.booleanProperty("dynmapHide", false);
 
-  public static final SettingAccess HIDDEN = new SettingAccess() {
+  public static final SettingAccess VISIBLE = new SettingAccess() {
     @Override
     public boolean getState(User user) {
       return WebMap.map().isPlayerVisible(user.getOfflinePlayer());
@@ -26,7 +26,7 @@ public class HideSetting {
   };
 
   static void createSetting(SettingsBook<User> settingsBook) {
-    var setting = Setting.createInverted(HIDDEN)
+    var setting = Setting.createInverted(VISIBLE)
         .setDisplayName("Dynmap Hide")
         .setToggle("N{1} hidden on Dynmap")
         .setToggleDescription("{Enable} being hidden on Dynmap")
