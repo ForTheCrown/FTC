@@ -12,7 +12,7 @@ public interface MailService {
     return BukkitServices.loadOrThrow(MailService.class);
   }
 
-  void send(Mail mail);
+  void send(Mail mail, MailSendFlag... flags);
 
   void sendQuietly(Mail mail);
 
@@ -31,4 +31,8 @@ public interface MailService {
   boolean hasUnread(UUID playerId);
 
   Mail getMessage(long messageId);
+
+  Attachment.Builder attachmentBuilder();
+
+  Mail.Builder mailBuilder();
 }

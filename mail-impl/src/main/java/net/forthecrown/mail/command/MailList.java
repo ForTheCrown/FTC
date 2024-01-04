@@ -3,6 +3,7 @@ package net.forthecrown.mail.command;
 import java.util.List;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.mail.Mail;
+import net.forthecrown.mail.Page;
 import net.forthecrown.text.TextWriters;
 import net.forthecrown.text.page.Footer;
 import net.forthecrown.text.page.Header;

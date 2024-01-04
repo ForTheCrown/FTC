@@ -11,11 +11,6 @@ dependencies {
   compileOnly(project(":scripting"))
 }
 
-pluginYml {
-  name = "FTC-Mail"
-  main = "net.forthecrown.mail.MailPlugin"
-
-  loadAfter {
-    regular("project:guilds")
-  }
+ftc {
+  implementedBy("mail-impl")
 }

@@ -10,6 +10,8 @@ import static net.kyori.adventure.text.Component.text;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +38,7 @@ import net.forthecrown.mail.Attachment;
 import net.forthecrown.mail.Mail;
 import net.forthecrown.mail.MailPermissions;
 import net.forthecrown.mail.MailService;
+import net.forthecrown.mail.Page;
 import net.forthecrown.registry.Holder;
 import net.forthecrown.scripts.commands.ScriptArgument;
 import net.forthecrown.text.PlayerMessage;
@@ -67,7 +70,10 @@ class MailCommand {
       = Options.argument(ArgumentTypes.array(StringArgumentType.string()), "tags");
 
   private static final ArgumentOption<Source> CLAIM_SCRIPT
-      = Options.argument(ScriptArgument.SCRIPT, "claim_script");
+      = Options.argument(ScriptArgument.SCRIPT, "claim-script");
+
+  private static final ArgumentOption<LocalDate> REWARD_EXPIRY
+      = Options.argument(ArgumentTypes.localDate(), "rewards-expire");
 
   private static final FlagOption USE_GAIN_MULTIPLIER
       = Options.flag("multiply-guild-exp");
@@ -85,6 +91,7 @@ class MailCommand {
     optionsBuilder.addOptional(ITEMS);
     optionsBuilder.addOptional(TAGS);
     optionsBuilder.addOptional(CLAIM_SCRIPT);
+    optionsBuilder.addOptional(REWARD_EXPIRY);
     optionsBuilder.addFlag(USE_GAIN_MULTIPLIER);
 
     var userService = Users.getService();
@@ -225,6 +232,11 @@ class MailCommand {
       attachment.items(list);
     }
 
+    options.getValueOptional(REWARD_EXPIRY).ifPresent(date -> {
+      var instant = date.atStartOfDay(ZoneId.systemDefault()).toInstant();
+      mailBuilder.attachmentExpiry(instant);
+    });
+
     options.getValueOptional(TAGS).ifPresent(attachment::addTags);
     options.getValueOptional(CLAIM_SCRIPT).ifPresent(attachment::claimScript);
     attachment.useGainMultiplier(options.has(USE_GAIN_MULTIPLIER));
@@ -300,6 +312,12 @@ class MailCommand {
       throws CommandSyntaxException
   {
     User user = page.player();
+
+    // Ensure they actually have permission to view the other player's mail
+    if (source.isPlayer() && !source.hasPermission(MailPermissions.MAIL_OTHERS)) {
+      throw Exceptions.NO_PERMISSION;
+    }
+
     var mailList = MailCommands.getMailList(service, user, includeDeleted);
 
     if (mailList.isEmpty()) {

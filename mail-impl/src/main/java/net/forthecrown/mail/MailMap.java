@@ -70,6 +70,8 @@ class MailMap {
       MailImpl mail = result.getValue();
       add(mail);
     }
+
+    ensureSorted();
   }
 
   long genId() {
@@ -103,6 +105,15 @@ class MailMap {
 
     if (mail.getSender() != null) {
       addToMap(mail.getSender(), bySender, mail);
+    }
+
+    MailImpl idExisting = idLookup.get(mail.mailId);
+    if (idExisting != null) {
+      LOGGER.warn("ID clash! Message {} conflicts with existing message {}. Generating new ID",
+          mail, idExisting
+      );
+
+      mail.mailId = genId();
     }
 
     addToMap(mail.getTarget(), byTarget, mail);

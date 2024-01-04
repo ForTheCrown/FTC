@@ -21,6 +21,7 @@ import net.forthecrown.grenadier.types.options.OptionsArgument;
 import net.forthecrown.mail.Mail;
 import net.forthecrown.mail.MailPermissions;
 import net.forthecrown.mail.MailService;
+import net.forthecrown.mail.Page;
 import net.forthecrown.mail.SentDateComparator;
 import net.forthecrown.text.Text;
 import net.forthecrown.user.User;

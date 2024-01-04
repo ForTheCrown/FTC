@@ -4,7 +4,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.time.Instant;
 import java.util.UUID;
 import java.util.function.Consumer;
-import net.forthecrown.mail.command.Page;
 import net.forthecrown.text.PlayerMessage;
 import net.forthecrown.text.ViewerAwareMessage;
 import net.forthecrown.user.User;
@@ -18,7 +17,7 @@ public interface Mail {
   long NULL_ID = 0;
 
   static Builder builder() {
-    return new MailBuilder();
+    return MailService.service().mailBuilder();
   }
 
   static void sendOrMail(User target, Component message) {
@@ -40,6 +39,8 @@ public interface Mail {
 
   @Nullable
   Attachment getAttachment();
+
+  AttachmentState getAttachmentState();
 
   @Nullable
   Instant getClaimDate();
@@ -144,11 +145,13 @@ public interface Mail {
 
     Builder attachment(Attachment attachment);
 
+    Builder attachmentExpiry(Instant instant);
+
     Mail build() throws IllegalStateException;
 
-    default Mail send() throws IllegalStateException {
+    default Mail send(MailSendFlag... flags) throws IllegalStateException {
       Mail built = build();
-      MailService.service().send(built);
+      MailService.service().send(built, flags);
       return built;
     }
 

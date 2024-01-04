@@ -34,7 +34,7 @@ class MailTargetsArgument implements ArgumentType<MailTargets>, SimpleVanillaMap
     UserParseResult result = userArgument.parse(reader);
 
     return source -> {
-      var users = result.getUsers(source, false);
+      var users = result.getUsers(source, true);
       return CompletableFuture.completedFuture(users);
     };
   }

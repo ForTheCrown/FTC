@@ -1,4 +1,4 @@
-package net.forthecrown.mail.command;
+package net.forthecrown.mail;
 
 import static net.forthecrown.command.UserMapTopCommand.DEF_PAGE_SIZE;
 

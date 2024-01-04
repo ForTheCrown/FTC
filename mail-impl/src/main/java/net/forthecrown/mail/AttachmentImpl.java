@@ -48,6 +48,7 @@ class AttachmentImpl implements Attachment {
   static final String KEY_TAGS = "tags";
   static final String KEY_ITEMS = "items";
   static final String KEY_SCRIPT = "claim_script";
+  static final String KEY_GAIN_MULTIPLIER = "use_currency_multiplier";
 
   private final CurrencyMap<Integer> currencyRewards;
   private final List<String> tags;
@@ -55,6 +56,18 @@ class AttachmentImpl implements Attachment {
   private final Source claimScript;
 
   private final boolean useGainMultiplier;
+
+  public ItemList getItems() {
+    return ItemLists.cloneAllItems(items);
+  }
+
+  public List<String> getTags() {
+    return Collections.unmodifiableList(tags);
+  }
+
+  public CurrencyMap<Integer> getCurrencyRewards() {
+    return CurrencyMaps.unmodifiable(currencyRewards);
+  }
 
   public static Result<AttachmentImpl> load(JsonElement element) {
     if (!element.isJsonObject()) {
@@ -69,7 +82,13 @@ class AttachmentImpl implements Attachment {
       json.remove(KEY_TAGS);
     }
 
-    if(json.has(KEY_ITEMS)) {
+    if (json.has(KEY_GAIN_MULTIPLIER)) {
+      boolean state = json.getBool(KEY_GAIN_MULTIPLIER);
+      json.remove(KEY_GAIN_MULTIPLIER);
+      builder.useGainMultiplier(state);
+    }
+
+    if (json.has(KEY_ITEMS)) {
       DataResult<ItemList> itemListRes
           = FtcCodecs.ITEM_LIST_CODEC.decode(JsonOps.INSTANCE, json.get(KEY_ITEMS))
           .map(Pair::getFirst);
@@ -128,6 +147,10 @@ class AttachmentImpl implements Attachment {
       for (Entry<String, Integer> entry : currencyRewards.idEntrySet()) {
         json.add(entry.getKey(), entry.getValue());
       }
+    }
+
+    if (useGainMultiplier) {
+      json.add(KEY_GAIN_MULTIPLIER, true);
     }
 
     return json.getSource();

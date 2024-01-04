@@ -9,15 +9,14 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
+import java.sql.Date;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.EqualsAndHashCode.Include;
 import lombok.Getter;
 import lombok.Setter;
-import net.forthecrown.mail.Mail.Builder;
 import net.forthecrown.mail.command.MailCommands;
-import net.forthecrown.mail.command.Page;
 import net.forthecrown.text.Messages;
 import net.forthecrown.text.PlayerMessage;
 import net.forthecrown.text.Text;
@@ -51,6 +50,7 @@ class MailImpl implements Mail {
   private static final String KEY_READ_DATE = "read_date";
   private static final String KEY_ID = "message_id";
   private static final String KEY_HIDE_SENDER = "hide_sender";
+  private static final String KEY_ATTACHMENT_EXPIRY = "attachment_expire_date";
 
   @Include
   private final UUID sender;
@@ -66,6 +66,8 @@ class MailImpl implements Mail {
 
   @Setter
   private Instant claimDate;
+  @Setter
+  private Instant attachmentExpiry;
 
   ServiceImpl service;
 
@@ -75,14 +77,16 @@ class MailImpl implements Mail {
   private boolean deleted;
   private boolean hideSender;
 
+  @Include
   long mailId = NULL_ID;
 
   public MailImpl(MailBuilder builder) {
-    this.sender     = builder.sender;
-    this.target     = builder.target;
-    this.message    = builder.message;
-    this.attachment = builder.attachment;
-    this.hideSender = builder.hideSender;
+    this.sender           = builder.sender;
+    this.target           = builder.target;
+    this.message          = builder.message;
+    this.attachment       = builder.attachment;
+    this.hideSender       = builder.hideSender;
+    this.attachmentExpiry = builder.attachmentExpiry;
   }
   
   /* --------------------------- SERIALIZATION ---------------------------- */
@@ -141,11 +145,13 @@ class MailImpl implements Mail {
     }
 
     MailImpl built = builder.build();
-    built.mailId = json.getLong(KEY_ID, NULL_ID);
-    built.claimDate = JsonUtils.readInstant(json.get(KEY_CLAIM_DATE));
-    built.sentDate  = JsonUtils.readInstant(json.get(KEY_SENT_DATE));
-    built.readDate  = JsonUtils.readInstant(json.get(KEY_READ_DATE));
-    built.hideSender = json.getBool(KEY_HIDE_SENDER, false);
+
+    built.mailId            = json.getLong(KEY_ID, NULL_ID);
+    built.hideSender        = json.getBool(KEY_HIDE_SENDER, false);
+    built.claimDate         = JsonUtils.readInstant(json.get(KEY_CLAIM_DATE));
+    built.sentDate          = JsonUtils.readInstant(json.get(KEY_SENT_DATE));
+    built.readDate          = JsonUtils.readInstant(json.get(KEY_READ_DATE));
+    built.attachmentExpiry  = JsonUtils.readInstant(json.get(KEY_ATTACHMENT_EXPIRY));
 
     return Result.success(built);
   }
@@ -199,6 +205,10 @@ class MailImpl implements Mail {
       if (claimDate != null) {
         json.add(KEY_CLAIM_DATE, JsonUtils.writeInstant(claimDate));
       }
+
+      if (attachmentExpiry != null) {
+        json.add(KEY_ATTACHMENT_EXPIRY, JsonUtils.writeInstant(attachmentExpiry));
+      }
     }
 
     if (sentDate != null) {
@@ -226,6 +236,28 @@ class MailImpl implements Mail {
   }
   
   /* ---------------------------------------------------------------------- */
+
+  @Override
+  public AttachmentState getAttachmentState() {
+    if (attachment == null || attachment.isEmpty()) {
+      return AttachmentState.NO_ATTACHMENT;
+    }
+
+    if (claimDate != null) {
+      return AttachmentState.CLAIMED;
+    }
+
+    if (attachmentExpiry == null) {
+      return AttachmentState.UNCLAIMED;
+    }
+
+    Instant now = Instant.now();
+    if (now.isAfter(attachmentExpiry)) {
+      return AttachmentState.EXPIRED;
+    }
+
+    return AttachmentState.UNCLAIMED;
+  }
 
   @Override
   public MessageType getMessageType() {
@@ -275,11 +307,37 @@ class MailImpl implements Mail {
       return null;
     }
 
-    boolean claimed = claimDate != null;
+    AttachmentState attachState = getAttachmentState();
     AttachmentImpl attach = getAttachment();
 
-    TextColor color = claimed ? NamedTextColor.GRAY : NamedTextColor.AQUA;
-    String text = claimed ? "Already claimed" : "Claim Rewards";
+    TextColor color;
+    String text;
+    String hover;
+
+    switch (attachState) {
+      case CLAIMED -> {
+        color = NamedTextColor.GRAY;
+        text = "Already claimed";
+        hover = "Already claimed rewards";
+      }
+
+      case UNCLAIMED -> {
+        color = NamedTextColor.AQUA;
+        text = "Claim Rewards";
+        hover = "Click to claim rewards!";
+      }
+
+      case EXPIRED -> {
+        color = TextColor.color(157, 107, 107);
+        text = "Rewards Expired";
+        hover = "Rewards expired on " + Text.DATE_FORMAT.format(Date.from(attachmentExpiry));
+      }
+
+      default -> {
+        // Not possible
+        throw new AssertionError();
+      }
+    }
 
     var builder = text()
         .content("[" + text + "]")
@@ -287,12 +345,7 @@ class MailImpl implements Mail {
 
     var writer = TextWriters.newWriter();
     writer.viewer(viewer);
-
-    if (!claimed) {
-      writer.line("Click to claim rewards!", NamedTextColor.YELLOW);
-    } else {
-      writer.line("Already claimed rewards", NamedTextColor.GRAY);
-    }
+    writer.line(hover);
 
     attach.write(writer);
 
@@ -413,75 +466,28 @@ class MailImpl implements Mail {
 
   @Override
   public void claimAttachment(Player player) throws CommandSyntaxException {
-    if (claimDate != null) {
+    var state = getAttachmentState();
+
+    if (state == AttachmentState.NO_ATTACHMENT) {
+      return;
+    }
+
+    if (state == AttachmentState.EXPIRED) {
+      throw MailExceptions.attachmentExpired(attachmentExpiry);
+    }
+
+    if (state == AttachmentState.CLAIMED) {
       throw MailExceptions.ALREADY_CLAIMED;
     }
 
     attachment.claim(player);
     Component claimMessage = attachment.claimMessage(player);
 
-    claimDate = Instant.now();
+    if (player.getUniqueId().equals(target)) {
+      claimDate = Instant.now();
+    }
+
     player.sendMessage(claimMessage);
   }
 }
 
-class MailBuilder implements Builder {
-
-  UUID sender;
-  UUID target;
-
-  ViewerAwareMessage message;
-
-  AttachmentImpl attachment;
-
-  boolean hideSender;
-
-  @Override
-  public Builder hideSender(boolean hideSender) {
-    this.hideSender = hideSender;
-    return this;
-  }
-
-  @Override
-  public Builder sender(UUID uuid) {
-    this.sender = uuid;
-    return this;
-  }
-
-  @Override
-  public Builder target(UUID uuid) {
-    this.target = uuid;
-    return this;
-  }
-
-  @Override
-  public Builder message(Component message) {
-    this.message = ViewerAwareMessage.wrap(message);
-    return this;
-  }
-
-  @Override
-  public Builder message(PlayerMessage message) {
-    this.message = message;
-    return this;
-  }
-
-  @Override
-  public Builder attachment(Attachment attachment) {
-    this.attachment = (AttachmentImpl) attachment;
-    return this;
-  }
-
-  @Override
-  public MailImpl build() {
-    if (target == null) {
-      throw new IllegalStateException("No target set");
-    }
-
-    if (message == null) {
-      throw new IllegalStateException("No message set");
-    }
-
-    return new MailImpl(this);
-  }
-}

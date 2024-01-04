@@ -3,7 +3,6 @@ package net.forthecrown.mail;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Collection;
 import java.util.List;
-import net.forthecrown.mail.AttachmentImpl.BuilderImpl;
 import net.forthecrown.user.currency.Currency;
 import net.forthecrown.user.currency.CurrencyMap;
 import net.forthecrown.utils.inventory.ItemList;
@@ -15,7 +14,7 @@ import org.bukkit.inventory.ItemStack;
 public interface Attachment {
 
   static Builder builder() {
-    return new BuilderImpl();
+    return MailService.service().attachmentBuilder();
   }
 
   CurrencyMap<Integer> getCurrencyRewards();

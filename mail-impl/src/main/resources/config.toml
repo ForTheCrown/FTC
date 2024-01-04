@@ -1,0 +1,3 @@
+
+# Allows forwarding mail messages to a player's discord if their accounts are linked
+discordForwardingAllowed = true
