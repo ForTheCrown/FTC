@@ -29,7 +29,7 @@ public class TitlesPlugin extends JavaPlugin {
   public void onEnable() {
     UserService service = Users.getService();
     service.registerComponent(UserTitles.class);
-    addPrefixElement(service.getNameFactory());
+    addNameElements(service.getNameFactory());
 
     loadTitles();
 
@@ -50,6 +50,7 @@ public class TitlesPlugin extends JavaPlugin {
   public void onDisable() {
     var nameFactory = Users.getService().getNameFactory();
     nameFactory.removePrefix("title_prefix");
+    nameFactory.removeField("title");
     TitlePlaceholders.unregister();
   }
 
@@ -58,7 +59,9 @@ public class TitlesPlugin extends JavaPlugin {
     titlesConfig = TomlConfigs.loadPluginConfig(this, TitlesConfig.class);
   }
 
-  void addPrefixElement(UserNameFactory factory) {
+  void addNameElements(UserNameFactory factory) {
+    factory.addProfileField("title", 33, new TitleProfileElement());
+
     factory.addPrefix("title_prefix", 1, (user, context) -> {
       // Don't display rank prefix if the user has disabled it,
       // only in certain circumstances though
