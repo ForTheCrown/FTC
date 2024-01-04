@@ -37,7 +37,7 @@ public class DescriptionPrompt extends StringPrompt {
   public @NotNull String getPromptText(@NotNull ConversationContext context) {
     // I hate using legacy systems like this
     return "Type the waypoint's new description into chat "
-        + ChatColor.GRAY + "(Use 'clear' to clear the description)";
+        + ChatColor.GRAY + "(Use 'clear' to clear the description. And use '\\n' for line breaks)";
   }
 
   @Override
@@ -71,7 +71,9 @@ public class DescriptionPrompt extends StringPrompt {
       return;
     }
 
-    PlayerMessage message = PlayerMessage.of(desc, user);
+    PlayerMessage message = PlayerMessage.of(desc, user)
+        .edit(string -> string.replaceAll("(?:\\\\n)+", "\n"));
+
     waypoint.setDescription(message);
 
     user.sendMessage(
