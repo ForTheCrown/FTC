@@ -9,6 +9,7 @@ import static com.mojang.serialization.Codec.INT;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import net.forthecrown.command.Exceptions;
@@ -17,6 +18,7 @@ import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.utils.io.FtcCodecs;
+import net.forthecrown.waypoints.command.StringListArgument;
 import org.bukkit.inventory.ItemStack;
 
 public class WaypointProperties {
@@ -112,6 +114,18 @@ public class WaypointProperties {
         throw Exceptions.format("Invalid waypoint name '{0}': {1}",
             newValue, result.error().get().message()
         );
+      });
+
+  public static final WaypointProperty<List<String>> ALIASES
+      = new WaypointProperty<>("aliases", new StringListArgument(), Codec.STRING.listOf(), null)
+      .setCallback((waypoint, oldValue, value) -> {
+        WaypointManager.getInstance().onAliasesUpdate(waypoint, oldValue, value);
+      })
+
+      .setValidator((waypoint, newValue) -> {
+        for (String s : newValue) {
+          NAME.validateValue(waypoint, s);
+        }
       });
 
   /**

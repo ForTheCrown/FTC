@@ -7,10 +7,12 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Stream;
 import lombok.Getter;
 import net.forthecrown.Loggers;
 import net.forthecrown.nbt.BinaryTags;
@@ -112,6 +114,36 @@ public class WaypointManager {
     }
   }
 
+  void onAliasesUpdate(Waypoint waypoint, List<String> old, List<String> newAliases) {
+    if (old != null && !old.isEmpty()) {
+      for (String s : old) {
+        String normalized = s.toLowerCase();
+        Waypoint found = byName.get(normalized);
+
+        if (found == null || !Objects.equals(waypoint, found)) {
+          continue;
+        }
+
+        byName.remove(normalized);
+      }
+    }
+
+    if (newAliases == null || newAliases.isEmpty()) {
+      return;
+    }
+
+    for (String newAlias : newAliases) {
+      String label = newAlias.toLowerCase();
+      Waypoint existing = byName.get(label);
+
+      if (existing != null) {
+        continue;
+      }
+
+      byName.put(label, waypoint);
+    }
+  }
+
   public void addWaypoint(Waypoint waypoint) {
     waypoint.manager = this;
     byId.put(waypoint.getId(), waypoint);
@@ -122,6 +154,11 @@ public class WaypointManager {
 
       // Ensure the marker exists, since we have a name
       Waypoints.updateDynmap(waypoint);
+    }
+
+    List<String> aliases = waypoint.get(WaypointProperties.ALIASES);
+    if (aliases != null) {
+      onAliasesUpdate(waypoint, null, aliases);
     }
 
     chunkMap.add(waypoint.getWorld(), waypoint.getBounds(), waypoint);
@@ -217,12 +254,25 @@ public class WaypointManager {
     }
   }
 
-  public Stream<String> getNames() {
-    // Don't return the keySet directly, as it contains
-    // lowerCase versions of the name for ease of lookup
-    return byName.values()
-        .stream()
-        .map(waypoint -> waypoint.get(WaypointProperties.NAME));
+  public Set<String> getNames() {
+    // Don't return the byName.keySet() directly, as it contains
+    // lowerCase versions of the names and aliases for ease of lookup
+    Set<String> names = new HashSet<>();
+
+    for (Waypoint value : byId.values()) {
+      String name = value.get(WaypointProperties.NAME);
+
+      if (!Strings.isNullOrEmpty(name)) {
+        names.add(name);
+      }
+
+      List<String> aliases = value.get(WaypointProperties.ALIASES);
+      if (aliases != null) {
+        names.addAll(aliases);
+      }
+    }
+
+    return names;
   }
 
   public Collection<Waypoint> getWaypoints() {

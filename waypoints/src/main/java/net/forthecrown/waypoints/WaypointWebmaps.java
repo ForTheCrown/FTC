@@ -90,7 +90,7 @@ class WaypointWebmaps {
 
       if (markerResult.isError()) {
         markerResult
-            .mapError(string -> "Failed to create marker for waypoint " + waypoint + ": ")
+            .mapError(string -> "Failed to create marker for waypoint " + waypoint + ": " + string)
             .applyError(LOGGER::error);
 
         return;

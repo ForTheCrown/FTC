@@ -87,6 +87,6 @@ public class WaypointArgument implements ArgumentType<ParseResult<Waypoint>> {
     var extensions = manager.getExtensions();
     extensions.forEach(extension -> extension.addSuggestions(builder, source));
 
-    return Completions.suggest(builder, WaypointManager.getInstance().getNames());
+    return Completions.suggest(builder, manager.getNames());
   }
 }

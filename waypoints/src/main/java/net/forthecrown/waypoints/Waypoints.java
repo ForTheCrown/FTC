@@ -159,7 +159,7 @@ public final class Waypoints {
 
     Matcher matcher = VALID_NAME_PATTERN.matcher(name);
     if (!matcher.matches()) {
-      return Results.error("Name can only contain alphanumeric character (a-z, 0-9, '_' or '$')");
+      return Results.error("Name can only contain alphanumeric characters (a-z, 0-9, '_' or '$')");
     }
 
     WaypointManager manager = WaypointManager.getInstance();
@@ -167,7 +167,7 @@ public final class Waypoints {
     int maxLength = config.maxNameLength;
 
     if (name.length() >= maxLength) {
-      return Results.error("Name longer than max length (%s)", maxLength);
+      return Results.error("Name longer than max length (%s characters max)", maxLength);
     }
 
     for (String bannedName : config.bannedNames) {

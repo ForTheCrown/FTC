@@ -19,6 +19,7 @@ import java.lang.ref.WeakReference;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -37,6 +38,7 @@ import net.forthecrown.nbt.TagTypes;
 import net.forthecrown.text.BufferedTextWriter;
 import net.forthecrown.text.PlayerMessage;
 import net.forthecrown.text.Text;
+import net.forthecrown.text.TextJoiner;
 import net.forthecrown.text.TextWriter;
 import net.forthecrown.text.TextWriters;
 import net.forthecrown.user.User;
@@ -1016,11 +1018,23 @@ public class Waypoint {
 
       if (residents > 1) {
         writer.field("Residents", Text.formatNumber(residents));
+        anythingWritten.setValue(true);
       } else if (residents == 1) {
         UUID resident = this.residents.keySet().iterator().next();
         writer.formattedField("Resident", "{0, user}", resident);
+        anythingWritten.setValue(true);
       }
+    }
 
+    List<String> aliases = get(WaypointProperties.ALIASES);
+
+    if (aliases != null && !aliases.isEmpty()) {
+      Component joined = TextJoiner.newJoiner()
+          .setDelimiter(text(", ", NamedTextColor.GRAY))
+          .add(aliases.stream().map(string -> text("'" + string + "'")))
+          .asComponent();
+
+      writer.field("Name Aliases", joined);
       anythingWritten.setValue(true);
     }
 
