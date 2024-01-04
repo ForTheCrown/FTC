@@ -172,7 +172,7 @@ class DiscordAppender extends AbstractAppender {
     }
 
     @Override
-    public void write(char @NotNull [] cbuf, int off, int len)
+    public void write(char [] cbuf, int off, int len)
         throws IOException
     {
       if (buffer.length() >= maxSize) {

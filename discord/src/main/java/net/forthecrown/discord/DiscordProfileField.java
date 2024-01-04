@@ -13,6 +13,10 @@ class DiscordProfileField implements ProfileDisplayElement {
 
   @Override
   public void write(TextWriter writer, User user, DisplayContext context) {
+    if (!context.profileViewable()) {
+      return;
+    }
+
     var opt = FtcDiscord.getUserMember(user);
 
     if (opt.isEmpty()) {
