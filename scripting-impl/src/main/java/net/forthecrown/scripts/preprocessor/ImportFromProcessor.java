@@ -13,7 +13,7 @@ class ImportFromProcessor extends RegexProcessor {
 
   public ImportFromProcessor() {
     super(Pattern.compile(
-        "import(\\s+\\*\\s+as)?\\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\\s+from\\s+['\"]([^'\"]+)['\"];?"
+        "import(\\s*\\*\\s*as)?\\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\\s+from\\s*['\"]([^'\"]+)['\"];?"
     ));
   }
 
