@@ -304,7 +304,7 @@ class MailCommand {
   }
 
   void displayPage(CommandSource source, Page page) throws CommandSyntaxException {
-    boolean includeDeleted = !page.player().getName().equals(source.textName());
+    boolean includeDeleted = page.player() != null && !page.player().getName().equals(source.textName());
     displayPage(source, page, includeDeleted);
   }
 
@@ -313,12 +313,14 @@ class MailCommand {
   {
     User user = page.player();
 
-    // Ensure they actually have permission to view the other player's mail
-    if (source.isPlayer() && !source.hasPermission(MailPermissions.MAIL_OTHERS)) {
-      throw Exceptions.NO_PERMISSION;
+    if (user == null) {
+      user = Commands.getUserSender(source);
     }
 
-    var mailList = MailCommands.getMailList(service, user, includeDeleted);
+    // Ensure they actually have permission to view the player's mail
+    validateViewingAccess(source, user);
+
+    List<Mail> mailList = MailCommands.getMailList(service, user, includeDeleted);
 
     if (mailList.isEmpty()) {
       throw Exceptions.NOTHING_TO_LIST;
@@ -326,6 +328,20 @@ class MailCommand {
 
     Component pageText = MailList.formatMail(source, page, mailList);
     source.sendMessage(pageText);
+  }
+
+  void validateViewingAccess(CommandSource source, User target) throws CommandSyntaxException {
+    if (!source.isPlayer() || source.hasPermission(MailPermissions.MAIL_OTHERS)) {
+      return;
+    }
+
+    Player player = source.asPlayer();
+
+    if (player.getUniqueId().equals(target.getUniqueId())) {
+      return;
+    }
+
+    throw Exceptions.NO_PERMISSION;
   }
 
   Page fromOptions(CommandSource source, ParsedOptions options) throws CommandSyntaxException {
