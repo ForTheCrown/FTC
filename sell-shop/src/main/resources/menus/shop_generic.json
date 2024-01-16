@@ -1,0 +1,16 @@
+{
+  "border": true,
+  "items": [
+    {"slot": "3,0", "hardcoded":    "filter_named"},
+    {"slot": "5,0", "hardcoded":     "filter_lore"},
+
+    {"slot": "8,0", "hardcoded":  "toggle_compact"},
+
+    {"slot": "8,1", "hardcoded":   "sell_amount_1"},
+    {"slot": "8,2", "hardcoded":  "sell_amount_16"},
+    {"slot": "8,3", "hardcoded":  "sell_amount_64"},
+    {"slot": "8,4", "hardcoded": "sell_amount_all"}
+  ]
+}
+
+

@@ -23,7 +23,7 @@ import org.spongepowered.math.vector.Vector3i;
 
 @Getter
 @RequiredArgsConstructor
-public class MarketReset {
+public class UnderShopReset {
   /* ----------------------------- CONSTANTS ------------------------------ */
 
   public static final String
@@ -124,10 +124,10 @@ public class MarketReset {
     return json.getSource();
   }
 
-  public static MarketReset deserialize(JsonElement element) {
+  public static UnderShopReset deserialize(JsonElement element) {
     JsonWrapper json = JsonWrapper.wrap(element.getAsJsonObject());
 
-    return new MarketReset(
+    return new UnderShopReset(
         Vectors.read3i(json.get(KEY_PLACE_POS)),
         Vectors.read3i(json.get(KEY_COPY_POS)),
         Vectors.read3i(json.get(KEY_COPY_SIZE))

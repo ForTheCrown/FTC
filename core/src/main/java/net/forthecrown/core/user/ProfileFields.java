@@ -124,7 +124,7 @@ interface ProfileFields {
       return;
     }
 
-    writer.formattedField("/back Location", "{0, location}", returnLoc);
+    writer.formattedField("/back location", "{0, location, -c}", returnLoc);
   };
 
   ProfileDisplayElement LOCATION = (writer, user, context) -> {
@@ -133,7 +133,7 @@ interface ProfileFields {
       return;
     }
 
-    writer.formattedField("Location", "{0, location}", location);
+    writer.formattedField("Location", "{0, location, -c}", location);
   };
 
   ProfileDisplayElement SEPARATED_USERS = blockedUsers(UserBlockList::getSeparated, "Separated");

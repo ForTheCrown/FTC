@@ -16,12 +16,21 @@ public record DisplayContext(
     boolean useNickName,
     boolean userOnline,
     boolean self,
+    boolean profileViewable,
     DisplayIntent intent,
     UserNameFactory factory
 ) {
 
   public DisplayContext withIntent(DisplayIntent intent) {
-    return new DisplayContext(viewer, useNickName, userOnline, self, intent, factory);
+    return new DisplayContext(
+        viewer,
+        useNickName,
+        userOnline,
+        self,
+        profileViewable,
+        intent,
+        factory
+    );
   }
 
   public boolean intentMatches(DisplayIntent... intents) {

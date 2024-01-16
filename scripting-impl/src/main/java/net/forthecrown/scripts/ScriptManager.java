@@ -33,8 +33,8 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.NativeJavaClass;
-import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.TopLevel;
 import org.spongepowered.math.vector.Vector2d;
 import org.spongepowered.math.vector.Vector2i;
 import org.spongepowered.math.vector.Vector3d;
@@ -56,7 +56,7 @@ public class ScriptManager implements ScriptService {
   @Getter
   private final ModuleManagerImpl modules;
 
-  private NativeObject topLevelScope;
+  private TopLevel topLevelScope;
 
   public ScriptManager(Path scriptsDirectory, Plugin scriptPlugin) {
     this.scriptsDirectory = scriptsDirectory;
@@ -98,12 +98,12 @@ public class ScriptManager implements ScriptService {
     autoImportedClasses.add(Worlds.class);
   }
 
-  public NativeObject getTopLevelScope(Context ctx) {
+  public TopLevel getTopLevelScope(Context ctx) {
     if (topLevelScope != null) {
       return topLevelScope;
     }
 
-    topLevelScope = new NativeObject();
+    topLevelScope = new TopLevel();
     ctx.initStandardObjects(topLevelScope);
 
     for (Class<?> autoImportedClass : autoImportedClasses) {

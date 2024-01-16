@@ -1,10 +1,13 @@
 
 # Determines if interactions with normal shops should be logged to console
 logNormalUses = false
+
 # Determines if interactions with admin shops should be logged to console
 logAdminUses = true
+
 # Max sign shop price
 maxPrice = 1000000
+
 # The amount of time a signshop will stay in memory
 unloadDelay = "5m"
 
@@ -23,7 +26,7 @@ scanInterval = "1d"
 
 # Time that sign shops have to be unused for to warrant a shop being evicted
 # for having no useful sign shops
-unusedShopKickTime = "2w"
+unusedShopKickTime = "2weeks"
 
 # The period of time a user must be inactive for their shop to be
 # evicted for inactivity
@@ -39,3 +42,31 @@ defaultPrice = 55000
 # Minimum amount of stock required inside each sign shop inside a
 # market shop
 minStock = 0.5
+
+# The resetting method used to reset shops
+# Possible values:
+# - 'under_shop' Will hide a 'template' version of the shop under the
+#       shop itself when the shop is claimed. When it is reset, the
+#       shop is replaced with the hidden template
+#
+# - 'template' Will copy a shop from a template location, template
+#       will not be edited, unlike the 'under_shop' variant
+#
+resetter = "under_shop"
+
+# 'under_shop' resetter settings
+[underShopResetter]
+# The amount of blocks the copied 'template' is placed at below the actual shop
+descent = 70
+
+# 'template' resetter settings.
+#
+# Note: a template assumes the markets area is copied exactly from the actual one
+#       and that alterations to shop orientation, rotation or position do not occurr
+#       on a shop-by-shop basis
+#
+[templateResetter]
+# Offset between shop locations and the copy locations
+offset = { x = 0, y = 0, z = 0 }
+# World the shops are copied from
+copyWorld = "world_void"

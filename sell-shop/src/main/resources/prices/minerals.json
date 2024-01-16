@@ -1,0 +1,68 @@
+[
+  {
+    "material": "coal",
+    "price": 10,
+    "compact-material": "coal_block",
+    "compact-multiplier": 9
+  },
+  {
+    "material": "emerald",
+    "price": 7,
+    "compact-material": "emerald_block",
+    "compact-multiplier": 9
+  },
+  {
+    "material": "diamond",
+    "price": 400,
+    "compact-material": "diamond_block",
+    "compact-multiplier": 9
+  },
+  {
+    "material": "lapis_lazuli",
+    "price": 10,
+    "compact-material": "lapis_block",
+    "compact-multiplier": 9
+  },
+  {
+    "material": "redstone",
+    "price": 10,
+    "compact-material": "redstone_block",
+    "compact-multiplier": 9
+  },
+  {
+    "material": "quartz",
+    "price": 8,
+    "compact-material": "quartz_block",
+    "compact-multiplier": 4
+  },
+  {
+    "material": "copper_ingot",
+    "price": 8,
+    "compact-material": "copper_block",
+    "compact-multiplier": 9
+  },
+  {
+    "material": "iron_ingot",
+    "price": 5,
+    "compact-material": "iron_block",
+    "compact-multiplier": 9
+  },
+  {
+    "material": "gold_ingot",
+    "price": 7,
+    "compact-material": "gold_block",
+    "compact-multiplier": 9
+  },
+  {
+    "material": "netherite_ingot",
+    "price": 8000,
+    "compact-material": "netherite_block",
+    "compact-multiplier": 9
+  },
+  {
+    "material": "amethyst_shard",
+    "price": 8,
+    "compact-material": "amethyst_block",
+    "compact-multiplier": 4
+  }
+]

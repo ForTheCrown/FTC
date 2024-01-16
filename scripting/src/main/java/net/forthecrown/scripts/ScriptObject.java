@@ -1,8 +1,9 @@
 package net.forthecrown.scripts;
 
+import org.mozilla.javascript.ConstProperties;
 import org.mozilla.javascript.Scriptable;
 
-public class ScriptObject implements Scriptable {
+public class ScriptObject implements Scriptable, ConstProperties {
 
   private final Script script;
 
@@ -88,5 +89,20 @@ public class ScriptObject implements Scriptable {
   @Override
   public boolean hasInstance(Scriptable instance) {
     return script.getScriptObject().hasInstance(instance);
+  }
+
+  @Override
+  public void putConst(String name, Scriptable start, Object value) {
+    script.getScriptObject().putConst(name, start, value);
+  }
+
+  @Override
+  public void defineConst(String name, Scriptable start) {
+    script.getScriptObject().defineConst(name, start);
+  }
+
+  @Override
+  public boolean isConst(String name) {
+    return script.getScriptObject().isConst(name);
   }
 }

@@ -2,7 +2,6 @@ package net.forthecrown.vanilla.packet;
 
 import java.lang.reflect.Field;
 import java.util.List;
-import net.forthecrown.Loggers;
 import net.forthecrown.packet.PacketCall;
 import net.forthecrown.packet.PacketHandler;
 import net.forthecrown.utils.math.Vectors;
@@ -16,20 +15,14 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.HangingSignBlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Sign;
-import org.bukkit.craftbukkit.v1_20_R2.block.CraftHangingSign;
-import org.bukkit.craftbukkit.v1_20_R2.block.CraftSign;
-import org.slf4j.Logger;
+import org.bukkit.craftbukkit.v1_20_R3.block.CraftHangingSign;
+import org.bukkit.craftbukkit.v1_20_R3.block.CraftSign;
 
 class SignPacketListener {
 
-  private static final Logger LOGGER = Loggers.getLogger();
-
   private final ListenersImpl renderer;
-
-  private static final int COMPATIBLE_VERSION = 3578;
 
   private Field ClientboundLevelChunkPacketData_blockEntitiesData;
 
@@ -37,13 +30,6 @@ class SignPacketListener {
   private Field BlockEntityInfo_packedXz;
   private Field BlockEntityInfo_y;
   private Field BlockEntityInfo_type;
-
-  static {
-    int dataVersion = Bukkit.getUnsafe().getDataVersion();
-    if (dataVersion != COMPATIBLE_VERSION) {
-      throw new RuntimeException("Packet listener class is out of date, needs updating!");
-    }
-  }
 
   public SignPacketListener(ListenersImpl renderer) {
     this.renderer = renderer;

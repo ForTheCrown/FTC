@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import java.time.Duration;
 import java.util.Optional;
 import lombok.Getter;
 import net.forthecrown.grenadier.Completions;
@@ -25,6 +26,7 @@ import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.sound.Sound.Source;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.util.Ticks;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
@@ -71,12 +73,18 @@ public class SoundAction implements Action {
       = Options.argument(FloatArgumentType.floatArg(0, 2))
       .setLabel("pitch")
       .setDefaultValue(1f)
+      .setSuggester((context, builder) -> {
+        return Completions.suggest(builder, "0.1", "1.0", "0.5", "1.5", "2.0");
+      })
       .build();
 
   static final ArgumentOption<Float> VOLUME
       = Options.argument(FloatArgumentType.floatArg(0))
       .setDefaultValue(1f)
       .setLabel("volume")
+      .setSuggester((context, builder) -> {
+        return Completions.suggest(builder, "0.1", "1.0", "0.5", "1.5", "2.0");
+      })
       .build();
 
   static final ArgumentOption<Source> CHANNEL
@@ -85,16 +93,19 @@ public class SoundAction implements Action {
       .setDefaultValue(Source.MASTER)
       .build();
 
-  static final ArgumentOption<Integer> TICK_DELAY
-      = Options.argument(IntegerArgumentType.integer(0))
-      .setLabel("tick-delay")
-      .setDefaultValue(0)
+  static final ArgumentOption<Duration> TICK_DELAY
+      = Options.argument(ArgumentTypes.time())
+      .setLabel("delay")
+      .setDefaultValue(Duration.ZERO)
       .build();
 
   static final ArgumentOption<Integer> REPEAT
       = Options.argument(IntegerArgumentType.integer(1))
       .setLabel("repeat")
       .setDefaultValue(1)
+      .setSuggester((context, builder) -> {
+        return Completions.suggest(builder, "1", "2", "3", "4", "5");
+      })
       .build();
 
   static final ArgumentOption<Double> PLAY_RADIUS = Options.argument(DoubleArgumentType.doubleArg(0d))
@@ -127,11 +138,13 @@ public class SoundAction implements Action {
             .source(options.getValue(CHANNEL))
             .build();
 
+        Duration delay = options.getValue(TICK_DELAY);
+        int delayTicks = (int) (delay.toMillis() / Ticks.SINGLE_TICK_DURATION_MS);
+
         double radius = options.getValue(PLAY_RADIUS);
-        int delay = options.getValue(TICK_DELAY);
         int repeats = options.getValue(REPEAT);
 
-        return new SoundAction(sound, radius, delay, repeats);
+        return new SoundAction(sound, radius, delayTicks, repeats);
       })
 
       .suggester(OPTIONS::listSuggestions)

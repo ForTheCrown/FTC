@@ -9,7 +9,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class VanillaPlugin extends JavaPlugin {
 
-  static final int CURRENT_DATA_VERSION = 3578;
+  static final int CURRENT_DATA_VERSION = 3700;
 
   @Override
   public void onEnable() {

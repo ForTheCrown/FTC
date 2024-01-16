@@ -1,6 +1,7 @@
 package net.forthecrown.utils;
 
 import com.mojang.datafixers.DataFixer;
+import io.papermc.paper.adventure.PaperAdventure;
 import io.papermc.paper.util.StacktraceDeobfuscator;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.lang.reflect.Field;
@@ -11,8 +12,8 @@ import net.forthecrown.Loggers;
 import net.forthecrown.nbt.CompoundTag;
 import net.forthecrown.nbt.paper.TagTranslators;
 import net.forthecrown.utils.math.Vectors;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.translation.GlobalTranslator;
-import net.minecraft.SharedConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.MappedRegistry;
@@ -43,16 +44,18 @@ import org.bukkit.block.TileState;
 import org.bukkit.block.banner.PatternType;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_20_R2.CraftServer;
-import org.bukkit.craftbukkit.v1_20_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_20_R2.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_20_R2.block.CraftBlockEntityState;
-import org.bukkit.craftbukkit.v1_20_R2.block.CraftBlockStates;
-import org.bukkit.craftbukkit.v1_20_R2.block.CraftCommandBlock;
-import org.bukkit.craftbukkit.v1_20_R2.block.data.CraftBlockData;
-import org.bukkit.craftbukkit.v1_20_R2.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_20_R2.util.CraftNamespacedKey;
+import org.bukkit.craftbukkit.v1_20_R3.CraftServer;
+import org.bukkit.craftbukkit.v1_20_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_20_R3.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_20_R3.block.CraftBlockEntityState;
+import org.bukkit.craftbukkit.v1_20_R3.block.CraftBlockStates;
+import org.bukkit.craftbukkit.v1_20_R3.block.CraftCommandBlock;
+import org.bukkit.craftbukkit.v1_20_R3.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_20_R3.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R3.util.CraftNamespacedKey;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.slf4j.Logger;
 import org.spongepowered.math.vector.Vector3i;
 
@@ -163,6 +166,12 @@ public final class VanillaAccess {
         VanillaAccess.getState(data),
         tag == null ? null : TagTranslators.COMPOUND.toMinecraft(tag)
     );
+  }
+
+  public static Component hoverName(ItemStack itemStack) {
+    net.minecraft.world.item.ItemStack nms = CraftItemStack.asNMSCopy(itemStack);
+    Component hoverName = PaperAdventure.asAdventure(nms.getHoverName());
+    return hoverName;
   }
 
   @SuppressWarnings({"rawtypes", "unchecked"})

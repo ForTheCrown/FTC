@@ -16,6 +16,12 @@ dependencies {
 
   implementation(project(":commons", "reobf"))
   implementation(project(":class-loader-tools"))
+
+  /*
+  implementation("net.forthecrown:paper-nbt:1.5.0:reobf")
+  implementation("net.forthecrown:grenadier:2.3.0:reobf")
+  implementation("net.forthecrown:grenadier-annotations:1.3.0")*/
+
   compileOnly("net.luckperms:api:5.4")
 
   compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit:2.6.4")

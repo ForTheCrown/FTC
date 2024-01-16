@@ -1,14 +1,9 @@
 package net.forthecrown.utils.io;
 
-import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
-import io.papermc.paper.plugin.configuration.PluginMeta;
-import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
@@ -17,34 +12,17 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.Loggers;
-import net.forthecrown.registry.Ref;
 import net.forthecrown.utils.PluginUtil;
-import org.apache.commons.io.file.PathUtils;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.slf4j.Logger;
 
 public class PluginJar {
 
   private static final Logger LOGGER = Loggers.getLogger();
-
-  /**
-   * Flag for resource save operation which allows jar resources to overwrite existing files if, and
-   * only if, the resource on the jar was modified after the file being overwritten.
-   * <p>
-   * Note that this flag still requires {@link #ALLOW_OVERWRITE} to be set in order for any files to
-   * be overwritten.
-   */
-  public static final int OVERWRITE_IF_NEWER = 0x2;
-
-  /**
-   * Flag which tells the resource save operation to overwrite existing files
-   */
-  public static final int ALLOW_OVERWRITE = 0x1;
 
   private static final Field javaPlugin_file;
 
@@ -90,49 +68,31 @@ public class PluginJar {
     return resourcePath(caller, s, others);
   }
 
-  private static Path resourcePath(JavaPlugin plugin, String s, String... others) {
+  public static Path resourcePath(JavaPlugin plugin, String s, String... others) {
     return getResourceFileSystem(plugin).getPath(s, others);
   }
 
   public static void saveResources(JavaPlugin plugin, String sourceDir) {
     Path dest = plugin.getDataFolder().toPath().resolve(sourceDir);
-    _saveResources(plugin, sourceDir, dest, 0);
+    _saveResources(plugin, sourceDir, dest);
   }
 
   public static void saveResources(String sourceDir) {
     JavaPlugin caller = PluginUtil.getCallingPlugin();
     Path dest = caller.getDataFolder().toPath().resolve(sourceDir);
-    _saveResources(caller, sourceDir, dest, 0);
+    _saveResources(caller, sourceDir, dest);
   }
 
   public static void saveResources(JavaPlugin plugin, String sourceDir, Path dest) {
-    _saveResources(plugin, sourceDir, dest, 0);
+    _saveResources(plugin, sourceDir, dest);
   }
 
   public static void saveResources(String sourceDir, Path dest) {
     JavaPlugin caller = PluginUtil.getCallingPlugin();
-    _saveResources(caller, sourceDir, dest, 0);
+    _saveResources(caller, sourceDir, dest);
   }
 
-  /**
-   * Saves a file/directory from the plugin jar resources to the provided path.
-   * <p>
-   * If the provided path is a file, it will simply write its contents to provided path.
-   *
-   * @param sourceDir The path to the source file/directory
-   * @param dest      The destination path to save to
-   * @param flags     Flags to use for determining whether a file should be overwritten or not, Set
-   *                  to 0 to never override existing files
-   * @throws IOException If an IO error occurs
-   * @see #ALLOW_OVERWRITE
-   * @see #OVERWRITE_IF_NEWER
-   */
-  public static void saveResources(String sourceDir, Path dest, int flags) {
-    JavaPlugin caller = PluginUtil.getCallingPlugin();
-    _saveResources(caller, sourceDir, dest, flags);
-  }
-
-  private static void _saveResources(JavaPlugin plugin, String sourceDir, Path dest, int flags) {
+  private static void _saveResources(JavaPlugin plugin, String sourceDir, Path dest) {
     Path jarDir = resourcePath(plugin, sourceDir);
 
     if (!Files.exists(jarDir)) {

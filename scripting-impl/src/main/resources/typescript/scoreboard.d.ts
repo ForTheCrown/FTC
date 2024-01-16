@@ -116,3 +116,34 @@ declare function setDisplayName(objective: string, displayName: any): boolean
  * @returns 'true' if the objective exists, 'false' otherwise
  */
 declare function setRenderType(objective: string, renderType: string): boolean
+
+/**
+ * Sets an objective's display slot
+ * @param objective Scoreboard objective name
+ * @param slot Display slot value, or 'null' to remove
+ * @returns 'true' if the objective was found and changed, 'false' otherwise
+ */
+declare function setDisplaySlot(objective: string, slot: string | null): boolean
+
+/**
+ * Gets an objective's display name
+ * @param objective Scoreboard objective name
+ * @returns 'null' if the objective wasn't found, otherwise returns 
+ *          the display name as a JS object
+ */
+declare function getDisplayName(objective: string): null | object
+
+/**
+ * Gets an objective's render type
+ * @param objective Scoreboard objective name
+ * @returns 'null' if the objective wasn't found, or the render type
+ */
+declare function getRenderType(objective: string): null | string
+
+/**
+ * Gets an objective's display slot
+ * @param objective Scoreboard objective name
+ * @returns 'null', if the objective has no set display slot, 'undefined' if the 
+ *          objective doesn't exist, or the display slot name
+ */
+declare function getDisplaySlot(objective: string): null | undefined | string

@@ -10,6 +10,10 @@ public class SpouseProfileElement implements ProfileDisplayElement {
 
   @Override
   public void write(TextWriter writer, User user, DisplayContext context) {
+    if (!context.profileViewable()) {
+      return;
+    }
+
     var spouse = Marriages.getSpouse(user);
 
     if (spouse == null) {

@@ -23,8 +23,28 @@ public class ServerlistListener implements Listener {
     this.plugin = plugin;
   }
 
+  void logPing(PaperServerListPingEvent event) {
+    var logger = plugin.getSLF4JLogger();
+    if (!logger.isDebugEnabled()) {
+      return;
+    }
+
+    var users = Users.getService();
+    var profile = users.getLookup().query(event.getAddress().getHostAddress());
+
+    if (profile == null) {
+      logger.debug("Received server ping from IP {}", event.getAddress().getAddress());
+    } else {
+      logger.debug("Received server ping from player {} (IP={})",
+          profile.getName(), event.getAddress().getAddress()
+      );
+    }
+  }
+
   @EventHandler(ignoreCancelled = true)
   public void onPaperServerListPing(PaperServerListPingEvent event) {
+    logPing(event);
+
     ServerListDisplay display = plugin.getDisplay();
     var config = plugin.getListConfig();
 

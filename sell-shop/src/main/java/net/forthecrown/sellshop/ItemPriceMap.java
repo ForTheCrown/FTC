@@ -108,6 +108,42 @@ public class ItemPriceMap implements Iterable<ItemSellData> {
     Arrays.fill(map, null);
   }
 
+  public Iterator<ItemSellData> nonRepeatingIterator() {
+    return new AbstractListIterator<ItemSellData>() {
+      @Override
+      protected void add(int pos, ItemSellData val) {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override
+      protected @Nullable ItemSellData get(int pos) {
+        var data = map[pos];
+        if (data == null) {
+          return null;
+        }
+        if (pos == data.getMaterial().ordinal()) {
+          return data;
+        }
+        return null;
+      }
+
+      @Override
+      protected void set(int pos, @Nullable ItemSellData val) {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override
+      protected void remove(int pos) {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override
+      protected int size() {
+        return map.length;
+      }
+    };
+  }
+
   /**
    * Creates an unmodifiable iterator which iterates through all non-null entries in the backing
    * array

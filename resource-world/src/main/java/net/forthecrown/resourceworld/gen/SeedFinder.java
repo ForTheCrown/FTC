@@ -19,7 +19,7 @@ import lombok.Getter;
 import net.forthecrown.Loggers;
 import net.forthecrown.resourceworld.RwConfig;
 import net.minecraft.world.level.levelgen.Heightmap;
-import org.bukkit.craftbukkit.v1_20_R2.CraftHeightMap;
+import org.bukkit.craftbukkit.v1_20_R3.CraftHeightMap;
 import org.slf4j.Logger;
 
 @Getter

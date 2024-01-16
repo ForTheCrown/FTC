@@ -6,6 +6,7 @@ import com.google.common.base.Preconditions;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +36,7 @@ import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
@@ -481,23 +483,21 @@ public class BoardImpl implements Leaderboard {
       return Optional.empty();
     }
 
-    var chunk = location.getChunk();
+    Chunk chunk = location.getChunk();
 
     if (!chunk.isEntitiesLoaded()) {
       // Force-load entities
-      var entityArray = chunk.getEntities();
+      Entity[] entityArray = chunk.getEntities();
+      TextDisplay fromArray = findFromArray(entityArray);
+
+      if (fromArray != null) {
+        ref = new WeakReference<>(fromArray);
+        return Optional.of(fromArray);
+      }
     }
 
-    var nearby = location.getNearbyEntitiesByType(TextDisplay.class, .5);
-    nearby.removeIf(textDisplay -> {
-      var pdc = textDisplay.getPersistentDataContainer();
-      if (!pdc.has(LEADERBOARD_KEY)) {
-        return true;
-      }
-
-      String string = pdc.get(LEADERBOARD_KEY, PersistentDataType.STRING);
-      return !Objects.equals(string, name);
-    });
+    Collection<TextDisplay> nearby = location.getNearbyEntitiesByType(TextDisplay.class, .5);
+    nearby.removeIf(textDisplay -> !isBoardEntity(textDisplay));
 
     if (nearby.isEmpty()) {
       return Optional.empty();
@@ -518,8 +518,31 @@ public class BoardImpl implements Leaderboard {
     }
 
     ref = new WeakReference<>(display);
-
     return Optional.of(display);
+  }
+
+  private boolean isBoardEntity(Entity entity) {
+    if (!(entity instanceof TextDisplay)) {
+      return false;
+    }
+
+    var pdc = entity.getPersistentDataContainer();
+    if (!pdc.has(LEADERBOARD_KEY)) {
+      return false;
+    }
+
+    String string = pdc.get(LEADERBOARD_KEY, PersistentDataType.STRING);
+    return Objects.equals(string, name);
+  }
+
+  private TextDisplay findFromArray(Entity[] entities) {
+    for (Entity entity : entities) {
+      if (isBoardEntity(entity)) {
+        return (TextDisplay) entity;
+      }
+    }
+
+    return null;
   }
 
   private List<LeaderboardScore> getSortedScores() {

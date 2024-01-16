@@ -304,6 +304,12 @@ public class ScoreboardModule extends IdScriptableObject {
         }
 
         Objective obj = objOpt.get();
+
+        if (slotStr.equals("null") || slotStr.equals("undefined")) {
+          obj.setDisplaySlot(null);
+          yield true;
+        }
+
         DisplaySlot slot = DisplaySlot.NAMES.value(slotStr);
 
         if (slot == null) {
@@ -334,13 +340,15 @@ public class ScoreboardModule extends IdScriptableObject {
       case ID_getRenderType -> {
         yield toObjective(args)
             .map(Objective::getRenderType)
-            .map(renderType -> renderType.name().toLowerCase());
+            .map(renderType -> renderType.name().toLowerCase())
+            .orElse(null);
       }
 
       case ID_getDisplaySlot -> {
         yield toObjective(args)
             .map(Objective::getDisplaySlot)
-            .map(DisplaySlot::getId);
+            .map(DisplaySlot::getId)
+            .orElse(null);
       }
 
       default -> throw f.unknown();

@@ -60,7 +60,7 @@ public class Transform {
   /* ----------------------------- TRANSFORMATION ------------------------------ */
 
   public Vector3i apply(Vector3i v) {
-    return apply(v.toDouble()).toInt();
+    return isIdentity() ? v : apply(v.toDouble()).toInt();
   }
 
   public Vector3d apply(Vector3d v) {

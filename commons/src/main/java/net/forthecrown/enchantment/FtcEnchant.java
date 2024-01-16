@@ -16,6 +16,8 @@ import org.jetbrains.annotations.NotNull;
 
 public abstract class FtcEnchant extends Enchantment {
 
+  private final NamespacedKey key;
+
   @Getter
   private final EnchantHandle handle;
   @Getter
@@ -29,7 +31,7 @@ public abstract class FtcEnchant extends Enchantment {
                     EnchantmentTarget type,
                     EquipmentSlot... slots
   ) {
-    super(key);
+    this.key = key;
 
     this.name = name;
     this.target = type;
@@ -41,6 +43,12 @@ public abstract class FtcEnchant extends Enchantment {
 
   public FtcEnchant(@NotNull NamespacedKey key, String name, Enchantment base) {
     this(key, name, base.getItemTarget(), base.getActiveSlots().toArray(new EquipmentSlot[0]));
+  }
+
+  @NotNull
+  @Override
+  public NamespacedKey getKey() {
+    return key;
   }
 
   @Override
@@ -71,6 +79,16 @@ public abstract class FtcEnchant extends Enchantment {
   @Override
   public boolean canEnchantItem(@NotNull ItemStack stack) {
     return true;
+  }
+
+  @Override
+  public int getMinModifiedCost(int level) {
+    return 0;
+  }
+
+  @Override
+  public int getMaxModifiedCost(int level) {
+    return 0;
   }
 
   @Override

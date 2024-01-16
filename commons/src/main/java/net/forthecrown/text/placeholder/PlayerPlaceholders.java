@@ -1,5 +1,6 @@
 package net.forthecrown.text.placeholder;
 
+import com.google.common.base.Strings;
 import java.util.regex.Pattern;
 import net.forthecrown.Loggers;
 import net.forthecrown.text.Text;
@@ -103,6 +104,14 @@ public class PlayerPlaceholders implements PlaceholderSource {
       case "pitch" -> TextPlaceholder.simple(pitch);
 
       case "uuid" -> TextPlaceholder.simple(user.getUniqueId());
+
+      case "ip" -> {
+        var ip = user.getIp();
+        if (Strings.isNullOrEmpty(ip)) {
+          yield null;
+        }
+        yield TextPlaceholder.simple(ip);
+      }
 
       case "playtime" -> {
         int playtime = user.getPlayTime();

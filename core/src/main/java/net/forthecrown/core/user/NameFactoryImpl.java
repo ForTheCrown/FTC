@@ -29,7 +29,6 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 public class NameFactoryImpl implements UserNameFactory {
@@ -171,13 +170,15 @@ public class NameFactoryImpl implements UserNameFactory {
     boolean showAdmin = context.viewerHasPermission(Permissions.PROFILE_BYPASS);
 
     List<ProfileDisplayElement> normalFields = getElements(this.profileFields);
-    List<ProfileDisplayElement> adminFields = getElements(this.adminFields);
-
     filterFields(normalFields, formattingHover);
-    filterFields(adminFields, formattingHover);
+
+    List<ProfileDisplayElement> adminFields;
 
     if (!showAdmin) {
-      adminFields.clear();
+      adminFields = List.of();
+    } else {
+      adminFields = getElements(this.adminFields);
+      filterFields(adminFields, formattingHover);
     }
 
     if (formattingHover) {
@@ -268,14 +269,16 @@ public class NameFactoryImpl implements UserNameFactory {
   @Override
   public DisplayContext createContext(User user, Audience viewer, Set<NameRenderFlags> flags) {
     boolean self;
+    boolean profileViewable = !user.get(Properties.PROFILE_PRIVATE);
 
     if (viewer != null) {
-      Player plr = Audiences.getPlayer(viewer);
+      User plr = Audiences.getUser(viewer);
 
       if (plr == null) {
         self = false;
       } else {
         self = plr.getUniqueId().equals(user.getUniqueId());
+        profileViewable |= self | plr.hasPermission(Permissions.PROFILE_BYPASS);
       }
     } else {
       self = false;
@@ -286,6 +289,7 @@ public class NameFactoryImpl implements UserNameFactory {
         flags.contains(NameRenderFlags.ALLOW_NICKNAME),
         flags.contains(NameRenderFlags.USER_ONLINE),
         self,
+        profileViewable,
         DisplayIntent.UNSET,
         this
     );
@@ -332,7 +336,7 @@ public class NameFactoryImpl implements UserNameFactory {
   }
 
   <T> List<T> getElements(List<ElementInfo<T>> infoList) {
-    List<T> result = new ArrayList<>();
+    List<T> result = new ArrayList<>(infoList.size());
     for (ElementInfo<T> info : infoList) {
       result.add(info.element);
     }

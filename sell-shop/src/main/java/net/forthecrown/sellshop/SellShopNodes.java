@@ -30,29 +30,34 @@ public final class SellShopNodes {
   /**
    * Node to toggle selling items with names
    */
-  static final MenuNode SELLING_NAMED
+  public static final MenuNode SELLING_NAMED
       = toggleProperty("Named Items", SellProperties.SELLING_NAMED);
 
   /**
    * Node to toggle selling items with lore
    */
-  static final MenuNode SELLING_LORE
+  public static final MenuNode SELLING_LORE
       = toggleProperty("Items With Lore", SellProperties.SELLING_LORE);
+
+  public static final MenuNode SELL_PER_1 = sellAmountOption(SellAmount.PER_1);
+  public static final MenuNode SELL_PER_16 = sellAmountOption(SellAmount.PER_16);
+  public static final MenuNode SELL_PER_64 = sellAmountOption(SellAmount.PER_64);
+  public static final MenuNode SELL_PER_ALL = sellAmountOption(SellAmount.ALL);
 
   /**
    * Slot 2 node map of sell amount options
    */
-  static final Map<Slot, MenuNode> SELL_AMOUNT_NODES = ImmutableMap.<Slot, MenuNode>builder()
-      .put(Slot.of(8, 1), sellAmountOption(SellAmount.PER_1))
-      .put(Slot.of(8, 2), sellAmountOption(SellAmount.PER_16))
-      .put(Slot.of(8, 3), sellAmountOption(SellAmount.PER_64))
-      .put(Slot.of(8, 4), sellAmountOption(SellAmount.ALL))
+  public static final Map<Slot, MenuNode> SELL_AMOUNT_NODES = ImmutableMap.<Slot, MenuNode>builder()
+      .put(Slot.of(8, 1), SELL_PER_1)
+      .put(Slot.of(8, 2), SELL_PER_16)
+      .put(Slot.of(8, 3), SELL_PER_64)
+      .put(Slot.of(8, 4), SELL_PER_ALL)
       .build();
 
   /**
    * Node which shows the web-store link
    */
-  static final MenuNode WEBSTORE = MenuNode.builder()
+  public static final MenuNode WEBSTORE = MenuNode.builder()
       .setItem(
           ItemStacks.builder(Material.EMERALD_BLOCK)
               .setName("&bWebstore")
@@ -76,7 +81,7 @@ public final class SellShopNodes {
 
       .build();
 
-  static final MenuNode INFO = MenuNode.builder()
+  public static final MenuNode INFO = MenuNode.builder()
       .setItem(
           ItemStacks.builder(Material.BOOK)
               .setName("&eInfo")
@@ -96,7 +101,7 @@ public final class SellShopNodes {
   /**
    * Node to toggle selling compacted items
    */
-  static final MenuNode COMPACT_TOGGLE = MenuNode.builder()
+  public static final MenuNode COMPACT_TOGGLE = MenuNode.builder()
       .setItem((user, context) -> {
         boolean compacted = user.get(SellProperties.COMPACTED);
 

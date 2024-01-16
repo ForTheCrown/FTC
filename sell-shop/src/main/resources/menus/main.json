@@ -1,0 +1,17 @@
+{
+  "title": "Sell Shop",
+  "size": "4rows",
+  "border": true,
+
+  "items": [
+    {"slot": "4,1", "hardcoded": "webstore"},
+
+    {"slot": "2,2", "menu_reference": "mob_drops"},
+    {"slot": "3,2", "menu_reference": "minerals"},
+    {"slot": "4,2", "hardcoded": "challenge_menu"},
+    {"slot": "5,2", "menu_reference": "mining"},
+    {"slot": "6,2", "menu_reference": "farming"},
+
+    {"slot": "4,3", "hardcoded": "info"}
+  ]
+}

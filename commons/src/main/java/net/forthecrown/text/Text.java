@@ -28,6 +28,7 @@ import net.forthecrown.text.parse.ChatParser;
 import net.forthecrown.text.parse.TextContext;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
+import net.forthecrown.utils.VanillaAccess;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
@@ -47,7 +48,6 @@ import net.kyori.adventure.translation.Translatable;
 import net.kyori.adventure.util.HSVLike;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_20_R2.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.Permissible;
 import org.intellij.lang.annotations.RegExp;
@@ -406,10 +406,10 @@ public final class Text {
    * @return The item's display name
    */
   public static Component itemDisplayName(ItemStack item) {
-    net.minecraft.world.item.ItemStack nms = CraftItemStack.asNMSCopy(item);
-    Component hoverName = PaperAdventure.asAdventure(nms.getHoverName());
+    Component hoverName = VanillaAccess.hoverName(item);
+    boolean hasDisplayName = item.getItemMeta().hasDisplayName();
 
-    if (nms.hasCustomHoverName() && hoverName.decoration(TextDecoration.ITALIC) == State.NOT_SET) {
+    if (hasDisplayName && hoverName.decoration(TextDecoration.ITALIC) == State.NOT_SET) {
       hoverName = hoverName.decorate(TextDecoration.ITALIC);
     }
 

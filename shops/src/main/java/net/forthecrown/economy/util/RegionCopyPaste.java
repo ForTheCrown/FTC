@@ -4,8 +4,8 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.List;
 import lombok.Getter;
 import net.forthecrown.utils.Tasks;
+import net.forthecrown.utils.math.AreaSelection;
 import net.forthecrown.utils.math.Vectors;
-import net.forthecrown.utils.math.WorldBounds3i;
 import net.forthecrown.utils.math.WorldVec3i;
 import org.bukkit.block.Block;
 import org.spongepowered.math.vector.Vector3i;
@@ -19,17 +19,17 @@ public class RegionCopyPaste implements Runnable {
   private final WorldVec3i destination;
 
   @Getter
-  private final WorldBounds3i origin;
+  private final AreaSelection origin;
 
   private List<CopyPreProcessor> preProcessors = null;
   private List<BlockFilter> blockFilters = null;
 
-  public RegionCopyPaste(WorldVec3i destination, WorldBounds3i origin) {
+  public RegionCopyPaste(WorldVec3i destination, AreaSelection origin) {
     this.destination = destination;
     this.origin = origin;
   }
 
-  public static RegionCopyPaste create(WorldBounds3i area, WorldVec3i destination) {
+  public static RegionCopyPaste create(AreaSelection area, WorldVec3i destination) {
     return new RegionCopyPaste(destination, area);
   }
 

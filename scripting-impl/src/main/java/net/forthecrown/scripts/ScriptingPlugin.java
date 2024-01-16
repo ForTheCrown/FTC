@@ -14,6 +14,7 @@ import net.forthecrown.scripts.pack.PackManager;
 import net.forthecrown.scripts.preprocessor.PreProcessor;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.forthecrown.utils.io.PathUtil;
+import net.forthecrown.utils.io.PluginJar;
 import net.forthecrown.utils.io.SerializationHelper;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -62,7 +63,7 @@ public class ScriptingPlugin extends JavaPlugin {
 
   @Override
   public void reloadConfig() {
-    saveResource("config.toml", false);
+    PluginJar.saveResources("config.toml");
     PreProcessor.setImportPlaceholders(null);
 
     SerializationHelper.readAsJson(

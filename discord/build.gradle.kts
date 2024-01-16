@@ -10,7 +10,7 @@ dependencies {
   compileOnly(project(":commons"))
   compileOnly(project(":user-titles"))
 
-  api("com.discordsrv:discordsrv:1.27.0-SNAPSHOT")
+  api("com.discordsrv:discordsrv:1.27.1-SNAPSHOT")
   compileOnly("org.apache.logging.log4j:log4j-core:2.19.0")
 }
 

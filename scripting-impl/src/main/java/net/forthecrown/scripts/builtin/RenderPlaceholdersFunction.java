@@ -19,8 +19,8 @@ public class RenderPlaceholdersFunction implements Callable {
 
   @Override
   public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-    if (args.length > 3) {
-      throw ScriptRuntime.typeError("Too many arguments! (Given: " + args.length + ", max 3)");
+    if (args.length > 4) {
+      throw ScriptRuntime.typeError("Too many arguments! (Given: " + args.length + ", max 4)");
     }
     if (args.length == 0) {
       return Context.getUndefinedValue();
@@ -28,22 +28,19 @@ public class RenderPlaceholdersFunction implements Callable {
 
     Component baseText = ScriptUtils.toText(cx, scope, args, 0);
     CommandSource viewer = ScriptUtils.toSource(args, 1);
+    PlaceholderRenderer renderer = toRenderer(args, 3);
 
-    PlaceholderRenderer renderer = Placeholders.newRenderer();
+    Scriptable placeholderTable = getPlaceholderTable(args, 2);
 
-    if (args.length == 3) {
-      Object placeholderTable = args[2];
-      if (!(placeholderTable instanceof ScriptableObject object)) {
-        throw ScriptRuntime.typeError("Expected third parameter to be JS object");
-      }
+    if (placeholderTable != null) {
+      Object[] ids = placeholderTable.getIds();
 
-      var ids = object.getIds();
       for (Object id : ids) {
         if (!(id instanceof String str)) {
           continue;
         }
 
-        Object value = ScriptableObject.getProperty(object, str);
+        Object value = ScriptableObject.getProperty(placeholderTable, str);
         TextPlaceholder placeholder;
 
         if (value instanceof Callable callable) {
@@ -58,6 +55,42 @@ public class RenderPlaceholdersFunction implements Callable {
 
     Component rendered = renderer.render(baseText, viewer);
     return new NativeJavaObject(scope, rendered, Component.class);
+  }
+
+  Scriptable getPlaceholderTable(Object[] args, int index) {
+    if (args.length <= index) {
+      return null;
+    }
+
+    Object arg = args[index];
+
+    if (arg instanceof NativeJavaObject) {
+      return null;
+    }
+
+    if (!(arg instanceof Scriptable scriptableObject)) {
+      return null;
+    }
+
+    return scriptableObject;
+  }
+
+  private PlaceholderRenderer toRenderer(Object[] args, int index) {
+    if (args.length <= index) {
+      return Placeholders.newRenderer();
+    }
+
+    Object value = args[index];
+    Object jValue = Context.jsToJava(value, Object.class);
+
+    if (jValue instanceof PlaceholderRenderer renderer) {
+      return renderer;
+    }
+    if (jValue instanceof PlaceholderContext context) {
+      return context.renderer();
+    }
+
+    return Placeholders.newRenderer();
   }
 
   record ValuePlaceholder(Object value, Context cx, Scriptable scope) implements TextPlaceholder {

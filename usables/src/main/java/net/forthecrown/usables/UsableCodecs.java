@@ -1,5 +1,6 @@
 package net.forthecrown.usables;
 
+import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
@@ -9,9 +10,18 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import net.forthecrown.grenadier.types.ArgumentTypes;
 import net.forthecrown.grenadier.types.IntRangeArgument.IntRange;
+import net.forthecrown.utils.inventory.ItemList;
+import net.forthecrown.utils.inventory.ItemLists;
 import net.forthecrown.utils.io.FtcCodecs;
 
 public class UsableCodecs {
+
+  public static final Codec<ItemList> ITEM_LIST_OR_SINGLE
+      = Codec.either(FtcCodecs.ITEM_LIST_CODEC, FtcCodecs.ITEM_CODEC)
+      .xmap(
+          either -> either.map(list -> list, ItemLists::newList),
+          Either::left
+      );
 
   private static Codec<IntRange> RECORD_CODEC = RecordCodecBuilder.create(instance -> {
     return instance

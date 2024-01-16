@@ -81,13 +81,12 @@ public class ItemArgumentType implements ArgumentType<ItemStack> {
       }
 
       int cursor = reader.getCursor();
-      ItemArgument.Result result = itemArgument.parse(reader);
-
       suggester = (context, builder) -> {
         builder = builder.createOffset(cursor);
         return itemArgument.listSuggestions(context, builder);
       };
 
+      ItemArgument.Result result = itemArgument.parse(reader);
       return result.create(amount, true);
     }
 

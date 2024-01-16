@@ -103,7 +103,6 @@ public class ServerListDisplay {
 
     for (Holder<DisplayEntry> i : dateCache) {
       var val = i.getValue();
-      LOGGER.debug("testing icon={}", i.getKey());
 
       if (!val.shouldUse(date, random)) {
         continue;

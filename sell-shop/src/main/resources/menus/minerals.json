@@ -1,0 +1,23 @@
+{
+  "title": "Minerals",
+  "extends": "shop_generic",
+
+  "header-item": "amethyst_shard",
+  "description": [ "Minerals, ores and ingots" ],
+
+  "sellable-items": {
+    "prices": "minerals",
+
+    "coal": "2,2",
+    "emerald": "3,2",
+    "amethyst_shard": "4,2",
+    "lapis_lazuli": "5,2",
+    "redstone": "6,2",
+
+    "quartz": "2,3",
+    "raw_copper": "3,3",
+    "raw_iron": "4,3",
+    "raw_gold": "5,3",
+    "ancient_debris": "6,3"
+  }
+}

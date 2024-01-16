@@ -1,5 +1,7 @@
 package net.forthecrown.usables.conditions;
 
+import static net.forthecrown.usables.UsableCodecs.ITEM_LIST_OR_SINGLE;
+
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -18,12 +20,11 @@ import net.forthecrown.text.Text;
 import net.forthecrown.text.TextJoiner;
 import net.forthecrown.usables.Condition;
 import net.forthecrown.usables.Interaction;
+import net.forthecrown.usables.ObjectType;
 import net.forthecrown.usables.UsableComponent;
 import net.forthecrown.usables.Usables;
-import net.forthecrown.usables.ObjectType;
 import net.forthecrown.utils.inventory.ItemList;
 import net.forthecrown.utils.inventory.ItemLists;
-import net.forthecrown.utils.io.FtcCodecs;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.inventory.ItemStack;
@@ -128,13 +129,13 @@ class ItemConditionType implements ObjectType<ItemCondition> {
 
   @Override
   public <S> DataResult<ItemCondition> load(Dynamic<S> dynamic) {
-    return FtcCodecs.ITEM_LIST_CODEC.decode(dynamic)
+    return ITEM_LIST_OR_SINGLE.decode(dynamic)
         .map(Pair::getFirst)
         .map(itemStacks -> new ItemCondition(requires, itemStacks));
   }
 
   @Override
   public <S> DataResult<S> save(@NotNull ItemCondition value, @NotNull DynamicOps<S> ops) {
-    return FtcCodecs.ITEM_LIST_CODEC.encodeStart(ops, value.getList());
+    return ITEM_LIST_OR_SINGLE.encodeStart(ops, value.getList());
   }
 }

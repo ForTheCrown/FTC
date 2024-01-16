@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Map;
 import java.util.Objects;
+import net.forthecrown.Loggers;
 import net.forthecrown.command.Exceptions;
 import net.forthecrown.command.arguments.RegistryArguments;
 import net.forthecrown.grenadier.CommandSource;
@@ -27,8 +28,11 @@ import net.forthecrown.scripts.Scripts;
 import net.forthecrown.scripts.pack.ScriptPack;
 import net.forthecrown.text.Text;
 import net.forthecrown.utils.io.source.Source;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.mozilla.javascript.ScriptRuntime;
+import org.mozilla.javascript.Scriptable;
 
 @CommandData("file = scripts.gcn")
 public class ScriptingCommand {
@@ -134,8 +138,6 @@ public class ScriptingCommand {
 
     if (result.error().isPresent()) {
       script.close();
-      result.logError();
-
       throw Exceptions.create(result.error().get());
     }
 
@@ -151,14 +153,30 @@ public class ScriptingCommand {
     }
 
     result.result().ifPresentOrElse(o -> {
-      source.sendSuccess(Text.format("Script execution finished, result={0}", o));
+      source.sendSuccess(Text.format("Script execution finished: &f{0}",
+          NamedTextColor.GRAY, toText(o, source)
+      ));
     }, () -> {
-      source.sendSuccess(Text.format("Script execution finished"));
+      source.sendSuccess(Text.format("Script execution finished", NamedTextColor.GRAY));
     });
 
     if (!keepOpen) {
       script.close();
       loader.remove(scriptSource);
     }
+  }
+
+  static Component toText(Object o, Audience viewer) {
+    try {
+      if (o instanceof Scriptable object) {
+        var obj = ScriptRuntime.toString(object);
+        return Text.valueOf(obj, viewer);
+      }
+    } catch (RuntimeException exc) {
+      Loggers.getLogger().error("Error getting string from script object", exc);
+      return Component.text("[Failed to convert to text]");
+    }
+
+    return Text.valueOf(o, viewer);
   }
 }

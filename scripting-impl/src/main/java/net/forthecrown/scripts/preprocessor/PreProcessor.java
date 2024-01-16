@@ -31,7 +31,7 @@ public class PreProcessor {
     this.source = source;
   }
 
-  static String replacePlaceholders(String jsImport) {
+  public static String replacePlaceholders(String jsImport) {
     if (importPlaceholders == null || importPlaceholders.isEmpty()) {
       return jsImport;
     }

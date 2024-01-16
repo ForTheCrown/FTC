@@ -8,11 +8,15 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import lombok.Getter;
+import net.forthecrown.Loggers;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.structure.BlockStructure;
 import net.forthecrown.utils.WeightedList;
+import org.slf4j.Logger;
 
 public class StructurePool {
+
+  private static final Logger LOGGER = Loggers.getLogger();
 
   public static StructurePool EMPTY
       = new StructurePool(Collections.emptyList());
@@ -38,19 +42,31 @@ public class StructurePool {
     }
   }
 
-  public WeightedList<BlockStructure> toWeightedList(Registry<BlockStructure> structures) {
-    WeightedList<BlockStructure> result = new WeightedList<>();
+  public WeightedList<StructureAndPalette> toWeightedList(Registry<BlockStructure> structures) {
+    WeightedList<StructureAndPalette> result = new WeightedList<>();
 
     for (PoolEntry entry : entries) {
-      structures.get(entry.structureName()).ifPresent(struct -> {
-        result.add(entry.weight(), struct);
+      structures.get(entry.structureName()).ifPresentOrElse(struct -> {
+        if (!struct.getPalettes().containsKey(entry.paletteName())) {
+          LOGGER.error("Couldn't find palette '{}' in structure '{}'",
+              entry.paletteName(), entry.structureName()
+          );
+
+          return;
+        }
+
+        result.add(entry.weight(), new StructureAndPalette(struct, entry.paletteName()));
+      }, () -> {
+        LOGGER.error("Couldn't find structure named '{}' for structure pool",
+            entry.structureName()
+        );
       });
     }
 
     return result;
   }
 
-  public Optional<BlockStructure> getRandom(Registry<BlockStructure> structures, Random random) {
+  public Optional<StructureAndPalette> getRandom(Registry<BlockStructure> structures, Random random) {
     if (isEmpty()) {
       return Optional.empty();
     }
@@ -63,7 +79,9 @@ public class StructurePool {
       weightVal -= entry.weight();
 
       if (weightVal <= 0) {
-        return structures.get(entry.structureName());
+        return structures.get(entry.structureName())
+            .map(structure -> new StructureAndPalette(structure, entry.paletteName()))
+            .filter(s -> s.structure().getPalettes().containsKey(s.paletteName()));
       }
 
       index++;

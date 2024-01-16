@@ -16,7 +16,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
@@ -123,7 +125,7 @@ public @UtilityClass class FtcCodecs {
       if (ops instanceof TagOps) {
         return (T) tag;
       } else {
-        return TagOps.OPS.convertTo(ops, tag);
+        return ops.createString(tag.toNbtString());
       }
     }
   };
@@ -223,6 +225,55 @@ public @UtilityClass class FtcCodecs {
   public static final Codec<UUID> STRING_UUID = UUIDUtil.STRING_CODEC;
 
   /* ----------------------------------------------------------- */
+
+  public static <V> Codec<V> combine(List<Codec<V>> codecs) {
+    return combine(0, codecs);
+  }
+
+  @SafeVarargs
+  public static <V> Codec<V> combine(Codec<V>... codecs) {
+    Objects.requireNonNull(codecs, "Null codecs");
+    return combine(0, Arrays.asList(codecs));
+  }
+
+  public static <V> Codec<V> combine(int encoderIndex, List<Codec<V>> codecs) {
+    Objects.requireNonNull(codecs, "Null codec list");
+    if (codecs.isEmpty()) {
+      throw new IllegalArgumentException("Empty codecs list");
+    }
+
+    Objects.checkIndex(encoderIndex, codecs.size());
+    Codec<V> encoder = codecs.get(encoderIndex);
+
+    return new Codec<>() {
+      @Override
+      public <T> DataResult<Pair<V, T>> decode(DynamicOps<T> ops, T input) {
+        DataResult<Pair<V, T>> errors = null;
+
+        for (Codec<V> codec : codecs) {
+          DataResult<Pair<V, T>> result = codec.decode(ops, input);
+
+          if (result.result().isPresent()) {
+            return result;
+          }
+
+          if (errors == null) {
+            errors = result;
+            continue;
+          }
+
+          errors = errors.apply2((vtPair, o) -> vtPair, result);
+        }
+
+        return errors;
+      }
+
+      @Override
+      public <T> DataResult<T> encode(V input, DynamicOps<T> ops, T prefix) {
+        return encoder.encode(input, ops, prefix);
+      }
+    };
+  }
 
   public static <T extends Keyed> Codec<T> registryCodec(Registry<T> registry) {
     return NAMESPACED_KEY.comapFlatMap(key -> {

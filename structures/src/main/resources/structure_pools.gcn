@@ -1,0 +1,31 @@
+name = "ftc-structure-pool"
+aliases = "structurepool" | "structpool"
+description = "Manages FTC's structure pools"
+
+literal("reload") {
+  executes = reloadPools()
+  description = "Reloads all structure pools"
+}
+
+literal("list") {
+  executes = listPools()
+  description = "Lists all structure pools"
+}
+
+literal("info").argument("pool", @pool) {
+  executes = poolInfo()
+  description = "Shows info about a structure pool"
+}
+
+literal("place").argument("pool", @pool) {
+  argument("options", @place_options) {
+    executes = placePool()
+    description = [
+      "Places a random structure from a structure pool",
+      "+ custom placement options"
+    ]
+  }
+
+  executes = placePool()
+  description = "Places a random structure from a structure pool"
+}

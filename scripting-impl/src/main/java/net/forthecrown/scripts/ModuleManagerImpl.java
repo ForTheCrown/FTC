@@ -13,16 +13,17 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
-import net.forthecrown.Loggers;
 import net.forthecrown.scripts.module.ImportInfo;
 import net.forthecrown.scripts.module.ImportInfo.BindingImport;
 import net.forthecrown.scripts.module.JsModule;
 import net.forthecrown.scripts.module.ModuleManager;
 import net.forthecrown.scripts.module.ScriptModule;
 import net.forthecrown.scripts.module.ScriptableModule;
+import net.forthecrown.scripts.modules.ParticlesModule;
 import net.forthecrown.scripts.modules.ScoreboardModule;
 import net.forthecrown.scripts.modules.WorldsObject;
 import net.forthecrown.utils.Result;
+import net.forthecrown.utils.io.source.PathSource;
 import net.forthecrown.utils.io.source.Source;
 import net.forthecrown.utils.io.source.Sources;
 import org.mozilla.javascript.NativeJavaClass;
@@ -31,11 +32,8 @@ import org.mozilla.javascript.ScriptRuntime;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.TopLevel;
-import org.slf4j.Logger;
 
 class ModuleManagerImpl implements ModuleManager {
-
-  private static final Logger LOGGER = Loggers.getLogger();
 
   private final Map<String, JsModule> moduleMap = new Object2ObjectOpenHashMap<>();
   private final Set<String> autoImported = new ObjectOpenHashSet<>();
@@ -48,9 +46,8 @@ class ModuleManagerImpl implements ModuleManager {
 
   public void addBuiltIns() {
     addModule("scoreboard", ScoreboardModule.MODULE);
-    addModule("worlds", WorldsObject.MODULE);
-
-    //setAutoModule("worlds", true);
+    addModule("worlds",     WorldsObject.MODULE);
+    addModule("particles",  ParticlesModule.MODULE);
   }
 
   @Override
@@ -256,6 +253,19 @@ class ModuleManagerImpl implements ModuleManager {
       return loadModule(source, script);
     }
 
+    if (script.getSource() instanceof PathSource source) {
+      Path file = source.path().getParent();
+
+      if (file != null) {
+        relative = file.resolve(fName);
+
+        if (Files.exists(relative)) {
+          Source s1 = Sources.fromPath(relative, source.directory());
+          return loadModule(s1, script);
+        }
+      }
+    }
+
     Path scriptFile = service.getScriptsDirectory().resolve(fName);
     if (Files.exists(scriptFile)) {
       Source source = Sources.fromPath(scriptFile, dir);
@@ -268,6 +278,10 @@ class ModuleManagerImpl implements ModuleManager {
   Result<JsModule> loadModule(Source source, Script script) {
     ScriptLoader loader = script.getLoader();
     Script importedScript = loader.loadScript(source);
+
+    if (importedScript.isCompiled()) {
+      return Result.success(new ScriptModule(importedScript));
+    }
 
     try {
       importedScript.compile();

@@ -272,13 +272,13 @@ public class RhinoScript implements Script {
       bindingScope = new NativeObject();
       evaluationScope = new NativeObject();
 
-      NativeObject topLevelScope = service.getTopLevelScope(ctx);
+      Scriptable topLevelScope = service.getTopLevelScope(ctx);
       bindingScope.setParentScope(topLevelScope);
       evaluationScope.setParentScope(bindingScope);
 
       put("args", createArgsArray());
       put("logger", logger);
-      put("_script", this);
+      put("_script", Context.javaToJS(this, bindingScope, ctx));
 
       if (extensions != null) {
         extensions.forEach((s, extension) -> {

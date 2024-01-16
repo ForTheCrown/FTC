@@ -1,0 +1,100 @@
+name = "ftc-structures"
+description = "FTC structures command"
+aliases "ftc_struct" | "struct" | "structures"
+
+literal("create").argument("name", ftc_key) {
+  argument("options", @create_options) {
+    executes = createStructure()
+    description = "Creates a structure from your WorldEdit selection + custom options"
+  }
+
+  executes = createStructure()
+  description = "Creates a structure from your WorldEdit selection"
+}
+
+literal("place").argument("struct", @struct) {
+  argument("options", @place_options) {
+    executes = placeStructure()
+    description = "Places a structure + placement options"
+  }
+
+  executes = placeStructure()
+  description = "Places a structure"
+}
+
+literal("reload") {
+  executes = reloadStructures()
+  description = "Reloads all structures from disk"
+}
+
+literal("save") {
+  executes = saveStructures()
+  description = "Saves all structures"
+}
+
+literal("list") {
+  executes = listStructures()
+  description = "Lists currently existing structures"
+}
+
+literal("info").argument("struct", @struct) {
+  executes = showInfo()
+  description = "Shows structures info"
+}
+
+literal("delete").argument("struct", @struct) {
+  executes = deleteStructure()
+  description = "Deletes a structure"
+}
+
+literal("export").argument("struct", @struct).argument("type", @import_type) {
+  executes = exportStructure()
+  description = [
+    "Exports an FTC structure to either a",
+    "vanilla structure or to a .schema file"
+  ]
+
+  literal("to").argument("destpath", ftc_key) {
+    executes = exportStructure()
+    description = [
+      "Exports an FTC structure to either a",
+      "vanilla structure or to a .schema file",
+      "+ exports to it a specific file"
+    ]
+  }
+}
+
+literal("import").argument("type", @import_type).argument("filepath", ftc_key) {
+  executes = importStructure()
+  description = "Imports a vanilla structure or .schema file"
+
+  literal("as").argument("destpath", ftc_key) {
+    executes = importStructure()
+    description = [
+      "Imports a vanilla structure or .schema file",
+      "+ copies it to the structures directory with a specific name"
+    ]
+  }
+}
+
+literal("palettes") {
+  literal("add").argument("struct", @struct).argument("palette", ftc_key) {
+    argument("options", @create_options) {
+      executes = addPalette()
+      description = "Adds a palette to a structure + placement options"
+    }
+
+    executes = addPalette()
+    description = "Adds a palette to a structure"
+  }
+
+  literal("remove").argument("struct", @struct).argument("palette", ftc_key) {
+    suggests = suggestPalettes()
+    executes = removePalette()
+    description = "Removes a palette from a structure"
+  }
+}
+
+literal("header").argument("struct", @struct) {
+  transformer = addDataArguments()
+}

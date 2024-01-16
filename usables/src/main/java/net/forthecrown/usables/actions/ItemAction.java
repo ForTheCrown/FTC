@@ -1,5 +1,7 @@
 package net.forthecrown.usables.actions;
 
+import static net.forthecrown.usables.UsableCodecs.ITEM_LIST_OR_SINGLE;
+
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -17,13 +19,12 @@ import net.forthecrown.command.arguments.ItemListResult;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.usables.Action;
 import net.forthecrown.usables.Interaction;
+import net.forthecrown.usables.ObjectType;
 import net.forthecrown.usables.UsableComponent;
 import net.forthecrown.usables.Usables;
-import net.forthecrown.usables.ObjectType;
 import net.forthecrown.usables.objects.Kit;
 import net.forthecrown.usables.objects.UsableObject;
 import net.forthecrown.utils.inventory.ItemList;
-import net.forthecrown.utils.io.FtcCodecs;
 import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -103,14 +104,14 @@ class ItemActionType implements ObjectType<ItemAction> {
 
   @Override
   public <S> DataResult<ItemAction> load(Dynamic<S> dynamic) {
-    return FtcCodecs.ITEM_LIST_CODEC.decode(dynamic)
+    return ITEM_LIST_OR_SINGLE.decode(dynamic)
         .map(Pair::getFirst)
         .map(itemStacks -> new ItemAction(give, itemStacks));
   }
 
   @Override
   public <S> DataResult<S> save(@NotNull ItemAction value, @NotNull DynamicOps<S> ops) {
-    return FtcCodecs.ITEM_LIST_CODEC.encodeStart(ops, value.getList());
+    return ITEM_LIST_OR_SINGLE.encodeStart(ops, value.getList());
   }
 
   @Override

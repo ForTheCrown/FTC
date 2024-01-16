@@ -1,7 +1,7 @@
 package net.forthecrown.economy.market;
 
 import static net.forthecrown.economy.market.MarketEviction.SOURCE_AUTOMATIC;
-import static net.forthecrown.economy.market.MarketReset.TEMPLATE_DEPTH;
+import static net.forthecrown.economy.market.UnderShopReset.TEMPLATE_DEPTH;
 import static net.kyori.adventure.text.Component.text;
 
 import com.google.common.base.Strings;
@@ -26,6 +26,7 @@ import net.forthecrown.command.Exceptions;
 import net.forthecrown.economy.EconExceptions;
 import net.forthecrown.economy.EconMessages;
 import net.forthecrown.mail.Mail;
+import net.forthecrown.mail.MailSendFlag;
 import net.forthecrown.text.Text;
 import net.forthecrown.user.TimeField;
 import net.forthecrown.user.User;
@@ -139,7 +140,7 @@ public class MarketShop {
 
   @Getter
   @Setter
-  private MarketReset reset;
+  private UnderShopReset reset;
 
   private final List<MarketScan> scans = new ObjectArrayList<>();
 
@@ -305,6 +306,8 @@ public class MarketShop {
       return false;
     }
 
+    getWorldGuard()
+
     reset.place(Markets.getWorld());
     return true;
   }
@@ -318,7 +321,7 @@ public class MarketShop {
   public void attemptPurchase(User user) throws CommandSyntaxException {
     //If they already own a shop
     if (Markets.ownsShop(user)) {
-      if (owner.equals(user.getUniqueId())) {
+      if (user.getUniqueId().equals(owner)) {
         throw Exceptions.create("You already own THIS shop lol");
       }
 
@@ -392,7 +395,7 @@ public class MarketShop {
     Vector3i wgMin = fromWorldEdit(worldGuard.getMinimumPoint());
     Vector3i wgMax = fromWorldEdit(worldGuard.getMaximumPoint());
 
-    MarketReset reset = new MarketReset(
+    UnderShopReset reset = new UnderShopReset(
         wgMin,
         wgMin.sub(0, TEMPLATE_DEPTH, 0),
         wgMax.sub(wgMin)
@@ -619,10 +622,9 @@ public class MarketShop {
    * @throws IllegalArgumentException If the shop has no owner or is already
    *                                  marked for eviction
    */
-  public void beginEviction(long evictionDate,
-                            Component reason,
-                            String source
-  ) throws IllegalArgumentException {
+  public void beginEviction(long evictionDate, Component reason, String source)
+      throws IllegalArgumentException
+  {
     Validate.isTrue(hasOwner(), "Cannot evict shop with no owner");
     Validate.isTrue(!markedForEviction(),
         "Shop '%s' is already marked for eviction",
@@ -637,7 +639,7 @@ public class MarketShop {
     Mail mail = Mail.builder()
         .target(user)
         .message(EconMessages.evictionMail(data))
-        .send();
+        .send(MailSendFlag.NO_DISCORD);
 
     if (user.isOnline()) {
       user.sendMessage(EconMessages.evictionNotice(data));
@@ -926,7 +928,7 @@ public class MarketShop {
     }
 
     if (json.has(KEY_RESET)) {
-      reset = MarketReset.deserialize(json.get(KEY_RESET));
+      reset = UnderShopReset.deserialize(json.get(KEY_RESET));
     }
   }
 
